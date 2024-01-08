@@ -365,7 +365,7 @@ public class RobotContainer
   {
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
-    Alliance alliance = DriverStation.getAlliance( );
+    Alliance alliance = DriverStation.getAlliance( ).get();
 
     // The selected command will be run in autonomous
     switch (mode)

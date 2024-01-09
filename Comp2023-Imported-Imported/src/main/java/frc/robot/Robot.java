@@ -109,7 +109,7 @@ public class Robot extends TimedRobot
   public void disabledInit( )
   {
     DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
-        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get())));
+        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get( ))));
 
     m_robotContainer.m_vision.initialize( );
     m_robotContainer.m_led.initialize( );
@@ -146,7 +146,7 @@ public class Robot extends TimedRobot
   public void autonomousInit( )
   {
     DataLogManager.log(String.format("autonomousInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
-        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get())));
+        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get( ))));
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
 
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot
   public void teleopInit( )
   {
     DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
-        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get())));
+        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get( ))));
 
     m_robotContainer.m_swerve.enterTeleopMode( );
 
@@ -241,7 +241,7 @@ public class Robot extends TimedRobot
         return "Red";
       case Blue :
         return "Blue";
-      default:
+      default :
         return "Invalid";
     }
 

@@ -250,7 +250,7 @@ public class Vision extends SubsystemBase
 
   public boolean isAprilTagValid(int aprilTagID)
   {
-    if (DriverStation.getAlliance( ).get() == Alliance.Blue)
+    if (DriverStation.getAlliance( ).get( ) == Alliance.Blue)
       switch (aprilTagID)
       {
         case 4 :
@@ -261,7 +261,7 @@ public class Vision extends SubsystemBase
         default :
           return false;
       }
-    else if (DriverStation.getAlliance( ).get() == Alliance.Red)
+    else if (DriverStation.getAlliance( ).get( ) == Alliance.Red)
       switch (aprilTagID)
       {
         case 1 :

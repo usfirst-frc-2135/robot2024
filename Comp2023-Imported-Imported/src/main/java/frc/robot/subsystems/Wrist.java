@@ -87,7 +87,7 @@ public class Wrist extends SubsystemBase
   private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
   private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
-  private int                       m_counter         = 0;
+  // private int                       m_counter         = 0; // TODO
 
   // Constructor
   public Wrist(Elbow elbow)

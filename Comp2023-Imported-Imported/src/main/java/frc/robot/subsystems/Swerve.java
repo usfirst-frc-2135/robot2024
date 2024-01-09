@@ -358,7 +358,7 @@ public class Swerve extends SubsystemBase
     m_field.getObject("trajectory").setTrajectory(m_trajectory);
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
-    trajStates = m_trajectory.getStates();
+    trajStates = m_trajectory.getStates( );
     DataLogManager.log(String.format("%s: PATH states: %d duration: %.3f secs", getSubsystem( ), trajStates.size( ),
         m_trajectory.getTotalTimeSeconds( )));
 
@@ -366,7 +366,7 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       m_poseBeforePath = getPose( );
-      m_posePathStart = m_trajectory.getInitialTargetHolonomicPose();
+      m_posePathStart = m_trajectory.getInitialTargetHolonomicPose( );
       resetOdometry(m_posePathStart);
       m_isFieldRelative = false;
     }

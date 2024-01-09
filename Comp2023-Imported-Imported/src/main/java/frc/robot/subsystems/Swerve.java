@@ -356,6 +356,14 @@ public class Swerve extends SubsystemBase
     Trajectory newTrajectory = new Trajectory( );
     return newTrajectory;
   }
+  //TODO: update the PathPlannerTrajectorytoTrajectory method, add the functionality
+
+  public Trajectory.State PathPlannerTrajectoryStatetoTrajectoryState(PathPlannerTrajectory.State trajectoryState)
+  {
+    Trajectory.State newTrajectoryState = new Trajectory.State( );
+    return newTrajectoryState;
+  }
+  //TODO: update the PathPlannerTrajectoryStatetoTrajectoryState method, add the functionality
 
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
@@ -387,8 +395,9 @@ public class Swerve extends SubsystemBase
     PathPlannerTrajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
-        m_trajectory.getEndState( ).targetHolonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
+    ChassisSpeeds targetChassisSpeeds =
+        m_holonomicController.calculate(currentPose, PathPlannerTrajectoryStatetoTrajectoryState(trajState),
+            m_trajectory.getEndState( ).targetHolonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -403,12 +412,12 @@ public class Swerve extends SubsystemBase
     double currentBL = m_swerveMods[2].getState( ).speedMetersPerSecond;
     double currentBR = m_swerveMods[3].getState( ).speedMetersPerSecond;
 
-    double targetTrajX = trajState.poseMeters.getX( );
-    double targetTrajY = trajState.poseMeters.getY( );
+    double targetTrajX = trajState.positionMeters.getX( );
+    double targetTrajY = trajState.positionMeters.getY( );
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( );
+    double targetHeading = m_trajectory.getEndState( ).targetHolonomicRotation.getDegrees( );
     double currentHeading = currentPose.getRotation( ).getDegrees( );
 
     setModuleStates(moduleStates);
@@ -448,16 +457,17 @@ public class Swerve extends SubsystemBase
       SmartDashboard.putNumber(String.format("%s: PATH_targetTrajX", getSubsystem( )), currentTrajX);
       SmartDashboard.putNumber(String.format("%s: PATH_targetTrajY", getSubsystem( )), currentTrajY);
 
-      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorX", getSubsystem( )),
-          trajState.poseMeters.relativeTo(currentPose).getX( ));
-      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorY", getSubsystem( )),
-          trajState.poseMeters.relativeTo(currentPose).getY( ));
+      //SmartDashboard.putNumber(String.format("%s: PATH_trajErrorX", getSubsystem( )),
+      // trajState.positionMeters.relativeTo(currentPose).getX( ));
+      //SmartDashboard.putNumber(String.format("%s: PATH_trajErrorY", getSubsystem( )),
+      //trajState.positionMeters.relativeTo(currentPose).getY( ));
 
       // target heading and its error
       SmartDashboard.putNumber(String.format("%s: PATH_targetHeading", getSubsystem( )), targetHeading);
       SmartDashboard.putNumber(String.format("%s: PATH_currentHeading", getSubsystem( )), currentHeading);
-      SmartDashboard.putNumber(String.format("%s: PATH_headingError", getSubsystem( )),
-          trajState.poseMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
+      //SmartDashboard.putNumber(String.format("%s: PATH_headingError", getSubsystem( )),
+      // trajState.positionMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
+      //TODO: The problem is that relativeTo no longer exists. RelativeTo compares the currentPose to the trajState
     }
   }
 

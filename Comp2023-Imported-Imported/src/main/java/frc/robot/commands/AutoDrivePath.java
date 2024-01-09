@@ -40,6 +40,7 @@ public class AutoDrivePath extends Command
   {
     DataLogManager.log(String.format("%s: Running '%s'", getName( ), m_pathName));
     m_swerve.driveWithPathFollowerInit(m_trajectory, m_useInitialPose);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.

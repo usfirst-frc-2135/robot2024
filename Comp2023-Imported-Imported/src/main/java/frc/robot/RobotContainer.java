@@ -6,7 +6,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.DataLogManager;

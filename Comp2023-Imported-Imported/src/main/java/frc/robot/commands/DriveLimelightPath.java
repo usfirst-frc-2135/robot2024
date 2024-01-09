@@ -50,8 +50,8 @@ public class DriveLimelightPath extends Command
     if (m_goalPose != null)
     {
       PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(1.7, 2, 2 * Math.PI, 4 * Math.PI),
-          new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
-          new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( ), m_goalPose.getRotation( )));
+          new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( )),
+          new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( )));
 
       m_swerve.driveWithPathFollowerInit(trajectory, true);
     }

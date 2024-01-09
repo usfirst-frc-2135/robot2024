@@ -615,33 +615,35 @@ public class Constants
       AUTOPRECHARGE      // AutoPreloadAndEngageChargeStation
     }
 
-    public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
-    public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
+    public static final double                       kMaxSpeedMetersPerSecond                       = 2.2;
+    public static final double                       kMaxAccelerationMetersPerSecondSquared         = 2.3;
+    public static final double                       kMaxAngularVelocityRadiansPerSecond            = 2 * Math.PI;
+    public static final double                       kMaxAngularAccelerationRadiansPerSecondSquared = 4 * Math.PI;
 
-    public static final double                       kSlowSpeedMetersPerSecond                   = 1.7;
-    public static final double                       kSlowAccelerationMetersPerSecondSquared     = 2.0;
+    public static final double                       kSlowSpeedMetersPerSecond                      = 1.7;
+    public static final double                       kSlowAccelerationMetersPerSecondSquared        = 2.0;
 
-    public static final double                       kChargeSpeedMetersPerSecond                 = 4.0;
-    public static final double                       kChargeAccelerationMetersPerSecondSquared   = 6.0;
+    public static final double                       kChargeSpeedMetersPerSecond                    = 4.0;
+    public static final double                       kChargeAccelerationMetersPerSecondSquared      = 6.0;
 
-    public static final double                       kSlowMaxAngularSpeedRadiansPerSecond        = 0.8 * Math.PI;
-    public static final double                       kSlowMaxAngularSpeedRadiansPerSecondSquared =
+    public static final double                       kSlowMaxAngularSpeedRadiansPerSecond           = 0.8 * Math.PI;
+    public static final double                       kSlowMaxAngularSpeedRadiansPerSecondSquared    =
         Math.pow(kSlowMaxAngularSpeedRadiansPerSecond, 2);
 
-    public static final double                       kMaxAngularSpeedRadiansPerSecond            = 1.2 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared     =
+    public static final double                       kMaxAngularSpeedRadiansPerSecond               = 1.2 * Math.PI;
+    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared        =
         Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
 
-    public static final double                       kPXController                               = 1;
-    public static final double                       kPYController                               = 1;
-    public static final double                       kPThetaController                           = 5;
+    public static final double                       kPXController                                  = 1;
+    public static final double                       kPYController                                  = 1;
+    public static final double                       kPThetaController                              = 5;
 
     // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints                 =
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints                    =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
     // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kSlowThetaControllerConstraints             =
+    public static final TrapezoidProfile.Constraints kSlowThetaControllerConstraints                =
         new TrapezoidProfile.Constraints(kSlowMaxAngularSpeedRadiansPerSecond, kSlowMaxAngularSpeedRadiansPerSecondSquared);
 
     public static TrajectoryConfig createConfig(double maxSpeed, double maxAccel, double startSpeed, double endSpeed)
@@ -666,13 +668,16 @@ public class Constants
 
     // Path following constraints
     public static final PathConstraints  defaultPathConfig  =
-        new PathConstraints(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared);
+        new PathConstraints(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared, kMaxAngularVelocityRadiansPerSecond,
+            kMaxAngularAccelerationRadiansPerSecondSquared);
 
     public static final PathConstraints  slowPathConfig     =
-        new PathConstraints(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared);
+        new PathConstraints(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared,
+            kMaxAngularVelocityRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
 
     public static final PathConstraints  chargePathConfig   =
-        new PathConstraints(kChargeSpeedMetersPerSecond, kChargeAccelerationMetersPerSecondSquared);
+        new PathConstraints(kChargeSpeedMetersPerSecond, kChargeAccelerationMetersPerSecondSquared,
+            kMaxAngularVelocityRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
 }

@@ -65,6 +65,7 @@ public class Swerve extends SubsystemBase
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
   private PathPlannerTrajectory    m_trajectory;
+
   private Timer                    m_trajTimer         = new Timer( );
   private Pose2d                   m_poseBeforePath    = new Pose2d( );
   private Pose2d                   m_posePathStart     = new Pose2d( );
@@ -349,16 +350,23 @@ public class Swerve extends SubsystemBase
   //
   // Autonomous mode - Holonomic path follower
   //
+
+  public Trajectory PathPlannerTrajectorytoTrajectory(PathPlannerTrajectory trajectory)
+  {
+    Trajectory newTrajectory = new Trajectory( );
+    return newTrajectory;
+  }
+
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
     m_trajectory = trajectory;
 
     m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
-    m_field.getObject("trajectory").setTrajectory(m_trajectory);
+    m_field.getObject("trajectory").setTrajectory(PathPlannerTrajectorytoTrajectory(m_trajectory));
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
-    trajStates = m_trajectory.getStates( );
+    trajStates = PathPlannerTrajectorytoTrajectory(m_trajectory).getStates( );
     DataLogManager.log(String.format("%s: PATH states: %d duration: %.3f secs", getSubsystem( ), trajStates.size( ),
         m_trajectory.getTotalTimeSeconds( )));
 
@@ -376,11 +384,11 @@ public class Swerve extends SubsystemBase
 
   public void driveWithPathFollowerExecute( )
   {
-    Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
+    PathPlannerTrajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
     ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
-        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
+        m_trajectory.getEndState( ).targetHolonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);

@@ -3,10 +3,9 @@
 //
 package frc.robot.commands;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,9 +49,8 @@ public class DriveLimelightPath extends Command
 
     if (m_goalPose != null)
     {
-      PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(1.7, 2),
-          new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
-          new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( ), m_goalPose.getRotation( )));
+      PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(1.7, 2, 2 * Math.PI, 4 * Math.PI),
+          new PathPoint(currentPose.getTranslation( )), new PathPoint(m_goalPose.getTranslation( )));
 
       m_swerve.driveWithPathFollowerInit(trajectory, true);
     }

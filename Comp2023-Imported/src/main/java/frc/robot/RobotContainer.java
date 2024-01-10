@@ -6,8 +6,7 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -365,7 +364,7 @@ public class RobotContainer
   {
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
-    Alliance alliance = DriverStation.getAlliance( );
+    Alliance alliance = DriverStation.getAlliance( ).get( );
 
     // The selected command will be run in autonomous
     switch (mode)

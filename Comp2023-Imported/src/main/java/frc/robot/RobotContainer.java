@@ -6,8 +6,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -388,7 +391,8 @@ public class RobotContainer
     }
 
     if (pathName != null)
-      m_autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
+      m_autoTrajectory =
+          new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d(0, 0));
 
     switch (mode)
     {

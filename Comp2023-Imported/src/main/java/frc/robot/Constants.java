@@ -12,7 +12,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -287,7 +286,7 @@ public class Constants
 
     // CANCoder elbow absolute offset
     public static final double               kCompOffset               = 0.0203;  // CANCoder offset rotations for comp bot
-    public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
+    public static final double               kBetaOffset               = 0.000;   // CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual mode config parameters
@@ -422,8 +421,8 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
 
     // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = 0.083252; // CANCoder offset angle for comp bot
-    public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
+    public static final double               kCompOffset               = 0.08325; // CANCoder offset angle for comp bot
+    public static final double               kBetaOffset               = 0.000;   // CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual config parameters

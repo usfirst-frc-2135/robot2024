@@ -52,7 +52,7 @@ public class Extension extends SubsystemBase
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final ElevatorSim         m_armSim          = new ElevatorSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio,
-      EXConsts.kForearmMassKg, EXConsts.kDrumRadiusMeters, -EXConsts.kLengthMax, EXConsts.kLengthMax, false,0.0);
+      EXConsts.kForearmMassKg, EXConsts.kDrumRadiusMeters, -EXConsts.kLengthMax, EXConsts.kLengthMax, false, 0.0);
 
   // Mechanism2d
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
@@ -329,7 +329,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveToPositionIsFinished( )
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(1.25);//EXConsts.kMMSafetyTimeoutRatio); //TODO: check
+    boolean timedOut = m_safetyTimer.hasElapsed(1.25);
     double error = m_targetInches - m_currentInches;
     boolean hittingHardStop = (m_targetInches <= 0.0) && (m_currentInches <= 1.0) && (m_hardStopCounter++ >= 10);
 

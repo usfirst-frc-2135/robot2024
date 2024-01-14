@@ -55,7 +55,7 @@ public class Wrist extends SubsystemBase
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final CANcoderSimState    m_CANCoderSim     = m_CANCoder.getSimState( );
   private final SingleJointedArmSim m_armSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1), WRConsts.kGearRatio, 1.0,
-      WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);
+      WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
@@ -87,7 +87,7 @@ public class Wrist extends SubsystemBase
   private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
   private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
-  private int                       m_counter         = 0;
+  // private int                       m_counter         = 0; // TODO
 
   // Constructor
   public Wrist(Elbow elbow)
@@ -101,7 +101,7 @@ public class Wrist extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentDegrees = getCANCoderDegrees( );
-    m_motor.setRotorPosition(Conversions.degreesToInputRotations(m_currentDegrees, WRConsts.kGearRatio));
+    m_motor.setPosition(Conversions.degreesToInputRotations(m_currentDegrees, WRConsts.kGearRatio));
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -246,7 +246,7 @@ public class Wrist extends SubsystemBase
   public void resetPositionToZero( )
   {
     if (m_motorValid)
-      m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
+      m_motor.setPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
   }
 
   public void setStopped( )

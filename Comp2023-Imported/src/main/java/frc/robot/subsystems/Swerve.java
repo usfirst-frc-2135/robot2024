@@ -87,6 +87,7 @@ public class Swerve extends SubsystemBase
   // Path following
   private int                      m_pathDebug         = 1;     // Debug flag to disable extra ramsete logging calls
   private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
+  private List<Trajectory.State>   trajStates          = new ArrayList<Trajectory.State>( );
 
   // Limelight drive
   private double                   m_turnConstant      = LLConsts.kTurnConstant;
@@ -353,19 +354,22 @@ public class Swerve extends SubsystemBase
 
   public Trajectory PathPlannerTrajectorytoTrajectory(PathPlannerTrajectory trajectory)
   {
-    Trajectory newTrajectory = new Trajectory( );
+    trajStates.clear( );
+    for (PathPlannerTrajectory.State state : trajectory.getStates( ))
+    {
+      trajStates.add(PathPlannerTrajectoryStatetoTrajectoryState(state));
+    }
+    Trajectory newTrajectory = new Trajectory(trajStates);
     return newTrajectory;
   }
 
-  //TODO: update the PathPlannerTrajectorytoTrajectory method, add the functionality
-
   public Trajectory.State PathPlannerTrajectoryStatetoTrajectoryState(PathPlannerTrajectory.State trajectoryState)
   {
-    Trajectory.State newTrajectoryState = new Trajectory.State( );
+    Trajectory.State newTrajectoryState =
+        new Trajectory.State(trajectoryState.timeSeconds, trajectoryState.velocityMps, trajectoryState.accelerationMpsSq,
+            new Pose2d(trajectoryState.positionMeters, trajectoryState.heading), trajectoryState.curvatureRadPerMeter);
     return newTrajectoryState;
   }
-
-  //TODO: update the PathPlannerTrajectoryStatetoTrajectoryState method, add the functionality
 
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {

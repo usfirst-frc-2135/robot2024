@@ -612,7 +612,8 @@ public class Constants
       AUTOPRESTOP,        // AutoPreloadAndStop
       AUTOPRECOMSHORT,    // AutoPreloadAndDriveOffCommunityShort
       AUTOPRECOMLONG,     // AutoPreloadAndDriveOffCommunityLong
-      AUTOPRECHARGE      // AutoPreloadAndEngageChargeStation
+      AUTOPRECHARGE,      // AutoPreloadAndEngageChargeStation
+      AUTOEXAMPLE
     }
 
     public static final double                       kMaxSpeedMetersPerSecond                       = 2.2;

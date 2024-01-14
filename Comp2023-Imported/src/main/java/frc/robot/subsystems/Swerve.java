@@ -356,6 +356,7 @@ public class Swerve extends SubsystemBase
     Trajectory newTrajectory = new Trajectory( );
     return newTrajectory;
   }
+
   //TODO: update the PathPlannerTrajectorytoTrajectory method, add the functionality
 
   public Trajectory.State PathPlannerTrajectoryStatetoTrajectoryState(PathPlannerTrajectory.State trajectoryState)
@@ -363,6 +364,7 @@ public class Swerve extends SubsystemBase
     Trajectory.State newTrajectoryState = new Trajectory.State( );
     return newTrajectoryState;
   }
+
   //TODO: update the PathPlannerTrajectoryStatetoTrajectoryState method, add the functionality
 
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
@@ -395,9 +397,8 @@ public class Swerve extends SubsystemBase
     PathPlannerTrajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    ChassisSpeeds targetChassisSpeeds =
-        m_holonomicController.calculate(currentPose, PathPlannerTrajectoryStatetoTrajectoryState(trajState),
-            m_trajectory.getEndState( ).targetHolonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
+    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose,
+        PathPlannerTrajectoryStatetoTrajectoryState(trajState), m_trajectory.getEndState( ).targetHolonomicRotation);
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -465,9 +466,6 @@ public class Swerve extends SubsystemBase
       // target heading and its error
       SmartDashboard.putNumber(String.format("%s: PATH_targetHeading", getSubsystem( )), targetHeading);
       SmartDashboard.putNumber(String.format("%s: PATH_currentHeading", getSubsystem( )), currentHeading);
-      //SmartDashboard.putNumber(String.format("%s: PATH_headingError", getSubsystem( )),
-      // trajState.positionMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
-      //TODO: The problem is that relativeTo no longer exists. RelativeTo compares the currentPose to the trajState
     }
   }
 

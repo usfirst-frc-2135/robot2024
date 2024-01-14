@@ -6,8 +6,6 @@ package frc.robot;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -108,8 +106,8 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit( )
   {
-    DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
-        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get( ))));
+    DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
+        DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
     m_robotContainer.m_vision.initialize( );
     m_robotContainer.m_led.initialize( );
@@ -145,8 +143,8 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit( )
   {
-    DataLogManager.log(String.format("autonomousInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
-        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get( ))));
+    DataLogManager.log(String.format("autonomousInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
+        DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
 
@@ -167,8 +165,8 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit( )
   {
-    DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
-        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ).get( ))));
+    DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
+        DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
     m_robotContainer.m_swerve.enterTeleopMode( );
 
@@ -213,39 +211,6 @@ public class Robot extends TimedRobot
   @Override
   public void testPeriodic( )
   {}
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private String matchTypeToString(MatchType matchType)
-  {
-    switch (matchType)
-    {
-      case None :
-        return "N";
-      case Practice :
-        return "P";
-      case Qualification :
-        return "Q";
-      case Elimination :
-        return "E";
-    }
-
-    return "<unknown>";
-  }
-
-  private String allianceToString(Alliance alliance)
-  {
-    switch (alliance)
-    {
-      case Red :
-        return "Red";
-      case Blue :
-        return "Blue";
-      default :
-        return "Invalid";
-    }
-
-  }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////
 

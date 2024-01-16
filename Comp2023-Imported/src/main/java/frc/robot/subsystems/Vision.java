@@ -244,13 +244,12 @@ public class Vision extends SubsystemBase
   {
     Transform2d deltaTransform = currentPose.minus(llPose);
 
-    // TODO: This should probably be the magnitude of the hypotenuse of the transform (linear distance)
-    return (((Math.abs(deltaTransform.getX( )) < 1.0) && ((Math.abs(deltaTransform.getY( )) < 1.0))));
+    return Math.hypot(deltaTransform.getX( ), deltaTransform.getY( )) < 1.0;
   }
 
   public boolean isAprilTagValid(int aprilTagID)
   {
-    if (DriverStation.getAlliance( ) == Alliance.Blue)
+    if (DriverStation.getAlliance( ).get( ) == Alliance.Blue)
       switch (aprilTagID)
       {
         case 4 :
@@ -261,7 +260,7 @@ public class Vision extends SubsystemBase
         default :
           return false;
       }
-    else if (DriverStation.getAlliance( ) == Alliance.Red)
+    else if (DriverStation.getAlliance( ).get( ) == Alliance.Red)
       switch (aprilTagID)
       {
         case 1 :

@@ -15,7 +15,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -53,7 +52,7 @@ public class Extension extends SubsystemBase
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final ElevatorSim         m_armSim          = new ElevatorSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio,
-      EXConsts.kForearmMassKg, EXConsts.kDrumRadiusMeters, -EXConsts.kLengthMax, EXConsts.kLengthMax, false);
+      EXConsts.kForearmMassKg, EXConsts.kDrumRadiusMeters, -EXConsts.kLengthMax, EXConsts.kLengthMax, false, 0.0);
 
   // Mechanism2d
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
@@ -96,7 +95,7 @@ public class Extension extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentInches = 0;  //NOTE: Don't call getCurrentInches( );
-    m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
+    m_motor.setPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -228,7 +227,7 @@ public class Extension extends SubsystemBase
   public void resetPositionToZero( )
   {
     if (m_motorValid)
-      m_motor.setRotorPosition(Conversions.inchesToWinchRotations(0, EXConsts.kRolloutRatio));
+      m_motor.setPosition(Conversions.inchesToWinchRotations(0, EXConsts.kRolloutRatio));
   }
 
   public void setStopped( )
@@ -330,7 +329,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveToPositionIsFinished( )
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(1.25);//EXConsts.kMMSafetyTimeoutRatio); //TODO: check
+    boolean timedOut = m_safetyTimer.hasElapsed(1.25);
     double error = m_targetInches - m_currentInches;
     boolean hittingHardStop = (m_targetInches <= 0.0) && (m_currentInches <= 1.0) && (m_hardStopCounter++ >= 10);
 

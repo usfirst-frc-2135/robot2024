@@ -1,0 +1,60 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/ArmSetHeightIdle": "Command",
+      "/SmartDashboard/ArmSetHeightScoreHigh": "Command",
+      "/SmartDashboard/ArmSetHeightScoreLow": "Command",
+      "/SmartDashboard/ArmSetHeightScoreMid": "Command",
+      "/SmartDashboard/ArmSetHeightStow": "Command",
+      "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/AutoChooserRun": "Command",
+      "/SmartDashboard/AutoDriveBalance": "Command",
+      "/SmartDashboard/DriveLLLeft": "Command",
+      "/SmartDashboard/DriveLLMiddle": "Command",
+      "/SmartDashboard/DriveLLRight": "Command",
+      "/SmartDashboard/DriveResetOdometry": "Command",
+      "/SmartDashboard/Dummy": "Command",
+      "/SmartDashboard/ElbowHigh": "Command",
+      "/SmartDashboard/ElbowIdle": "Command",
+      "/SmartDashboard/ElbowLow": "Command",
+      "/SmartDashboard/ElbowMech": "Mechanism2d",
+      "/SmartDashboard/ElbowMid": "Command",
+      "/SmartDashboard/ElbowSetAngleToZero": "Command",
+      "/SmartDashboard/ElbowShelf": "Command",
+      "/SmartDashboard/ElbowStow": "Command",
+      "/SmartDashboard/ExtensionCalibrate": "Command",
+      "/SmartDashboard/ExtensionHigh": "Command",
+      "/SmartDashboard/ExtensionIdle": "Command",
+      "/SmartDashboard/ExtensionLow": "Command",
+      "/SmartDashboard/ExtensionMech": "Mechanism2d",
+      "/SmartDashboard/ExtensionMid": "Command",
+      "/SmartDashboard/ExtensionShelf": "Command",
+      "/SmartDashboard/ExtensionStow": "Command",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/GripperAcquire": "Command",
+      "/SmartDashboard/GripperExpel": "Command",
+      "/SmartDashboard/GripperHold": "Command",
+      "/SmartDashboard/GripperStop": "Command",
+      "/SmartDashboard/LEDSet": "Command",
+      "/SmartDashboard/LED_Color": "String Chooser",
+      "/SmartDashboard/Reset Odometry Mode": "String Chooser",
+      "/SmartDashboard/WristHigh": "Command",
+      "/SmartDashboard/WristIdle": "Command",
+      "/SmartDashboard/WristLow": "Command",
+      "/SmartDashboard/WristMech": "Mechanism2d",
+      "/SmartDashboard/WristMid": "Command",
+      "/SmartDashboard/WristRunBrake": "Command",
+      "/SmartDashboard/WristRunConstant": "Command",
+      "/SmartDashboard/WristSetAngleToZero": "Command",
+      "/SmartDashboard/WristShelf": "Command",
+      "/SmartDashboard/WristStow": "Command"
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
+  }
+}

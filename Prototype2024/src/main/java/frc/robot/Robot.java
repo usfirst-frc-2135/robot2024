@@ -78,7 +78,7 @@ public class Robot extends TimedRobot
 
 
     m_motor1.set(motorOutput); 
-    m_motor2.set(motorOutput); 
+    m_motor2.set(-1*motorOutput); 
     SmartDashboard.putNumber("MotorVoltage", motorOutput);
     
   }

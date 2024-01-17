@@ -24,7 +24,7 @@ public class AutoDrivePath extends Command
     m_swerve = swerve;
     m_pathName = pathName;
     m_trajectory = trajectory;
-    m_useInitialPose = useInitialPose;
+    m_useInitialPose = false;//useInitialPose;
 
     setName("AutoDrivePath");
     addRequirements(m_swerve);

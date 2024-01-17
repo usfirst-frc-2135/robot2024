@@ -392,12 +392,20 @@ public class Swerve extends SubsystemBase
       resetOdometry(m_posePathStart);
       m_isFieldRelative = false;
     }
+    else
+    {
+      updateSwerveOdometry( );
+      resetOdometry(m_poseEstimator.getEstimatedPosition( ));
+    }
 
     m_trajTimer.restart( );
   }
 
   public void driveWithPathFollowerExecute( )
   {
+
+    //TODO: Add a check for the current estimated robot position
+
     PathPlannerTrajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
@@ -481,7 +489,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.120));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.120)); // TODO: Give more time if the robot needs to adjust more
   }
 
   public void driveWithPathFollowerEnd( )

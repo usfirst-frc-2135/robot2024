@@ -24,7 +24,7 @@ public class AutoDrivePath extends Command
     m_swerve = swerve;
     m_pathName = pathName;
     m_trajectory = trajectory;
-    m_useInitialPose = false;//useInitialPose;
+    m_useInitialPose = useInitialPose;
 
     setName("AutoDrivePath");
     addRequirements(m_swerve);
@@ -47,7 +47,7 @@ public class AutoDrivePath extends Command
   @Override
   public void execute( )
   {
-    m_swerve.driveWithPathFollowerExecute( );
+    m_swerve.driveWithPathFollowerExecute(m_useInitialPose);
   }
 
   // Called once the command ends or is interrupted.

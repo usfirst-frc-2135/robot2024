@@ -87,7 +87,6 @@ public class Swerve extends SubsystemBase
   // Path following
   private int                      m_pathDebug         = 1;     // Debug flag to disable extra ramsete logging calls
   private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
-  private List<Trajectory.State>   trajStates          = new ArrayList<Trajectory.State>( );
 
   // Limelight drive
   private double                   m_turnConstant      = LLConsts.kTurnConstant;
@@ -352,23 +351,22 @@ public class Swerve extends SubsystemBase
   // Autonomous mode - Holonomic path follower
   //
 
-  public Trajectory PathPlannerTrajectorytoTrajectory(PathPlannerTrajectory trajectory)
+  public Trajectory PPTrajtoWPITraj(PathPlannerTrajectory trajectory)
   {
+    List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
     trajStates.clear( );
+
     for (PathPlannerTrajectory.State state : trajectory.getStates( ))
     {
-      trajStates.add(PathPlannerTrajectoryStatetoTrajectoryState(state));
+      trajStates.add(PPTrajStatetoWPITrajState(state));
     }
-    Trajectory newTrajectory = new Trajectory(trajStates);
-    return newTrajectory;
+    return new Trajectory(trajStates);
   }
 
-  public Trajectory.State PathPlannerTrajectoryStatetoTrajectoryState(PathPlannerTrajectory.State trajectoryState)
+  public Trajectory.State PPTrajStatetoWPITrajState(PathPlannerTrajectory.State trajectoryState)
   {
-    Trajectory.State newTrajectoryState =
-        new Trajectory.State(trajectoryState.timeSeconds, trajectoryState.velocityMps, trajectoryState.accelerationMpsSq,
-            new Pose2d(trajectoryState.positionMeters, trajectoryState.heading), trajectoryState.curvatureRadPerMeter);
-    return newTrajectoryState;
+    return new Trajectory.State(trajectoryState.timeSeconds, trajectoryState.velocityMps, trajectoryState.accelerationMpsSq,
+        new Pose2d(trajectoryState.positionMeters, trajectoryState.heading), trajectoryState.curvatureRadPerMeter);
   }
 
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
@@ -377,10 +375,10 @@ public class Swerve extends SubsystemBase
 
     m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
-    m_field.getObject("trajectory").setTrajectory(PathPlannerTrajectorytoTrajectory(m_trajectory));
+    m_field.getObject("trajectory").setTrajectory(PPTrajtoWPITraj(m_trajectory));
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
-    trajStates = PathPlannerTrajectorytoTrajectory(m_trajectory).getStates( );
+    trajStates = PPTrajtoWPITraj(m_trajectory).getStates( );
     DataLogManager.log(String.format("%s: PATH states: %d duration: %.3f secs", getSubsystem( ), trajStates.size( ),
         m_trajectory.getTotalTimeSeconds( )));
 
@@ -392,25 +390,24 @@ public class Swerve extends SubsystemBase
       resetOdometry(m_posePathStart);
       m_isFieldRelative = false;
     }
-    else
-    {
-      updateSwerveOdometry( );
+    else  // Adds a check for the current estimated robot position
       resetOdometry(m_poseEstimator.getEstimatedPosition( ));
-    }
 
     m_trajTimer.restart( );
   }
 
-  public void driveWithPathFollowerExecute( )
+  public void driveWithPathFollowerExecute(boolean useInitialPose)
   {
-
-    //TODO: Add a check for the current estimated robot position
-
+    /*
+     * TODO: Needs to be tested
+     * if (!useInitialPose) // Adds a check for the current estimated robot position
+     * resetOdometry(m_poseEstimator.getEstimatedPosition( ));
+     */
     PathPlannerTrajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose,
-        PathPlannerTrajectoryStatetoTrajectoryState(trajState), m_trajectory.getEndState( ).targetHolonomicRotation);
+    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, PPTrajStatetoWPITrajState(trajState),
+        m_trajectory.getEndState( ).targetHolonomicRotation);
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -489,7 +486,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.120)); // TODO: Give more time if the robot needs to adjust more
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.120));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -576,9 +573,9 @@ public class Swerve extends SubsystemBase
           ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation, m_pigeon.getYaw( ))
           : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
     }
-
+    //
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SWConsts.maxSpeed);
-
+    //
     for (SwerveModule mod : m_swerveMods)
       mod.setDesiredState(swerveModuleStates[mod.m_moduleNumber], isOpenLoop);
   }

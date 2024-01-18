@@ -58,7 +58,7 @@ public class DriveLimelightPath extends Command
   {
     if (m_goalPose != null)
     {
-      m_swerve.driveWithPathFollowerExecute( );
+      m_swerve.driveWithPathFollowerExecute(true); //Sets Path to not check for current position
     }
   }
 

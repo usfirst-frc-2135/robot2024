@@ -70,7 +70,7 @@ public class Swerve extends SubsystemBase
   private Pose2d                   m_poseBeforePath    = new Pose2d( );
   private Pose2d                   m_posePathStart     = new Pose2d( );
   private boolean                  m_isFieldRelative   = true;
-  private boolean                  m_allowPoseEstimate = false;
+  private boolean                  m_allowPoseEstimate = true;
 
   // Module variables
   private boolean                  m_isSnapping;
@@ -166,6 +166,8 @@ public class Swerve extends SubsystemBase
     // swTab.add("SWM0_Velocity", m_swerveMods[0].getState( ).speedMetersPerSecond).withPosition(0, 0).withSize(2, 1);
 
     SmartDashboard.putData("Field", m_field);
+    // pose
+
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -206,6 +208,10 @@ public class Swerve extends SubsystemBase
 
   private void updateSmartDashboard( )
   {
+    SmartDashboard.putNumber("poseEstimationX", m_poseEstimator.getEstimatedPosition( ).getX( ));
+    SmartDashboard.putNumber("poseEstimationY", m_poseEstimator.getEstimatedPosition( ).getY( ));
+    SmartDashboard.putNumber("poseEstimationRotation", m_poseEstimator.getEstimatedPosition( ).getRotation( ).getDegrees( ));
+
     if (m_swerveDebug)
     {
       for (int i = 0; i < 4; i++)
@@ -275,7 +281,6 @@ public class Swerve extends SubsystemBase
 
       return;
     }
-
     // get turn value - just horizontal offset from target
     double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
 

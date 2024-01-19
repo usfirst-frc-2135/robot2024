@@ -144,7 +144,20 @@ public class Swerve extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-    // This method will be called once per scheduler run when in simulation
+
+    if (m_allowPoseEstimate)
+    {
+      Pose2d botLLPose = m_vision.getLimelightValidPose(getPose( ));
+      double latency = m_vision.getTargetLatency( );
+
+      //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+      if (botLLPose != null && DriverStation.isTeleopEnabled( ))
+        m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+
+      resetOdometry(botLLPose);
+
+    }
+
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.

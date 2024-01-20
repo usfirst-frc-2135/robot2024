@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,42 +40,47 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic( )
   {
-    double motorOutput = 0.0;
-    if (m_controller.getBButton())
-      motorOutput = 0.5;
-    else if (m_controller.getYButton( ))
-      motorOutput = (SmartDashboard.getNumber("CustomSpeed", motorOutput));
-    else if (m_controller.getAButton( ))
-      motorOutput = 1;
-    else if (m_controller.getLeftBumper())
-    {
-      double stickValue= m_controller.getRightY();
-      double stickDeadband = MathUtil.applyDeadband(stickValue, 0.15);
-      motorOutput = stickDeadband;
-    }
-    else if (m_controller.getRightBumper()){
-      if (m_controller.getXButton( ) && m_controller.getRightBumper()){
-        m_goal = new TrapezoidProfile.State(goal_1, 0);
-        SmartDashboard.putString("tester", "totally");
+    if (m_controller.getLeftBumper())
+    { 
+      double motorOutput = 0.0;
+      if (m_controller.getYButton( ))
+        motorOutput = (SmartDashboard.getNumber("CustomSpeed", motorOutput)); //custom from -1 to 1 [negative is backwards]
+      else if (m_controller.getLeftBumper())
+      {
+        double stickValue= m_controller.getRightY();
+        double stickDeadband = MathUtil.applyDeadband(stickValue, 0.15);
+        motorOutput = stickDeadband;
       }
-      else if (m_controller.getBButton( ) && m_controller.getRightBumper())
+      m_motor1.set(motorOutput); 
+      m_motor2.set(-1*motorOutput); 
+      SmartDashboard.putNumber("MotorVoltage", motorOutput); 
+    }
+    
+    else if (m_controller.getRightBumper()){
+
+      if (m_controller.getXButton( ))
+      {
+        m_goal = new TrapezoidProfile.State(goal_1, 0);
+        DataLogManager.log("goal: " + m_goal);
+      }
+      else if (m_controller.getBButton( ))
+      {
         m_goal = new TrapezoidProfile.State(goal_2, 0);
+        DataLogManager.log("goal: " + m_goal);
+      }  
       SmartDashboard.putNumber("0-goal", m_goal.position);
+      DataLogManager.log("goal position: " + m_goal.position);
       TrapezoidProfile profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
       m_setpoint = profile.calculate(kDt);
       m_motor1.setSetpoint(PIDMode.kPosition, m_setpoint.position, 0.0);
-      SmartDashboard.putString("tester", "out");
+      //SmartDashboard.putString("tester", "1");
       SmartDashboard.putNumber("1-setpoint", m_setpoint.position);
-    }
 
-    //#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//#//
-    // m_motor1.set(motorOutput); 
-    // m_motor2.set(-1*motorOutput); 
-    // SmartDashboard.putNumber("MotorVoltage", motorOutput); 
+    }    
   }
 
   @Override
-  public void robotPeriodic( )
+  public void robotPeriodic()
   {
     m_motor1.periodic();
     m_motor2.periodic();

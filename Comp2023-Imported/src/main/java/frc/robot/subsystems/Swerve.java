@@ -111,6 +111,8 @@ public class Swerve extends SubsystemBase
   private PIDController            m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
+  private Pose2d                   m_botLLPose         = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
+
   // define theta controller for robot heading
   private PIDController            m_xController       = new PIDController(1, 0, 0);
   private PIDController            m_yController       = new PIDController(1, 0, 0);
@@ -144,17 +146,17 @@ public class Swerve extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-
     if (m_allowPoseEstimate)
     {
-      Pose2d botLLPose = m_vision.getLimelightValidPose(getPose( ));
+
+      m_botLLPose = m_vision.getLimelightValidPose(getPose( ));
       double latency = m_vision.getTargetLatency( );
 
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-      if (botLLPose != null && DriverStation.isTeleopEnabled( ))
-        m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+      if (m_botLLPose != null && DriverStation.isTeleopEnabled( ))
+        m_poseEstimator.addVisionMeasurement(m_botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
 
-      resetOdometry(botLLPose);
+      resetOdometry(m_botLLPose);
 
     }
 
@@ -514,7 +516,11 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    m_poseEstimator.resetPosition(m_heading, getPositions( ), pose);
+    DataLogManager.log("heading " + m_heading);
+    DataLogManager.log("positions " + getPositions( ));
+    DataLogManager.log("pose " + pose);
+
+    m_poseEstimator.resetPosition(m_heading, getPositions( ), new Pose2d( )); //pose);
     DataLogManager.log(String.format("%s: Reset position   : %s Gyro : %s", getSubsystem( ),
         m_poseEstimator.getEstimatedPosition( ).toString( ), m_heading.toString( )));
   }

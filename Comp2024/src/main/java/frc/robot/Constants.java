@@ -64,40 +64,40 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class Ports
   {
-    public static final String kCANCarnivore     = "canivore1";
-    public static final String kCANRio           = "rio";
+    public static final String kCANCarnivore              = "canivore1";
+    public static final String kCANRio                    = "rio";
 
     // CANivore CAN IDs - Swerve
-    public static final int    kCANID_DriveLF    = 1;
-    public static final int    kCANID_AngleLF    = 2;
-    public static final int    kCANID_CANCoderLF = 3;
+    public static final int    kCANID_DriveLF             = 1;
+    public static final int    kCANID_AngleLF             = 2;
+    public static final int    kCANID_CANCoderLF          = 3;
 
-    public static final int    kCANID_DriveRF    = 4;
-    public static final int    kCANID_AngleRF    = 5;
-    public static final int    kCANID_CANCoderRF = 6;
+    public static final int    kCANID_DriveRF             = 4;
+    public static final int    kCANID_AngleRF             = 5;
+    public static final int    kCANID_CANCoderRF          = 6;
 
-    public static final int    kCANID_DriveLR    = 7;
-    public static final int    kCANID_AngleLR    = 8;
-    public static final int    kCANID_CANCoderLR = 9;
+    public static final int    kCANID_DriveLR             = 7;
+    public static final int    kCANID_AngleLR             = 8;
+    public static final int    kCANID_CANCoderLR          = 9;
 
-    public static final int    kCANID_DriveRR    = 10;
-    public static final int    kCANID_AngleRR    = 11;
-    public static final int    kCANID_CANCoderRR = 12;
+    public static final int    kCANID_DriveRR             = 10;
+    public static final int    kCANID_AngleRR             = 11;
+    public static final int    kCANID_CANCoderRR          = 12;
 
-    public static final int    kCANID_Pigeon2    = 13;
+    public static final int    kCANID_Pigeon2             = 13;
 
     // RoboRIO CAN IDs
-    public static final int    kCANID_Elbow      = 15;
-    public static final int    kCANID_ELCANCoder = 16;
+    public static final int    kCANID_Intake              = 15;
+    public static final int    kCANID_IntakeCANCoder      = 16;
 
-    public static final int    kCANID_Extension  = 17;
+    public static final int    kCANID_IntakeRotor         = 17;
+    public static final int    kCANID_IntakeRotorCANCoder = 18;
 
-    public static final int    kCANID_Wrist      = 19;
-    public static final int    kCANID_WRCANCoder = 20;
+    public static final int    kCANID_IntakeRollers       = 19;
 
-    public static final int    kCANID_Gripper    = 21;
+    public static final int    kCANID_Shooter             = 20;
 
-    public static final int    kCANID_CANdle     = 0;
+    public static final int    kCANID_CANdle              = 0;
 
     // Digital I/Os
     // public static final int    kDIO_ExampleDetect = 2;

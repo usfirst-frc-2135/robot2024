@@ -10,82 +10,102 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
+public class Robot extends TimedRobot
+{
+  private Command        m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
-  private final boolean UseLimelight = false;
+  private final boolean  UseLimelight = false;
 
   @Override
-  public void robotInit() {
-    m_robotContainer = new RobotContainer();
+  public void robotInit( )
+  {
+    m_robotContainer = new RobotContainer( );
 
-    m_robotContainer.drivetrain.getDaqThread().setThreadPriority(99);
+    m_robotContainer.drivetrain.getDaqThread( ).setThreadPriority(99);
   }
+
   @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run(); 
-    if (UseLimelight) {    
+  public void robotPeriodic( )
+  {
+    CommandScheduler.getInstance( ).run( );
+    if (UseLimelight)
+    {
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
-      Pose2d llPose = lastResult.getBotPose2d_wpiBlue();
+      Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
-      if (lastResult.valid) {
-        m_robotContainer.drivetrain.addVisionMeasurement(llPose, Timer.getFPGATimestamp());
+      if (lastResult.valid)
+      {
+        m_robotContainer.drivetrain.addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit( )
+  {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic( )
+  {}
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit( )
+  {}
 
   @Override
-  public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+  public void autonomousInit( )
+  {
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (m_autonomousCommand != null)
+    {
+      m_autonomousCommand.schedule( );
     }
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic( )
+  {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit( )
+  {}
 
   @Override
-  public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+  public void teleopInit( )
+  {
+    if (m_autonomousCommand != null)
+    {
+      m_autonomousCommand.cancel( );
     }
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic( )
+  {}
 
   @Override
-  public void teleopExit() {
+  public void teleopExit( )
+  {}
+
+  @Override
+  public void testInit( )
+  {
+    CommandScheduler.getInstance( ).cancelAll( );
   }
 
   @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+  public void testPeriodic( )
+  {}
 
   @Override
-  public void testPeriodic() {}
+  public void testExit( )
+  {}
 
   @Override
-  public void testExit() {}
-
-  @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic( )
+  {}
 }

@@ -427,7 +427,7 @@ public class RobotContainer
             "AutoPreloadMidAndEngageChargeStation", m_autoTrajectory);
         break;
       case AUTOTESTPATH :
-        m_autoCommand = new AutoDrivePath(m_swerve, "DriveExample", m_autoTrajectory, true);
+        m_autoCommand = new AutoDrivePath(m_swerve, "DriveExample", m_autoTrajectory, false);
         break;
     }
 

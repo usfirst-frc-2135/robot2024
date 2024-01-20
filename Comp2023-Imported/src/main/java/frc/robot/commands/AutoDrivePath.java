@@ -47,7 +47,7 @@ public class AutoDrivePath extends Command
   @Override
   public void execute( )
   {
-    m_swerve.driveWithPathFollowerExecute(m_useInitialPose);
+    m_swerve.driveWithPathFollowerExecute( );
   }
 
   // Called once the command ends or is interrupted.

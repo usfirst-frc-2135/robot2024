@@ -97,6 +97,9 @@ public class Constants
 
     public static final int    kCANID_Shooter             = 20;
 
+    public static final int    kCANID_ClimberR            = 21;
+    public static final int    kCANID_ClimberL            = 22;
+
     public static final int    kCANID_CANdle              = 0;
 
     // Digital I/Os

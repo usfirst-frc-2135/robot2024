@@ -206,7 +206,6 @@ public class Swerve extends SubsystemBase
       if (rawPose != null)
       {
         resetOdometry(rawPose);
-        DataLogManager.log("Raw Pose " + rawPose);
       }
     }
 
@@ -226,14 +225,6 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("poseEstimationX", m_poseEstimator.getEstimatedPosition( ).getX( ));
     SmartDashboard.putNumber("poseEstimationY", m_poseEstimator.getEstimatedPosition( ).getY( ));
     SmartDashboard.putNumber("poseEstimationRotation", m_poseEstimator.getEstimatedPosition( ).getRotation( ).getDegrees( ));
-
-    Pose2d rawPoseSD = m_vision.getLimelightRawPose( );
-
-    if (rawPoseSD != null)
-    {
-      SmartDashboard.putNumber("rawPoseX", rawPoseSD.getX( ));
-      SmartDashboard.putNumber("rawPoseY", rawPoseSD.getY( ));
-    }
 
     if (m_swerveDebug)
     {

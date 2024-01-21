@@ -111,8 +111,6 @@ public class Swerve extends SubsystemBase
   private PIDController            m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
-  private Pose2d                   m_botLLPose         = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
-
   // define theta controller for robot heading
   private PIDController            m_xController       = new PIDController(1, 0, 0);
   private PIDController            m_yController       = new PIDController(1, 0, 0);
@@ -146,19 +144,19 @@ public class Swerve extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-    if (m_allowPoseEstimate)
-    {
+    // if (m_allowPoseEstimate)
+    // {
 
-      m_botLLPose = m_vision.getLimelightValidPose(getPose( ));
-      double latency = m_vision.getTargetLatency( );
+    //   m_botLLPose = m_vision.getLimelightValidPose(getPose( ));
+    //   double latency = m_vision.getTargetLatency( );
 
-      //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-      if (m_botLLPose != null && DriverStation.isTeleopEnabled( ))
-        m_poseEstimator.addVisionMeasurement(m_botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+    //   //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+    //   if (m_botLLPose != null && DriverStation.isTeleopEnabled( ))
+    //     m_poseEstimator.addVisionMeasurement(m_botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
 
-      resetOdometry(m_botLLPose);
+    //   resetOdometry(m_botLLPose);
 
-    }
+    // }
 
   }
 
@@ -207,7 +205,10 @@ public class Swerve extends SubsystemBase
       Pose2d rawPose = m_vision.getLimelightRawPose( );
 
       if (rawPose != null)
+      {
         resetOdometry(rawPose);
+        DataLogManager.log("Raw Pose " + rawPose);
+      }
     }
 
     m_position = getPose( );
@@ -226,6 +227,14 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("poseEstimationX", m_poseEstimator.getEstimatedPosition( ).getX( ));
     SmartDashboard.putNumber("poseEstimationY", m_poseEstimator.getEstimatedPosition( ).getY( ));
     SmartDashboard.putNumber("poseEstimationRotation", m_poseEstimator.getEstimatedPosition( ).getRotation( ).getDegrees( ));
+
+    Pose2d rawPoseSD = m_vision.getLimelightRawPose( );
+
+    if (rawPoseSD != null)
+    {
+      SmartDashboard.putNumber("rawPoseX", rawPoseSD.getX( ));
+      SmartDashboard.putNumber("rawPoseY", rawPoseSD.getY( ));
+    }
 
     if (m_swerveDebug)
     {

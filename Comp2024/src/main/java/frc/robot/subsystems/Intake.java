@@ -16,11 +16,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase
 {
   // Member objects
-  private final WPI_TalonSRX m_intakeRoller       = new WPI_TalonSRX(0);
+  private final WPI_TalonSRX m_intakeRoller = new WPI_TalonSRX(0);
   private final TalonFX      m_intakeRotor  = new TalonFX(0);
   private final CANcoder     m_CANCoder     = new CANcoder(0);
-  private final DigitalInput m_limitSwitch1 = new DigitalInput(0);
-  private final DigitalInput m_limitSwitch2 = new DigitalInput(0);
+  private final DigitalInput m_limitSwitch  = new DigitalInput(0);
 
   //Devices and simulation objs
 

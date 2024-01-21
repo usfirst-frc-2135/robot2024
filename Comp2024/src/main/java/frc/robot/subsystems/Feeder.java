@@ -1,5 +1,5 @@
 //
-// Intake Subystem - takes in Notes and delivers them to the Shooter
+// Feeder Subystem - takes in Notes and feeds them into the Amp and Trap
 //
 package frc.robot.subsystems;
 
@@ -11,16 +11,15 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //
-// Intake subsystem class
+// Feeder subsystem class
 //
 public class Feeder extends SubsystemBase
 {
   // Member objects
-  private final WPI_TalonSRX m_feeder       = new WPI_TalonSRX(0);
+  private final WPI_TalonSRX m_feederRoller = new WPI_TalonSRX(0);
   private final TalonFX      m_feederRotor  = new TalonFX(0);
   private final CANcoder     m_CANCoder     = new CANcoder(0);
-  private final DigitalInput m_limitSwitch1 = new DigitalInput(0);
-  private final DigitalInput m_limitSwitch2 = new DigitalInput(0);
+  private final DigitalInput m_limitSwitch  = new DigitalInput(0);
 
   //Devices and simulation objs
 

@@ -1,5 +1,5 @@
 //
-// Intake Subystem - takes in Notes and delivers them to the Shooter
+// Climber Subystem - lifts the robot to hang onto the chain
 //
 package frc.robot.subsystems;
 
@@ -8,7 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //
-// Intake subsystem class
+// Climber subsystem class
 //
 public class Climber extends SubsystemBase
 {

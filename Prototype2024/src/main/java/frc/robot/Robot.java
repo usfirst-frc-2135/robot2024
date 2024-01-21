@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.ExampleSmartMotorController.PIDMode;
 
-
 public class Robot extends TimedRobot
 {
   private final static double                       kDt           = 0.020;  // 20 msec per RoboRIO loop
@@ -82,8 +81,8 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
-    m_motor1.periodic();
-    m_motor2.periodic();
+    m_motor1.periodic( );
+    m_motor2.periodic( );
   }
 
 }

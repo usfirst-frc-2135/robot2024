@@ -23,7 +23,7 @@ public class ExampleSmartMotorController implements MotorController
   {
     kPosition, kVelocity, kMovementWitchcraft
   }
-
+//////////
   private static final double   kEncoderCPR         = 4096;
 
   // private final static double                       ks            = 0.0;   // Volts to overcome static friction

@@ -125,7 +125,6 @@ public class Swerve extends SubsystemBase
 
     resetAnglesToAbsolute( );
     resetGyro(180.0); // All starting positions facing driver in field relative
-    resetOdometry(new Pose2d(0, 0, m_heading));
 
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
     m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -531,7 +530,7 @@ public class Swerve extends SubsystemBase
     DataLogManager.log("positions " + getPositions( ));
     DataLogManager.log("pose " + pose);
 
-    m_poseEstimator.resetPosition(m_heading, getPositions( ), new Pose2d( )); //pose);
+    m_poseEstimator.resetPosition(m_heading, getPositions( ), pose);
     DataLogManager.log(String.format("%s: Reset position   : %s Gyro : %s", getSubsystem( ),
         m_poseEstimator.getEstimatedPosition( ).toString( ), m_heading.toString( )));
   }

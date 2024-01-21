@@ -265,14 +265,10 @@ public class Constants
 
     // Current limit settings - Intake Roller
 
-    // CANCoder Intake Roller absolute offset
-
     // Manual mode config parameters
     public enum IntakeRollereMode
     {
     }
-
-    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)
 
     // Motion Magic config parameters
   }
@@ -283,8 +279,6 @@ public class Constants
   public static final class IntakeRotorConsts
   {
     // Global settings
-
-    // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
 
     // Current limit settings - Intake Rotor
 
@@ -299,98 +293,34 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Wrist
+  // Feeder Roller 
   /////////////////////////////////////////////////////////////////////////////
-  public static final class WRConsts
+  public static final class FeederRollerConsts
   {
     // Global settings
-    public static final double               kGearRatio                = 106.1; // Gear reduction for wrist
-    public static final double               kGripperLengthMeters      = 0.3;   // Sim value: 11.8 in
-    public static final double               kGripperMassKg            = 3.0;   // Sim value: 6.6 lbs
 
-    public static final double               kAngleMin                 = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
-    public static final double               kAngleStow                = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
-    public static final double               kAngleIdle                = 0.0;   // Slightly off stowed value
-    public static final double               kAngleScoreLow            = 25.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double               kAngleScoreMid            = 20.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
-    public static final double               kAngleScoreHigh           = 20.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleScoreAuto           = 110.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleSubstation          = 0.0; // From Mech Design (3'1-38" above floor)
-    public static final double               kAngleMax                 = 115.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
-
-    public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
-    public static final boolean              kInvertCANCoder           = true;
-
-    // Current limit settings - wrist
-    public static final double               kSupplyCurrentLimit       = 10.0;  // Supply current limit (after trigger)
-    public static final double               kSupplyTriggerCurrent     = 10.0;  // Supply trigger current that will cause limiting
-    public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
-
-    public static final double               kStatorCurrentLimit       = 20.0; // Stator current limit (after trigger)
-    public static final boolean              kStatorCurrentLimitEnable = true; // Stator current enable
-
-    public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
-
-    // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = 0.08325; // CANCoder offset angle for comp bot
-    public static final double               kBetaOffset               = 0.000;   // CANCoder offset rotations for beta bot
-    public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
+    // Current limit settings - Feeder Roller
 
     // Manual config parameters
-    public enum WristMode
+    public enum FeederRollerMode
     {
-      WRIST_INIT,    // Initialize wrist
-      WRIST_DOWN,    // Wrist moving down
-      WRIST_STOPPED, // Wrist stop and hold position
-      WRIST_UP       // Wrist moving up
     }
 
-    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)
-    public static final double kScoreSpeedVolts  = 4.0;            // Motor voltage during scoring slam dunk (was 2.0 * manual speed)
-    public static final double kBrakeSpeedVolts  = 0.0;            // Motor voltage braking after slam dunk (was 0.25 percent output)
-
     // Motion Magic config parameters
-    public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
-    public static final double kMMSCurveStrength = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
-    public static final double kS                = 0.0;            // Voltage constant to overcome friction
-    public static final double kV                = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp            = 1.350;          // Wrist PID proportional constant
-    public static final double kPidKi            = 0.0;            // Wrist PID integral constant
-    public static final double kPidKd            = 0.0;            // Wrist PID derivative constant
-
-    public static final int    kAllowedError     = 0;              // Wrist PID allowable closed loop error in counts
-    public static final double kToleranceDegrees = 2.0;            // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-
-    public static final double kArbitraryFF      = -0.08; //-0.034;         // Wrist motor output for 90 degrees
-    public static final double kMMSafetyTimeout  = 3;              // Seconds allowed for a Motion Magic movement
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Grippper
+  // Feeder Rotor
   /////////////////////////////////////////////////////////////////////////////
-  public static final class GRConsts
+  public static final class FeederRotorConsts
   {
     // Global settings
-    public static final boolean kInvertMotor          = false; // Motor direction for positive input
 
-    // Input current limit settings - gripper
-    public static final double  kSupplyCurrentLimit   = 30.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 30.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
+    // Input current limit settings - Feeder Rotor
 
-    public enum GRMode
+    public enum FeederRotorMode
     {
-      GR_STOP,    // stop motor
-      GR_ACQUIRE, // acquire game pieces
-      GR_EXPEL,   // expel game pieces
-      GR_HOLD,    // hold game pieces
     }
-
-    public static final double kGripperSpeedAcquire = 1.0;        // Percent output - Acquire game piece from loading station or floor
-    public static final double kGripperSpeedHold    = 3.0 / 12.0; // Percent output - Hold game piece while traversing the field (must be <= 4V equiv)
-    public static final double kGripperSpeedExpel   = -0.2;       // Percent output - Score game piece on cone node or cube shelf
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -399,19 +329,12 @@ public class Constants
   public static final class VIConsts
   {
     // Limelight-defined streaming states
-    public static final int STANDARD      = 0;  // Both cameras side-by-side
-    public static final int PIP_MAIN      = 1;  // Limelight with second camera inset
-    public static final int PIP_SECONDARY = 2;  // Second camera with limelight inset
 
     // Limelight-defined LED mode states
-    public static final int LED_OFF       = 1;
-    public static final int LED_ON        = 3;
 
     public enum VIRequests
     {
-      VISION_OFF,   // Disable limelight LED and enable secondary camera mode
-      VISION_ON,    // Enable limelight LED and disable secondary camera mode
-      VISION_TOGGLE // Toggle modes
+
     }
 
     public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //

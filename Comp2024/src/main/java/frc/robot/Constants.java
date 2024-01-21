@@ -504,14 +504,22 @@ public class Constants
 
     public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
-        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 1 
-        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 2 
-        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 3 
-        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 4 
-        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(0)),                               // AprilTag ID: 5 
-        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(0)),                                // AprilTag ID: 6 
-        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(0)),                                // AprilTag ID: 7
-        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(0))                                 // AprilTag ID: 8
+        new Pose2d(new Translation2d(15.079472, 0.245872), new Rotation2d(Units.degreesToRadians(120))),    // AprilTag ID: 1 
+        new Pose2d(new Translation2d(16.185134, 0.883666), new Rotation2d(Units.degreesToRadians(120))),    // AprilTag ID: 2 
+        new Pose2d(new Translation2d(16.579342, 4.982718), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 3 
+        new Pose2d(new Translation2d(16.579342, 5.547868), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 4 
+        new Pose2d(new Translation2d(14.700758, 8.2042), new Rotation2d(Units.degreesToRadians(270))),      // AprilTag ID: 5 
+        new Pose2d(new Translation2d(1.8415, 8.20426), new Rotation2d(Units.degreesToRadians(270))),        // AprilTag ID: 6 
+        new Pose2d(new Translation2d(-0.0381, 5.547868), new Rotation2d(Units.degreesToRadians(0))),          // AprilTag ID: 7
+        new Pose2d(new Translation2d(-0.0381, 4.982718), new Rotation2d(Units.degreesToRadians(0))),          // AprilTag ID: 8
+        new Pose2d(new Translation2d(0.356108, 0.883666), new Rotation2d(Units.degreesToRadians(60))),      // AprilTag ID: 9
+        new Pose2d(new Translation2d(1.461516, 0.245872), new Rotation2d(Units.degreesToRadians(60))),      // AprilTag ID: 10
+        new Pose2d(new Translation2d(11.904726, 3.713226), new Rotation2d(Units.degreesToRadians(300))),    // AprilTag ID: 11
+        new Pose2d(new Translation2d(11.904726, 4.49834), new Rotation2d(Units.degreesToRadians(60))),      // AprilTag ID: 12
+        new Pose2d(new Translation2d(11.220196, 4.105148), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 13
+        new Pose2d(new Translation2d(5.320792, 4.105148), new Rotation2d(Units.degreesToRadians(0))),       // AprilTag ID: 14
+        new Pose2d(new Translation2d(4.641342, 4.49834), new Rotation2d(Units.degreesToRadians(120))),      // AprilTag ID: 15
+        new Pose2d(new Translation2d(4.641342, 3.713226), new Rotation2d(Units.degreesToRadians(240)))      // AprilTag ID: 16
     ));
 
     // Direction of goal relative to AprilTag 
@@ -522,12 +530,11 @@ public class Constants
       DIRECTION_RIGHT   // Right
     }
 
-    public static final double kATagDepthInGrid    = Units.inchesToMeters(14.25);    // Depth from front of grid to AprilTag - 1'2-1/4"
-    public static final double kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
-    public static final double kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
-    public static final double kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06;     // Addition of 6cm to adjust for empirical error 
-    public static final double kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30); // Robot stop 30 inches from the substation loading zone
-    public static final double kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
+    /*
+     * (needs to be updated to new robot limelight position)
+     * public static final double kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth
+     * from limelight to front robot edge
+     */
   }
 
   /////////////////////////////////////////////////////////////////////////////

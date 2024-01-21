@@ -92,10 +92,15 @@ public class Constants
     public static final int    kCANID_IntakeRotor         = 16;
     public static final int    kCANID_IntakeRotorCANCoder = 17;
 
-    public static final int    kCANID_Shooter             = 20;
+    public static final int    kCANID_FeederRoller        = 18;
 
-    public static final int    kCANID_ClimberL            = 21;
-    public static final int    kCANID_ClimberR            = 22;
+    public static final int    kCANID_FeederRotor         = 21;
+    public static final int    kCANID_FeederRotorCANCoder = 22;
+
+    public static final int    kCANID_Shooter             = 24;
+
+    public static final int    kCANID_ClimberL            = 25;
+    public static final int    kCANID_ClimberR            = 26;
 
     public static final int    kCANID_CANdle              = 0;
 
@@ -258,9 +263,6 @@ public class Constants
   {
     // Global settings
 
-    public static final InvertedValue kInvertMotor    = InvertedValue.Clockwise_Positive;  // Motor direction for positive input
-    public static final boolean       kInvertCANCoder = false;
-
     // Current limit settings - Intake Roller
 
     // CANCoder Intake Roller absolute offset
@@ -268,98 +270,32 @@ public class Constants
     // Manual mode config parameters
     public enum IntakeRollereMode
     {
-      IntakeRoller_INIT,    // Initialize elbow
-      IntakeRoller_DOWN,    // Intake Rollermoving down
-      IntakeRoller_STOPPED, // Intake Roller stop and hold position
-      IntakeRoller_UP       // Intake Roller moving up
     }
 
     public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)
 
     // Motion Magic config parameters
-    public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 531.7;          // 10/7/23 Tuned! Elbow motion magic acceleration (target velocity in 200ms)
-    public static final double kMMJerk           = kMMAcceleration * 3.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
-    public static final double kS                = 0.0;            // Voltage constant to overcome friction
-    public static final double kV                = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp            = 4.32;           // Elbow PID proportional constant
-    public static final double kPidKi            = 0.0;            // Elbow PID integral constant
-    public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
-
-    public static final double kArbitraryFF      = 0.235;          // Elbow motor output (duty cycle) for arm at 90 degrees
-    public static final double kExtArbFF         = 0.0; //0.007;          // Elbow motor output (duty cycle) for arm at 90 degrees with full extension
-
-    public static final double kToleranceDegrees = 2.0;            // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
-    public static final double kMMSafetyTimeout  = 2.5;            // Seconds allowed for a Motion Magic movement
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Extension
+  // Intake Rotor
   /////////////////////////////////////////////////////////////////////////////
-  public static final class EXConsts
+  public static final class IntakeRotorConsts
   {
     // Global settings
-    public static final double        kGearRatio                = 9.64; // Gear reduction for extension
-    private static final double       kDrumDiameterInches       = 1.375; // Drum diameter in inches
-    public static final double        kDrumRadiusMeters         = Units.inchesToMeters(kDrumDiameterInches) / 2;
-    private static final double       kDrumCircumInches         = kDrumDiameterInches * Math.PI;   // Drum diameter in inches
-    public static final double        kRolloutRatio             = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
-    public static final double        kForearmLengthMeters      = 1.0;   // Sim value: 48 inches
-    public static final double        kForearmMassKg            = 2.0;   // Sim value: 13.2 lbs 
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
-    public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double        kLengthStow               = 0.25;  // By definition - extension fully retracted
-    public static final double        kLengthIdle               = -0.25;  // Slightly off mechanical hard stopoppppppppp
-    public static final double        kLengthScoreLow           = 12.5;   // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double        kLengthScoreMid           = 0.5;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double        kLengthScoreHigh          = 18.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double        kLengthSubstation         = 0.5;  // From Mech Design (3'1-38" above floor)
-    public static final double        kLengthMax                = 18.5;  // Extension maximum allowable length (2" beyond high length)
-    public static final double        kLengthExtension          = 1.0;
 
-    public static final InvertedValue kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive inputt
-
-    // Current limit settings - extension
-    public static final double        kSupplyCurrentLimit       = 20.0;  // Supply current limit (after trigger)
-    public static final double        kSupplyTriggerCurrent     = 20.0;  // Supply trigger current that will cause limiting
-    public static final double        kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final boolean       kSupplyCurrentLimitEnable = true;  // Supply current enable
-
-    public static final double        kStatorCurrentLimit       = 45.0; // Stator current limit (after trigger)
-    public static final boolean       kStatorCurrentLimitEnable = true; // Stator current enable
-
-    public static final double        kNeutralDeadband          = 0.001; // Extension motor output deadband
+    // Current limit settings - Intake Rotor
 
     // Calibration
-    public static final double        kCalibrateSpeedVolts      = -1.4; // Motor voltage during calibration
 
     // Manual config parameters
-    public enum ExtensionMode
+    public enum IntakeRotorMode
     {
-      EXTENSION_INIT,    // Initialize extension
-      EXTENSION_OUT,     // Extension moving out
-      EXTENSION_STOPPED, // Extension stop and hold position
-      EXTENSION_IN       // Extension moving in
     }
 
-    public static final double kManualSpeedVolts     = 3.0;            // Motor voltage during manual operation (joystick)
-
     // Motion Magic config parameters
-    public static final double kMMVelocity           = 79.75;          // 10/7/23 Tuned! Extension motion magic velocity (0.625 of max motor RPM)
-    public static final double kMMAcceleration       = 708.9;          // 10/7/23 Tuned! Extension motion magic acceleration (target velocity in 150ms)
-    public static final double kMMJerk               = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
-    public static final double kS                    = 0.0;            // Voltage constant to overcome friction
-    public static final double kV                    = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp                = 2.0;          // Extension PID proportional constant
-    public static final double kPidKi                = 0.0;            // Extension PID integral constant
-    public static final double kPidKd                = 0.0;            // Extension PID derivative constant
-
-    public static final int    kAllowedError         = 0;              // Extension PID allowable closed loop error in counts
-    public static final double kToleranceInches      = 0.5;            // Extension PID tolerance in inches
-
-    public static final double kArbitraryFF          = -0.125;         // Extension motor output for extension when fully retracted
-    public static final double kMMSafetyTimeoutRatio = 0.16;           // Seconds allowed for a Motion Magic movement
   }
 
   /////////////////////////////////////////////////////////////////////////////

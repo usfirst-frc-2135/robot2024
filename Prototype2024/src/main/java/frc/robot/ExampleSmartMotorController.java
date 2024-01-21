@@ -32,7 +32,7 @@ public class ExampleSmartMotorController implements MotorController
   private final static double   ki                  = 0.0;
   private final static double   kd                  = 0.0;
 
-  private static final double   kGearRatio          = 40.0;          
+  private static final double   kGearRatio          = 40.0;
   private static final double   kCarriageMassKg     = 0.1;
   private static final double   kDrumDiameterMeters = 1.0 / Math.PI; // Drum diameter in meters (make meter = rotation)
   private static final double   kLengthMeters       = 2.0;           // Maximum length in meters
@@ -205,7 +205,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public void set(double percentOutput)
   {
-     m_motor.set(ControlMode.PercentOutput, percentOutput);
+    m_motor.set(ControlMode.PercentOutput, percentOutput);
   }
 
   /**

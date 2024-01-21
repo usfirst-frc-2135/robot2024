@@ -68,37 +68,34 @@ public class Constants
     public static final String kCANRio                    = "rio";
 
     // CANivore CAN IDs - Swerve
-    public static final int    kCANID_DriveLF             = 1;
-    public static final int    kCANID_AngleLF             = 2;
+    public static final int    kCANID_DriveLF             = 1;    //Falcon 500
+    public static final int    kCANID_SteerLF             = 2;
     public static final int    kCANID_CANCoderLF          = 3;
 
-    public static final int    kCANID_DriveRF             = 4;
-    public static final int    kCANID_AngleRF             = 5;
+    public static final int    kCANID_DriveRF             = 4;    //Falcon 500     
+    public static final int    kCANID_SteerRF             = 5;
     public static final int    kCANID_CANCoderRF          = 6;
 
-    public static final int    kCANID_DriveLR             = 7;
-    public static final int    kCANID_AngleLR             = 8;
+    public static final int    kCANID_DriveLR             = 7;    //Falcon 500
+    public static final int    kCANID_SteerLR             = 8;
     public static final int    kCANID_CANCoderLR          = 9;
 
-    public static final int    kCANID_DriveRR             = 10;
-    public static final int    kCANID_AngleRR             = 11;
+    public static final int    kCANID_DriveRR             = 10;   //Falcon 500
+    public static final int    kCANID_SteerRR             = 11;
     public static final int    kCANID_CANCoderRR          = 12;
 
     public static final int    kCANID_Pigeon2             = 13;
 
     // RoboRIO CAN IDs
-    public static final int    kCANID_Intake              = 15;
-    public static final int    kCANID_IntakeCANCoder      = 16;
+    public static final int    kCANID_IntakeRoller        = 15;
 
-    public static final int    kCANID_IntakeRotor         = 17;
-    public static final int    kCANID_IntakeRotorCANCoder = 18;
-
-    public static final int    kCANID_IntakeRollers       = 19;
+    public static final int    kCANID_IntakeRotor         = 16;
+    public static final int    kCANID_IntakeRotorCANCoder = 17;
 
     public static final int    kCANID_Shooter             = 20;
 
-    public static final int    kCANID_ClimberR            = 21;
-    public static final int    kCANID_ClimberL            = 22;
+    public static final int    kCANID_ClimberL            = 21;
+    public static final int    kCANID_ClimberR            = 22;
 
     public static final int    kCANID_CANdle              = 0;
 
@@ -203,7 +200,7 @@ public class Constants
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_AngleLF, Ports.kCANID_CANCoderLF,
+        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_SteerLF, Ports.kCANID_CANCoderLF,
             isComp ? compAngleOffset : betaAngleOffset);
       }
     }
@@ -216,7 +213,7 @@ public class Constants
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_AngleRF, Ports.kCANID_CANCoderRF,
+        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_SteerRF, Ports.kCANID_CANCoderRF,
             isComp ? compAngleOffset : betaAngleOffset);
       }
     }
@@ -229,7 +226,7 @@ public class Constants
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_AngleLR, Ports.kCANID_CANCoderLR,
+        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_SteerLR, Ports.kCANID_CANCoderLR,
             isComp ? compAngleOffset : betaAngleOffset);
       }
     }
@@ -242,7 +239,7 @@ public class Constants
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_AngleRR, Ports.kCANID_CANCoderRR,
+        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_SteerRR, Ports.kCANID_CANCoderRR,
             isComp ? compAngleOffset : betaAngleOffset);
       }
     }
@@ -255,50 +252,26 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Elbow
+  // Intake Roller
   /////////////////////////////////////////////////////////////////////////////
-  public static final class ELConsts
+  public static final class IntakeRollerConsts
   {
     // Global settings
-    public static final double               kGearRatio                = 202.5;   // Gear reduction for elbow
-    public static final double               kForearmLengthMeters      = 1.22;  // Sim value: 48 inches
-    public static final double               kForearmMassKg            = 6.0;   // Sim value: 13.2 lbs 
 
-    public static final double               kAngleMin                 = -3.0;  // Elbow minimum allowable degrees (a few degrees less than stowed)
-    public static final double               kAngleStow                = 2.0;   // By definition - elbow is vertical
-    public static final double               kAngleIdle                = 15.0;  // Slightly angled out, empirically checked
-    public static final double               kAngleScoreLow            = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double               kAngleScoreMid            = 80.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double               kAngleScoreHigh           = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double               kAngleSubstation          = 45.0; // From Mech Design (3'1-38" above floor), empirical
-    public static final double               kAngleMax                 = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
+    public static final InvertedValue kInvertMotor    = InvertedValue.Clockwise_Positive;  // Motor direction for positive input
+    public static final boolean       kInvertCANCoder = false;
 
-    public static final InvertedValue        kInvertMotor              = InvertedValue.Clockwise_Positive;  // Motor direction for positive input
-    public static final boolean              kInvertCANCoder           = false;
+    // Current limit settings - Intake Roller
 
-    // Current limit settings - elbow
-    public static final double               kSupplyCurrentLimit       = 30.0;  // Supply current limit (after trigger)
-    public static final double               kSupplyTriggerCurrent     = 30.0;  // Supply trigger current that will cause limiting
-    public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
-
-    public static final double               kStatorCurrentLimit       = 75.0; // Stator current limit (after trigger)
-    public static final boolean              kStatorCurrentLimitEnable = true; // Stator current enable
-
-    public static final double               kNeutralDeadband          = 0.001; // Elbow motor output deadband
-
-    // CANCoder elbow absolute offset
-    public static final double               kCompOffset               = 0.0203;  // CANCoder offset rotations for comp bot
-    public static final double               kBetaOffset               = 0.000;   // CANCoder offset rotations for beta bot
-    public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
+    // CANCoder Intake Roller absolute offset
 
     // Manual mode config parameters
-    public enum ElbowMode
+    public enum IntakeRollereMode
     {
-      ELBOW_INIT,    // Initialize elbow
-      ELBOW_DOWN,    // Elbow moving down
-      ELBOW_STOPPED, // Elbow stop and hold position
-      ELBOW_UP       // Elbow moving up
+      IntakeRoller_INIT,    // Initialize elbow
+      IntakeRoller_DOWN,    // Intake Rollermoving down
+      IntakeRoller_STOPPED, // Intake Roller stop and hold position
+      IntakeRoller_UP       // Intake Roller moving up
     }
 
     public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)

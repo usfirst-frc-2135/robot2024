@@ -64,45 +64,45 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class Ports
   {
-    public static final String kCANCarnivore              = "canivore1";
-    public static final String kCANRio                    = "rio";
+    public static final String kCANCarnivore         = "canivore1";
+    public static final String kCANRio               = "rio";
 
     // CANivore CAN IDs - Swerve
-    public static final int    kCANID_DriveLF             = 1;    //Falcon 500
-    public static final int    kCANID_SteerLF             = 2;
-    public static final int    kCANID_CANCoderLF          = 3;
+    public static final int    kCANID_DriveLF        = 1;    // Falcon 500
+    public static final int    kCANID_SteerLF        = 2;    // Falcon 500
+    public static final int    kCANID_CANCoderLF     = 3;    // CANCoder
 
-    public static final int    kCANID_DriveRF             = 4;    //Falcon 500     
-    public static final int    kCANID_SteerRF             = 5;
-    public static final int    kCANID_CANCoderRF          = 6;
+    public static final int    kCANID_DriveRF        = 4;    //Falcon 500     
+    public static final int    kCANID_SteerRF        = 5;    // Falcon 500
+    public static final int    kCANID_CANCoderRF     = 6;    // CANCoder
 
-    public static final int    kCANID_DriveLR             = 7;    //Falcon 500
-    public static final int    kCANID_SteerLR             = 8;
-    public static final int    kCANID_CANCoderLR          = 9;
+    public static final int    kCANID_DriveLR        = 7;    //Falcon 500
+    public static final int    kCANID_SteerLR        = 8;    // Falcon 500
+    public static final int    kCANID_CANCoderLR     = 9;    // CANCoder
 
-    public static final int    kCANID_DriveRR             = 10;   //Falcon 500
-    public static final int    kCANID_SteerRR             = 11;
-    public static final int    kCANID_CANCoderRR          = 12;
+    public static final int    kCANID_DriveRR        = 10;   //Falcon 500
+    public static final int    kCANID_SteerRR        = 11;   // Falcon 500
+    public static final int    kCANID_CANCoderRR     = 12;   // CANCoder
 
-    public static final int    kCANID_Pigeon2             = 13;
+    public static final int    kCANID_Pigeon2        = 13;   // Pigeon2 IMU
 
     // RoboRIO CAN IDs
-    public static final int    kCANID_IntakeRoller        = 15;
+    public static final int    kCANID_IntakeRoller   = 15;   // Talon SRX - 775Pro
+    public static final int    kCANID_IntakeRotary   = 16;   // Falcon 500
+    public static final int    kCANID_IntakeCANCoder = 17;   // CANCoder
 
-    public static final int    kCANID_IntakeRotor         = 16;
-    public static final int    kCANID_IntakeRotorCANCoder = 17;
+    public static final int    kCANID_FeederRoller   = 19;   // Talon SRX - 775Pro
+    public static final int    kCANID_FeederRotary   = 20;   // Falcon 500
+    public static final int    kCANID_FeederCANCoder = 21;   // CANCoder
 
-    public static final int    kCANID_FeederRoller        = 18;
+    public static final int    kCANID_ShooterL       = 23;   // Falcon 500
+    public static final int    kCANID_ShooterR       = 24;   // Falcon 500
+    public static final int    kCANID_ShooterRotary  = 25;   // Falcon 500
 
-    public static final int    kCANID_FeederRotor         = 21;
-    public static final int    kCANID_FeederRotorCANCoder = 22;
+    public static final int    kCANID_ClimberL       = 27;   // Falcon 500
+    public static final int    kCANID_ClimberR       = 28;   // Falcon 500
 
-    public static final int    kCANID_Shooter             = 24;
-
-    public static final int    kCANID_ClimberL            = 25;
-    public static final int    kCANID_ClimberR            = 26;
-
-    public static final int    kCANID_CANdle              = 0;
+    public static final int    kCANID_CANdle         = 0;
 
     // Digital I/Os
     // public static final int    kDIO_ExampleDetect = 2;

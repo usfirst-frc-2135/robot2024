@@ -244,7 +244,7 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   // Swerve snap constraints
   /////////////////////////////////////////////////////////////////////////////
-  public static final class SnapConstants
+  public static final class SnapConsts
   {
     public static final double                       kP                                      = 5.0;
     public static final double                       kI                                      = 0;
@@ -264,7 +264,7 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   // Autonomous trajectory constraints
   /////////////////////////////////////////////////////////////////////////////
-  public static final class AutoConstants
+  public static final class AutoConsts
   {
     public static final double                       kMaxAngularSpeedRadiansPerSecond        = 1.2 * Math.PI;
     public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =

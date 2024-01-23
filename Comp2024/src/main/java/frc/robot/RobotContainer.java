@@ -11,7 +11,6 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants.AutoChooser;
+import frc.robot.commands.Dummy;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -88,15 +88,13 @@ public class RobotContainer
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
     SmartDashboard.putData("Field", m_field);
-
   }
 
   /****************************************************************************
    * 
-   * Use this method to define your button->command mappings. Buttons can be created by instantiating
-   * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
-   * {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * Use this method to define your button-command mappings. Buttons can be created by instantiating
+   * a GenericHID or one of its subclasses (Joystick or XboxController), and then passing it to a
+   * JoystickButton.
    */
   private void configureButtonBindings( )
   {
@@ -119,38 +117,34 @@ public class RobotContainer
     final POVButton driverDown = new POVButton(m_driverPad, 180);
     final POVButton driverLeft = new POVButton(m_driverPad, 270);
     //
-    // @formatter:off
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
-    final Trigger driverLeftTrigger = new Trigger(( )->m_driverPad.getLeftTriggerAxis() > Constants.kTriggerThreshold);
-    final Trigger driverRightTrigger = new Trigger(( )->m_driverPad.getRightTriggerAxis() > Constants.kTriggerThreshold);
+    final Trigger driverLeftTrigger = new Trigger(( ) -> m_driverPad.getLeftTriggerAxis( ) > Constants.kTriggerThreshold);
+    final Trigger driverRightTrigger = new Trigger(( ) -> m_driverPad.getRightTriggerAxis( ) > Constants.kTriggerThreshold);
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     // final Trigger driverLeftTrigger = new Trigger(( )->m_driverPad.getRightX() > Constants.kTriggerThreshold);
     // final Trigger driverRightTrigger = new Trigger(( )->m_driverPad.getRightY() > Constants.kTriggerThreshold);
-    // @formatter:on
 
     // Driver - A, B, X, Y
-    // driverA.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
-    // driverB.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
-    // driverX.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
-    // driverY.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+    driverA.onTrue(new Dummy("driver A"));
+    driverB.whileTrue(new Dummy("driver B"));
+    driverX.whileTrue(new Dummy("driver X"));
+    driverY.whileTrue(new Dummy("driver Y"));
     //
     // Driver - Bumpers, start, back
-    // driverLeftBumper.onTrue(new Dummy("left bumper"));
-    // driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    // driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    // driverBack.onTrue(new DriveResetGyro(m_swerve, driverStart, driverBack)); // aka View
-    // driverStart.onTrue(new DriveResetGyro(m_swerve, driverStart, driverBack)); // aka Menu
+    driverLeftBumper.onTrue(new Dummy("driver left bumper"));
+    driverRightBumper.onTrue(new Dummy("driver right bumper"));
+    driverBack.onTrue(new Dummy("driver back")); // aka View
+    driverStart.onTrue(new Dummy("driver start")); // aka Menu
     //
     // Driver - POV buttons
-    // driverUp.onTrue(new DriveSnap(m_swerve, 0));
-    // driverRight.onTrue(new DriveSnap(m_swerve, -90));
-    // driverDown.onTrue(new DriveSnap(m_swerve, 180));
-    // driverLeft.onTrue(new DriveSnap(m_swerve, 90));
+    driverUp.onTrue(new Dummy("driver 0"));
+    driverRight.onTrue(new Dummy("driver 90"));
+    driverDown.onTrue(new Dummy("driver 180"));
+    driverLeft.onTrue(new Dummy("driver 270"));
     //
-    // Operator Left/Right Trigger
-    // driverLeftTrigger.onTrue(new Dummy("left trigger"));
-    // driverRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    // driverRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+    // Driver Left/Right Trigger
+    driverLeftTrigger.onTrue(new Dummy("driver left trigger"));
+    driverRightTrigger.onTrue(new Dummy("driver right trigger"));
 
     ///////////////////////////////////////////////////////
     //
@@ -170,7 +164,7 @@ public class RobotContainer
     final POVButton operRight = new POVButton(m_operatorPad, 90);
     final POVButton operDown = new POVButton(m_operatorPad, 180);
     final POVButton operLeft = new POVButton(m_operatorPad, 270);
-    //
+    // 
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     final Trigger operLeftTrigger = new Trigger(( ) -> m_operatorPad.getLeftTriggerAxis( ) > Constants.kTriggerThreshold);
     final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightTriggerAxis( ) > Constants.kTriggerThreshold);
@@ -179,31 +173,26 @@ public class RobotContainer
     // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightY( ) > Constants.kTriggerThreshold);
 
     // Operator - A, B, X, Y
-    // operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
-    // operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
-    // operX.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
-    // operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
+    operA.onTrue(new Dummy("oper A"));
+    operB.whileTrue(new Dummy("oper B"));
+    operX.whileTrue(new Dummy("oper X"));
+    operY.whileTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    // operLeftBumper.whileTrue(new WristRunConstant(m_wrist, true));
-    // operLeftBumper.onFalse(new WristRunBrake(m_wrist, true));
-    // operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    // operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    // operBack.toggleOnTrue(new ArmManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
-
-    // operStart.onTrue(new CameraDisplaySet(m_vision, VIConsts.PIP_SECONDARY)); // aka Menu
+    operLeftBumper.onTrue(new Dummy("oper left bumper"));
+    operRightBumper.onTrue(new Dummy("oper right bumper"));
+    operBack.onTrue(new Dummy("oper back")); // aka View
+    operStart.onTrue(new Dummy("oper start")); // aka Menu
     //
     // Operator - POV buttons
-    // operUp.onTrue(new ArmSetHeightShelf(m_elbow, m_extension, m_wrist));
-    // operRight.onTrue(new Dummy("POV right"));
-    // operDown.onTrue(new Dummy("POV down"));
-    // operLeft.onTrue(new Dummy("POV left"));
+    operUp.onTrue(new Dummy("oper 0"));
+    operRight.onTrue(new Dummy("oper 90"));
+    operDown.onTrue(new Dummy("oper 180"));
+    operLeft.onTrue(new Dummy("oper 270"));
     //
     // Operator Left/Right Trigger
-    // operLeftTrigger.whileTrue(new WristRunConstant(m_wrist, false));
-    // operLeftTrigger.onFalse(new WristRunBrake(m_wrist, false));
-    // operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    // operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+    operLeftTrigger.onTrue(new Dummy("oper left trigger"));
+    operRightTrigger.onTrue(new Dummy("oper right trigger"));
   }
 
   /****************************************************************************
@@ -212,11 +201,11 @@ public class RobotContainer
    */
   private void initDefaultCommands( )
   {
-    // m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
+    // m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
 
     // // Default command - Motion Magic hold
     // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    // m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
+    // m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension));
     // m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
     // Default command - manual mode

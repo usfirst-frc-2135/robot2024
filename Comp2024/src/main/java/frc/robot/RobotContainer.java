@@ -233,15 +233,11 @@ public class RobotContainer
   {
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-    m_autoChooser.addOption("1 - AutoDriveOffCommunityShort", AutoChooser.AUTOCOMSHORT);
-    m_autoChooser.addOption("2 - AutoDriveOffCommunityLong", AutoChooser.AUTOCOMLONG);
-    m_autoChooser.addOption("3 - AutoEngageChargeStation", AutoChooser.AUTOCHARGE);
-    m_autoChooser.addOption("4 - AutoPreloadAndStop", AutoChooser.AUTOPRESTOP);
-    m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityShort", AutoChooser.AUTOPRECOMSHORT);
-    m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", AutoChooser.AUTOPRECOMLONG);
-    m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", AutoChooser.AUTOPRECHARGE);
-
-    //m_chooser.addOption("8 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
+    m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
+    m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
+    m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
@@ -263,19 +259,17 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-      case AUTOPRESTOP :
+      case AUTOPRELOADONLY :
         break;
-      case AUTOCOMSHORT :
-      case AUTOPRECOMSHORT :
-        pathName = (alliance == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
+      case AUTOLEAVE :
+      case AUTOPRELOADANDLEAVE :
+        pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
         break;
-      case AUTOCOMLONG :
-      case AUTOPRECOMLONG :
-        pathName = (alliance == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
+      case AUTOPRELOADSCOREANOTHER :
+        pathName = (alliance == Alliance.Red) ? "driveToAnotherRed" : "driveToAnotherBlue";
         break;
-      case AUTOCHARGE :
-      case AUTOPRECHARGE :
-        pathName = (alliance == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
+      case AUTOTESTPATH :
+        pathName = (alliance == Alliance.Red) ? "driveTestPathRed" : "driveTestPathBlue";
         break;
     }
 
@@ -289,29 +283,20 @@ public class RobotContainer
     //   case AUTOSTOP :
     //     m_autoCommand = new AutoStop(m_swerve);
     //     break;
-    //   case AUTOCOMSHORT :
-    //     m_autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_autoTrajectory, true);
+    //   case AUTOPRELOADONLY :
+    //     m_autoCommand = new AutoScorePreload(m_swerve);
     //     break;
-    //   case AUTOCOMLONG :
-    //     m_autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", m_autoTrajectory, true);
+    //   case AUTOLEAVE :
+    //     m_autoCommand = new AutoLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
     //     break;
-    //   case AUTOCHARGE :
-    //     m_autoCommand = new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", m_autoTrajectory);
+    //   case AUTOPRELOADANDLEAVE :
+    //     m_autoCommand = new AutoPreloadAndLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
     //     break;
-    //   case AUTOPRESTOP :
-    //     m_autoCommand = new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
+    //   case AUTOPRELOADSCOREANOTHER :
+    //     m_autoCommand = new AutoPreloadAndScoreAnother(m_swerve, "driveToAnother", m_autoTrajectory);
     //     break;
-    //   case AUTOPRECOMSHORT :
-    //     m_autoCommand = new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-    //         "AutoPreloadAndLeaveCommunityShort", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRECOMLONG :
-    //     m_autoCommand = new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-    //         "AutoPreloadAndLeaveCommunityLong", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRECHARGE :
-    //     m_autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-    //         "AutoPreloadMidAndEngageChargeStation", m_autoTrajectory);
+    //   case AUTOTESTPATH :
+    //     m_autoCommand = new AutoTestPath(m_swerve, "AutoTestPath", m_autoTrajectory);
     //     break;
     // }
 

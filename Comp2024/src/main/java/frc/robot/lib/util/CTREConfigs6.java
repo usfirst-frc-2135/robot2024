@@ -46,7 +46,7 @@ public final class CTREConfigs6
     return driveConfig;
   }
 
-  public static TalonFXConfiguration swerveAngleFXConfig( )
+  public static TalonFXConfiguration swerveSteerFXConfig( )
   {
     TalonFXConfiguration angleConfig = new TalonFXConfiguration( );
 

@@ -111,77 +111,63 @@ public class Constants
   public static final class SWConsts
   {
     /* Individual module constants */
-    public static final double                trackWidth                    = Units.inchesToMeters(22.7);
-    public static final double                wheelBase                     = Units.inchesToMeters(22.7);
-
-    public static final double                wheelDiameter                 = Units.inchesToMeters(4.0);
-    public static final double                wheelCircumference            = wheelDiameter * Math.PI;
-
-    public static final double                driveGearRatio                = 6.75;
-    public static final double                steerGearRatio                = 21.43;
-
-    public static final Translation2d[ ]      swerveModuleLocations         =
-    {
-        new Translation2d(wheelBase / 2.0, trackWidth / 2.0), new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
-    };
-
-    public static final SwerveDriveKinematics swerveKinematics              = new SwerveDriveKinematics(swerveModuleLocations);
+    public static final double               driveGearRatio                = 6.75;
+    public static final double               steerGearRatio                = 21.43;
 
     /* Swerve Current Limiting */
-    public static final int                   driveSupplyCurrentLimit       = 35;
-    public static final int                   driveSupplyCurrentThreshold   = 60;
-    public static final double                driveSupplyTimeThreshold      = 0.1;
-    public static final boolean               driveSupplyCurrentLimitEnable = true;
+    public static final int                  driveSupplyCurrentLimit       = 35;
+    public static final int                  driveSupplyCurrentThreshold   = 60;
+    public static final double               driveSupplyTimeThreshold      = 0.1;
+    public static final boolean              driveSupplyCurrentLimitEnable = true;
 
-    public static final int                   steerSupplyCurrentLimit       = 25;
-    public static final int                   steerSupplyCurrentThreshold   = 40;
-    public static final double                steerSupplyTimeThreshold      = 0.1;
-    public static final boolean               steerSupplyCurrentLimitEnable = true;
+    public static final int                  steerSupplyCurrentLimit       = 25;
+    public static final int                  steerSupplyCurrentThreshold   = 40;
+    public static final double               steerSupplyTimeThreshold      = 0.1;
+    public static final boolean              steerSupplyCurrentLimitEnable = true;
 
     /* Drive Motor PID Values */
-    public static final double                driveFFKS                     = 0.0;
-    public static final double                driveFFKV                     = 0.0;
-    public static final double                driveKP                       = 0.36;
-    public static final double                driveKI                       = 0.0;
-    public static final double                driveKD                       = 0.0;
+    public static final double               driveFFKS                     = 0.0;
+    public static final double               driveFFKV                     = 0.0;
+    public static final double               driveKP                       = 0.36;
+    public static final double               driveKI                       = 0.0;
+    public static final double               driveKD                       = 0.0;
 
-    /* Angle Motor PID Values */
-    public static final double                steerFFKS                     = 0.0;
-    public static final double                steerFFKV                     = 0.0;
-    public static final double                steerKP                       = 12.0;
-    public static final double                steerKI                       = 0.0;
-    public static final double                steerKD                       = 0.0;
+    /* Steering Motor PID Values */
+    public static final double               steerFFKS                     = 0.0;
+    public static final double               steerFFKV                     = 0.0;
+    public static final double               steerKP                       = 12.0;
+    public static final double               steerKI                       = 0.0;
+    public static final double               steerKD                       = 0.0;
 
     /* Neutral Modes */
-    public static final InvertedValue         driveMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue      driveNeutralMode              = NeutralModeValue.Brake;
-    public static final double                driveOpenLoopRamp             = 0.25;
-    public static final double                driveClosedLoopRamp           = 0.0;
+    public static final InvertedValue        driveMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue     driveNeutralMode              = NeutralModeValue.Brake;
+    public static final double               driveOpenLoopRamp             = 0.25;
+    public static final double               driveClosedLoopRamp           = 0.0;
 
-    public static final InvertedValue         steerMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue      steerNeutralMode              = NeutralModeValue.Coast;
-    public static final double                steerOpenLoopRamp             = 0.0;
-    public static final double                steerClosedLoopRamp           = 0.0;
+    public static final InvertedValue        steerMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue     steerNeutralMode              = NeutralModeValue.Coast;
+    public static final double               steerOpenLoopRamp             = 0.0;
+    public static final double               steerClosedLoopRamp           = 0.0;
 
-    public static final SensorDirectionValue  steerCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
-    public static final boolean               gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
+    public static final SensorDirectionValue steerCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
+    public static final boolean              gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
 
     /* Drive Motor Characterization Values */
-    public static final double                driveKS                       = (0.32 / 12);
-    public static final double                driveKV                       = (1.51 / 12);
-    public static final double                driveKA                       = (0.27 / 12);
+    public static final double               driveKS                       = (0.32 / 12);
+    public static final double               driveKV                       = (1.51 / 12);
+    public static final double               driveKA                       = (0.27 / 12);
 
     /* Swerve Profiling Values */
-    public static final double                maxSpeed                      = 4.5;  // meters per second
-    public static final double                maxAngularVelocity            = 6.0;  // orginially 10.0
-    public static final double                maxSpeedSlowMode              = 2.25; // meters per second
-    public static final double                maxAngularVelocitySlowMode    = 4.0;  // orginially 5.0
+    public static final double               maxSpeed                      = 4.5;  // meters per second
+    public static final double               maxAngularVelocity            = 6.0;  // orginially 10.0
+    public static final double               maxSpeedSlowMode              = 2.25; // meters per second
+    public static final double               maxAngularVelocitySlowMode    = 4.0;  // orginially 5.0
 
     /* Controller Invert */
-    public static final boolean               invertXAxis                   = false;
-    public static final boolean               invertYAxis                   = false;
-    public static final boolean               invertRAxis                   = false;
+    public static final boolean              invertXAxis                   = false;
+    public static final boolean              invertYAxis                   = false;
+    public static final boolean              invertRAxis                   = false;
 
     /*** MODULE SPECIFIC CONSTANTS ***/
 
@@ -236,6 +222,62 @@ public class Constants
             isComp ? compAngleOffset : betaAngleOffset);
       }
     }
+
+    /*** SWERVE SUBSYSTEM CONSTANTS ***/
+
+    public static final double                trackWidth            = Units.inchesToMeters(22.7);
+    public static final double                wheelBase             = Units.inchesToMeters(22.7);
+
+    public static final double                wheelDiameter         = Units.inchesToMeters(4.0);
+    public static final double                wheelCircumference    = wheelDiameter * Math.PI;
+
+    public static final Translation2d[ ]      swerveModuleLocations =
+    {
+        new Translation2d(wheelBase / 2.0, trackWidth / 2.0), new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
+        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
+    };
+
+    public static final SwerveDriveKinematics swerveKinematics      = new SwerveDriveKinematics(swerveModuleLocations);
+
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Swerve snap constraints
+  /////////////////////////////////////////////////////////////////////////////
+  public static final class SnapConstants
+  {
+    public static final double                       kP                                      = 5.0;
+    public static final double                       kI                                      = 0;
+    public static final double                       kD                                      = 0.0;
+    public static final double                       kTimeout                                = 0.75;
+    public static final double                       kEpsilon                                = 1.0;
+
+    // Constraints for the profiled angle controller
+    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 2.0 * Math.PI;
+    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
+        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
+
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
+        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Autonomous trajectory constraints
+  /////////////////////////////////////////////////////////////////////////////
+  public static final class AutoConstants
+  {
+    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 1.2 * Math.PI;
+    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
+        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
+
+    public static final double                       kPXController                           = 1;
+    public static final double                       kPYController                           = 1;
+    public static final double                       kPThetaController                       = 5;
+
+    // Constraint for the motion profilied robot angle controller
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
+        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -368,55 +410,6 @@ public class Constants
       LEDCOLOR_PURPLE,  // CANdle purple
       LEDCOLOR_DASH     // CANdle color taken from dashboard
     }
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Swerve snap
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class SnapConstants
-  {
-    public static final double                       kP                                      = 5.0;
-    public static final double                       kI                                      = 0;
-    public static final double                       kD                                      = 0.0;
-    public static final double                       kTimeout                                = 0.75;
-    public static final double                       kEpsilon                                = 1.0;
-
-    // Constraints for the profiled angle controller
-    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 2.0 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
-        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
-
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Autonomous
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class AutoConstants
-  {
-    enum AutoChooser
-    {
-      AUTOSTOP,                // AutoStop - do nothing
-      AUTOPRELOADONLY,         // Score preloaded game piece
-      AUTOLEAVE,               // Leave starting zone
-      AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
-      AUTOPRELOADSCOREANOTHER, // Score preload and score another
-      AUTOTESTPATH             // Run a selected test path
-    }
-
-    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 1.2 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
-        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
-
-    public static final double                       kPXController                           = 1;
-    public static final double                       kPYController                           = 1;
-    public static final double                       kPThetaController                       = 5;
-
-    // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-
   }
 
 }

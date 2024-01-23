@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants.AutoChooser;
 import frc.robot.commands.Dummy;
 
 /**
@@ -31,19 +30,30 @@ import frc.robot.commands.Dummy;
  */
 public class RobotContainer
 {
-  private static RobotContainer        m_instance;
+  private static RobotContainer m_instance;
 
   // Joysticks
-  private final XboxController         m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController         m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
+  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
 
-  private Field2d                      m_field       = new Field2d( );
+  private Field2d               m_field       = new Field2d( );
 
   // The robot's shared subsystems
 
   // These subsystems can use LED or vision and must be created afterward
 
-  // A chooser for autonomous commands
+  // Chooser for autonomous commands
+
+  enum AutoChooser
+  {
+    AUTOSTOP,                // AutoStop - do nothing
+    AUTOPRELOADONLY,         // Score preloaded game piece
+    AUTOLEAVE,               // Leave starting zone
+    AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
+    AUTOPRELOADSCOREANOTHER, // Score preload and score another
+    AUTOTESTPATH             // Run a selected test path
+  }
+
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
   private Command                      m_autoCommand;
   PathPlannerTrajectory                m_autoTrajectory;

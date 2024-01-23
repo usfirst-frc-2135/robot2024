@@ -44,16 +44,7 @@ public class Constants
   public static final double kStickDeadband        = 0.15;
   public static final double kTriggerThreshold     = 0.25;
 
-  // Timeout constants
-  public static final int    kLongCANTimeoutMs     = 100;
-  public static final int    kCANTimeoutMs         = 10;
-
-  // PDH constatns
-  public static final double kMinCurrent           = 0.125;  // Minimum detectable current from PDH
-
-  // Field constants
-  public static final double kGridNodeSpacing      = 0.4667; // 18.375 inches between cube node and peg nodes
-
+  // Phoenix firmware versions expected
   public static final int    kPhoenix5MajorVersion = ((22 * 256) + 0);
   public static final int    kPhoenix6MajorVersion = 23;
 
@@ -257,52 +248,22 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Intake Roller
+  // Intake subsystem
   /////////////////////////////////////////////////////////////////////////////
-  public static final class IntakeRollerConsts
+  public static final class INConsts
   {
     // Global settings
 
-    // Current limit settings - Intake Roller
-
-    // Manual mode config parameters
-    public enum IntakeRollereMode
-    {
-    }
-
-    // Motion Magic config parameters
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Intake Rotor
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class IntakeRotorConsts
-  {
-    // Global settings
-
-    // Current limit settings - Intake Rotor
-
-    // Calibration
+    // Current limit settings - Roller
+    // Current limit settings - Rotary
 
     // Manual config parameters
-    public enum IntakeRotorMode
+    public enum RollerMode
     {
     }
-
-    // Motion Magic config parameters
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Feeder Roller 
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class FeederRollerConsts
-  {
-    // Global settings
-
-    // Current limit settings - Feeder Roller
 
     // Manual config parameters
-    public enum FeederRollerMode
+    public enum RotaryMode
     {
     }
 
@@ -310,17 +271,66 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Feeder Rotor
+  // Feeder subsystem 
   /////////////////////////////////////////////////////////////////////////////
-  public static final class FeederRotorConsts
+  public static final class FDConsts
   {
     // Global settings
 
-    // Input current limit settings - Feeder Rotor
+    // Current limit settings - Roller
+    // Current limit settings - Rotary
 
-    public enum FeederRotorMode
+    // Manual config parameters
+    public enum RollerMode
     {
     }
+
+    // Manual config parameters
+    public enum RotaryMode
+    {
+    }
+
+    // Motion Magic config parameters
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Shooter subsystem 
+  /////////////////////////////////////////////////////////////////////////////
+  public static final class SHConsts
+  {
+    // Global settings
+
+    // Current limit settings - Roller
+    // Current limit settings - Rotary
+
+    // Manual config parameters
+    public enum ShooterMode
+    {
+    }
+
+    // Manual config parameters
+    public enum RotaryMode
+    {
+    }
+
+    // Motion Magic config parameters
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Climber subsystem 
+  /////////////////////////////////////////////////////////////////////////////
+  public static final class CLConsts
+  {
+    // Global settings
+
+    // Current limit settings - Winch
+
+    // Manual config parameters
+    public enum ClimberMode
+    {
+    }
+
+    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////

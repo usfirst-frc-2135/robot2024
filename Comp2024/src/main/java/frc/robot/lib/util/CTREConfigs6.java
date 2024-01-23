@@ -3,15 +3,8 @@ package frc.robot.lib.util;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import frc.robot.Constants;
-import frc.robot.Constants.IntakeRollerConsts;
-import frc.robot.Constants.IntakeRotorConsts;
 import frc.robot.Constants.SWConsts;
-import frc.robot.Constants.FeederRollerConsts;
-import frc.robot.Robot;
-import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
 {
@@ -98,79 +91,34 @@ public final class CTREConfigs6
 
     return config;
   }
+
+  public static TalonFXConfiguration exampleFXConfig( )
+  {
+    TalonFXConfiguration exConfig = new TalonFXConfiguration( );
+
+    // Closed loop settings
+    // exConfig.ClosedLoopGeneral.*
+    // exConfig.ClosedLoopRamps.*
+
+    // Current limit settings
+
+    // Feedback settings
+    // exConfig.Feedback.*
+
+    // Hardware limit switches
+    // exConfig.HardwareLimitSwitch.*
+
+    // Motion Magic settings
+
+    // Motor output settings
+
+    // Open Loop settings
+    // exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
+
+    // Slot settings
+
+    // Software limit switches
+
+    return exConfig;
+  }
 }
-
-// elConfig.ClosedLoopGeneral.*
-// elConfig.ClosedLoopRamps.*
-
-// Current limit settings
-
-// Feedback settings
-// elConfig.Feedback.*
-
-// Hardware limit switches
-// elConfig.HardwareLimitSwitch.*
-
-// Motion Magic settings
-
-// Motor output settings
-
-// Closed loop settings
-
-// Open Loop settings
-
-// elConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
-
-// Slot settings
-
-// Software limit switches
-
-// Closed Loop settings
-// wrConfig.ClosedLoopGeneral.*
-// wrConfig.ClosedLoopRamps.*
-
-// Current limit settings
-
-// Feedback settings
-// wrConfig.Feedback.*
-
-// Hardware limit switches
-// wrConfig.HardwareLimitSwitch.*
-
-// Motion Magic settings
-
-// Closed loop settings
-
-// Open Loop settings
-
-// wrConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
-
-// Slot settings
-
-// Software limit switches
-
-// Closed Loop settings
-// exConfig.ClosedLoopGeneral.*
-// exConfig.ClosedLoopRamps.*
-
-// Current limit settings
-
-// Feedback settings
-// exConfig.Feedback.*
-
-// Hardware limit switches
-// exConfig.HardwareLimitSwitch.*
-
-// Motion Magic settings
-
-// Motor output settings
-
-// Closed loop settings
-
-// Open Loop settings
-
-// exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
-
-// Slot settings
-
-// Software limit switches

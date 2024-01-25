@@ -423,6 +423,35 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
+  // Limelight driving alignment
+  /////////////////////////////////////////////////////////////////////////////
+  public static final class LLConsts
+  {
+    // Default calibration
+    public static final double kDistance1        = 48;    // distance from bumper in inches for first reference point
+    public static final double kVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
+    public static final double kDistance2        = 60;    // distance from bumper in inches for second reference point
+    public static final double kVertOffset2      = -4.85; // LL y reading in degrees for second reference point
+
+    // Limelight PID driving controls
+    public static final double kTurnConstant     = 0.0;
+    public static final double kTurnPidKp        = 0.005;
+    public static final double kTurnPidKi        = 0.0;
+    public static final double kTurnPidKd        = 0.0;
+    public static final double kTurnMax          = 0.4;
+    public static final double kThrottlePidKp    = 0.011;
+    public static final double kThrottlePidKi    = 0.0;
+    public static final double kThrottlePidKd    = 0.0;
+    public static final double kThrottleMax      = 0.2;
+    public static final double kThrottleShape    = 10.0;
+
+    public static final double kTargetAngle      = 0.0;   // Optimal shooting angle
+    public static final double kSetPointDistance = 60.0;  // Optimal shooting distance
+    public static final double kAngleThreshold   = 3.5;   // Degrees tolerance around optimal
+    public static final double kDistThreshold    = 6.0;   // Inches tolerance around optimal
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
   // CANdle
   /////////////////////////////////////////////////////////////////////////////
   public static final class LEDConsts

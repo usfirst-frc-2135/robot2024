@@ -47,7 +47,7 @@ public class SwerveModule
 
     /* Angle Motor Config */
     m_steerMotor = new TalonFX(moduleConstants.steerMotorID, Constants.Ports.kCANCarnivore);
-    PhoenixUtil6.getInstance( ).talonFXInitialize6(m_steerMotor, steerName.toString( ), CTREConfigs6.swerveAngleFXConfig( ));
+    PhoenixUtil6.getInstance( ).talonFXInitialize6(m_steerMotor, steerName.toString( ), CTREConfigs6.swerveSteerFXConfig( ));
 
     /* Drive Motor Config */
     m_driveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Ports.kCANCarnivore);
@@ -89,8 +89,8 @@ public class SwerveModule
 
   public void resetToAbsolute( )
   {
-    m_steerMotor.setPosition(
-        Conversions.rotationsToInputRotations((getCanCoderRotations( ) - m_steerOffset), SWConsts.steerGearRatio));
+    m_steerMotor
+        .setPosition(Conversions.rotationsToInputRotations((getCanCoderRotations( ) - m_steerOffset), SWConsts.steerGearRatio));
   }
 
   public double getCanCoderRotations( )

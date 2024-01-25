@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Dummy;
+import frc.robot.generated.TunerConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -59,6 +60,8 @@ public class RobotContainer
   PathPlannerTrajectory                m_autoTrajectory;
 
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
+
+  public final CommandSwerveDrivetrain drivetrain    = TunerConstants.DriveTrain; // My drivetrain
 
   // Command Scheduler
 
@@ -230,6 +233,7 @@ public class RobotContainer
    */
   private void initAutonomousChooser( )
   {
+
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
@@ -249,6 +253,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
+
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     Alliance alliance = DriverStation.getAlliance( ).get( );
@@ -300,6 +305,8 @@ public class RobotContainer
     // }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
+
+    m_autoCommand = drivetrain.getAutoPath("Test");//pathName);
 
     return m_autoCommand;
   }

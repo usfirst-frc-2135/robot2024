@@ -3,11 +3,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -26,6 +28,8 @@ public class Robot extends TimedRobot
   private Command            m_autonomousCommand;
 
   private boolean            m_faultsCleared = false;
+
+  private final boolean      UseLimelight    = false;
 
   public static CTREConfigs5 ctreConfigs5;
   public static CTREConfigs6 ctreConfigs6;
@@ -67,6 +71,8 @@ public class Robot extends TimedRobot
     // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
     m_robotContainer = RobotContainer.getInstance( );
 
+    m_robotContainer.drivetrain.getDaqThread( ).setThreadPriority(99);
+
     LiveWindow.disableAllTelemetry( );
 
     CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(String.format("%s: Init", cmd.getName( ))));
@@ -98,6 +104,18 @@ public class Robot extends TimedRobot
     // subsystem periodic() methods. This must be called from the robot's periodic block in order
     // for anything in the Command-based framework to work.
     CommandScheduler.getInstance( ).run( );
+
+    if (UseLimelight)
+    {
+      var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
+
+      Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
+
+      if (lastResult.valid)
+      {
+        m_robotContainer.drivetrain.addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
+      }
+    }
   }
 
   /**

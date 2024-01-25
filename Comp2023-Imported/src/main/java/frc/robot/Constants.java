@@ -7,15 +7,12 @@ import java.util.List;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.pathplanner.lib.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.math.util.Units;
 import frc.robot.lib.util.SwerveModuleConstants;
 
@@ -286,7 +283,7 @@ public class Constants
 
     // CANCoder elbow absolute offset
     public static final double               kCompOffset               = 0.0203;  // CANCoder offset rotations for comp bot
-    public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
+    public static final double               kBetaOffset               = 0.000;   // CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual mode config parameters
@@ -421,8 +418,8 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
 
     // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = 0.083252; // CANCoder offset angle for comp bot
-    public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
+    public static final double               kCompOffset               = 0.08325; // CANCoder offset angle for comp bot
+    public static final double               kBetaOffset               = 0.000;   // CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual config parameters
@@ -612,67 +609,20 @@ public class Constants
       AUTOPRESTOP,        // AutoPreloadAndStop
       AUTOPRECOMSHORT,    // AutoPreloadAndDriveOffCommunityShort
       AUTOPRECOMLONG,     // AutoPreloadAndDriveOffCommunityLong
-      AUTOPRECHARGE      // AutoPreloadAndEngageChargeStation
+      AUTOPRECHARGE,      // AutoPreloadAndEngageChargeStation
+      AUTOTESTPATH
     }
 
-    public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
-    public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
-
-    public static final double                       kSlowSpeedMetersPerSecond                   = 1.7;
-    public static final double                       kSlowAccelerationMetersPerSecondSquared     = 2.0;
-
-    public static final double                       kChargeSpeedMetersPerSecond                 = 4.0;
-    public static final double                       kChargeAccelerationMetersPerSecondSquared   = 6.0;
-
-    public static final double                       kSlowMaxAngularSpeedRadiansPerSecond        = 0.8 * Math.PI;
-    public static final double                       kSlowMaxAngularSpeedRadiansPerSecondSquared =
-        Math.pow(kSlowMaxAngularSpeedRadiansPerSecond, 2);
-
-    public static final double                       kMaxAngularSpeedRadiansPerSecond            = 1.2 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared     =
+    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 1.2 * Math.PI;
+    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
         Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
 
-    public static final double                       kPXController                               = 1;
-    public static final double                       kPYController                               = 1;
-    public static final double                       kPThetaController                           = 5;
+    public static final double                       kPXController                           = 1;
+    public static final double                       kPYController                           = 1;
+    public static final double                       kPThetaController                       = 5;
 
     // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints                 =
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-
-    // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kSlowThetaControllerConstraints             =
-        new TrapezoidProfile.Constraints(kSlowMaxAngularSpeedRadiansPerSecond, kSlowMaxAngularSpeedRadiansPerSecondSquared);
-
-    public static TrajectoryConfig createConfig(double maxSpeed, double maxAccel, double startSpeed, double endSpeed)
-    {
-      TrajectoryConfig config = new TrajectoryConfig(maxSpeed, maxAccel);
-      config.setKinematics(SWConsts.swerveKinematics);
-      config.setStartVelocity(startSpeed);
-      config.setEndVelocity(endSpeed);
-      config.addConstraint(new CentripetalAccelerationConstraint(3.0));
-
-      return config;
-    }
-
-    // Trajectory Speed Configs
-    public static final TrajectoryConfig defaultSpeedConfig =
-        new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
-            .setKinematics(SWConsts.swerveKinematics);
-
-    public static final TrajectoryConfig slowSpeedConfig    =
-        new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
-            .setKinematics(SWConsts.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
-
-    // Path following constraints
-    public static final PathConstraints  defaultPathConfig  =
-        new PathConstraints(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared);
-
-    public static final PathConstraints  slowPathConfig     =
-        new PathConstraints(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared);
-
-    public static final PathConstraints  chargePathConfig   =
-        new PathConstraints(kChargeSpeedMetersPerSecond, kChargeAccelerationMetersPerSecondSquared);
   }
-
 }

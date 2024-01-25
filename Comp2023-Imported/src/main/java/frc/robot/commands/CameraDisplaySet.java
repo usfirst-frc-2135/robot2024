@@ -3,8 +3,6 @@
 //
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Vision;
 
@@ -13,13 +11,11 @@ import frc.robot.subsystems.Vision;
  */
 public class CameraDisplaySet extends Command
 {
-  private int          m_stream;
-  private NetworkTable m_table;            // Network table reference for getting LL values
-  private Vision       m_vision;
+  private int    m_stream;
+  private Vision m_vision;
 
   public CameraDisplaySet(Vision vision, int stream)
   {
-    m_table = NetworkTableInstance.getDefault( ).getTable("limelight");
     m_vision = vision;
     m_stream = stream;
 

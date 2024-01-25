@@ -6,7 +6,7 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -65,11 +65,12 @@ public class Swerve extends SubsystemBase
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
   private PathPlannerTrajectory    m_trajectory;
+
   private Timer                    m_trajTimer         = new Timer( );
   private Pose2d                   m_poseBeforePath    = new Pose2d( );
   private Pose2d                   m_posePathStart     = new Pose2d( );
   private boolean                  m_isFieldRelative   = true;
-  private boolean                  m_allowPoseEstimate = false;
+  private boolean                  m_allowPoseEstimate = true;
 
   // Module variables
   private boolean                  m_isSnapping;
@@ -165,6 +166,8 @@ public class Swerve extends SubsystemBase
     // swTab.add("SWM0_Velocity", m_swerveMods[0].getState( ).speedMetersPerSecond).withPosition(0, 0).withSize(2, 1);
 
     SmartDashboard.putData("Field", m_field);
+    // pose
+
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -205,6 +208,10 @@ public class Swerve extends SubsystemBase
 
   private void updateSmartDashboard( )
   {
+    SmartDashboard.putNumber("poseEstimationX", m_poseEstimator.getEstimatedPosition( ).getX( ));
+    SmartDashboard.putNumber("poseEstimationY", m_poseEstimator.getEstimatedPosition( ).getY( ));
+    SmartDashboard.putNumber("poseEstimationRotation", m_poseEstimator.getEstimatedPosition( ).getRotation( ).getDegrees( ));
+
     if (m_swerveDebug)
     {
       for (int i = 0; i < 4; i++)
@@ -274,7 +281,6 @@ public class Swerve extends SubsystemBase
 
       return;
     }
-
     // get turn value - just horizontal offset from target
     double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
 
@@ -349,16 +355,35 @@ public class Swerve extends SubsystemBase
   //
   // Autonomous mode - Holonomic path follower
   //
+
+  public Trajectory PPTrajectoryToWPITrajectory(PathPlannerTrajectory trajectory)
+  {
+    List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
+    trajStates.clear( );
+
+    for (PathPlannerTrajectory.State state : trajectory.getStates( ))
+    {
+      trajStates.add(PPTrajectoryStateToWPITrajectorState(state));
+    }
+    return new Trajectory(trajStates);
+  }
+
+  public Trajectory.State PPTrajectoryStateToWPITrajectorState(PathPlannerTrajectory.State trajectoryState)
+  {
+    return new Trajectory.State(trajectoryState.timeSeconds, trajectoryState.velocityMps, trajectoryState.accelerationMpsSq,
+        new Pose2d(trajectoryState.positionMeters, trajectoryState.heading), trajectoryState.curvatureRadPerMeter);
+  }
+
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
     m_trajectory = trajectory;
 
     m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
-    m_field.getObject("trajectory").setTrajectory(m_trajectory);
+    m_field.getObject("trajectory").setTrajectory(PPTrajectoryToWPITrajectory(m_trajectory));
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
-    trajStates = m_trajectory.getStates( );
+    trajStates = PPTrajectoryToWPITrajectory(m_trajectory).getStates( );
     DataLogManager.log(String.format("%s: PATH states: %d duration: %.3f secs", getSubsystem( ), trajStates.size( ),
         m_trajectory.getTotalTimeSeconds( )));
 
@@ -366,7 +391,7 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       m_poseBeforePath = getPose( );
-      m_posePathStart = m_trajectory.getInitialHolonomicPose( );
+      m_posePathStart = m_trajectory.getInitialTargetHolonomicPose( );
       resetOdometry(m_posePathStart);
       m_isFieldRelative = false;
     }
@@ -376,11 +401,11 @@ public class Swerve extends SubsystemBase
 
   public void driveWithPathFollowerExecute( )
   {
-    Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
+    PathPlannerTrajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
-        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
+    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose,
+        PPTrajectoryStateToWPITrajectorState(trajState), m_trajectory.getEndState( ).targetHolonomicRotation);
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -395,12 +420,12 @@ public class Swerve extends SubsystemBase
     double currentBL = m_swerveMods[2].getState( ).speedMetersPerSecond;
     double currentBR = m_swerveMods[3].getState( ).speedMetersPerSecond;
 
-    double targetTrajX = trajState.poseMeters.getX( );
-    double targetTrajY = trajState.poseMeters.getY( );
+    double targetTrajX = trajState.positionMeters.getX( );
+    double targetTrajY = trajState.positionMeters.getY( );
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( );
+    double targetHeading = m_trajectory.getEndState( ).targetHolonomicRotation.getDegrees( );
     double currentHeading = currentPose.getRotation( ).getDegrees( );
 
     setModuleStates(moduleStates);
@@ -440,16 +465,14 @@ public class Swerve extends SubsystemBase
       SmartDashboard.putNumber(String.format("%s: PATH_targetTrajX", getSubsystem( )), currentTrajX);
       SmartDashboard.putNumber(String.format("%s: PATH_targetTrajY", getSubsystem( )), currentTrajY);
 
-      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorX", getSubsystem( )),
-          trajState.poseMeters.relativeTo(currentPose).getX( ));
-      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorY", getSubsystem( )),
-          trajState.poseMeters.relativeTo(currentPose).getY( ));
+      //SmartDashboard.putNumber(String.format("%s: PATH_trajErrorX", getSubsystem( )),
+      // trajState.positionMeters.relativeTo(currentPose).getX( ));
+      //SmartDashboard.putNumber(String.format("%s: PATH_trajErrorY", getSubsystem( )),
+      //trajState.positionMeters.relativeTo(currentPose).getY( ));
 
       // target heading and its error
       SmartDashboard.putNumber(String.format("%s: PATH_targetHeading", getSubsystem( )), targetHeading);
       SmartDashboard.putNumber(String.format("%s: PATH_currentHeading", getSubsystem( )), currentHeading);
-      SmartDashboard.putNumber(String.format("%s: PATH_headingError", getSubsystem( )),
-          trajState.poseMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
     }
   }
 
@@ -548,9 +571,7 @@ public class Swerve extends SubsystemBase
           ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation, m_pigeon.getYaw( ))
           : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
     }
-
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SWConsts.maxSpeed);
-
     for (SwerveModule mod : m_swerveMods)
       mod.setDesiredState(swerveModuleStates[mod.m_moduleNumber], isOpenLoop);
   }

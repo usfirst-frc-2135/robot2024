@@ -89,7 +89,7 @@ public class SwerveModule
 
   public void resetToAbsolute( )
   {
-    m_steerMotor.setRotorPosition(
+    m_steerMotor.setPosition(
         Conversions.rotationsToInputRotations((getCanCoderRotations( ) - m_steerOffset), SWConsts.steerGearRatio));
   }
 

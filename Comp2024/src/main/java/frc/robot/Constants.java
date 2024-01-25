@@ -372,12 +372,19 @@ public class Constants
   public static final class VIConsts
   {
     // Limelight-defined streaming states
+    public static final int STANDARD      = 0;  // Both cameras side-by-side
+    public static final int PIP_MAIN      = 1;  // Limelight with second camera inset
+    public static final int PIP_SECONDARY = 2;  // Second camera with limelight inset
 
     // Limelight-defined LED mode states
+    public static final int LED_OFF       = 1;
+    public static final int LED_ON        = 3;
 
     public enum VIRequests
     {
-
+      VISION_OFF,   // Disable limelight LED and enable secondary camera mode
+      VISION_ON,    // Enable limelight LED and disable secondary camera mode
+      VISION_TOGGLE // Toggle mode
     }
 
     public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //

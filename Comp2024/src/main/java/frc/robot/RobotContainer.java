@@ -325,14 +325,14 @@ public class RobotContainer
     m_odomChooser.addOption("ID6 - AprilTag", 6);
     m_odomChooser.addOption("ID7 - AprilTag", 7);
     m_odomChooser.addOption("ID8 - AprilTag", 8);
-    m_odomChooser.addOption("ID8 - AprilTag", 9);
-    m_odomChooser.addOption("ID8 - AprilTag", 10);
-    m_odomChooser.addOption("ID8 - AprilTag", 11);
-    m_odomChooser.addOption("ID8 - AprilTag", 12);
-    m_odomChooser.addOption("ID8 - AprilTag", 13);
-    m_odomChooser.addOption("ID8 - AprilTag", 14);
-    m_odomChooser.addOption("ID8 - AprilTag", 15);
-    m_odomChooser.addOption("ID8 - AprilTag", 16);
+    m_odomChooser.addOption("ID9 - AprilTag", 9);
+    m_odomChooser.addOption("ID10 - AprilTag", 10);
+    m_odomChooser.addOption("ID11 - AprilTag", 11);
+    m_odomChooser.addOption("ID12 - AprilTag", 12);
+    m_odomChooser.addOption("ID13 - AprilTag", 13);
+    m_odomChooser.addOption("ID14 - AprilTag", 14);
+    m_odomChooser.addOption("ID15 - AprilTag", 15);
+    m_odomChooser.addOption("ID16 - AprilTag", 16);
 
     // Configure odometry sendable chooser
     SmartDashboard.putData("Reset Odometry Mode", m_odomChooser);

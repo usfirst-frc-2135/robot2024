@@ -246,6 +246,7 @@ public class Vision extends SubsystemBase
     return Math.hypot(deltaTransform.getX( ), deltaTransform.getY( )) < 1.0;
   }
 
+  // TODO: change to be 2024 apriltrag positions
   public boolean isAprilTagValid(int aprilTagID)
   {
     if (DriverStation.getAlliance( ).get( ) == Alliance.Blue)

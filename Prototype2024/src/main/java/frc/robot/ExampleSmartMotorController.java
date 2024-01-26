@@ -89,12 +89,12 @@ public class ExampleSmartMotorController implements MotorController
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps( )));
 
-    SmartDashboard.putNumber("2-motorVolts", m_motorSim.getMotorOutputLeadVoltage( ));    // Voltage applied to motor
-    SmartDashboard.putNumber("3-armPos", m_elevatorSim.getPositionMeters( ));             // Get elevator position from simulation (meters)
-    SmartDashboard.putNumber("4-armVel", m_elevatorSim.getVelocityMetersPerSecond( ));    // Get elevator velocity from simulation (mps)
+    // SmartDashboard.putNumber("2-motorVolts", m_motorSim.getMotorOutputLeadVoltage( ));    // Voltage applied to motor
+    // SmartDashboard.putNumber("3-armPos", m_elevatorSim.getPositionMeters( ));             // Get elevator position from simulation (meters)
+    // SmartDashboard.putNumber("4-armVel", m_elevatorSim.getVelocityMetersPerSecond( ));    // Get elevator velocity from simulation (mps)
     SmartDashboard.putNumber("5-Rotations", getEncoderPosition( ));                       // Output shaft distance (rotations)
-    SmartDashboard.putNumber("6-Velocity", getEncoderVelocity( ));                        // Output shaft velocity (rps)
-    SmartDashboard.putNumber("7-normError", m_motor.getClosedLoopError( ) / kEncoderCPR); // Normalized error in shaft rotations 
+    // SmartDashboard.putNumber("6-Velocity", getEncoderVelocity( ));                        // Output shaft velocity (rps)
+    // SmartDashboard.putNumber("7-normError", m_motor.getClosedLoopError( ) / kEncoderCPR); // Normalized error in shaft rotations 
     SmartDashboard.putNumber("8-setpoint", m_motor.getSelectedSensorPosition( )); // Normalized error in shaft rotations 
     // SmartDashboard.putNumber("9-encoder", m_motor.getClosedLoopTarget( ));        // Normalized error in shaft rotations 
   }

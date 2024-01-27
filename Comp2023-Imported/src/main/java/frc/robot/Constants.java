@@ -579,7 +579,7 @@ public class Constants
       AUTOPRECOMSHORT,    // AutoPreloadAndDriveOffCommunityShort
       AUTOPRECOMLONG,     // AutoPreloadAndDriveOffCommunityLong
       AUTOPRECHARGE,      // AutoPreloadAndEngageChargeStation
-      AUTOTESTPATH
+      AUTOTESTPATH, AUTOSHORTNOTE
     }
 
     public static final double                       kMaxAngularSpeedRadiansPerSecond        = 1.2 * Math.PI;

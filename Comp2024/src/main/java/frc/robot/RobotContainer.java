@@ -6,8 +6,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -17,10 +20,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Dummy;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Telemetry;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,13 +37,30 @@ import frc.robot.commands.Dummy;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_instance;
+  private static RobotContainer                m_instance;
 
   // Joysticks
-  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController                 m_driverPad     = new XboxController(Constants.kDriverPadPort);
+  private final XboxController                 m_operatorPad   = new XboxController(Constants.kOperatorPadPort);
 
-  private Field2d               m_field       = new Field2d( );
+  private Field2d                              m_field         = new Field2d( );
+
+  private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+  private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final CommandXboxController          joystick        = new CommandXboxController(0); // My joystick
+
+  private final SwerveRequest.FieldCentric     drive           =
+      new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+                                                                  // driving in open loop
+  private final SwerveRequest.SwerveDriveBrake brake           = new SwerveRequest.SwerveDriveBrake( );
+  private final SwerveRequest.RobotCentric     forwardStraight =
+      new SwerveRequest.RobotCentric( ).withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.PointWheelsAt    point           = new SwerveRequest.PointWheelsAt( );
+
+  private final Telemetry                      logger          = new Telemetry(MaxSpeed);
 
   // The robot's shared subsystems
 
@@ -60,6 +84,8 @@ public class RobotContainer
 
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
 
+  public final CommandSwerveDrivetrain drivetrain    = TunerConstants.DriveTrain; // My drivetrain
+
   // Command Scheduler
 
   /**
@@ -70,6 +96,8 @@ public class RobotContainer
     addSmartDashboardWidgets( );
 
     configureButtonBindings( );
+
+    configureBindings( );
 
     initDefaultCommands( );
 
@@ -205,6 +233,32 @@ public class RobotContainer
     operRightTrigger.onTrue(new Dummy("oper right trigger"));
   }
 
+  // Taken from CTRE-SwerveWithPathPlanner
+  private void configureBindings( )
+  {
+    drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(( ) -> drive.withVelocityX(-joystick.getLeftY( ) * MaxSpeed) // Drive forward with
+            // negative Y (forward)
+            .withVelocityY(-joystick.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(-joystick.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        ).ignoringDisable(true));
+
+    joystick.a( ).whileTrue(drivetrain.applyRequest(( ) -> brake));
+    joystick.b( ).whileTrue(
+        drivetrain.applyRequest(( ) -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY( ), -joystick.getLeftX( )))));
+
+    // reset the field-centric heading on left bumper press
+    joystick.leftBumper( ).onTrue(drivetrain.runOnce(( ) -> drivetrain.seedFieldRelative( )));
+
+    // if (Utils.isSimulation()) {
+    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+    // }
+    drivetrain.registerTelemetry(logger::telemeterize);
+
+    joystick.pov(0).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
+    joystick.pov(180).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
+  }
+
   /****************************************************************************
    * 
    * Initialize default commands for these subsystems
@@ -230,6 +284,7 @@ public class RobotContainer
    */
   private void initAutonomousChooser( )
   {
+
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
@@ -249,6 +304,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
+
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     Alliance alliance = DriverStation.getAlliance( ).get( );
@@ -300,6 +356,8 @@ public class RobotContainer
     // }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
+
+    m_autoCommand = drivetrain.getAutoPath("Test");//pathName);
 
     return m_autoCommand;
   }

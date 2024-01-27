@@ -345,6 +345,7 @@ public class RobotContainer
     m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", AutoChooser.AUTOPRECOMLONG);
     m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", AutoChooser.AUTOPRECHARGE);
     m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("9 - AutoShortNote", AutoChooser.AUTOSHORTNOTE);
 
     //m_chooser.addOption("8 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
 
@@ -384,6 +385,10 @@ public class RobotContainer
         break;
       case AUTOTESTPATH :
         pathName = "DriveExample";
+        break;
+      case AUTOSHORTNOTE :
+        pathName = (alliance == Alliance.Red) ? "R_DriveShortNote" : "B_DriveShortNote";
+        break;
     }
 
     if (pathName != null)
@@ -422,6 +427,9 @@ public class RobotContainer
         break;
       case AUTOTESTPATH :
         m_autoCommand = new AutoDrivePath(m_swerve, "DriveExample", m_autoTrajectory, false);
+        break;
+      case AUTOSHORTNOTE :
+        m_autoCommand = new AutoDrivePath(m_swerve, pathName, m_autoTrajectory, true);
         break;
     }
 

@@ -47,6 +47,7 @@ public class ExampleSmartMotorController implements MotorController
   // private static final double   kRolloutRatioMeters = kDrumCircumMeters / kGearRatio;     // Meters per shaft rotation
 
   private WPI_TalonSRX          m_motor;
+  private int                   m_port;
   private TalonSRXSimCollection m_motorSim;
   //private final ElevatorSim     m_elevatorSim       = new ElevatorSim(DCMotor.getVex775Pro(1), kGearRatio, kCarriageMassKg,
   //    kDrumDiameterMeters / 2, -kLengthMeters, kLengthMeters, false);
@@ -60,6 +61,7 @@ public class ExampleSmartMotorController implements MotorController
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public ExampleSmartMotorController(int port)
   {
+    m_port = port;
     // Create the Talon SRX object and the attached CTRE Mag encoder
     m_motor = new WPI_TalonSRX(port);
     m_motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
@@ -212,7 +214,8 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public void set(double percentOutput)
   {
-    // m_motor.set(ControlMode.PercentOutput, percentOutput);
+    m_motor.set(ControlMode.PercentOutput, percentOutput);
+    SmartDashboard.putNumber("set value " + m_port, percentOutput);
   }
 
   /**

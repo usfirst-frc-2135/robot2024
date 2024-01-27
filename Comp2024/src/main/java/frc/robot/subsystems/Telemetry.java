@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.lib.util.PhoenixUtil6;
 
 public class Telemetry
 {
@@ -31,6 +32,7 @@ public class Telemetry
   {
     MaxSpeed = maxSpeed;
     SignalLogger.start( );
+    lastTime = Utils.getCurrentTimeSeconds( );
   }
 
   /* What to publish over networktables for telemetry */
@@ -50,7 +52,7 @@ public class Telemetry
 
   /* Keep a reference of the last pose to calculate the speeds */
   private Pose2d                       m_lastPose         = new Pose2d( );
-  private double                       lastTime           = Utils.getCurrentTimeSeconds( );
+  private double                       lastTime           = 0.0;
 
   /* Mechanisms to represent the swerve module states */
   private final Mechanism2d[ ]         m_moduleMechanisms = new Mechanism2d[ ]

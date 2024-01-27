@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VIConsts;
-import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -18,67 +17,66 @@ import frc.robot.subsystems.Vision;
  */
 public class DriveLimelightPath extends Command
 {
-  private final Swerve          m_swerve;
-  private final Vision          m_vision;
-  private final VIGoalDirection m_goalDirection;
-  private Pose2d                m_goalPose;
+  // private final Swerve          m_swerve;
+  // private final Vision          m_vision;
+  private Pose2d m_goalPose;
 
-  public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
+  // public DriveLimelightPath(Swerve swerve, Vision vision)
   {
-    m_swerve = swerve;
-    m_vision = vision;
-    m_goalDirection = goalDirection;
+    // m_swerve = swerve;
+    // m_vision = vision;
+    // m_goalDirection = goalDirection;
 
-    setName("DriveLimelightPath");
-    addRequirements(m_swerve);
+    // setName("DriveLimelightPath");
+    // addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    Pose2d currentPose = m_swerve.getPose( );
-    DataLogManager.log(String.format("%s: goalDirection %s curPose %s", getName( ), m_goalDirection, currentPose));
+    // Pose2d currentPose = m_swerve.getPose( );
+    // DataLogManager.log(String.format("%s: goalDirection %s curPose %s", getName( ), m_goalDirection, currentPose));
 
-    m_goalPose = getGoalPose(m_goalDirection);
-    DataLogManager.log(String.format("%s: goalPose %s", getName( ), m_goalPose));
+    // m_goalPose = getGoalPose(m_goalDirection);
+    // DataLogManager.log(String.format("%s: goalPose %s", getName( ), m_goalPose));
 
-    if (m_goalPose != null)
-    {
-      //PathPlannerTrajectory trajectory = new PathPlannerPath(new List<Translation2d> (currentPose, m_goalPose)), new PathConstraints(1.7, 2, 2 * Math.PI, 4 * Math.PI),
-      //new GoalEndState(0, m_goalPose.getRotation()).getTrajectory(new ChassisSpeeds(), new Rotation2d());
+    // if (m_goalPose != null)
+    // {
+    //   //PathPlannerTrajectory trajectory = new PathPlannerPath(new List<Translation2d> (currentPose, m_goalPose)), new PathConstraints(1.7, 2, 2 * Math.PI, 4 * Math.PI),
+    //   //new GoalEndState(0, m_goalPose.getRotation()).getTrajectory(new ChassisSpeeds(), new Rotation2d());
 
-      //m_swerve.driveWithPathFollowerInit(trajectory, true);
-    }
+    //   //m_swerve.driveWithPathFollowerInit(trajectory, true);
+    // }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    if (m_goalPose != null)
-    {
-      m_swerve.driveWithPathFollowerExecute( );
-    }
+    // if (m_goalPose != null)
+    // {
+    //   m_swerve.driveWithPathFollowerExecute( );
+    // }
   }
 
   // Called once the command ends or is  interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_swerve.driveWithPathFollowerEnd( );
-    if (m_goalPose == null)
-    {
-      m_swerve.driveStop(true);
-    }
+    // m_swerve.driveWithPathFollowerEnd( );
+    // if (m_goalPose == null)
+    // {
+    //   m_swerve.driveStop(true);
+    // }
   }
 
   // Returns true when the command  sh
-  @Override
-  public boolean isFinished( )
-  {
-    return (m_goalPose == null) || (m_swerve.driveWithPathFollowerIsFinished( ));
-  }
+  // @Override
+  // public boolean isFinished( )
+  // {
+  //   return (m_goalPose == null) || (m_swerve.driveWithPathFollowerIsFinished( ));
+  // }
 
   @Override
   public boolean runsWhenDisabled( )
@@ -91,58 +89,29 @@ public class DriveLimelightPath extends Command
     return (targetId <= 4) ? -1 : 1;
   }
 
-  public Pose2d getGoalPose(VIConsts.VIGoalDirection goalDirection)
+  // public Pose2d getGoalPose()
   {
-    int targetId = m_vision.getTargetID( );
+    // int targetId = m_vision.getTargetID( );
 
-    if ((!m_vision.isAprilTagValid(targetId)) || (targetId < 0))
-    {
-      return null;
-    }
+    // if ((!m_vision.isAprilTagValid(targetId)) || (targetId < 0))
+    // {
+    //   return null;
+    // }
 
-    Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
-    double goalXValue = 0;
-    double goalYValue = 0;
-    String strName;
+    // Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
+    // double goalXValue = 0;
+    // double goalYValue = 0;
+    // String strName;
 
-    if (targetId == 4 || targetId == 5)
-    {
-      goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustSubPathX);
-    }
-    else
-    {
-      goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathX);
-    }
-
-    switch (goalDirection)
-    {
-      default :
-      case DIRECTION_LEFT :
-        strName = "LEFT";
-        goalYValue = targetPose.getY( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathY);
-        if (targetId == 4 || targetId == 5)
-        {
-          goalYValue = targetPose.getY( ) - getSignFromId(targetId) * (VIConsts.kAdjustSubPathY);
-        }
-        break;
-      case DIRECTION_MIDDLE :
-        strName = "MIDDLE";
-        goalYValue = targetPose.getY( );
-        break;
-      case DIRECTION_RIGHT :
-        strName = "RIGHT";
-        goalYValue = targetPose.getY( ) - getSignFromId(targetId) * (VIConsts.kAdjustPathY);
-        if (targetId == 4 || targetId == 5)
-        {
-          goalYValue = targetPose.getY( ) + getSignFromId(targetId) * VIConsts.kAdjustSubPathY;
-        }
-        break;
-    }
-
-    DataLogManager.log(String.format("%s: Calculate target ID %d direction %s", getName( ), targetId, strName));
-
-    return new Pose2d(new Translation2d(goalXValue, goalYValue),
-        new Rotation2d(targetPose.getRotation( ).getRadians( ) + Math.PI));
+    // if (targetId == 4 || targetId == 5)
+    // {
+    //   goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustSubPathX);
+    // }
+    // else
+    // {
+    //   goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathX);
+    // }
 
   }
+
 }

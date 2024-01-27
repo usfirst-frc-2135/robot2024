@@ -257,13 +257,6 @@ public class Swerve extends SubsystemBase
     double ty = vision.getVertOffsetDeg( );
     m_limelightDistance = vision.getDistLimelight( );
 
-    // boolean sanityCheck =
-    //     tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
-    // // && (fabs(ty) <= vertAngleRange)
-
-    // DataLogManager.log(String.format("%s: DLL tv: %d tx: %.2f ty: %.2f lldist: %.2f distErr: %.2f check: %s", getSubsystem( ), tv,
-    //     tx, ty, m_limelightDistance, Math.abs(m_setPointDistance - m_limelightDistance), ((sanityCheck) ? "PASSED" : "FAILED")));
-
     return true;
   }
 

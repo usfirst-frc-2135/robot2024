@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.VIConsts;
 
 /**
@@ -29,10 +28,6 @@ public class Vision extends SubsystemBase
   public MedianFilter           m_tvfilter      = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
 
   // Declare module variables
-  private double                m_distance1     = LLConsts.kDistance1;   // x position in inches for first reference point
-  private double                m_vertOffset1   = LLConsts.kVertOffset1; // y reading in degrees for first reference point
-  private double                m_distance2     = LLConsts.kDistance2;   // x position in inches for second reference point
-  private double                m_vertOffset2   = LLConsts.kVertOffset2; // y reading in degrees for second reference point
   private double                m_slope;   // Linear regressions slope from calibration
   private double                m_offset;  // Linear regressions slope from calibration
 
@@ -65,10 +60,6 @@ public class Vision extends SubsystemBase
     m_table = NetworkTableInstance.getDefault( ).getTable("limelight");
 
     // Put all the needed widgets on the dashboard
-    SmartDashboard.putNumber("VI_distance1", m_distance1);
-    SmartDashboard.putNumber("VI_distance2", m_distance2);
-    SmartDashboard.putNumber("VI_vertOffset1", m_vertOffset1);
-    SmartDashboard.putNumber("VI_vertOffset2", m_vertOffset2);
 
     SmartDashboard.setDefaultBoolean("VI_OVERRIDE", false);
     SmartDashboard.putNumber("VI_OVERRIDE_TX", 0.0);
@@ -246,7 +237,6 @@ public class Vision extends SubsystemBase
     return Math.hypot(deltaTransform.getX( ), deltaTransform.getY( )) < 1.0;
   }
 
-  // TODO: change to be 2024 apriltrag positions
   public boolean isAprilTagValid(int aprilTagID)
   {
     if (DriverStation.getAlliance( ).get( ) == Alliance.Blue)
@@ -293,17 +283,6 @@ public class Vision extends SubsystemBase
   }
 
   public void syncStateFromDashboard( )
-  {
-    m_distance1 = SmartDashboard.getNumber("VI_distance1", m_distance1);
-    m_distance2 = SmartDashboard.getNumber("VI_distance2", m_distance2);
-    m_vertOffset1 = SmartDashboard.getNumber("VI_vertOffset1", m_vertOffset1);
-    m_vertOffset2 = SmartDashboard.getNumber("VI_vertOffset2", m_vertOffset2);
-
-    m_slope = (m_distance2 - m_distance1) / (m_vertOffset2 - m_vertOffset1);
-    m_offset = m_distance1 - m_slope * m_vertOffset1;
-
-    SmartDashboard.putNumber("VI_Slope", m_slope);
-    SmartDashboard.putNumber("VI_Offset", m_offset);
-  }
+  {}
 
 }

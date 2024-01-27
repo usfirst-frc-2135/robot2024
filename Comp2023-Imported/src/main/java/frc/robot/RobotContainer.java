@@ -29,7 +29,6 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts;
-import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.Constants.WRConsts;
 import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.ArmSetHeightIdle;
@@ -191,9 +190,6 @@ public class RobotContainer
 
     // On-the-fly path generation helper tests
     SmartDashboard.putData("DriveResetOdometry", new DriveResetOdometry(m_swerve, m_vision));
-    SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
-    SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
-    SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
 
     // LED (CANdle) test
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
@@ -240,9 +236,7 @@ public class RobotContainer
 
     // Driver - A, B, X, Y
     driverA.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
-    driverB.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
-    driverX.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
-    driverY.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+
     //
     // Driver - Bumpers, start, back
     driverLeftBumper.onTrue(new Dummy("left bumper"));

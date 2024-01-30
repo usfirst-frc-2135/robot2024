@@ -18,7 +18,7 @@ public class Intake extends SubsystemBase
 {
   // Member objects
   private final WPI_TalonSRX m_intakeRoller = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private final TalonFX      m_intakeRotor  = new TalonFX(Ports.kCANID_IntakeRotary);
+  private final TalonFX      m_intakeRotary = new TalonFX(Ports.kCANID_IntakeRotary);
   private final CANcoder     m_CANCoder     = new CANcoder(Ports.kCANID_IntakeCANCoder);
   private final DigitalInput m_notInIntake  = new DigitalInput(Ports.kDIO0_NoteInIntake);
 

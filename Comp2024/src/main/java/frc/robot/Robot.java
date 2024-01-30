@@ -24,7 +24,8 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class Robot extends TimedRobot
 {
-  private final boolean      UseLimelight    = false;
+  private final boolean      m_useLimelight  = false;
+  public boolean             m_isComp        = false;
 
   private RobotContainer     m_robotContainer;
   private Command            m_autonomousCommand;
@@ -54,12 +55,12 @@ public class Robot extends TimedRobot
       robotName = "SIMULATION";
     else if (serialNum.equals(Constants.kCompSN))
     {
-      Constants.isComp = true;
+      m_isComp = true;
       robotName = "COMPETITION (A)";
     }
     else if (serialNum.equals(Constants.kBetaSN))
     {
-      Constants.isComp = false;
+      m_isComp = false;
       robotName = "PRACTICE (B)";
     }
     DataLogManager.log(String.format("robotInit: Detected the %s robot! ", robotName));
@@ -102,7 +103,7 @@ public class Robot extends TimedRobot
     // for anything in the Command-based framework to work.
     CommandScheduler.getInstance( ).run( );
 
-    if (UseLimelight)
+    if (m_useLimelight)
     {
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 

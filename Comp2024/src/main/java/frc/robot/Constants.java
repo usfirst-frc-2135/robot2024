@@ -27,9 +27,6 @@ import frc.robot.lib.util.SwerveModuleConstants;
  */
 public class Constants
 {
-  // Toggles constants between comp robot and practice robot (named "beta")
-  public static boolean      isComp;
-
   // bot serial nums
   public static final String kCompSN               = "03238074";
   public static final String kBetaSN               = "03260A3A";
@@ -102,7 +99,7 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class Falcon500
   {
-    public static int          kMaxRPM     = 6380; // free speed for Falcon 500 motor
+    public static final int    kMaxRPM     = 6380; // free speed for Falcon 500 motor
     public static final double kEncoderCPR = 2048; // CPR is from Falcon 500 Manual
   }
 
@@ -175,8 +172,9 @@ public class Constants
     /* Front Left Module - Module 0 */
     public static final class Mod0
     {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.043945;
+      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
+      public static final double   betaAngleOffset = 0.0;
+      public static final double   compAngleOffset = 0.043945;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -188,8 +186,9 @@ public class Constants
     /* Front Right Module - Module 1 */
     public static final class Mod1
     {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = -0.331787;
+      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
+      public static final double   betaAngleOffset = 0.0;
+      public static final double   compAngleOffset = -0.331787;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -201,8 +200,9 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.272949;
+      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
+      public static final double   betaAngleOffset = 0.0;
+      public static final double   compAngleOffset = 0.272949;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -214,8 +214,9 @@ public class Constants
     /* Back Right Module - Module 3 */
     public static final class Mod3
     {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.25836;
+      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
+      public static final double   betaAngleOffset = 0.0;
+      public static final double   compAngleOffset = 0.25836;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {

@@ -93,7 +93,8 @@ public class Constants
     public static final int    kCANID_CANdle         = 0;
 
     // Digital I/Os
-    // public static final int    kDIO_ExampleDetect = 2;
+    public static final int    kDIO0_NoteInIntake    = 0;
+    public static final int    kDIO1_NoteInFeeder    = 1;
   }
 
   /////////////////////////////////////////////////////////////////////////////

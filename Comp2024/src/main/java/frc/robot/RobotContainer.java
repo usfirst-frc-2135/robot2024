@@ -21,7 +21,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.Dummy;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 
 /**
@@ -56,6 +60,11 @@ public class RobotContainer
   // The robot's shared subsystems
 
   // These subsystems can use LED or vision and must be created afterward
+  public final CommandSwerveDrivetrain         drivetrain      = TunerConstants.DriveTrain; // My drivetrain
+  private final Intake                         m_intake        = new Intake( );
+  private final Shooter                        m_shooter       = new Shooter( );
+  private final Feeder                         m_feeder        = new Feeder( );
+  private final Climber                        m_climber       = new Climber( );
 
   // Chooser for autonomous commands
 
@@ -74,8 +83,6 @@ public class RobotContainer
   PathPlannerTrajectory                m_autoTrajectory;
 
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-
-  public final CommandSwerveDrivetrain drivetrain    = TunerConstants.DriveTrain; // My drivetrain
 
   // Command Scheduler
 

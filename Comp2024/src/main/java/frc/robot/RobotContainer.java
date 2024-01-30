@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,8 +38,6 @@ public class RobotContainer
   // Joysticks
   private final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
   private final CommandXboxController          m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
-
-  private Field2d                              m_field         = new Field2d( );
 
   private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
@@ -117,7 +114,6 @@ public class RobotContainer
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
-    SmartDashboard.putData("Field", m_field);
   }
 
   /****************************************************************************

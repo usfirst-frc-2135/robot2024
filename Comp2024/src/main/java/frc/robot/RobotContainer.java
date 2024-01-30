@@ -37,7 +37,7 @@ import frc.robot.subsystems.Telemetry;
 public class RobotContainer
 {
   private static RobotContainer                m_instance;
-  private final boolean                        macOSXSim       = true;
+  private final boolean                        m_macOSXSim     = true;
 
   // Joysticks
   private final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
@@ -207,7 +207,7 @@ public class RobotContainer
    */
   private void initDefaultCommands( )
   {
-    if (!macOSXSim)
+    if (!m_macOSXSim)
       drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
           drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Ports;
 
 //
 // Shooter subsystem class
@@ -13,7 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase
 {
   // Member objects
-  private final TalonFX m_shooter = new TalonFX(0);
+  private final TalonFX m_shooterL = new TalonFX(Ports.kCANID_ShooterL);
+  private final TalonFX m_shooterR = new TalonFX(Ports.kCANID_ShooterR);
 
   //Devices and simulation objs
 

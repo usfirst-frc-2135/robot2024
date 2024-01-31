@@ -143,19 +143,6 @@ public class Swerve extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-    // if (m_allowPoseEstimate)
-    // {
-
-    //   m_botLLPose = m_vision.getLimelightValidPose(getPose( ));
-    //   double latency = m_vision.getTargetLatency( );
-
-    //   //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-    //   if (m_botLLPose != null && DriverStation.isTeleopEnabled( ))
-    //     m_poseEstimator.addVisionMeasurement(m_botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
-
-    //   resetOdometry(m_botLLPose);
-
-    // }
 
   }
 
@@ -355,7 +342,15 @@ public class Swerve extends SubsystemBase
     double ty = vision.getVertOffsetDeg( );
     m_limelightDistance = vision.getDistLimelight( );
 
+    boolean sanityCheck =
+        tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
+    // && (fabs(ty) <= vertAngleRange)
+
     DataLogManager.log(String.format("%s: DLL tv: %d tx: %.2f ty: %.2f lldist: %.2f distErr: %.2f check: %s", getSubsystem( ), tv,
+        tx, ty, m_limelightDistance, Math.abs(m_setPointDistance - m_limelightDistance), ((sanityCheck) ? "PASSED" : "FAILED")));
+
+    return sanityCheck;
+
   }
 
   ///////////////////////////////////////////////////////////////////////////////

@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SnapConstants;
@@ -87,7 +88,22 @@ public class Swerve extends SubsystemBase
   private int                      m_pathDebug         = 1;     // Debug flag to disable extra ramsete logging calls
   private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
 
-  // // Limelight drive
+  // Limelight drive
+  private double                   m_turnConstant      = LLConsts.kTurnConstant;
+  private double                   m_turnPidKp         = LLConsts.kTurnPidKp;
+  private double                   m_turnPidKi         = LLConsts.kTurnPidKi;
+  private double                   m_turnPidKd         = LLConsts.kTurnPidKd;
+  private double                   m_turnMax           = LLConsts.kTurnMax;
+  private double                   m_throttlePidKp     = LLConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi     = LLConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd     = LLConsts.kThrottlePidKd;
+  private double                   m_throttleMax       = LLConsts.kThrottleMax;
+  private double                   m_throttleShape     = LLConsts.kThrottleShape;
+
+  private double                   m_targetAngle       = LLConsts.kTargetAngle;      // Optimal shooting angle
+  private double                   m_setPointDistance  = LLConsts.kSetPointDistance; // Optimal shooting distance
+  private double                   m_angleThreshold    = LLConsts.kAngleThreshold;   // Tolerance around optimal
+  private double                   m_distThreshold     = LLConsts.kDistThreshold;    // Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
   private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
@@ -109,7 +125,6 @@ public class Swerve extends SubsystemBase
 
     resetAnglesToAbsolute( );
     resetGyro(180.0); // All starting positions facing driver in field relative
-    resetOdometry(new Pose2d(0, 0, m_heading));
 
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
     m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -128,7 +143,19 @@ public class Swerve extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-    // This method will be called once per scheduler run when in simulation
+    // if (m_allowPoseEstimate)
+    // {
+
+    //   m_botLLPose = m_vision.getLimelightValidPose(getPose( ));
+    //   double latency = m_vision.getTargetLatency( );
+
+    //   //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+    //   if (m_botLLPose != null && DriverStation.isTeleopEnabled( ))
+    //     m_poseEstimator.addVisionMeasurement(m_botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+
+    //   resetOdometry(m_botLLPose);
+
+    // }
 
   }
 
@@ -228,10 +255,80 @@ public class Swerve extends SubsystemBase
   public void driveWithLimelightInit(Vision vision, boolean m_endAtTarget)
   {
     // get pid values from dashboard
+    m_turnConstant = SmartDashboard.getNumber("DLL_turnConstant", m_turnConstant);
+    m_turnPidKp = SmartDashboard.getNumber("DLL_turnPidKp", m_turnPidKp);
+    m_turnPidKi = SmartDashboard.getNumber("DLL_turnPidKi", m_turnPidKi);
+    m_turnPidKd = SmartDashboard.getNumber("DLL_turnPidKd", m_turnPidKd);
+    m_turnMax = SmartDashboard.getNumber("DLL_turnMax", m_turnMax);
+
+    m_throttlePidKp = SmartDashboard.getNumber("DLL_throttlePidKp", m_throttlePidKp);
+    m_throttlePidKi = SmartDashboard.getNumber("DLL_throttlePidKi", m_throttlePidKi);
+    m_throttlePidKd = SmartDashboard.getNumber("DLL_throttlePidKd", m_throttlePidKd);
+    m_throttleMax = SmartDashboard.getNumber("DLL_throttleMax", m_throttleMax);
+    m_throttleShape = SmartDashboard.getNumber("DLL_throttleShape", m_throttleShape);
+
+    m_targetAngle = SmartDashboard.getNumber("DLL_targetAngle", m_targetAngle);
+    m_setPointDistance = SmartDashboard.getNumber("DLL_setPointDistance", m_setPointDistance);
+    m_angleThreshold = SmartDashboard.getNumber("DLL_angleThreshold", m_angleThreshold);
+    m_distThreshold = SmartDashboard.getNumber("DLL_distThreshold", m_distThreshold);
+
+    // load in Pid constants to controller
+    m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
+    m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
 
     vision.m_tyfilter.reset( );
     vision.m_tvfilter.reset( );
     vision.syncStateFromDashboard( );
+  }
+
+  public void driveWithLimelightExecute(Vision vision)
+  {
+    boolean tv = vision.getTargetValid( );
+    double tx = vision.getHorizOffsetDeg( );
+    double ty = vision.getVertOffsetDeg( );
+
+    if (!tv)
+    {
+      driveStop(false);
+      if (m_limelightDebug >= 1)
+        DataLogManager.log(String.format("%s: DLL TV-FALSE - SIT STILL", getSubsystem( )));
+
+      return;
+    }
+    // get turn value - just horizontal offset from target
+    double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
+
+    if (turnOutput > 0)
+      turnOutput = turnOutput + m_turnConstant;
+    else if (turnOutput < 0)
+      turnOutput = turnOutput - m_turnConstant;
+
+    // get throttle value
+    m_limelightDistance = m_vision.getDistLimelight( );
+
+    double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
+    double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);
+
+    // put turn and throttle outputs on the dashboard
+    SmartDashboard.putNumber("DLL_turnOutput", turnOutput);
+    SmartDashboard.putNumber("DLL_throttleOutput", throttleOutput);
+    SmartDashboard.putNumber("DLL_limeLightDist", m_limelightDistance);
+
+    // cap max turn and throttle output
+    turnOutput = MathUtil.clamp(turnOutput, -m_turnMax, m_turnMax);
+    throttleOutput = MathUtil.clamp(throttleOutput, -m_throttleMax, m_throttleMax);
+
+    // put turn and throttle outputs on the dashboard
+    SmartDashboard.putNumber("DLL_turnClamped", turnOutput);
+    SmartDashboard.putNumber("DLL_throttleClamped", throttleOutput);
+
+    Translation2d llTranslation = new Translation2d(throttleOutput, 0);
+    drive(llTranslation, turnOutput, false, true);
+
+    if (m_limelightDebug >= 1)
+      DataLogManager.log(
+          String.format("%s: DLL tv: %d tx: %.2f ty: %.2f lldist: %.2f distErr: %.2f trnOut: %.2f thrOut: %2f", getSubsystem( ),
+              tv, tx, ty, m_limelightDistance, Math.abs(m_setPointDistance - m_limelightDistance), turnOutput, throttleOutput));
   }
 
   public boolean driveWithLimelightIsFinished(Vision vision)
@@ -239,7 +336,8 @@ public class Swerve extends SubsystemBase
     boolean tv = vision.getTargetValid( );
     double tx = vision.getHorizOffsetDeg( );
 
-    return true;
+    return (tv && ((Math.abs(tx)) <= m_angleThreshold)
+        && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold));
   }
 
   public void driveWithLimelightEnd( )
@@ -257,7 +355,7 @@ public class Swerve extends SubsystemBase
     double ty = vision.getVertOffsetDeg( );
     m_limelightDistance = vision.getDistLimelight( );
 
-    return true;
+    DataLogManager.log(String.format("%s: DLL tv: %d tx: %.2f ty: %.2f lldist: %.2f distErr: %.2f check: %s", getSubsystem( ), tv,
   }
 
   ///////////////////////////////////////////////////////////////////////////////

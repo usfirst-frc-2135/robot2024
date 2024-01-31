@@ -499,7 +499,7 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
-    public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
+    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
         new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 1 
         new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 2 
@@ -512,13 +512,19 @@ public class Constants
     ));
 
     // Direction of goal relative to AprilTag 
+    public enum VIGoalDirection
+    {
+      DIRECTION_LEFT,   // Left
+      DIRECTION_MIDDLE, // Middle
+      DIRECTION_RIGHT   // Right
+    }
 
-    public static final double       kATagDepthInGrid    = Units.inchesToMeters(14.25);    // Depth from front of grid to AprilTag - 1'2-1/4"
-    public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
-    public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
-    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06;     // Addition of 6cm to adjust for empirical error 
-    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30); // Robot stop 30 inches from the substation loading zone
-    public static final double       kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
+    public static final double kATagDepthInGrid    = Units.inchesToMeters(14.25);    // Depth from front of grid to AprilTag - 1'2-1/4"
+    public static final double kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
+    public static final double kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
+    public static final double kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06;     // Addition of 6cm to adjust for empirical error 
+    public static final double kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30); // Robot stop 30 inches from the substation loading zone
+    public static final double kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -563,6 +569,31 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   // Limelight driving alignment
   /////////////////////////////////////////////////////////////////////////////
+  public static final class LLConsts
+  {
+    // Default calibration
+    public static final double kDistance1        = 48;    // distance from bumper in inches for first reference point
+    public static final double kVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
+    public static final double kDistance2        = 60;    // distance from bumper in inches for second reference point
+    public static final double kVertOffset2      = -4.85; // LL y reading in degrees for second reference point
+
+    // Limelight PID driving controls
+    public static final double kTurnConstant     = 0.0;
+    public static final double kTurnPidKp        = 0.005;
+    public static final double kTurnPidKi        = 0.0;
+    public static final double kTurnPidKd        = 0.0;
+    public static final double kTurnMax          = 0.4;
+    public static final double kThrottlePidKp    = 0.011;
+    public static final double kThrottlePidKi    = 0.0;
+    public static final double kThrottlePidKd    = 0.0;
+    public static final double kThrottleMax      = 0.2;
+    public static final double kThrottleShape    = 10.0;
+
+    public static final double kTargetAngle      = 0.0;   // Optimal shooting angle
+    public static final double kSetPointDistance = 60.0;  // Optimal shooting distance
+    public static final double kAngleThreshold   = 3.5;   // Degrees tolerance around optimal
+    public static final double kDistThreshold    = 6.0;   // Inches tolerance around optimal
+  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Autonomous

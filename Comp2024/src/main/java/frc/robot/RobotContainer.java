@@ -20,10 +20,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -71,10 +73,7 @@ public class RobotContainer
   enum AutoChooser
   {
     AUTOSTOP,                // AutoStop - do nothing
-    AUTOPRELOADONLY,         // Score preloaded game piece
     AUTOLEAVE,               // Leave starting zone
-    AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
-    AUTOPRELOADSCOREANOTHER, // Score preload and score another
     AUTOTESTPATH             // Run a selected test path
   }
 
@@ -287,11 +286,8 @@ public class RobotContainer
 
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-    m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
-    m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
-    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
-    m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
-    m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("2 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
@@ -314,50 +310,21 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-      case AUTOPRELOADONLY :
         break;
       case AUTOLEAVE :
-      case AUTOPRELOADANDLEAVE :
-        pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
-        break;
-      case AUTOPRELOADSCOREANOTHER :
-        pathName = (alliance == Alliance.Red) ? "driveToAnotherRed" : "driveToAnotherBlue";
+        pathName = (alliance == Alliance.Red) ? "R_Note1Acquire" : "B_Note1Acquire";
         break;
       case AUTOTESTPATH :
-        pathName = (alliance == Alliance.Red) ? "driveTestPathRed" : "driveTestPathBlue";
+        pathName = "Test";
         break;
     }
 
-    // if (pathName != null)
-    //   m_autoTrajectory =
-    //       new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d(0, 0));
-
-    // switch (mode)
-    // {
-    //   default :
-    //   case AUTOSTOP :
-    //     m_autoCommand = new AutoStop(m_swerve);
-    //     break;
-    //   case AUTOPRELOADONLY :
-    //     m_autoCommand = new AutoScorePreload(m_swerve);
-    //     break;
-    //   case AUTOLEAVE :
-    //     m_autoCommand = new AutoLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADANDLEAVE :
-    //     m_autoCommand = new AutoPreloadAndLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADSCOREANOTHER :
-    //     m_autoCommand = new AutoPreloadAndScoreAnother(m_swerve, "driveToAnother", m_autoTrajectory);
-    //     break;
-    //   case AUTOTESTPATH :
-    //     m_autoCommand = new AutoTestPath(m_swerve, "AutoTestPath", m_autoTrajectory);
-    //     break;
-    // }
-
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
 
-    m_autoCommand = drivetrain.getAutoPath("Test");//pathName);
+    if (pathName != null)
+      m_autoCommand = drivetrain.getAutoPath(pathName);
+    else
+      m_autoCommand = new AutoStop(drivetrain);
 
     return m_autoCommand;
   }

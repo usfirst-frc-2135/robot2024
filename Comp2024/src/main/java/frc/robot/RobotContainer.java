@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Dummy;
+import frc.robot.subsystems.LED;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,6 +36,9 @@ public class RobotContainer
   // Joysticks
   private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
   private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+
+  public final LED              m_led         = new LED( );
+  public final Power            m_power       = new Power( );
 
   private Field2d               m_field       = new Field2d( );
 

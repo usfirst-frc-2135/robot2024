@@ -109,6 +109,9 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
+    m_robotContainer.m_power.initialize( );
+    m_robotContainer.m_led.initialize( );
+
     // These subsystems can use LED and vision subsystems
 
   }
@@ -210,6 +213,7 @@ public class Robot extends TimedRobot
   {
     // Print out talon faults and clear sticky ones
     DataLogManager.log(String.format("robotFaultDump:  ----- DUMP FAULTS --------------"));
-
+    m_robotContainer.m_led.faultDump( );
+    m_robotContainer.m_power.faultDump( );
   }
 }

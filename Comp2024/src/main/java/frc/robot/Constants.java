@@ -293,6 +293,7 @@ public class Constants
     // Manual config parameters
     public enum RollerMode
     {
+      ROLLER_STOP, ROLLER_ACQUIRE, ROLLER_EXPEL, ROLLER_HOLD
     }
 
     // Manual config parameters
@@ -316,6 +317,7 @@ public class Constants
     // Manual config parameters
     public enum RollerMode
     {
+      ROLLER_STOP
     }
 
     // Manual config parameters

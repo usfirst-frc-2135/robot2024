@@ -8,7 +8,11 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.INConsts;
+import frc.robot.Constants.FDConsts.RollerMode;
+import frc.robot.lib.util.PhoenixUtil5;
 
 //
 // Intake subsystem class
@@ -20,7 +24,7 @@ public class Intake extends SubsystemBase
   private final TalonFX      m_intakeRotor  = new TalonFX(0);
   private final CANcoder     m_CANCoder     = new CANcoder(0);
   private final DigitalInput m_limitSwitch  = new DigitalInput(0);
-
+  private boolean            m_intakeValid;
   //Devices and simulation objs
 
   // Constructor
@@ -28,12 +32,17 @@ public class Intake extends SubsystemBase
   {
     setName("Intake");
     setSubsystem("Intake");
+    m_intakeValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_intakeRoller, "Intake Roller");
+    SmartDashboard.putBoolean("HL_validIN", m_intakeValid);
+    // TODO needs to be initialized 
     initialize( );
   }
 
   @Override
   public void periodic( )
   {
+    double currentDraw = m_intakeRoller.getStatorCurrent( );
+    SmartDashboard.putNumber("IN_currentDraw", currentDraw);
     // This method will be called once per scheduler run
   }
 
@@ -47,4 +56,20 @@ public class Intake extends SubsystemBase
 
   public void initialize( )
   {}
+
+  public void setIntakeRollerSpeed(RollerMode mode){
+    final String strName;
+    double output = 0.0;
+
+    switch (mode)
+    {
+      default :
+      case ROLLER_STOP:
+        strName = "STOP"; 
+        output = 0.0; 
+        break; 
+      case ROLLER_ACQUIRE
+    }
+  }
+
 }

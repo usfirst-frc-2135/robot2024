@@ -77,7 +77,7 @@ public class TunerConstants
   private static final int                          kFrontLeftDriveMotorId   = 1;
   private static final int                          kFrontLeftSteerMotorId   = 2;
   private static final int                          kFrontLeftEncoderId      = 3;
-  private static final double                       kFrontLeftEncoderOffset  = Constants.isComp ? 0.0 : -0.13671875; // TODO: replace "0.0" with Comp Offset
+  private static final double                       kFrontLeftEncoderOffset  = -0.13671875;
 
   private static final double                       kFrontLeftXPosInches     = 11.35;
   private static final double                       kFrontLeftYPosInches     = 11.35;
@@ -86,7 +86,7 @@ public class TunerConstants
   private static final int                          kFrontRightDriveMotorId  = 4;
   private static final int                          kFrontRightSteerMotorId  = 5;
   private static final int                          kFrontRightEncoderId     = 6;
-  private static final double                       kFrontRightEncoderOffset = Constants.isComp ? 0.0 : -0.400634765625; // TODO: replace "0.0" with Comp Offset
+  private static final double                       kFrontRightEncoderOffset = -0.400634765625;
 
   private static final double                       kFrontRightXPosInches    = 11.35;
   private static final double                       kFrontRightYPosInches    = -11.35;
@@ -95,7 +95,7 @@ public class TunerConstants
   private static final int                          kBackLeftDriveMotorId    = 7;
   private static final int                          kBackLeftSteerMotorId    = 8;
   private static final int                          kBackLeftEncoderId       = 9;
-  private static final double                       kBackLeftEncoderOffset   = Constants.isComp ? 0.0 : 0.13037109375; // TODO: replace "0.0" with Comp Offset
+  private static final double                       kBackLeftEncoderOffset   = 0.13037109375;
 
   private static final double                       kBackLeftXPosInches      = -11.35;
   private static final double                       kBackLeftYPosInches      = 11.35;
@@ -104,7 +104,7 @@ public class TunerConstants
   private static final int                          kBackRightDriveMotorId   = 10;
   private static final int                          kBackRightSteerMotorId   = 11;
   private static final int                          kBackRightEncoderId      = 12;
-  private static final double                       kBackRightEncoderOffset  = Constants.isComp ? 0.0 : -0.406982421875; // TODO: replace "0.0" with Comp Offset
+  private static final double                       kBackRightEncoderOffset  = -0.406982421875;
 
   private static final double                       kBackRightXPosInches     = -11.35;
   private static final double                       kBackRightYPosInches     = -11.35;

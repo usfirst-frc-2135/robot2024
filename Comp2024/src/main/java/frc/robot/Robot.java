@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.util.CTREConfigs5;
@@ -25,12 +24,13 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class Robot extends TimedRobot
 {
+  private final boolean      m_useLimelight  = false;
+  public boolean             m_isComp        = false;
+
   private RobotContainer     m_robotContainer;
   private Command            m_autonomousCommand;
 
   private boolean            m_faultsCleared = false;
-
-  private final boolean      UseLimelight    = false;
 
   public static CTREConfigs5 ctreConfigs5;
   public static CTREConfigs6 ctreConfigs6;
@@ -55,12 +55,12 @@ public class Robot extends TimedRobot
       robotName = "SIMULATION";
     else if (serialNum.equals(Constants.kCompSN))
     {
-      Constants.isComp = true;
+      m_isComp = true;
       robotName = "COMPETITION (A)";
     }
     else if (serialNum.equals(Constants.kBetaSN))
     {
-      Constants.isComp = false;
+      m_isComp = false;
       robotName = "PRACTICE (B)";
     }
     DataLogManager.log(String.format("robotInit: Detected the %s robot! ", robotName));
@@ -74,11 +74,8 @@ public class Robot extends TimedRobot
 
     m_robotContainer.drivetrain.getDaqThread( ).setThreadPriority(99);
 
-    LiveWindow.disableAllTelemetry( );
-
     CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(String.format("%s: Init", cmd.getName( ))));
-    CommandScheduler.getInstance( )
-        .onCommandInterrupt(cmd -> DataLogManager.log(String.format("%s: Interrupted", cmd.getName( ))));
+    CommandScheduler.getInstance( ).onCommandInterrupt(cmd -> DataLogManager.log(String.format("%s: Interrupt", cmd.getName( ))));
     CommandScheduler.getInstance( ).onCommandFinish(cmd -> DataLogManager.log(String.format("%s: End", cmd.getName( ))));
 
     PortForwarder.add(5800, "limelight.local", 5800);
@@ -106,7 +103,7 @@ public class Robot extends TimedRobot
     // for anything in the Command-based framework to work.
     CommandScheduler.getInstance( ).run( );
 
-    if (UseLimelight)
+    if (m_useLimelight)
     {
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 

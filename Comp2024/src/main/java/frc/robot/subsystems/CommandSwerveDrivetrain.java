@@ -61,13 +61,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm( ));
     }
 
-    AutoBuilder.configureHolonomic(( ) -> this.getState( ).Pose, // Supplier of current robot pose
-        this::seedFieldRelative,  // Consumer for seeding pose against auto
-        this::getCurrentRobotChassisSpeeds, (speeds) -> this.setControl(autoRequest.withSpeeds(speeds)), // Consumer of ChassisSpeeds to drive the robot
+    AutoBuilder.configureHolonomic(( ) -> this.getState( ).Pose,      // Supplier of current robot pose
+        this::seedFieldRelative,                                      // Consumer for seeding pose against auto
+        this::getCurrentRobotChassisSpeeds,                           // Supplier of chassis speeds
+        (speeds) -> this.setControl(autoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
         new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
-            driveBaseRadius, new ReplanningConfig( )),
-        ( ) -> false, // Change this if the path needs to be flipped on red vs blue
-        this); // Subsystem for requirements
+            driveBaseRadius, new ReplanningConfig( )),                // Path following config
+        ( ) -> false,                                                 // Change this if the path needs to be flipped on red vs blue
+        this);                                                        // Subsystem for requirements
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)

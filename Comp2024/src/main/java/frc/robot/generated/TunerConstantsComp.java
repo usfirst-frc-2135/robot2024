@@ -1,4 +1,3 @@
-// COMPETITION BOT TUNER CONSTANTS
 package frc.robot.generated;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -11,7 +10,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackTy
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-public class TunerConstants
+public class TunerConstantsComp
 {
   // Both sets of gains need to be tuned to your individual robot.
 

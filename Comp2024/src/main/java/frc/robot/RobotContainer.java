@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -37,7 +38,7 @@ import frc.robot.subsystems.Telemetry;
 public class RobotContainer
 {
   private static RobotContainer                m_instance;
-  private final boolean                        m_macOSXSim     = true;
+  private final boolean                        m_macOSXSim     = false;
 
   // Joysticks
   private final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
@@ -290,36 +291,12 @@ public class RobotContainer
         break;
     }
 
-    // if (pathName != null)
-    //   m_autoTrajectory =
-    //       new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d(0, 0));
-
-    // switch (mode)
-    // {
-    //   default :
-    //   case AUTOSTOP :
-    //     m_autoCommand = new AutoStop(m_swerve);
-    //     break;
-    //   case AUTOPRELOADONLY :
-    //     m_autoCommand = new AutoScorePreload(m_swerve);
-    //     break;
-    //   case AUTOLEAVE :
-    //     m_autoCommand = new AutoLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADANDLEAVE :
-    //     m_autoCommand = new AutoPreloadAndLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADSCOREANOTHER :
-    //     m_autoCommand = new AutoPreloadAndScoreAnother(m_swerve, "driveToAnother", m_autoTrajectory);
-    //     break;
-    //   case AUTOTESTPATH :
-    //     m_autoCommand = new AutoTestPath(m_swerve, "AutoTestPath", m_autoTrajectory);
-    //     break;
-    // }
-
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
 
-    m_autoCommand = drivetrain.getAutoPath("Test");//pathName);
+    if (pathName != null)
+      m_autoCommand = drivetrain.getAutoPath(pathName);
+    else
+      m_autoCommand = new AutoStop(drivetrain);
 
     return m_autoCommand;
   }

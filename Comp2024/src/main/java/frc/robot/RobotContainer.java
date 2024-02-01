@@ -42,7 +42,7 @@ import frc.robot.subsystems.Telemetry;
 public class RobotContainer
 {
   private static RobotContainer                m_instance;
-  private final boolean                        m_macOSXSim     = true;
+  private final boolean                        m_macOSXSim     = false;
 
   // Joysticks
   private final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);

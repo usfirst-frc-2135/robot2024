@@ -11,7 +11,10 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.INConsts;
+import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.Constants.Ports;
+import frc.robot.lib.util.PhoenixUtil5;
 
 //
 // Intake subsystem class
@@ -23,7 +26,7 @@ public class Intake extends SubsystemBase
   private final TalonFX      m_intakeRotary = new TalonFX(Ports.kCANID_IntakeRotary);
   private final CANcoder     m_CANCoder     = new CANcoder(Ports.kCANID_IntakeCANCoder);
   private final DigitalInput m_notInIntake  = new DigitalInput(Ports.kDIO0_NoteInIntake);
-
+  private boolean            m_intakeValid;
   //Devices and simulation objs
 
   // Constructor

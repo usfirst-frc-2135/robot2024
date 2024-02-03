@@ -294,9 +294,13 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
+        m_autoCommand = new AutoStop(drivetrain);
+        break;
       case AUTOPRELOADONLY :
         break;
       case AUTOLEAVE :
+        m_autoCommand = drivetrain.getAutoPath("DriveS1");
+        break;
       case AUTOPRELOADANDLEAVE :
         pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
         break;
@@ -308,9 +312,9 @@ public class RobotContainer
         break;
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));
 
-    return drivetrain.getAutoPath("Test"); //pathName);
+    return m_autoCommand;
   }
 
   public void runAutonomousCommand( )

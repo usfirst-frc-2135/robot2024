@@ -30,7 +30,7 @@ import frc.robot.lib.util.PhoenixUtil6;
 public class Intake extends SubsystemBase
 {
 
-  public static final class WRConsts
+  public static final class INConsts
   {
     public static final double kGearRatio = 27.41;
   }

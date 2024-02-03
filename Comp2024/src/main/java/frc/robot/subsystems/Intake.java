@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase
   public enum INMode
   {
     // Add these contants for the roller
-    INTAKEROTARY_INIT,    // Initialize wrist
+    INTAKEROTARY_INIT,    // Initialize intake
     INTAKEROTARY_DOWN,    // IntakeRotar moving down
     INTAKEROTARY_STOPPED, // IntakeRotar stop and hold position
     INTAKEROTARY_UP       // IntakeRotar moving up
@@ -51,8 +51,8 @@ public class Intake extends SubsystemBase
   private final CANcoder         m_CANCoder        = new CANcoder(Ports.kCANID_IntakeCANCoder);
   private final DigitalInput     m_noteInIntake    = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
-  private final CANcoderSimState m_CANCoderSim     = m_CANCoder.getSimState( );
   private final TalonFXSimState  m_motorSim        = m_intakeRotary.getSimState( );
+  private final CANcoderSimState m_CANCoderSim     = m_CANCoder.getSimState( );
 
   // Declare module variables
   private boolean                m_motorValid;      // Health indicator for Falcon 

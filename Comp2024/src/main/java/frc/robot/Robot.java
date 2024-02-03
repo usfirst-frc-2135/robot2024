@@ -168,7 +168,10 @@ public class Robot extends TimedRobot
    */
   @Override
   public void autonomousPeriodic( )
-  {}
+  {
+    DataLogManager.log("Current Position: " + RobotContainer.getInstance( ).drivetrain.getState( ).Pose + "\nCurrent Speeds: "
+        + RobotContainer.getInstance( ).drivetrain.getModule(0).getCurrentState( ).speedMetersPerSecond);
+  }
 
   @Override
   public void teleopInit( )

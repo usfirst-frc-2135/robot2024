@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.IntakeRollerRun;
+import frc.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,7 +44,7 @@ public class RobotContainer
   // The robot's shared subsystems
 
   // These subsystems can use LED or vision and must be created afterward
-
+  public final Intake           m_intake      = new Intake( );
   // Chooser for autonomous commands
 
   enum AutoChooser
@@ -189,8 +192,8 @@ public class RobotContainer
     operY.whileTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new Dummy("oper left bumper"));
-    operRightBumper.onTrue(new Dummy("oper right bumper"));
+    operRightBumper.onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
+    operRightBumper.onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_HOLD));
     operBack.onTrue(new Dummy("oper back")); // aka View
     operStart.onTrue(new Dummy("oper start")); // aka Menu
     //
@@ -201,7 +204,8 @@ public class RobotContainer
     operLeft.onTrue(new Dummy("oper 270"));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new Dummy("oper left trigger"));
+    operLeftTrigger.onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_EXPEL)); // oper left trigger
+    operLeftTrigger.onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
     operRightTrigger.onTrue(new Dummy("oper right trigger"));
   }
 

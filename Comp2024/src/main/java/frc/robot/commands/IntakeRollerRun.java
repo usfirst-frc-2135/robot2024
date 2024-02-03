@@ -3,6 +3,8 @@
 //
 package frc.robot.commands;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.subsystems.Intake;
@@ -13,23 +15,23 @@ import frc.robot.subsystems.Intake;
 public class IntakeRollerRun extends Command
 {
   // Member variables/objects
-  private final Intake       m_intakeRoller;
+  private final Intake       m_intake;
   private final INRollerMode m_mode;
 
   public IntakeRollerRun(Intake intake, INRollerMode mode)
   {
-    m_intakeRoller = intake;
+    m_intake = intake;
     m_mode = mode;
 
     setName("IntakeRollerRun");
-    addRequirements(m_intakeRoller);
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    m_intakeRoller.setIntakeRollerSpeed(m_mode);
+    m_intake.setIntakeRollerSpeed(m_mode);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

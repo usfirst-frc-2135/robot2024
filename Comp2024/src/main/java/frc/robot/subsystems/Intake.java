@@ -43,7 +43,7 @@ public class Intake extends SubsystemBase
   public void periodic( )
   {
     double currentDraw = m_intakeRoller.getStatorCurrent( );
-    SmartDashboard.putNumber("IN_currentDraw", currentDraw);
+    SmartDashboard.putNumber("INRoller_currentDraw", currentDraw);
     // This method will be called once per scheduler run
   }
 

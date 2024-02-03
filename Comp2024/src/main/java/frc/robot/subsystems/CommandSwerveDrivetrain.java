@@ -13,13 +13,16 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.util.LimelightHelpers;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -27,6 +30,8 @@ import frc.robot.generated.TunerConstants;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
+  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
+
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
@@ -68,7 +73,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         (speeds) -> this.setControl(autoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
         new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
             driveBaseRadius, new ReplanningConfig( )),                // Path following config
-        ( ) ->
+        ( ) ->                                                        // Red vs. Blue alliance
         {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field.
@@ -80,7 +85,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
           }
           return false;
         },                                                            // Change this if the path needs to be flipped on red vs blue
-        this);                                                        // Subsystem for requirements        
+        this);                                                        // Subsystem for requirements
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)
@@ -114,4 +119,22 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     });
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
+
+  @Override
+  public void periodic( )
+  {
+    // This method will be called once per scheduler run
+    if (m_useLimelight)
+    {
+      var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
+
+      Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
+
+      if (lastResult.valid)
+      {
+        addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
+      }
+    }
+  }
+
 }

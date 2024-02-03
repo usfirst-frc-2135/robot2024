@@ -1,7 +1,11 @@
+//
+// LED subystem - LED feedback on robot
+//
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
 
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,12 +13,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.Ports;
 
+//
+// LED subsystem class
+//
 public class LED extends SubsystemBase
 {
+  // Member objects
   private final CANdle                    m_candle        = new CANdle(Ports.kCANID_CANdle);
+
   private final SendableChooser<LEDColor> m_ledChooser    = new SendableChooser<LEDColor>( );
   private LEDColor                        m_previousColor = LEDColor.LEDCOLOR_OFF;
 
+  // Constructor
   public LED( )
   {
     setName("LED");
@@ -23,6 +33,7 @@ public class LED extends SubsystemBase
     setColor(LEDColor.LEDCOLOR_BLUE);
     m_candle.configBrightnessScalar(0.7);
 
+    // Add options for colors in SmartDashboard
     m_ledChooser.setDefaultOption("LED_Off", LEDColor.LEDCOLOR_OFF);
     m_ledChooser.addOption("LED_White", LEDColor.LEDCOLOR_WHITE);
     m_ledChooser.addOption("LED_Red", LEDColor.LEDCOLOR_RED);
@@ -33,15 +44,16 @@ public class LED extends SubsystemBase
     m_ledChooser.addOption("LED_Purple", LEDColor.LEDCOLOR_PURPLE);
 
     SmartDashboard.putData("LED_Color", m_ledChooser);
-    SmartDashboard.putBoolean("LED_normalMode", false);
+    SmartDashboard.putBoolean("LED_normalMode", true);
 
     initialize( );
-
   }
 
   @Override
   public void periodic( )
   {
+    // This method will be called once per scheduler run
+    setColor(m_ledChooser.getSelected( ));
 
   }
 
@@ -54,7 +66,7 @@ public class LED extends SubsystemBase
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    setColor(LEDColor.LEDCOLOR_OFF);
+
   }
 
   public void faultDump( )
@@ -70,6 +82,7 @@ public class LED extends SubsystemBase
     {
       if (color == (LEDColor.LEDCOLOR_DASH))
         color = m_ledChooser.getSelected( );
+      DataLogManager.log("");
 
       switch (color)
       {
@@ -84,38 +97,39 @@ public class LED extends SubsystemBase
           break;
         case LEDCOLOR_RED :
           strName = "RED";
-          m_candle.setLEDs(255, 84, 84); // red
+          m_candle.setLEDs(255, 0, 0); // red
           break;
         case LEDCOLOR_ORANGE :
           strName = "ORANGE";
-          m_candle.setLEDs(255, 172, 84); // orange
+          m_candle.setLEDs(255, 80, 0); // orange
           break;
         case LEDCOLOR_YELLOW :
           strName = "YELLOW";
-          m_candle.setLEDs(255, 241, 84); // yellow
+          m_candle.setLEDs(255, 255, 0); // yellow
           break;
         case LEDCOLOR_GREEN :
           strName = "GREEN";
-          m_candle.setLEDs(84, 255, 98); // green
+          m_candle.setLEDs(0, 255, 0); // green
           break;
         case LEDCOLOR_BLUE :
           strName = "BLUE";
-          m_candle.setLEDs(84, 175, 255); // blue
+          m_candle.setLEDs(0, 0, 255); // blue
           break;
         case LEDCOLOR_PURPLE :
           strName = "PURPLE";
-          m_candle.setLEDs(189, 84, 255); // purple
+          m_candle.setLEDs(255, 0, 255); // purple
           break;
       }
 
       DataLogManager.log(String.format("%s: color is now %s", getSubsystem( ), strName));
       m_previousColor = color;
+
     }
   }
 
   public void setNormalColor(LEDColor color)
   {
-    Boolean normalMode = SmartDashboard.getBoolean("LED_normalMode", false);
+    Boolean normalMode = SmartDashboard.getBoolean("LED_normalMode", true);
 
     if (normalMode)
       setColor(color);
@@ -123,7 +137,7 @@ public class LED extends SubsystemBase
 
   public void setLLColor(LEDColor color)
   {
-    Boolean normalMode = SmartDashboard.getBoolean("LED_normalMode", false);
+    Boolean normalMode = SmartDashboard.getBoolean("LED_normalMode", true);
 
     if (!normalMode)
       setColor(color);

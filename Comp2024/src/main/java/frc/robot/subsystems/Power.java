@@ -1,6 +1,4 @@
-//
-// Power subystem - handles Power Distribution Hub readings
-//
+
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DataLogManager;

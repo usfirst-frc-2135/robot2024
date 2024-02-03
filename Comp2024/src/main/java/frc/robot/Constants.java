@@ -374,6 +374,8 @@ public class Constants
     // Limelight-defined streaming states
 
     // Limelight-defined LED mode states
+    public static final int LED_OFF = 1;
+    public static final int LED_ON  = 3;
 
     public enum VIRequests
     {

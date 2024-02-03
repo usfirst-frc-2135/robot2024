@@ -20,8 +20,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.LEDSet;
 import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Power;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -102,6 +105,8 @@ public class RobotContainer
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
     SmartDashboard.putData("Field", m_field);
+    SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
+
   }
 
   /****************************************************************************

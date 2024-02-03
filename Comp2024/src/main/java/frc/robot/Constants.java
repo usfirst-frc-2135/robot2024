@@ -291,10 +291,14 @@ public class Constants
     // Current limit settings - Rotary
 
     // Manual config parameters
-    public enum RollerMode
+    public enum INRollerMode
     {
       ROLLER_STOP, ROLLER_ACQUIRE, ROLLER_EXPEL, ROLLER_HOLD
     }
+
+    public static final double kIntakeRollerSpeedAcquire = 0.5;
+    public static final double kIntakeRollerSpeedHold    = 1.0 / 5.0;
+    public static final double kIntakeRollerSpeedExpel   = -0.1;
 
     // Manual config parameters
     public enum RotaryMode
@@ -317,7 +321,7 @@ public class Constants
     // Manual config parameters
     public enum RollerMode
     {
-      ROLLER_STOP
+
     }
 
     // Manual config parameters

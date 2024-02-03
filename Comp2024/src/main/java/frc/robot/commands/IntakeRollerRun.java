@@ -1,35 +1,35 @@
 //
-// Gripper Run command - sets motors to desired mode
+// Intake Roller Run command - sets motors to desired mode
 //
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.GRConsts.GRMode;
-import frc.robot.subsystems.Gripper;
+import frc.robot.Constants.INConsts.INRollerMode;
+import frc.robot.subsystems.Intake;
 
 //
-// Gripper Run command
+// Intake Roller Run command
 //
-public class GripperRun extends Command
+public class IntakeRollerRun extends Command
 {
   // Member variables/objects
-  private final Gripper m_gripper;
-  private final GRMode  m_mode;
+  private final Intake       m_intakeRoller;
+  private final INRollerMode m_mode;
 
-  public GripperRun(Gripper gripper, GRMode mode)
+  public IntakeRollerRun(Intake intake, INRollerMode mode)
   {
-    m_gripper = gripper;
+    m_intakeRoller = intake;
     m_mode = mode;
 
-    setName("GripperRun");
-    addRequirements(m_gripper);
+    setName("IntakeRollerRun");
+    addRequirements(m_intakeRoller);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    m_gripper.setGripperSpeed(m_mode);
+    m_intakeRoller.setIntakeRollerSpeed(m_mode);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

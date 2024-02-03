@@ -7,11 +7,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.FDConsts.RollerMode;
+import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.lib.util.PhoenixUtil5;
 
 //
@@ -57,19 +58,34 @@ public class Intake extends SubsystemBase
   public void initialize( )
   {}
 
-  public void setIntakeRollerSpeed(RollerMode mode){
+  public void setIntakeRollerSpeed(INRollerMode mode)
+  {
     final String strName;
     double output = 0.0;
 
     switch (mode)
     {
       default :
-      case ROLLER_STOP:
-        strName = "STOP"; 
-        output = 0.0; 
-        break; 
-      case ROLLER_ACQUIRE
+      case ROLLER_STOP :
+        strName = "STOP";
+        output = 0.0;
+        break;
+      case ROLLER_ACQUIRE :
+        strName = "ACQUIRE";
+        output = INConsts.kIntakeRollerSpeedAcquire;
+        break;
+      case ROLLER_EXPEL :
+        strName = "EXPEL";
+        output = INConsts.kIntakeRollerSpeedExpel;
+        break;
+      case ROLLER_HOLD :
+        strName = "HOLD";
+        output = INConsts.kIntakeRollerSpeedHold;
+        break;
+
     }
+    DataLogManager.log(String.format("%s: Mode is no - %s", getSubsystem( ), strName));
+    m_intakeRoller.set(output);
   }
 
 }

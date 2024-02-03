@@ -72,7 +72,10 @@ public class RobotContainer
   enum AutoChooser
   {
     AUTOSTOP,                // AutoStop - do nothing
+    AUTOPRELOADONLY,         // Score preloaded game piece
     AUTOLEAVE,               // Leave starting zone
+    AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
+    AUTOPRELOADSCOREANOTHER, // Score preload and score another
     AUTOTESTPATH             // Run a selected test path
   }
 
@@ -247,8 +250,11 @@ public class RobotContainer
 
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-    m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
-    m_autoChooser.addOption("2 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
+    m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
+    m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
+    m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
@@ -271,12 +277,17 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
+      case AUTOPRELOADONLY :
         break;
       case AUTOLEAVE :
-        pathName = (alliance == Alliance.Red) ? "R_Note1Acquire" : "B_Note1Acquire";
+      case AUTOPRELOADANDLEAVE :
+        pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
+        break;
+      case AUTOPRELOADSCOREANOTHER :
+        pathName = (alliance == Alliance.Red) ? "driveToAnotherRed" : "driveToAnotherBlue";
         break;
       case AUTOTESTPATH :
-        pathName = "Test";
+        pathName = (alliance == Alliance.Red) ? "driveTestPathRed" : "driveTestPathBlue";
         break;
     }
 

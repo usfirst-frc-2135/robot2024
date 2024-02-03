@@ -39,7 +39,6 @@ public class Vision extends SubsystemBase
   private NetworkTable          m_table;            // Network table reference for getting LL values
 
   private DoubleArraySubscriber m_botPoseSub;
-  private Pose2d                m_botLLPose     = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
 
   private double                m_targetHorizAngle;      // LL Target horizontal Offset from Crosshair to Target (-27 to 27 deg)
   private double                m_targetVertAngle;       // LL Target vertical Offset from Crosshair to Target (-20.5 to 20.5 deg)
@@ -208,7 +207,7 @@ public class Vision extends SubsystemBase
       // Array [6] order: Translation (X, Y, Z), Rotation(Roll, Pitch, Yaw)
       double yawDegrees = m_botPoseArray[5] + ((m_botPoseArray[5] < 0) ? 360 : 0);
 
-      m_botLLPose =
+      Pose2d m_botLLPose =
           new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(Units.degreesToRadians(yawDegrees)));
 
       double[ ] robotPose = new double[ ]

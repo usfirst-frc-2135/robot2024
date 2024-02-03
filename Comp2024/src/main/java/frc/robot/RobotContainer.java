@@ -21,8 +21,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.Dummy;
 import frc.robot.generated.TunerConstants;
-import frc.robot.lib.util.CTREConfigs5;
-import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -44,9 +42,6 @@ public class RobotContainer
   // Joysticks
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
   private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
-
-  private static CTREConfigs5                  ctreConfigs5    = new CTREConfigs5( );
-  private static CTREConfigs6                  ctreConfigs6    = new CTREConfigs6( );
 
   private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity

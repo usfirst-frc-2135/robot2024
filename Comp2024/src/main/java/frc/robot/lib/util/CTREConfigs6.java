@@ -89,4 +89,16 @@ public final class CTREConfigs6
     return config;
   }
 
+  public static TalonFXConfiguration intakeRotaryFXConfig( )
+  {
+    TalonFXConfiguration intakeRotaryConfig = new TalonFXConfiguration( );
+    return intakeRotaryConfig;
+  }
+
+  public static CANcoderConfiguration intakeRotaryCancoderConfig( )
+  {
+    CANcoderConfiguration config = new CANcoderConfiguration( );
+    return config;
+  }
+
 }

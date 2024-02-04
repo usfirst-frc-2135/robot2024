@@ -299,18 +299,19 @@ public class RobotContainer
         m_autoCommand = new AutoStop(drivetrain);
         break;
       case AUTOPRELOADONLY :
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
         m_autoCommand = drivetrain.getAutoPath("DriveS1");
         break;
       case AUTOPRELOADANDLEAVE :
-        pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOPRELOADSCOREANOTHER :
-        pathName = (alliance == Alliance.Red) ? "driveToAnotherRed" : "driveToAnotherBlue";
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        pathName = (alliance == Alliance.Red) ? "driveTestPathRed" : "driveTestPathBlue";
+        m_autoCommand = drivetrain.getAutoPath("Test");
         break;
     }
 

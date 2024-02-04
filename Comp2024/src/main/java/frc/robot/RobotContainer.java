@@ -191,9 +191,9 @@ public class RobotContainer
     m_operatorPad.y( ).whileTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.leftBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
-    m_operatorPad.leftBumper( ).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_HOLD));
-    m_operatorPad.rightBumper( ).onTrue(new Dummy("oper right bumper"));
+    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
+    m_operatorPad.leftBumper( ).onTrue(new Dummy("oper right bumper"));
     m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
     m_operatorPad.start( ).onTrue(new Dummy("oper start")); // aka Menu
     //
@@ -206,9 +206,9 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_EXPEL));
-    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper right trigger"));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_EXPEL));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
+    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper right trigger"));
 
     ///////////////////////////////////////////////////////
     //

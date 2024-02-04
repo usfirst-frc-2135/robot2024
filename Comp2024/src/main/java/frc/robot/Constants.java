@@ -156,19 +156,19 @@ public class Constants
   public static final class INConsts
   {
     // Global settings
-
+    public static final boolean kInvertMotor = true; // Motor direction for positive input
     // Current limit settings - Roller
     // Current limit settings - Rotary
 
     // Manual config parameters
     public enum INRollerMode
     {
-      ROLLER_STOP, ROLLER_ACQUIRE, ROLLER_EXPEL, ROLLER_HOLD
+      ROLLER_STOP, ROLLER_ACQUIRE, ROLLER_EXPEL
     }
 
     public static final double kIntakeRollerSpeedAcquire = 0.5;
-    public static final double kIntakeRollerSpeedHold    = 1.0 / 5.0;
-    public static final double kIntakeRollerSpeedExpel   = -0.1;
+
+    public static final double kIntakeRollerSpeedExpel   = -0.25;
 
     // Manual config parameters
     public enum RotaryMode

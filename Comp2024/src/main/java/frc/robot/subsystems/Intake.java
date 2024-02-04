@@ -37,6 +37,8 @@ public class Intake extends SubsystemBase
     m_intakeValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_intakeRoller, "Intake Roller");
     SmartDashboard.putBoolean("HL_validIN", m_intakeValid);
     // TODO needs to be initialized 
+
+    intakeTalonInitialize(m_intakeRoller, INConsts.kInvertMotor);
     initialize( );
   }
 
@@ -46,6 +48,7 @@ public class Intake extends SubsystemBase
     double currentDraw = m_intakeRoller.getStatorCurrent( );
     SmartDashboard.putNumber("INRoller_currentDraw", currentDraw);
     // This method will be called once per scheduler run
+
   }
 
   @Override
@@ -58,6 +61,12 @@ public class Intake extends SubsystemBase
 
   public void initialize( )
   {}
+
+  private void intakeTalonInitialize(WPI_TalonSRX motor, boolean inverted)
+  {
+    motor.setInverted(inverted);
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setInverted");
+  }
 
   public void setIntakeRollerSpeed(INRollerMode mode)
   {
@@ -78,10 +87,6 @@ public class Intake extends SubsystemBase
       case ROLLER_EXPEL :
         strName = "EXPEL";
         output = INConsts.kIntakeRollerSpeedExpel;
-        break;
-      case ROLLER_HOLD :
-        strName = "HOLD";
-        output = INConsts.kIntakeRollerSpeedHold;
         break;
 
     }

@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.INConsts.INRollerMode;
+import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
 import frc.robot.generated.TunerConstants;
@@ -47,6 +47,7 @@ public class RobotContainer
 
   private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private Command                              m_autoCommand;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric     drive           =
@@ -298,23 +299,28 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
+        m_autoCommand = new AutoStop(drivetrain);
+        break;
       case AUTOPRELOADONLY :
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
+        m_autoCommand = drivetrain.getAutoPath("DriveS1");
+        break;
       case AUTOPRELOADANDLEAVE :
-        pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOPRELOADSCOREANOTHER :
-        pathName = (alliance == Alliance.Red) ? "driveToAnotherRed" : "driveToAnotherBlue";
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        pathName = (alliance == Alliance.Red) ? "driveTestPathRed" : "driveTestPathBlue";
+        m_autoCommand = drivetrain.getAutoPath("Test");
         break;
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));
 
-    return drivetrain.getAutoPath("Test"); //pathName);
+    return m_autoCommand;
   }
 
   public void runAutonomousCommand( )

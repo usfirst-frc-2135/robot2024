@@ -4,6 +4,7 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.Idle;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,8 +15,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
  */
 public class AutoStop extends Command
 {
-  private final CommandSwerveDrivetrain          m_drivetrain;
-  private final SwerveRequest.ApplyChassisSpeeds request = new SwerveRequest.ApplyChassisSpeeds( );
+  private final CommandSwerveDrivetrain m_drivetrain;
 
   public AutoStop(CommandSwerveDrivetrain drivetrain)
   {
@@ -34,7 +34,7 @@ public class AutoStop extends Command
   @Override
   public void execute( )
   {
-    m_drivetrain.setControl(request.withSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0)));
+    m_drivetrain.setControl(new SwerveRequest.Idle( ));
   }
 
   // Called once the command ends or is interrupted.

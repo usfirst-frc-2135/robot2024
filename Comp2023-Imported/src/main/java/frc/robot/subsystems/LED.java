@@ -57,15 +57,15 @@ public class LED extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-   // This method will be called once per scheduler run when in simulation
+    // This method will be called once per scheduler run when in simulation
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
+
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setColor(LEDColor.LEDCOLOR_OFF);
-
   }
 
   public void faultDump( )

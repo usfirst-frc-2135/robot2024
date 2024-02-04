@@ -168,9 +168,12 @@ public class Constants
     // Manual config parameters
     public enum RotaryMode
     {
+      // Add these contants for the roller
+      INIT,    // Initialize intake
+      DOWN,    // IntakeRotar moving down
+      STOPPED, // IntakeRotar stop and hold position
+      UP       // IntakeRotar moving up
     }
-
-    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////

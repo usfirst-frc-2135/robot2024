@@ -36,12 +36,12 @@ import frc.robot.subsystems.Telemetry;
  */
 public class RobotContainer
 {
-  private static RobotContainer                m_instance;
   private final boolean                        m_macOSXSim     = true;
+  public boolean                               m_isComp        = false;
 
   // Joysticks
-  private final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
-  private final CommandXboxController          m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
+  private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
+  private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
   private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
@@ -79,7 +79,6 @@ public class RobotContainer
   }
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
-  private Command                      m_autoCommand;
   PathPlannerTrajectory                m_autoTrajectory;
 
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
@@ -91,6 +90,10 @@ public class RobotContainer
    */
   public RobotContainer( )
   {
+    detectRobot( );
+
+    drivetrain.getDaqThread( ).setThreadPriority(99);
+
     addSmartDashboardWidgets( );
 
     configureButtonBindings( );
@@ -102,11 +105,27 @@ public class RobotContainer
     initOdometryChooser( );
   }
 
-  public static RobotContainer getInstance( )
+  private void detectRobot( )
   {
-    if (m_instance == null)
-      m_instance = new RobotContainer( );
-    return m_instance;
+    // Detect which robot/RoboRIO
+    String serialNum = System.getenv("serialnum");
+    String robotName = "UNKNOWN";
+
+    DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
+
+    if (serialNum == null)
+      robotName = "SIMULATION";
+    else if (serialNum.equals(Constants.kCompSN))
+    {
+      m_isComp = true;
+      robotName = "COMPETITION (A)";
+    }
+    else if (serialNum.equals(Constants.kBetaSN))
+    {
+      m_isComp = false;
+      robotName = "PRACTICE (B)";
+    }
+    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
   }
 
   /****************************************************************************
@@ -214,8 +233,7 @@ public class RobotContainer
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
-
-    else
+    else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
       drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
           drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)
@@ -230,14 +248,14 @@ public class RobotContainer
     drivetrain.registerTelemetry(logger::telemeterize);
 
     // // Default command - Motion Magic hold
-    // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    // m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension));
-    // m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
+    // m_intake.setDefaultCommand(new IntakeMoveToPosition(m_intake));
+    // m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
+    // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    //m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    //m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    //m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    // m_intake.setDefaultCommand(new IntakeRun(m_intake));
+    // m_climber.setDefaultCommand(new ClimberRun(m_climber));
+    // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 
   /****************************************************************************
@@ -290,38 +308,9 @@ public class RobotContainer
         break;
     }
 
-    // if (pathName != null)
-    //   m_autoTrajectory =
-    //       new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d(0, 0));
-
-    // switch (mode)
-    // {
-    //   default :
-    //   case AUTOSTOP :
-    //     m_autoCommand = new AutoStop(m_swerve);
-    //     break;
-    //   case AUTOPRELOADONLY :
-    //     m_autoCommand = new AutoScorePreload(m_swerve);
-    //     break;
-    //   case AUTOLEAVE :
-    //     m_autoCommand = new AutoLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADANDLEAVE :
-    //     m_autoCommand = new AutoPreloadAndLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADSCOREANOTHER :
-    //     m_autoCommand = new AutoPreloadAndScoreAnother(m_swerve, "driveToAnother", m_autoTrajectory);
-    //     break;
-    //   case AUTOTESTPATH :
-    //     m_autoCommand = new AutoTestPath(m_swerve, "AutoTestPath", m_autoTrajectory);
-    //     break;
-    // }
-
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
 
-    m_autoCommand = drivetrain.getAutoPath("Test");//pathName);
-
-    return m_autoCommand;
+    return drivetrain.getAutoPath("Test"); //pathName);
   }
 
   public void runAutonomousCommand( )
@@ -363,6 +352,10 @@ public class RobotContainer
     return m_odomChooser.getSelected( );
   }
 
+  /****************************************************************************
+   * 
+   * Gamepad interfaces
+   */
   public CommandXboxController getDriver( )
   {
     return m_driverPad;
@@ -372,5 +365,15 @@ public class RobotContainer
   {
     return m_operatorPad;
   }
+
+  // Called by disabledInit - place subsystem initializations here
+
+  public void initialize( )
+  {}
+
+  // Called when user button is pressed - place subsystem fault dumps here
+
+  public void faultDump( )
+  {}
 
 }

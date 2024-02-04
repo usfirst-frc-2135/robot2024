@@ -67,7 +67,7 @@ public class RobotContainer
   private final Feeder                         m_feeder        = new Feeder( );
 
   private final Climber                        m_climber       = new Climber( );
-  public final Power                           m_power         = new Power( );
+  //public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 

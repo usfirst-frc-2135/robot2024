@@ -73,6 +73,7 @@ public class Robot extends TimedRobot
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
     m_robotContainer.initialize( );
+    //m_robotContainer.m_power.initialize( );
   }
 
   /**

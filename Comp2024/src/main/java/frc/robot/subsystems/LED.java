@@ -53,7 +53,6 @@ public class LED extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    setColor(m_ledChooser.getSelected( ));
 
   }
 
@@ -66,6 +65,7 @@ public class LED extends SubsystemBase
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
+    setColor(m_ledChooser.getSelected( ));
 
   }
 
@@ -125,21 +125,5 @@ public class LED extends SubsystemBase
       m_previousColor = color;
 
     }
-  }
-
-  public void setNormalColor(LEDColor color)
-  {
-    Boolean normalMode = SmartDashboard.getBoolean("LED_normalMode", true);
-
-    if (normalMode)
-      setColor(color);
-  }
-
-  public void setLLColor(LEDColor color)
-  {
-    Boolean normalMode = SmartDashboard.getBoolean("LED_normalMode", true);
-
-    if (!normalMode)
-      setColor(color);
   }
 }

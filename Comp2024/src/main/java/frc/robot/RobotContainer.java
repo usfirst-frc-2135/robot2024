@@ -11,7 +11,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Power;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,6 +28,8 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 
@@ -63,15 +64,15 @@ public class RobotContainer
   private final Telemetry                      logger          = new Telemetry(MaxSpeed);
 
   // The robot's shared subsystems
+  private final LED                            m_led           = new LED( );
+  private final Power                          m_power         = new Power( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final CommandSwerveDrivetrain         drivetrain      = TunerConstants.DriveTrain; // My drivetrain
+  private final CommandSwerveDrivetrain        drivetrain      = TunerConstants.DriveTrain; // My drivetrain
   private final Intake                         m_intake        = new Intake( );
   private final Shooter                        m_shooter       = new Shooter( );
   private final Feeder                         m_feeder        = new Feeder( );
-
   private final Climber                        m_climber       = new Climber( );
-  //public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 
@@ -89,8 +90,6 @@ public class RobotContainer
   PathPlannerTrajectory                m_autoTrajectory;
 
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-
-  // Command Scheduler
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -383,13 +382,27 @@ public class RobotContainer
   // Called by disabledInit - place subsystem initializations here
 
   public void initialize( )
-  {}
+  {
+    m_led.initialize( );
+    m_power.initialize( );
+
+    m_intake.initialize( );
+    m_shooter.initialize( );
+    m_feeder.initialize( );
+    m_climber.initialize( );
+  }
 
   // Called when user button is pressed - place subsystem fault dumps here
 
   public void faultDump( )
   {
+    m_led.faultDump( );
+    m_power.faultDump( );
 
+    m_intake.faultDump( );
+    m_shooter.faultDump( );
+    m_feeder.faultDump( );
+    m_climber.faultDump( );
   }
 
 }

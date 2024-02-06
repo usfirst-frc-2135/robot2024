@@ -134,6 +134,11 @@ public class Intake extends SubsystemBase
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Degrees: %.1f", getSubsystem( ), m_targetDegrees));
   }
 
+  public void faultDump( )
+  {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+  }
+
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
 
   public double getRotaryPosition( )

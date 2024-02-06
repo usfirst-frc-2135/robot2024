@@ -11,6 +11,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Power;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -19,8 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.IntakeRollerRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -37,15 +40,16 @@ import frc.robot.subsystems.Telemetry;
  */
 public class RobotContainer
 {
-  private static RobotContainer                m_instance;
-  private final boolean                        m_macOSXSim     = false;
+  private final boolean                        m_macOSXSim     = true;
+  public boolean                               m_isComp        = false;
 
   // Joysticks
-  private final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
-  private final CommandXboxController          m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
+  private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
+  private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
   private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private Command                              m_autoCommand;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric     drive           =
@@ -65,19 +69,23 @@ public class RobotContainer
   private final Intake                         m_intake        = new Intake( );
   private final Shooter                        m_shooter       = new Shooter( );
   private final Feeder                         m_feeder        = new Feeder( );
+
   private final Climber                        m_climber       = new Climber( );
+  //public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 
   enum AutoChooser
   {
     AUTOSTOP,                // AutoStop - do nothing
+    AUTOPRELOADONLY,         // Score preloaded game piece
     AUTOLEAVE,               // Leave starting zone
+    AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
+    AUTOPRELOADSCOREANOTHER, // Score preload and score another
     AUTOTESTPATH             // Run a selected test path
   }
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
-  private Command                      m_autoCommand;
   PathPlannerTrajectory                m_autoTrajectory;
 
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
@@ -89,6 +97,10 @@ public class RobotContainer
    */
   public RobotContainer( )
   {
+    detectRobot( );
+
+    drivetrain.getDaqThread( ).setThreadPriority(99);
+
     addSmartDashboardWidgets( );
 
     configureButtonBindings( );
@@ -100,11 +112,27 @@ public class RobotContainer
     initOdometryChooser( );
   }
 
-  public static RobotContainer getInstance( )
+  private void detectRobot( )
   {
-    if (m_instance == null)
-      m_instance = new RobotContainer( );
-    return m_instance;
+    // Detect which robot/RoboRIO
+    String serialNum = System.getenv("serialnum");
+    String robotName = "UNKNOWN";
+
+    DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
+
+    if (serialNum == null)
+      robotName = "SIMULATION";
+    else if (serialNum.equals(Constants.kCompSN))
+    {
+      m_isComp = true;
+      robotName = "COMPETITION (A)";
+    }
+    else if (serialNum.equals(Constants.kBetaSN))
+    {
+      m_isComp = false;
+      robotName = "PRACTICE (B)";
+    }
+    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
   }
 
   /****************************************************************************
@@ -168,8 +196,9 @@ public class RobotContainer
     m_operatorPad.y( ).whileTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
+    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
     m_operatorPad.leftBumper( ).onTrue(new Dummy("oper left bumper"));
-    m_operatorPad.rightBumper( ).onTrue(new Dummy("oper right bumper"));
     m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
     m_operatorPad.start( ).onTrue(new Dummy("oper start")); // aka Menu
     //
@@ -182,8 +211,9 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_EXPEL));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper right trigger"));
 
     ///////////////////////////////////////////////////////
     //
@@ -212,8 +242,7 @@ public class RobotContainer
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
-
-    else
+    else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
       drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
           drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)
@@ -228,14 +257,14 @@ public class RobotContainer
     drivetrain.registerTelemetry(logger::telemeterize);
 
     // // Default command - Motion Magic hold
-    // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    // m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension));
-    // m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
+    // m_intake.setDefaultCommand(new IntakeMoveToPosition(m_intake));
+    // m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
+    // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    //m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    //m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    //m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    // m_intake.setDefaultCommand(new IntakeRun(m_intake));
+    // m_climber.setDefaultCommand(new ClimberRun(m_climber));
+    // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 
   /****************************************************************************
@@ -247,8 +276,11 @@ public class RobotContainer
 
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-    m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
-    m_autoChooser.addOption("2 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
+    m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
+    m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
+    m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
@@ -271,21 +303,26 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
+        m_autoCommand = new AutoStop(drivetrain);
+        break;
+      case AUTOPRELOADONLY :
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
-        pathName = (alliance == Alliance.Red) ? "R_Note1Acquire" : "B_Note1Acquire";
+        m_autoCommand = drivetrain.getAutoPath("DriveS1");
+        break;
+      case AUTOPRELOADANDLEAVE :
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
+        break;
+      case AUTOPRELOADSCOREANOTHER :
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        pathName = "Test";
+        m_autoCommand = drivetrain.getAutoPath("Test");
         break;
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
-
-    if (pathName != null)
-      m_autoCommand = drivetrain.getAutoPath(pathName);
-    else
-      m_autoCommand = new AutoStop(drivetrain);
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));
 
     return m_autoCommand;
   }
@@ -329,6 +366,10 @@ public class RobotContainer
     return m_odomChooser.getSelected( );
   }
 
+  /****************************************************************************
+   * 
+   * Gamepad interfaces
+   */
   public CommandXboxController getDriver( )
   {
     return m_driverPad;
@@ -337,6 +378,18 @@ public class RobotContainer
   public CommandXboxController getOperator( )
   {
     return m_operatorPad;
+  }
+
+  // Called by disabledInit - place subsystem initializations here
+
+  public void initialize( )
+  {}
+
+  // Called when user button is pressed - place subsystem fault dumps here
+
+  public void faultDump( )
+  {
+
   }
 
 }

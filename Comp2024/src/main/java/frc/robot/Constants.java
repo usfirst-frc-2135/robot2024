@@ -4,17 +4,11 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import frc.robot.lib.util.SwerveModuleConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -109,138 +103,12 @@ public class Constants
   public static final class SWConsts
   {
     /* Individual module constants */
-    public static final double               driveGearRatio                = 6.75;
-    public static final double               steerGearRatio                = 21.43;
-
-    /* Swerve Current Limiting */
-    public static final int                  driveSupplyCurrentLimit       = 35;
-    public static final int                  driveSupplyCurrentThreshold   = 60;
-    public static final double               driveSupplyTimeThreshold      = 0.1;
-    public static final boolean              driveSupplyCurrentLimitEnable = true;
-
-    public static final int                  steerSupplyCurrentLimit       = 25;
-    public static final int                  steerSupplyCurrentThreshold   = 40;
-    public static final double               steerSupplyTimeThreshold      = 0.1;
-    public static final boolean              steerSupplyCurrentLimitEnable = true;
-
-    /* Drive Motor PID Values */
-    public static final double               driveFFKS                     = 0.0;
-    public static final double               driveFFKV                     = 0.0;
-    public static final double               driveKP                       = 0.36;
-    public static final double               driveKI                       = 0.0;
-    public static final double               driveKD                       = 0.0;
-
-    /* Steering Motor PID Values */
-    public static final double               steerFFKS                     = 0.0;
-    public static final double               steerFFKV                     = 0.0;
-    public static final double               steerKP                       = 12.0;
-    public static final double               steerKI                       = 0.0;
-    public static final double               steerKD                       = 0.0;
-
-    /* Neutral Modes */
-    public static final InvertedValue        driveMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue     driveNeutralMode              = NeutralModeValue.Brake;
-    public static final double               driveOpenLoopRamp             = 0.25;
-    public static final double               driveClosedLoopRamp           = 0.0;
-
-    public static final InvertedValue        steerMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue     steerNeutralMode              = NeutralModeValue.Coast;
-    public static final double               steerOpenLoopRamp             = 0.0;
-    public static final double               steerClosedLoopRamp           = 0.0;
-
-    public static final SensorDirectionValue steerCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
-    public static final boolean              gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
-
-    /* Drive Motor Characterization Values */
-    public static final double               driveKS                       = (0.32 / 12);
-    public static final double               driveKV                       = (1.51 / 12);
-    public static final double               driveKA                       = (0.27 / 12);
-
-    /* Swerve Profiling Values */
-    public static final double               maxSpeed                      = 4.5;  // meters per second
-    public static final double               maxAngularVelocity            = 6.0;  // orginially 10.0
-    public static final double               maxSpeedSlowMode              = 2.25; // meters per second
-    public static final double               maxAngularVelocitySlowMode    = 4.0;  // orginially 5.0
+    public static final boolean gyroInvert  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Controller Invert */
-    public static final boolean              invertXAxis                   = false;
-    public static final boolean              invertYAxis                   = false;
-    public static final boolean              invertRAxis                   = false;
-
-    /*** MODULE SPECIFIC CONSTANTS ***/
-
-    /* Front Left Module - Module 0 */
-    public static final class Mod0
-    {
-      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
-      public static final double   betaAngleOffset = 0.0;
-      public static final double   compAngleOffset = 0.043945;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_SteerLF, Ports.kCANID_CANCoderLF,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    /* Front Right Module - Module 1 */
-    public static final class Mod1
-    {
-      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
-      public static final double   betaAngleOffset = 0.0;
-      public static final double   compAngleOffset = -0.331787;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_SteerRF, Ports.kCANID_CANCoderRF,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    /* Back Left Module - Module 2 */
-    public static final class Mod2
-    {
-      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
-      public static final double   betaAngleOffset = 0.0;
-      public static final double   compAngleOffset = 0.272949;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_SteerLR, Ports.kCANID_CANCoderLR,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    /* Back Right Module - Module 3 */
-    public static final class Mod3
-    {
-      private static final boolean isComp          = true;  // TODO: needs to be fixed if we keep these module definitions
-      public static final double   betaAngleOffset = 0.0;
-      public static final double   compAngleOffset = 0.25836;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_SteerRR, Ports.kCANID_CANCoderRR,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    /*** SWERVE SUBSYSTEM CONSTANTS ***/
-
-    public static final double                trackWidth            = Units.inchesToMeters(22.7);
-    public static final double                wheelBase             = Units.inchesToMeters(22.7);
-
-    public static final double                wheelDiameter         = Units.inchesToMeters(4.0);
-    public static final double                wheelCircumference    = wheelDiameter * Math.PI;
-
-    public static final Translation2d[ ]      swerveModuleLocations =
-    {
-        new Translation2d(wheelBase / 2.0, trackWidth / 2.0), new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
-    };
-
-    public static final SwerveDriveKinematics swerveKinematics      = new SwerveDriveKinematics(swerveModuleLocations);
-
+    public static final boolean invertXAxis = false;
+    public static final boolean invertYAxis = false;
+    public static final boolean invertRAxis = false;
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -288,21 +156,29 @@ public class Constants
   public static final class INConsts
   {
     // Global settings
-
+    public static final boolean kInvertMotor = true; // Motor direction for positive input
     // Current limit settings - Roller
     // Current limit settings - Rotary
 
     // Manual config parameters
-    public enum RollerMode
+    public enum INRollerMode
     {
+      ROLLER_STOP, ROLLER_ACQUIRE, ROLLER_EXPEL
     }
+
+    public static final double kIntakeRollerSpeedAcquire = 0.5;
+
+    public static final double kIntakeRollerSpeedExpel   = -0.25;
 
     // Manual config parameters
     public enum RotaryMode
     {
+      // Add these contants for the roller
+      INIT,    // Initialize intake
+      DOWN,    // IntakeRotar moving down
+      STOPPED, // IntakeRotar stop and hold position
+      UP       // IntakeRotar moving up
     }
-
-    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -318,6 +194,7 @@ public class Constants
     // Manual config parameters
     public enum RollerMode
     {
+
     }
 
     // Manual config parameters

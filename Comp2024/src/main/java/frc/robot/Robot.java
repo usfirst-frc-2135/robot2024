@@ -3,18 +3,13 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.lib.util.CTREConfigs5;
-import frc.robot.lib.util.CTREConfigs6;
-import frc.robot.lib.util.LimelightHelpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -24,16 +19,9 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class Robot extends TimedRobot
 {
-  private final boolean      m_useLimelight  = true;
-  public boolean             m_isComp        = false;
-
-  private RobotContainer     m_robotContainer;
-  private Command            m_autonomousCommand;
-
-  private boolean            m_faultsCleared = false;
-
-  public static CTREConfigs5 ctreConfigs5;
-  public static CTREConfigs6 ctreConfigs6;
+  private final RobotContainer m_robotContainer = new RobotContainer( );
+  private Command              m_autonomousCommand;
+  private boolean              m_faultsCleared  = false;
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization
@@ -44,35 +32,6 @@ public class Robot extends TimedRobot
   {
     // Starts recording to data log
     DataLogManager.start( );
-
-    // Detect which robot/RoboRIO
-    String serialNum = System.getenv("serialnum");
-    String robotName = "UNKNOWN";
-
-    DataLogManager.log(String.format("robotInit: RoboRIO SN: %s", serialNum));
-
-    if (serialNum == null)
-      robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kCompSN))
-    {
-      m_isComp = true;
-      robotName = "COMPETITION (A)";
-    }
-    else if (serialNum.equals(Constants.kBetaSN))
-    {
-      m_isComp = false;
-      robotName = "PRACTICE (B)";
-    }
-    DataLogManager.log(String.format("robotInit: Detected the %s robot! ", robotName));
-
-    // Instantiate CTRE configurations
-    ctreConfigs5 = new CTREConfigs5( );
-    ctreConfigs6 = new CTREConfigs6( );
-
-    // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
-    m_robotContainer = RobotContainer.getInstance( );
-
-    m_robotContainer.drivetrain.getDaqThread( ).setThreadPriority(99);
 
     CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(String.format("%s: Init", cmd.getName( ))));
     CommandScheduler.getInstance( ).onCommandInterrupt(cmd -> DataLogManager.log(String.format("%s: Interrupt", cmd.getName( ))));
@@ -102,18 +61,6 @@ public class Robot extends TimedRobot
     // subsystem periodic() methods. This must be called from the robot's periodic block in order
     // for anything in the Command-based framework to work.
     CommandScheduler.getInstance( ).run( );
-
-    if (m_useLimelight)
-    {
-      var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
-
-      Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
-
-      if (lastResult.valid)
-      {
-        m_robotContainer.drivetrain.addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
-      }
-    }
   }
 
   /**
@@ -125,10 +72,12 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
-    // These subsystems can use LED and vision subsystems
-
+    m_robotContainer.initialize( );
   }
 
+  /**
+   * This function is called periodically while disabled.
+   */
   @Override
   public void disabledPeriodic( )
   {
@@ -138,14 +87,15 @@ public class Robot extends TimedRobot
       if (!m_faultsCleared)
       {
         m_faultsCleared = true;
-        robotFaultDump( );
+        m_robotContainer.faultDump( );
       }
     }
-    else if (m_faultsCleared)
+    else
       m_faultsCleared = false;
   }
 
   /**
+   * This function is called once each time the robot enters Disabled mode.
    * This autonomous runs the autonomous command selected by your {@link RobotContainer} class.
    */
   @Override
@@ -168,18 +118,16 @@ public class Robot extends TimedRobot
    */
   @Override
   public void autonomousPeriodic( )
-  {
-    DataLogManager.log("Current Position: " + RobotContainer.getInstance( ).drivetrain.getState( ).Pose + "\nCurrent Speeds: "
-        + RobotContainer.getInstance( ).drivetrain.getModule(0).getCurrentState( ).speedMetersPerSecond);
-  }
+  {}
 
+  /**
+   * This function is called once each time the robot enters Teleop mode.
+   */
   @Override
   public void teleopInit( )
   {
     DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
-
-    // m_robotContainer.m_swerve.enterTeleopMode( );
 
     // This makes sure that the autonomous stops running when teleop starts running. 
 
@@ -187,8 +135,6 @@ public class Robot extends TimedRobot
     {
       m_autonomousCommand.cancel( );
     }
-
-    // CommandScheduler.getInstance( ).schedule(m_robotContainer.m_extensionCalibrate);
   }
 
   /**
@@ -198,6 +144,9 @@ public class Robot extends TimedRobot
   public void teleopPeriodic( )
   {}
 
+  /**
+   * This function is called once each time the robot enters Simulation mode.
+   */
   @Override
   public void simulationInit( )
   {}
@@ -223,12 +172,4 @@ public class Robot extends TimedRobot
   public void testPeriodic( )
   {}
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private void robotFaultDump( )
-  {
-    // Print out talon faults and clear sticky ones
-    DataLogManager.log(String.format("robotFaultDump:  ----- DUMP FAULTS --------------"));
-
-  }
 }

@@ -31,6 +31,7 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,7 +72,11 @@ public class RobotContainer
   private final Feeder                         m_feeder        = new Feeder( );
 
   private final Climber                        m_climber       = new Climber( );
+<<<<<<< Updated upstream
   //public final Power                           m_power         = new Power( );
+=======
+  private final Vision                         m_vision        = new Vision( );
+>>>>>>> Stashed changes
 
   // Chooser for autonomous commands
 
@@ -265,6 +270,7 @@ public class RobotContainer
     // m_intake.setDefaultCommand(new IntakeRun(m_intake));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
+
   }
 
   /****************************************************************************

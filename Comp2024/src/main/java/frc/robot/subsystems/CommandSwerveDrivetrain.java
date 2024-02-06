@@ -15,12 +15,14 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 
@@ -30,7 +32,7 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
+  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
 
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
@@ -129,6 +131,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
+      // DataLogManager.log(String.format("llPose: ", LimelightHelpers.getBotPose()));
 
       if (lastResult.valid)
       {

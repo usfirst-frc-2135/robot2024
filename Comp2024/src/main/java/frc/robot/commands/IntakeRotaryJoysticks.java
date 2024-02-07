@@ -31,7 +31,7 @@ public class IntakeRotaryJoysticks extends Command
   @Override
   public void execute( )
   {
-    m_intake.moveRotaryWithJoystick(m_gamePad.getRightX( ));
+    m_intake.moveRotaryWithJoystick(-m_gamePad.getRightY( ));
   }
 
   // Called once the command ends or is interrupted.

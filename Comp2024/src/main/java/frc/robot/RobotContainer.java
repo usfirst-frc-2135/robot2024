@@ -8,7 +8,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -42,7 +41,7 @@ import frc.robot.subsystems.Telemetry;
 public class RobotContainer
 {
   private final boolean                        m_macOSXSim     = true;
-  public boolean                               m_isComp        = false;
+  private boolean                              m_isComp        = detectRobot( );
 
   // Joysticks
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
@@ -87,8 +86,6 @@ public class RobotContainer
   }
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
-  PathPlannerTrajectory                m_autoTrajectory;
-
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
 
   /**
@@ -96,8 +93,6 @@ public class RobotContainer
    */
   public RobotContainer( )
   {
-    detectRobot( );
-
     drivetrain.getDaqThread( ).setThreadPriority(99);
 
     addSmartDashboardWidgets( );
@@ -111,27 +106,29 @@ public class RobotContainer
     initOdometryChooser( );
   }
 
-  private void detectRobot( )
+  private static boolean detectRobot( )
   {
     // Detect which robot/RoboRIO
     String serialNum = System.getenv("serialnum");
     String robotName = "UNKNOWN";
+    boolean isComp = false;
 
     DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
 
     if (serialNum == null)
       robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kCompSN))
+    else if (serialNum.equals(Constants.kCompSN)) // TODO: get this from Comp RoboRIO for 2024
     {
-      m_isComp = true;
+      isComp = true;
       robotName = "COMPETITION (A)";
     }
-    else if (serialNum.equals(Constants.kBetaSN))
+    else if (serialNum.equals(Constants.kBetaSN)) // TODO: get this from Beta RoboRIO for 2024
     {
-      m_isComp = false;
-      robotName = "PRACTICE (B)";
+      isComp = false;
+      robotName = "PRACTICE/BETA (B)";
     }
     DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+    return isComp;
   }
 
   /****************************************************************************
@@ -145,6 +142,7 @@ public class RobotContainer
     // For future work to set up Shuffleboard layout from code
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
+
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
   }
 

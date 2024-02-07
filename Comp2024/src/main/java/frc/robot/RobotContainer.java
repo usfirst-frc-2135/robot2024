@@ -160,9 +160,9 @@ public class RobotContainer
     //
     // Driver - A, B, X, Y
     // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
-    // m_driverPad.b( ).whileTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
-    m_driverPad.x( ).whileTrue(new Dummy("driver X"));
-    m_driverPad.y( ).whileTrue(new Dummy("driver Y"));
+    // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
+    m_driverPad.x( ).onTrue(new Dummy("driver X"));
+    m_driverPad.y( ).onTrue(new Dummy("driver Y"));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
@@ -188,9 +188,9 @@ public class RobotContainer
     //
     // Operator - A, B, X, Y
     m_operatorPad.a( ).onTrue(new Dummy("oper A"));
-    m_operatorPad.b( ).whileTrue(new Dummy("oper B"));
-    m_operatorPad.x( ).whileTrue(new Dummy("oper X"));
-    m_operatorPad.y( ).whileTrue(new Dummy("oper Y"));
+    m_operatorPad.b( ).onTrue(new Dummy("oper B"));
+    m_operatorPad.x( ).onTrue(new Dummy("oper X"));
+    m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
     m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
@@ -355,7 +355,7 @@ public class RobotContainer
     m_odomChooser.addOption("ID16 - AprilTag", 16);
 
     // Configure odometry sendable chooser
-    SmartDashboard.putData("Reset Odometry Mode", m_odomChooser);
+    SmartDashboard.putData("Reset Odometry", m_odomChooser);
   }
 
   public Integer getOdometryOption( )

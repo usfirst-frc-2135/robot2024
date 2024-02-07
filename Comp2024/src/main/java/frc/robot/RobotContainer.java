@@ -11,7 +11,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Power;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,6 +28,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 
@@ -71,7 +71,7 @@ public class RobotContainer
   private final Feeder                         m_feeder        = new Feeder( );
 
   private final Climber                        m_climber       = new Climber( );
-  //public final Power                           m_power         = new Power( );
+  public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 

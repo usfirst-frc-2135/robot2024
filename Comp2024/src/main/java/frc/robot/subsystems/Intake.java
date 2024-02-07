@@ -23,6 +23,7 @@ import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.Constants.INConsts.RotaryMode;
 import frc.robot.Constants.Ports;
+import frc.robot.lib.util.CTREConfigs5;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil5;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -85,7 +86,8 @@ public class Intake extends SubsystemBase
   {
     setName("Intake");
     setSubsystem("Intake");
-    m_intakeValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller");
+    m_intakeValid =
+        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller", CTREConfigs5.intakeRollerConfig( ));
     SmartDashboard.putBoolean("HL_validIN", m_intakeValid);
     // TODO needs to be initialized 
 

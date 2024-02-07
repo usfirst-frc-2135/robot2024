@@ -72,11 +72,7 @@ public class RobotContainer
   private final Feeder                         m_feeder        = new Feeder( );
 
   private final Climber                        m_climber       = new Climber( );
-<<<<<<< Updated upstream
   //public final Power                           m_power         = new Power( );
-=======
-  private final Vision                         m_vision        = new Vision( );
->>>>>>> Stashed changes
 
   // Chooser for autonomous commands
 

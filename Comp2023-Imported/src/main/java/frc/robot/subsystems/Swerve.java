@@ -186,12 +186,21 @@ public class Swerve extends SubsystemBase
 
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
       if (botLLPose != null && DriverStation.isTeleopEnabled( ))
+      {
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+        m_poseEstimator.update(m_heading, getPositions( ));
+        // resetOdometry(m_poseEstimator.getEstimatedPosition( ).getX( ));
+      }
 
       Pose2d rawPose = m_vision.getLimelightRawPose( );
+      Pose2d Origin = new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0));
+      double OriginX = Origin.getX( );
+      double OriginY = Origin.getY( );
+      Rotation2d OriginRot = Origin.getRotation( );
 
-      if (rawPose != null)
+      if (rawPose != null && rawPose.getX( ) != OriginX && rawPose.getY( ) != OriginY && rawPose.getRotation( ) != OriginRot)
       {
+        DataLogManager.log("updating at zero" + rawPose);
         resetOdometry(rawPose);
       }
     }
@@ -505,9 +514,12 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    DataLogManager.log("heading " + m_heading);
-    DataLogManager.log("positions " + getPositions( ));
-    DataLogManager.log("pose " + pose);
+    DataLogManager.log("heading!!!!!!!!!!!!: " + m_heading);
+    for (int i = 0; i < getPositions( ).length; i++)
+    {
+      DataLogManager.log("positions!!!!: " + i + " " + getPositions( )[i]);
+    }
+    DataLogManager.log("pose!!!!!!!!!!!!!:  " + pose);
 
     m_poseEstimator.resetPosition(m_heading, getPositions( ), pose);
     DataLogManager.log(String.format("%s: Reset position   : %s Gyro : %s", getSubsystem( ),

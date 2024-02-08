@@ -13,6 +13,7 @@ import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.INConsts.RotaryMode;
@@ -263,10 +265,13 @@ public class Intake extends SubsystemBase
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
-  public void moveRotaryWithJoystick(double axisValue)
+  public void moveRotaryWithJoystick(XboxController joystick)
   {
+    double axisValue = -joystick.getRightY( );
     boolean rangeLimited = false;
-    RotaryMode newMode = RotaryMode.STOPPED;
+    RotaryMode newMode = RotaryMode.INIT;
+
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if (axisValue < 0.0)
     {

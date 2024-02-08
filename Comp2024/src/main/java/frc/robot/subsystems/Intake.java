@@ -206,7 +206,12 @@ public class Intake extends SubsystemBase
   // Initialize dashboard widgets
 
   private void initSmartDashboard( )
-  {}
+  {
+    // Initialize dashboard widgets
+    SmartDashboard.putBoolean("HL_validWR", m_rotaryValid);
+    SmartDashboard.putBoolean("HL_validWRCC", m_ccValid);
+    SmartDashboard.putData("WristMech", m_mech);
+  }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
 

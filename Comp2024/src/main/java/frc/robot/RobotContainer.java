@@ -11,6 +11,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Power;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -68,7 +69,9 @@ public class RobotContainer
   private final Intake                         m_intake        = new Intake( );
   private final Shooter                        m_shooter       = new Shooter( );
   private final Feeder                         m_feeder        = new Feeder( );
+
   private final Climber                        m_climber       = new Climber( );
+  //public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 
@@ -385,6 +388,8 @@ public class RobotContainer
   // Called when user button is pressed - place subsystem fault dumps here
 
   public void faultDump( )
-  {}
+  {
+
+  }
 
 }

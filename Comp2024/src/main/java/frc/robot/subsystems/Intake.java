@@ -14,6 +14,8 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -67,6 +69,18 @@ public class Intake extends SubsystemBase
   public static final double        kManualSpeedVolts   = 3.0;            // Motor voltage during manual operation (joystick)
 
   // Motion Magic config parameters
+  public static final double        kMMVelocity         = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
+  public static final double        kMMAcceleration     = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
+  public static final double        kMMSCurveStrength   = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
+  public static final double        kS                  = 0.0;            // Voltage constant to overcome friction
+  public static final double        kV                  = 0.1129;         // Voltage constant per desired RPM
+  public static final double        kPidKp              = 1.350;          // Wrist PID proportional constant
+  public static final double        kPidKi              = 0.0;            // Wrist PID integral constant
+  public static final double        kPidKd              = 0.0;            // Wrist PID derivative constant
+
+  public static final int           kAllowedError       = 0;              // Wrist PID allowable closed loop error in counts
+  public static final double        kToleranceDegrees   = 2.0;            // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
+  public static final double        kMMSafetyTimeout    = 3;
 
   // Member objects
   private final WPI_TalonSRX        m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -100,12 +114,11 @@ public class Intake extends SubsystemBase
 
   private static double             m_currentDegrees    = 0.0; // Current angle in degrees
   private double                    m_targetDegrees     = 0.0; // Target angle in degrees
-
+  private Debouncer                 m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
 
   private VoltageOut                m_requestVolts      = new VoltageOut(0).withEnableFOC(false);
   private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
-  private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
   private StatusSignal<Double>      m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );
@@ -168,7 +181,6 @@ public class Intake extends SubsystemBase
     m_currentDegrees = getTalonFXDegrees( );
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
-    SmartDashboard.putNumber("IN_totalFF", m_totalArbFeedForward);
     if (m_debug)
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
@@ -213,7 +225,7 @@ public class Intake extends SubsystemBase
     SmartDashboard.putData("RotaryMech", m_rotaryMech);
   }
 
-  // Put methods for controlling this subsystem here. Call these from Commands.
+  // Put methods for controlling this subsystem here. Call these from Commands```````````````````````````````                 .
 
   public void initialize( )
   {
@@ -262,10 +274,20 @@ public class Intake extends SubsystemBase
     return m_currentDegrees;
   }
 
+  private boolean isWithinTolerance(double targetDegrees)
+  {
+    return (Math.abs(targetDegrees - m_currentDegrees) < kToleranceDegrees);
+  }
+
   public void setRotaryStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
     m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
+  }
+
+  private boolean isMoveValid(double degrees)
+  {
+    return (degrees > kAngleMin) && (degrees < kAngleMax);
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -280,22 +302,18 @@ public class Intake extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      DataLogManager.log("Axis value if moved down" + axisValue);
       if (m_currentDegrees > kAngleMin)
       {
         newMode = INConsts.RotaryMode.UP;
-        DataLogManager.log("If angle is greater than the minimum angle" + axisValue);
       }
       else
         rangeLimited = true;
     }
     else if (axisValue > 0.0)
     {
-      DataLogManager.log("If angle is greater than 0" + axisValue);
       if (m_currentDegrees < kAngleMax)
       {
         newMode = INConsts.RotaryMode.DOWN;
-        DataLogManager.log("If angle is less than the maximum angle" + axisValue);
       }
       else
         rangeLimited = true;
@@ -314,6 +332,66 @@ public class Intake extends SubsystemBase
     m_targetDegrees = m_currentDegrees;
 
     m_rotaryMotor.setControl(m_requestVolts.withOutput(axisValue * kManualSpeedVolts));
+  }
+
+  ///////////////////////// MOTION MAGIC ///////////////////////////////////
+
+  public void moveToPositionInit(double newAngle, boolean holdPosition)
+  {
+    m_safetyTimer.restart( );
+
+    if (holdPosition)
+      newAngle = getRotaryPosition( );
+
+    // Decide if a new position request
+    if (holdPosition || newAngle != m_targetDegrees || !isWithinTolerance(newAngle))
+    {
+      // Validate the position request
+      if (isMoveValid(newAngle))
+      {
+        m_targetDegrees = newAngle;
+        m_moveIsFinished = false;
+        m_withinTolerance.calculate(false); // Reset the debounce filter
+
+        m_rotaryMotor
+            .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
+        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ),
+            m_currentDegrees, m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio),
+            Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
+      }
+      else
+        DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+            m_targetDegrees, kAngleMin, kAngleMax));
+    }
+    else
+    {
+      m_moveIsFinished = true;
+      DataLogManager.log(String.format("%s: Position already achieved - %s", getSubsystem( ), m_targetDegrees));
+    }
+  }
+
+  public void moveToPositionExecute( )
+  {
+    if (m_calibrated)
+      m_rotaryMotor
+          .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
+  }
+
+  public boolean moveToPositionIsFinished( )
+  {
+    boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
+    double error = m_targetDegrees - m_currentDegrees;
+
+    if (m_withinTolerance.calculate(Math.abs(error) < kToleranceDegrees) || timedOut)
+    {
+      if (!m_moveIsFinished)
+        DataLogManager.log(String.format("%s: Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f %s",
+            getSubsystem( ), m_currentDegrees, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
+
+      m_moveIsFinished = true;
+    }
+
+    return m_moveIsFinished;
   }
 
 }

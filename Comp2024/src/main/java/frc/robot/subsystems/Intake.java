@@ -82,8 +82,8 @@ public class Intake extends SubsystemBase
   // Declare module variables
 
   // Mechanism2d
-  private final Mechanism2d         m_mech              = new Mechanism2d(3, 3);
-  private final MechanismRoot2d     m_mechRoot          = m_mech.getRoot("wrist", 1.5, 2);
+  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(3, 3);
+  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 1.5, 2);
   private final MechanismLigament2d m_mechLigament      =
       m_mechRoot.append(new MechanismLigament2d("wrist", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
@@ -208,9 +208,9 @@ public class Intake extends SubsystemBase
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_validWR", m_rotaryValid);
-    SmartDashboard.putBoolean("HL_validWRCC", m_ccValid);
-    SmartDashboard.putData("WristMech", m_mech);
+    SmartDashboard.putBoolean("HL_validRotary", m_rotaryValid);
+    SmartDashboard.putBoolean("HL_validRotaryCC", m_ccValid);
+    SmartDashboard.putData("RotaryMech", m_rotaryMech);
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.

@@ -2,6 +2,10 @@ package frc.robot.lib.util;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
 {
@@ -91,8 +95,60 @@ public final class CTREConfigs6
 
   public static TalonFXConfiguration intakeRotaryFXConfig( )
   {
-    TalonFXConfiguration intakeRotaryConfig = new TalonFXConfiguration( );
-    return intakeRotaryConfig;
+    TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
+
+    // Closed Loop settings
+    // inRotaryConfig.ClosedLoopGeneral.*
+    // inRotaryConfig.ClosedLoopRamps.*
+
+    // Current limit settings
+    inRotaryConfig.CurrentLimits.SupplyCurrentLimit = 25.0;
+    inRotaryConfig.CurrentLimits.SupplyCurrentThreshold = 25.0;
+    inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
+    inRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 20.0;
+    inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    // Feedback settings
+    // inRotaryConfig.Feedback.*
+
+    // Hardware limit switches
+    // inRotaryConfig.HardwareLimitSwitch.*
+
+    // Motion Magic settings
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 0.0;
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 0.0;
+    inRotaryConfig.MotionMagic.MotionMagicJerk = 0.0;
+
+    // Motor output settings
+    inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
+    inRotaryConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    inRotaryConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // Closed loop settings
+
+    // Open Loop settings
+    inRotaryConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
+    // inRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
+    inRotaryConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+
+    // Slot settings
+    inRotaryConfig.Slot0.kS = 0.0;
+    inRotaryConfig.Slot0.kV = 0.0;
+    inRotaryConfig.Slot0.kP = 0.0;
+    inRotaryConfig.Slot0.kI = 0.0;
+    inRotaryConfig.Slot0.kD = 0.0;
+
+    // Software limit switches
+    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+    //     Conversions.degreesToInputRotations(WRConsts.kAngleMin, WRConsts.kGearRatio);
+    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+    //     Conversions.degreesToInputRotations(WRConsts.kAngleMax, WRConsts.kGearRatio);
+    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+
+    return inRotaryConfig;
   }
 
   public static CANcoderConfiguration intakeRotaryCancoderConfig( )

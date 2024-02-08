@@ -2,8 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.INConsts.INRollerMode;
-import frc.robot.Constants.INConsts.RotaryMode;
 import frc.robot.subsystems.Intake;
 
 /**
@@ -12,16 +10,16 @@ import frc.robot.subsystems.Intake;
 public class IntakeRotaryJoysticks extends Command
 {
 
-  private final Intake   m_rotary;
+  private final Intake   m_intake;
   private XboxController m_gamePad;
 
-  public IntakeRotaryJoysticks(Intake rotary, XboxController gamePad)
+  public IntakeRotaryJoysticks(Intake intake, XboxController gamePad)
   {
-    m_rotary = rotary;
+    m_intake = intake;
     m_gamePad = gamePad;
 
     setName("IntakeRotaryJoysticks");
-    addRequirements(m_rotary);
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
@@ -33,7 +31,7 @@ public class IntakeRotaryJoysticks extends Command
   @Override
   public void execute( )
   {
-    m_rotary.moveRotaryWithJoystick(m_gamePad);
+    m_intake.moveRotaryWithJoystick(-m_gamePad.getRightY( ));
   }
 
   // Called once the command ends or is interrupted.

@@ -4,6 +4,8 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -211,13 +213,36 @@ public class Constants
   public static final class SHConsts
   {
     // Global settings
+    public static final int                      kSH11CANID               = 11;
 
-    // Current limit settings - Roller
-    // Current limit settings - Rotary
+    public static final double                   kFlywheelGearRatio       = (18.0 / 12.0);
+    public static final double                   kFlywheelCPR             = Falcon500.kEncoderCPR * kFlywheelGearRatio;
+
+    public static final int                      kVelocityMeasWindow      = 1;
+    public static final SensorVelocityMeasPeriod kVelocityMeasPeriod      = SensorVelocityMeasPeriod.Period_10Ms;
+    public static final double                   kFlywheelPidKf           = 0.04775;
+    public static final double                   kFlywheelPidKp           = 0.2;
+    public static final double                   kFlywheelPidKi           = 0.0;
+    public static final double                   kFlywheelPidKd           = 0.0;
+    public static final double                   kFlywheelNeutralDeadband = 0.01;
+
+    public static final double                   kFlywheelToleranceRPM    = 150.0;     // Tolerance band around target RPM
+    public static final double                   kFlywheelLowerTargetRPM  = 1000.0;    // RPM for lower hub
+    public static final double                   kFlywheelUpperTargetRPM  = 2150.0;    // RPM for upper hub
+    public static final double                   kFlywheelPrimeRPM        = kFlywheelUpperTargetRPM; // RPM for shooter priming
+
+    public static final double                   kReverseRPMThreshold     = 20.0;      // RPM threshold for allowing reverse
+    public static final double                   kFlywheelReverseRPM      = -1000.0;   // RPM for reversing out game pieces
 
     // Manual config parameters
-    public enum ShooterMode
+    public enum SHMode
     {
+      SHOOTER_REVERSE,    // Shooter runs in reverse direction to handle jams
+      SHOOTER_STOP,       // Shooter is stopped
+      SHOOTER_SCORE,      // Shooter ramped to an initial speed before shooting
+      SHOOTER_LOWERHUB,   // Shooter at speed for low hub
+      SHOOTER_UPPERHUB,   // Shooter at speed for high hub
+
     }
 
     // Manual config parameters

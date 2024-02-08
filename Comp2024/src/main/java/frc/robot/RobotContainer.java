@@ -21,9 +21,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.INConsts.INRollerMode;
+import frc.robot.Constants.SHConsts.SHMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
+import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -198,7 +200,9 @@ public class RobotContainer
     // Operator - Bumpers, start, back
     m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
     m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
-    m_operatorPad.leftBumper( ).onTrue(new Dummy("oper left bumper"));
+    m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, SHMode.SHOOTER_SCORE));
+    m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, SHMode.SHOOTER_STOP));
+
     m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
     m_operatorPad.start( ).onTrue(new Dummy("oper start")); // aka Menu
     //

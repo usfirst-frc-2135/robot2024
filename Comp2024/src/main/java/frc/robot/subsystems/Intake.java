@@ -45,108 +45,73 @@ import frc.robot.lib.util.PhoenixUtil6;
 //
 public class Intake extends SubsystemBase
 {
-  private static final boolean   kRollerInvertMotor  = true; // Motor direction for positive input
+  private static final boolean      kRollerInvertMotor  = true; // Motor direction for positive input
 
-  public static final double        kRotaryGearRatio   = 27.41;
-  private static final double    kRollerSpeedAcquire = 0.5;
-  private static final double    kRollerSpeedExpel   = -0.25;
+  public static final double        kRotaryGearRatio    = 27.41;
+  private static final double       kRollerSpeedAcquire = 0.5;
+  private static final double       kRollerSpeedExpel   = -0.25;
 
-  public static final double        kAngleMin          = -2.0;
-  public static final double        kAngleStow         = 0.0;
-  public static final double        kAngleIdle         = 0.0;
-  public static final double        kAngleScoreLow     = 25.0;
-  public static final double        kAngleScoreMid     = 20.0;
-  public static final double        kAngleScoreHigh    = 20.0;
-  public static final double        kAngleScoreAuto    = 110.0;
-  public static final double        kAngleSubstation   = 0.0;
-  public static final double        kAngleMax          = 115.0;
-  public static final double     kRotaryGearRatio    = 27.41;
+  private final double              kLigament2dOffset   = 0.0; // Offset from mechanism root for wrist ligament
+  public static final double        kAngleMin           = -2.0;
+  public static final double        kAngleStow          = 0.0;
+  public static final double        kAngleIdle          = 0.0;
+  public static final double        kAngleScoreLow      = 25.0;
+  public static final double        kAngleScoreMid      = 20.0;
+  public static final double        kAngleScoreHigh     = 20.0;
+  public static final double        kAngleScoreAuto     = 110.0;
+  public static final double        kAngleSubstation    = 0.0;
+  public static final double        kAngleMax           = 115.0;
 
-  public static final double        kManualSpeedVolts  = 3.0;            // Motor voltage during manual operation (joystick)
-  private final double              kLigament2dOffset  = 0.0; // Offset from mechanism root for wrist ligament
-  public static final double     kAngleMin           = -2.0;
-  public static final double     kAngleStow          = 0.0;
-  public static final double     kAngleIdle          = 0.0;
-  public static final double     kAngleScoreLow      = 25.0;
-  public static final double     kAngleScoreMid      = 20.0;
-  public static final double     kAngleScoreHigh     = 20.0;
-  public static final double     kAngleScoreAuto     = 110.0;
-  public static final double     kAngleSubstation    = 0.0;
-  public static final double     kAngleMax           = 115.0;
-
-  public static final double     kManualSpeedVolts   = 3.0;            // Motor voltage during manual operation (joystick)
+  public static final double        kManualSpeedVolts   = 3.0;            // Motor voltage during manual operation (joystick)
 
   // Motion Magic config parameters
 
   // Member objects
-  private final WPI_TalonSRX        m_rollerMotor      = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private final TalonFX             m_rotaryMotor      = new TalonFX(Ports.kCANID_IntakeRotary);
-  private final CANcoder            m_CANCoder         = new CANcoder(Ports.kCANID_IntakeCANCoder);
-  private final DigitalInput        m_noteInIntake     = new DigitalInput(Ports.kDIO0_NoteInIntake);
-  private final WPI_TalonSRX     m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private final TalonFX          m_rotaryMotor       = new TalonFX(Ports.kCANID_IntakeRotary);
-  private final CANcoder         m_CANCoder          = new CANcoder(Ports.kCANID_IntakeCANCoder);
-  private final DigitalInput     m_noteInIntake      = new DigitalInput(Ports.kDIO0_NoteInIntake);
+  private final WPI_TalonSRX        m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
+  private final TalonFX             m_rotaryMotor       = new TalonFX(Ports.kCANID_IntakeRotary);
+  private final CANcoder            m_CANCoder          = new CANcoder(Ports.kCANID_IntakeCANCoder);
+  private final DigitalInput        m_noteInIntake      = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
-  private final TalonFXSimState     m_rotarySim        = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState    m_CANCoderSim      = m_CANCoder.getSimState( );
-  private final SingleJointedArmSim m_armSim           =
+  private final TalonFXSimState     m_rotarySim         = m_rotaryMotor.getSimState( );
+  private final CANcoderSimState    m_CANCoderSim       = m_CANCoder.getSimState( );
+  private final SingleJointedArmSim m_armSim            =
       new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio, 1.0, 12, -Math.PI, Math.PI, false, 0.0);
-  private final TalonFXSimState  m_rotarySim         = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState m_CANCoderSim       = m_CANCoder.getSimState( );
 
   // Declare module variables
 
   // Mechanism2d
-  private final Mechanism2d         m_mech             = new Mechanism2d(3, 3);
-  private final MechanismRoot2d     m_mechRoot         = m_mech.getRoot("wrist", 1.5, 2);
-  private final MechanismLigament2d m_mechLigament     =
+  private final Mechanism2d         m_mech              = new Mechanism2d(3, 3);
+  private final MechanismRoot2d     m_mechRoot          = m_mech.getRoot("wrist", 1.5, 2);
+  private final MechanismLigament2d m_mechLigament      =
       m_mechRoot.append(new MechanismLigament2d("wrist", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
   // Roller variables
-  private boolean                m_rollerValid;     // Health indicator for motor 
+  private boolean                   m_rollerValid;     // Health indicator for motor 
 
   // Rotary variables
-  private boolean                   m_rotaryValid;     // Health indicator for Falcon 
+  private boolean                   m_rotaryValid;     // Health indicator for motor 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
-  private boolean                   m_calibrated       = true;
-  private boolean                   m_debug            = true;
-  private boolean                m_rotaryValid;     // Health indicator for motor 
-  private boolean                m_ccValid;         // Health indicator for CANCoder 
-  private boolean                m_calibrated        = true;
-  private boolean                m_debug             = true;
+  private boolean                   m_calibrated        = true;
+  private boolean                   m_debug             = true;
 
-  private RotaryMode                m_rotaryMode       = RotaryMode.ROTARY_INIT;     // Manual movement mode with joysticks
-  private RotaryMode             m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
+  private RotaryMode                m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
 
-  private static double             m_currentDegrees   = 0.0; // Current angle in degrees
-  private double                    m_targetDegrees    = 0.0; // Target angle in degrees
-  private static double          m_currentDegrees    = 0.0; // Current angle in degrees
-  private double                 m_targetDegrees     = 0.0; // Target angle in degrees
+  private static double             m_currentDegrees    = 0.0; // Current angle in degrees
+  private double                    m_targetDegrees     = 0.0; // Target angle in degrees
 
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
 
-  private VoltageOut                m_requestVolts     = new VoltageOut(0).withEnableFOC(false);
-  private MotionMagicVoltage        m_requestMMVolts   = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private VoltageOut                m_requestVolts      = new VoltageOut(0).withEnableFOC(false);
+  private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
-  private VoltageOut             m_requestVolts      = new VoltageOut(0).withEnableFOC(false);
-  private MotionMagicVoltage     m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
-  private double                 m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
-  private Timer                     m_safetyTimer      = new Timer( ); // Safety timer for movements
-  private StatusSignal<Double>      m_rotaryPosition   = m_rotaryMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_rotaryVelocity   = m_rotaryMotor.getRotorVelocity( );
-  private StatusSignal<Double>      m_rotaryCLoopError = m_rotaryMotor.getClosedLoopError( );
-  private StatusSignal<Double>      m_rotarySupplyCur  = m_rotaryMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rotaryStatorCur  = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_ccPosition       = m_CANCoder.getAbsolutePosition( );
-  private Timer                  m_safetyTimer       = new Timer( ); // Safety timer for movements
-  private StatusSignal<Double>   m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );
-  private StatusSignal<Double>   m_rotaryVelocity    = m_rotaryMotor.getRotorVelocity( );
-  private StatusSignal<Double>   m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
-  private StatusSignal<Double>   m_rotarySupplyCur   = m_rotaryMotor.getSupplyCurrent( );
-  private StatusSignal<Double>   m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>   m_ccPosition        = m_CANCoder.getAbsolutePosition( );
+  private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );
+  private StatusSignal<Double>      m_rotaryVelocity    = m_rotaryMotor.getRotorVelocity( );
+  private StatusSignal<Double>      m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
+  private StatusSignal<Double>      m_rotarySupplyCur   = m_rotaryMotor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
+  private StatusSignal<Double>      m_ccPosition        = m_CANCoder.getAbsolutePosition( );
 
   private boolean                   m_intakeValid;
 

@@ -25,7 +25,7 @@ public class Conversions
    *          Gear Ratio between Motor and Mechanism
    * @return Input Shaft Rotations
    */
-  public static double degreesToInputRotations(double degrees, double gearRatio)
+  public static double degreesToOutputRotations(double degrees, double gearRatio)
   {
     return degrees / (360.0 / gearRatio);
   }

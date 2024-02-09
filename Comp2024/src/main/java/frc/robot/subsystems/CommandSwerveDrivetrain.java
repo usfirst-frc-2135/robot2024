@@ -14,6 +14,8 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
@@ -120,6 +122,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
+  public boolean checkIfNonZero(Pose2d llPose)
+  {
+    Pose2d origin = new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0));
+
+    return (!(llPose.getX( ) == origin.getX( ) && llPose.getY( ) == origin.getY( )
+        && llPose.getRotation( ) == origin.getRotation( )));
+
+  }
+
   @Override
   public void periodic( )
   {
@@ -131,7 +142,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
       // DataLogManager.log(String.format("llPose: ", LimelightHelpers.getBotPose()));
 
-      if (lastResult.valid)
+      if (lastResult.valid && checkIfNonZero(llPose))
       {
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }

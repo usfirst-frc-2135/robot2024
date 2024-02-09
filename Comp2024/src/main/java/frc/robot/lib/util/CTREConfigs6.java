@@ -4,7 +4,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import frc.robot.lib.math.Conversions;
 
@@ -89,6 +88,7 @@ public final class CTREConfigs6
 
     // config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     // config.MagnetSensor.SensorDirection = SWConsts.steerCanCoderInvert;
+    // // config.MagnetSensor.MagnetOffset 
 
     return config;
   }
@@ -154,10 +154,6 @@ public final class CTREConfigs6
   public static CANcoderConfiguration intakeRotaryCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
-
-    config.MagnetSensor.MagnetOffset = -0.891113;
-    config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-
     return config;
   }
 

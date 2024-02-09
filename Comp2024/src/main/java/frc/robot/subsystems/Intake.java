@@ -56,7 +56,7 @@ public class Intake extends SubsystemBase
   private static final double       kRollerSpeedExpel   = -0.25;
 
   private final double              kLigament2dOffset   = 0.0; // Offset from mechanism root for wrist ligament
-  public static final double        kAngleMin           = -90.0;
+  public static final double        kAngleMin           = -2.0;
   public static final double        kAngleStow          = 0.0;
   public static final double        kAngleIdle          = 0.0;
   public static final double        kAngleScoreLow      = 25.0;
@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase
   public static final double        kAngleScoreHigh     = 20.0;
   public static final double        kAngleScoreAuto     = 110.0;
   public static final double        kAngleSubstation    = 0.0;
-  public static final double        kAngleMax           = 120.0;
+  public static final double        kAngleMax           = 115.0;
 
   public static final double        kManualSpeedVolts   = 3.0;            // Motor voltage during manual operation (joystick)
 
@@ -150,10 +150,7 @@ public class Intake extends SubsystemBase
     m_ccValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
     if (Robot.isReal( ))
-    {
-      m_currentDegrees = rotationsToDegrees(m_CANCoder.getAbsolutePosition( ).getValue( ));
-      m_rotaryMotor.setPosition(m_CANCoder.getAbsolutePosition( ).getValue( ));
-    }
+      m_rotaryMotor.setPosition(Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio));
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
 
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -181,14 +178,9 @@ public class Intake extends SubsystemBase
     double currentDraw = m_rollerMotor.getStatorCurrent( );
     SmartDashboard.putNumber("INRoller_currentDraw", currentDraw);
 
-    m_ccPosition = m_CANCoder.getAbsolutePosition( );
-    SmartDashboard.putNumber("CC Value: ", rotationsToDegrees(m_ccPosition.getValue( )));
-
     m_currentDegrees = getTalonFXDegrees( );
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
-    SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
-
     if (m_debug)
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
@@ -247,8 +239,7 @@ public class Intake extends SubsystemBase
 
   private double getTalonFXDegrees( )
   {
-    m_rotaryPosition = m_rotaryMotor.getRotorPosition( ).refresh( );
-    return Conversions.rotationsToOutputDegrees(m_rotaryPosition.getValue( ), kRotaryGearRatio);
+    return Conversions.rotationsToOutputDegrees(m_rotaryPosition.refresh( ).getValue( ), kRotaryGearRatio);
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
@@ -297,11 +288,6 @@ public class Intake extends SubsystemBase
   private boolean isMoveValid(double degrees)
   {
     return (degrees > kAngleMin) && (degrees < kAngleMax);
-  }
-
-  public static double rotationsToDegrees(double rotations)
-  {
-    return rotations * (360.0);
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -368,10 +354,10 @@ public class Intake extends SubsystemBase
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
         m_rotaryMotor
-            .setControl(m_requestMMVolts.withPosition(Conversions.degreesToOutputRotations(m_targetDegrees, kRotaryGearRatio)));
+            .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
         DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ),
-            m_currentDegrees, m_targetDegrees, Conversions.degreesToOutputRotations(m_currentDegrees, kRotaryGearRatio),
-            Conversions.degreesToOutputRotations(m_targetDegrees, kRotaryGearRatio)));
+            m_currentDegrees, m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio),
+            Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
@@ -388,7 +374,7 @@ public class Intake extends SubsystemBase
   {
     if (m_calibrated)
       m_rotaryMotor
-          .setControl(m_requestMMVolts.withPosition(Conversions.degreesToOutputRotations(m_targetDegrees, kRotaryGearRatio)));
+          .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 
   public boolean moveToPositionIsFinished( )
@@ -406,11 +392,6 @@ public class Intake extends SubsystemBase
     }
 
     return m_moveIsFinished;
-  }
-
-  public void moveToPositionEnd( )
-  {
-    m_safetyTimer.stop( );
   }
 
 }

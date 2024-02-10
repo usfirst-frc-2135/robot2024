@@ -6,7 +6,7 @@ public final class CTREConfigs5
 {
   // Grouped by subsystem
 
-  public static TalonSRXConfiguration gripperConfig( )
+  public static TalonSRXConfiguration intakeRollerConfig( )
   {
     TalonSRXConfiguration config = new TalonSRXConfiguration( );
 

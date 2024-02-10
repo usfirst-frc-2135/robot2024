@@ -40,6 +40,7 @@ import frc.robot.Constants.INConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
+import frc.robot.lib.util.CTREConfigs5;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil5;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -121,7 +122,8 @@ public class Intake extends SubsystemBase
     setName("Intake");
     setSubsystem("Intake");
 
-    m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller");
+    m_rollerValid =
+        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller", CTREConfigs5.intakeRollerConfig( ));
     SmartDashboard.putBoolean("HL_validIN", m_rollerValid);
     m_rollerMotor.setInverted(kRollerMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
@@ -221,6 +223,11 @@ public class Intake extends SubsystemBase
     //m_currentDegrees = getTalonFXDegrees( );
     m_targetDegrees = m_currentDegrees;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Degrees: %.1f", getSubsystem( ), m_targetDegrees));
+  }
+
+  public void faultDump( )
+  {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
   }
 
   private double getTalonFXDegrees( )

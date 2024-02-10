@@ -8,8 +8,14 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Power;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -88,6 +94,8 @@ public class RobotContainer
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
+  private boolean                      autoTesting   = true;
+  private Pose2d                       initial       = null;
 
   // Command Scheduler
 
@@ -294,6 +302,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
+    String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
 
     // The selected command will be run in autonomous
@@ -307,7 +316,7 @@ public class RobotContainer
         m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
-        m_autoCommand = drivetrain.getAutoPath("DriveS1");
+        m_autoCommand = drivetrain.getAutoPath(pathName = "DriveS1");
         break;
       case AUTOPRELOADANDLEAVE :
         m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
@@ -316,8 +325,15 @@ public class RobotContainer
         m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        m_autoCommand = drivetrain.getAutoPath("Test");
+        m_autoCommand = drivetrain.getAutoPath(pathName = "Test");
         break;
+    }
+    if (autoTesting && pathName != null)
+    {
+      initial = new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d( ))
+          .getInitialTargetHolonomicPose( );
+      if (initial != null)
+        drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
     }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));

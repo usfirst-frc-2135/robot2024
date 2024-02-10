@@ -88,6 +88,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this);                                                        // Subsystem for requirements
   }
 
+  public void resetOdometry(Pose2d pose)
+  {
+    m_odometry.resetPosition(pose.getRotation( ), m_modulePositions, pose);
+  }
+
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)
   {
     return run(( ) -> this.setControl(requestSupplier.get( )));
@@ -96,6 +101,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   public Command getAutoPath(String pathName)
   {
     return new PathPlannerAuto(pathName);
+  }
+
+  public Pose2d getInitialPose2d(String pathName)
+  {
+    return new PathPlannerAuto(pathName).getStaringPoseFromAutoFile(pathName);
   }
 
   public ChassisSpeeds getCurrentRobotChassisSpeeds( )

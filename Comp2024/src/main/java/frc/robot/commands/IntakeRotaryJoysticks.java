@@ -1,28 +1,25 @@
-
-// ROBOTBUILDER TYPE: Command.
-
 package frc.robot.commands;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.Idle;
-
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake;
 
 /**
  *
  */
-public class AutoStop extends Command
+public class IntakeRotaryJoysticks extends Command
 {
-  private final CommandSwerveDrivetrain m_drivetrain;
 
-  public AutoStop(CommandSwerveDrivetrain drivetrain)
+  private final Intake   m_intake;
+  private XboxController m_gamePad;
+
+  public IntakeRotaryJoysticks(Intake intake, XboxController gamePad)
   {
-    m_drivetrain = drivetrain;
+    m_intake = intake;
+    m_gamePad = gamePad;
 
-    setName("AutoStop");
-    addRequirements(m_drivetrain);
+    setName("IntakeRotaryJoysticks");
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
@@ -34,7 +31,7 @@ public class AutoStop extends Command
   @Override
   public void execute( )
   {
-    m_drivetrain.setControl(new SwerveRequest.Idle( ));
+    m_intake.moveRotaryWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.

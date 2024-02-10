@@ -11,17 +11,18 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.INConsts.INRollerMode;
+import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.SHConsts.SHMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
+import frc.robot.commands.IntakeRotaryJoysticks;
+import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -40,7 +41,7 @@ import frc.robot.subsystems.Telemetry;
  */
 public class RobotContainer
 {
-  private final boolean                        m_macOSXSim     = true;
+  private final boolean                        m_macOSXSim     = false;
   private boolean                              m_isComp        = detectRobot( );
 
   // Joysticks
@@ -193,9 +194,11 @@ public class RobotContainer
     m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
-    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
-    m_operatorPad.leftBumper( ).onTrue(new Dummy("oper left bumper"));
+    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, RollerMode.ACQUIRE));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, SHMode.SHOOTER_SCORE));
+    m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, SHMode.SHOOTER_STOP));
+
     m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
     m_operatorPad.start( ).onTrue(new Dummy("oper start")); // aka Menu
     //
@@ -208,8 +211,8 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_EXPEL));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, RollerMode.EXPEL));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
 
     ///////////////////////////////////////////////////////
@@ -259,7 +262,7 @@ public class RobotContainer
     // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    // m_intake.setDefaultCommand(new IntakeRun(m_intake));
+    m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
@@ -290,10 +293,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
-
-    String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
-    Alliance alliance = DriverStation.getAlliance( ).get( );
 
     // The selected command will be run in autonomous
     switch (mode)

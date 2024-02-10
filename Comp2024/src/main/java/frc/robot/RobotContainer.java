@@ -93,7 +93,7 @@ public class RobotContainer
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-  private boolean                      autoTesting   = true;
+  private boolean                      autoTesting   = false;
   private Pose2d                       initial       = null;
 
   /**
@@ -326,6 +326,8 @@ public class RobotContainer
         m_autoCommand = drivetrain.getAutoPath(pathName = "Test");
         break;
     }
+
+    // TODO: needs to be moved (doesn't work with path mirroring)
     if (autoTesting && pathName != null)
     {
       initial = new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d( ))

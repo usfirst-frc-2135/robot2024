@@ -97,7 +97,10 @@ public class RobotContainer
   private boolean                      autoTesting   = true;
   private Pose2d                       initial       = null;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
   // Command Scheduler
 >>>>>>> Stashed changes

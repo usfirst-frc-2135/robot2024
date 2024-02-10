@@ -74,8 +74,8 @@ public class Constants
     public static final int    kCANID_FeederRotary   = 20;   // Falcon 500
     public static final int    kCANID_FeederCANCoder = 21;   // CANCoder
 
-    public static final int    kCANID_ShooterL       = 23;   // Falcon 500
-    public static final int    kCANID_ShooterR       = 24;   // Falcon 500
+    public static final int    kCANID_ShooterLower   = 23;   // Falcon 500
+    public static final int    kCANID_ShooterUpper   = 24;   // Falcon 500
     public static final int    kCANID_ShooterRotary  = 25;   // Falcon 500
 
     public static final int    kCANID_ClimberL       = 27;   // Falcon 500
@@ -117,7 +117,7 @@ public class Constants
   public static final class SnapConsts
   {
     public static final double                       kP                                      = 5.0;
-    public static final double                       kI                                      = 0;
+    public static final double                       kI                                      = 0.0;
     public static final double                       kD                                      = 0.0;
     public static final double                       kTimeout                                = 0.75;
     public static final double                       kEpsilon                                = 1.0;
@@ -205,6 +205,9 @@ public class Constants
     // Manual config parameters
     public enum ShooterMode
     {
+      REVERSE,    // Shooter runs in reverse direction to handle jams
+      STOP,       // Shooter is stopped
+      SCORE,      // Shooter ramped to an initial speed before shooting
     }
 
     // Manual config parameters

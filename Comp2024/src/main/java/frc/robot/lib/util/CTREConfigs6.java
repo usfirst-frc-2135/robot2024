@@ -1,14 +1,12 @@
 package frc.robot.lib.util;
 
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
-import frc.robot.Constants.SWConsts;
-import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
 {
@@ -62,12 +60,12 @@ public final class CTREConfigs6
     // angleConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.steerSupplyTimeThreshold;
     // angleConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.steerSupplyCurrentLimitEnable;
 
-    // //  angleConfig.CurrentLimits.*
-    // //  angleConfig.Feedback.*
-    // //  angleConfig.HardwareLimitSwitch.*
-    // //  angleConfig.MotionMagic.*
+    //  angleConfig.CurrentLimits.*
+    //  angleConfig.Feedback.*
+    //  angleConfig.HardwareLimitSwitch.*
+    //  angleConfig.MotionMagic.*
 
-    // //  angleConfig.MotorOutput.DutyCycleNeutralDeadband
+    //  angleConfig.MotorOutput.DutyCycleNeutralDeadband
     // angleConfig.MotorOutput.Inverted = SWConsts.steerMotorInvert;
     // angleConfig.MotorOutput.NeutralMode = SWConsts.steerNeutralMode;
 
@@ -80,7 +78,7 @@ public final class CTREConfigs6
     // angleConfig.Slot0.kI = SWConsts.steerKI;
     // angleConfig.Slot0.kD = SWConsts.steerKD;
 
-    // //  angleConfig.SoftwareLimitSwitch.*
+    //  angleConfig.SoftwareLimitSwitch.*
 
     return angleConfig;
   }
@@ -100,7 +98,7 @@ public final class CTREConfigs6
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
 
-    // // Motion Magic config parameters
+    // Motion Magic config parameters
     // public static final double kMMVelocity = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
     // public static final double kMMAcceleration = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
     // public static final double kMMSCurveStrength = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
@@ -173,6 +171,51 @@ public final class CTREConfigs6
     config.MagnetSensor.MagnetOffset = -0.891113;
 
     return config;
+  }
+
+  public static TalonFXConfiguration shooterFXConfig( )
+  {
+    TalonFXConfiguration shooterConfig = new TalonFXConfiguration( );
+
+    // public static final int kVelocityMeasWindow = 1;
+    // public static final SensorVelocityMeasPeriod kVelocityMeasPeriod = SensorVelocityMeasPeriod.Period_10Ms;
+    // public static final double kFlywheelPidKf = 0.04775;
+    // public static final double kFlywheelPidKp = 0.2;
+    // public static final double kFlywheelPidKi = 0.0;
+    // public static final double kFlywheelPidKd = 0.0;
+    // public static final double kFlywheelNeutralDeadband = 0.01;
+
+    // shooterConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.0;
+    // shooterConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.0;
+
+    shooterConfig.CurrentLimits.SupplyCurrentLimit = 35.0;
+    shooterConfig.CurrentLimits.SupplyCurrentThreshold = 35.0;
+    shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
+    shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    // shooterConfig.Feedback.*
+    // shooterConfig.HardwareLimitSwitch.*
+    // shooterConfig.MotionMagic.*
+
+    // shooterConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
+    // shooterConfig.MotorOutput.Inverted = false;
+    // shooterConfig.MotorOutput.NeutralMode = NeutralMode.Coast;
+
+    // shooterConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.0;
+    // shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.0;
+
+    // shooterConfig.Slot0.kS = 0.0;
+    // shooterConfig.Slot0.kV = 0.0;
+    // shooterConfig.Slot0.kP = 0.0;
+    // shooterConfig.Slot0.kI = 0.0;
+    // shooterConfig.Slot0.kD = 0.0;
+
+    // shooterConfig.SoftwareLimitSwitch.*
+
+    return shooterConfig;
   }
 
 }

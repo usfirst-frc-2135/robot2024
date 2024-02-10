@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Falcon500;
 import frc.robot.Constants.Ports;
-import frc.robot.Constants.SHConsts.SHMode;
+import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.lib.util.PhoenixUtil6;
 
 //
@@ -33,7 +33,7 @@ public class Shooter extends SubsystemBase
   private boolean                              m_atDesiredSpeed         = false; // Indicates flywheel RPM is close to target
   private boolean                              m_atDesiredSpeedPrevious;
 
-  private SHMode                               m_curMode;                // Current shooter mode
+  private ShooterMode                          m_curMode;                // Current shooter mode
   private double                               m_targetSpeed;      // Requested flywheel RPM
   private double                               m_flywheelRPM;            // Current flywheel RPM
 
@@ -87,7 +87,7 @@ public class Shooter extends SubsystemBase
   public void initialize( )
   {
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
-    setShooterMode(SHMode.SHOOTER_STOP);
+    setShooterMode(ShooterMode.STOP);
   }
 
   public void faultDump( )
@@ -95,7 +95,7 @@ public class Shooter extends SubsystemBase
     DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
   }
 
-  public void setShooterMode(SHMode mode)
+  public void setShooterMode(ShooterMode mode)
   {
     m_curMode = mode;
 
@@ -105,13 +105,13 @@ public class Shooter extends SubsystemBase
 
     switch (mode)
     {
-      case SHOOTER_STOP :
+      case STOP :
         m_targetSpeed = 0.0;
         break;
-      case SHOOTER_REVERSE :
+      case REVERSE :
         m_targetSpeed = -0.5;
         break;
-      case SHOOTER_SCORE :
+      case SCORE :
         m_targetSpeed = 0.5;
         break;
       default :

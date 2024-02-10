@@ -205,13 +205,13 @@ public class Constants
     // Global settings
 
     // Manual config parameters
-    public enum SHMode
+    public enum ShooterMode
     {
-      SHOOTER_REVERSE,    // Shooter runs in reverse direction to handle jams
-      SHOOTER_STOP,       // Shooter is stopped
-      SHOOTER_SCORE,      // Shooter ramped to an initial speed before shooting
-      SHOOTER_LOWERHUB,   // Shooter at speed for low hub
-      SHOOTER_UPPERHUB,   // Shooter at speed for high hub
+      REVERSE,    // Shooter runs in reverse direction to handle jams
+      STOP,       // Shooter is stopped
+      SCORE,      // Shooter ramped to an initial speed before shooting
+      LOWERHUB,   // Shooter at speed for low hub
+      UPPERHUB,   // Shooter at speed for high hub
 
     }
 

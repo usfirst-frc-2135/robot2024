@@ -4,6 +4,8 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -203,8 +205,14 @@ public class Constants
     // Global settings
 
     // Manual config parameters
-    public enum ShooterMode
+    public enum SHMode
     {
+      SHOOTER_REVERSE,    // Shooter runs in reverse direction to handle jams
+      SHOOTER_STOP,       // Shooter is stopped
+      SHOOTER_SCORE,      // Shooter ramped to an initial speed before shooting
+      SHOOTER_LOWERHUB,   // Shooter at speed for low hub
+      SHOOTER_UPPERHUB,   // Shooter at speed for high hub
+
     }
 
     // Manual config parameters

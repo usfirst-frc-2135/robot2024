@@ -1,6 +1,7 @@
 package frc.robot.lib.util;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -37,7 +38,7 @@ public class PhoenixUtil5
     return errorCode;
   }
 
-  public boolean talonSRXInitialize(WPI_TalonSRX talon, String name)
+  public boolean talonSRXInitialize(WPI_TalonSRX talon, String name, TalonSRXConfiguration config)
   {
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
@@ -55,7 +56,7 @@ public class PhoenixUtil5
     if (error == ErrorCode.OK)
     {
       // This can take multiple attempts before ready
-      for (int i = 0; i < m_retries; i++)
+      for (int i = 0; i < m_retries && fwVersion == 0; i++)
       {
         fwVersion = talon.getFirmwareVersion( );
         error = talonSRXCheckError(talon, baseStr + "getFirmwareVersion error");
@@ -81,11 +82,15 @@ public class PhoenixUtil5
         DataLogManager
             .log(String.format("%s: ID %2d - Msg: configFactoryDefault error - %d", m_className, deviceID, error.value));
       else
+      {
         initialized = true;
+        talon.configAllSettings(config);
+        error = talonSRXCheckError(talon, baseStr + "configAllSettings error");
+      }
     }
 
-    DataLogManager.log(String.format("%s: ID %2d - %s is %s - error %d", m_className, deviceID, baseStr,
-        (talonValid && initialized) ? "VALID!" : "UNRESPONSIVE!", error.value));
+    DataLogManager.log(String.format("%s: ID %2d - %s is %s", m_className, deviceID, baseStr,
+        (talonValid && initialized) ? "VALID!" : "UNRESPONSIVE!"));
 
     return talonValid && initialized;
   }

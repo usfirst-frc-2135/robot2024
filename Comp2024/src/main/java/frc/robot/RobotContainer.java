@@ -96,6 +96,11 @@ public class RobotContainer
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
   private boolean                      autoTesting   = true;
   private Pose2d                       initial       = null;
+<<<<<<< Updated upstream
+=======
+
+  // Command Scheduler
+>>>>>>> Stashed changes
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

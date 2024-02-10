@@ -51,38 +51,39 @@ import frc.robot.lib.util.PhoenixUtil6;
 public class Intake extends SubsystemBase
 {
   // Constants
-  private static final boolean      kRollerMotorInvert  = true;     // Motor direction for positive input
+  private static final boolean      kRollerMotorInvert    = true;     // Motor direction for positive input
 
-  private static final double       kRollerSpeedAcquire = 0.5;
-  private static final double       kRollerSpeedExpel   = -0.25;
+  private static final double       kRollerSpeedAcquire   = 0.5;
+  private static final double       kRollerSpeedExpel     = -0.25;
+  private static final double       kRollerSpeedToShooter = -0.6;
 
-  private static final double       kRotaryGearRatio    = 27.41;
-  private static final double       kLigament2dOffset   = 0.0;      // Offset from mechanism root for ligament
-  private static final double       kManualSpeedVolts   = 3.5;      // Motor voltage during manual operation (joystick)
-  private static final double       kAngleMin           = -90.0;
-  private static final double       kAngleRetracted     = -88.0;
-  private static final double       kAngleHandoff       = 0.0;
-  private static final double       kAngleDeployed      = 112.0;
-  private static final double       kAngleMax           = 115.0;
+  private static final double       kRotaryGearRatio      = 27.41;
+  private static final double       kLigament2dOffset     = 0.0;      // Offset from mechanism root for ligament
+  private static final double       kManualSpeedVolts     = 3.5;      // Motor voltage during manual operation (joystick)
+  private static final double       kAngleMin             = -90.0;
+  private static final double       kAngleRetracted       = -88.0;
+  private static final double       kAngleHandoff         = 0.0;
+  private static final double       kAngleDeployed        = 112.0;
+  private static final double       kAngleMax             = 115.0;
 
-  private static final double       kToleranceDegrees   = 2.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout    = 3.0;
+  private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
+  private static final double       kMMSafetyTimeout      = 3.0;
 
   // Device and simulation objects
-  private static final WPI_TalonSRX m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private static final TalonFX      m_rotaryMotor       = new TalonFX(Ports.kCANID_IntakeRotary);
-  private static final CANcoder     m_CANCoder          = new CANcoder(Ports.kCANID_IntakeCANCoder);
-  private static final DigitalInput m_noteInIntake      = new DigitalInput(Ports.kDIO0_NoteInIntake);
+  private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
+  private static final TalonFX      m_rotaryMotor         = new TalonFX(Ports.kCANID_IntakeRotary);
+  private static final CANcoder     m_CANCoder            = new CANcoder(Ports.kCANID_IntakeCANCoder);
+  private static final DigitalInput m_noteInIntake        = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
-  private final TalonFXSimState     m_rotarySim         = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState    m_CANCoderSim       = m_CANCoder.getSimState( );
-  private final SingleJointedArmSim m_armSim            =
+  private final TalonFXSimState     m_rotarySim           = m_rotaryMotor.getSimState( );
+  private final CANcoderSimState    m_CANCoderSim         = m_CANCoder.getSimState( );
+  private final SingleJointedArmSim m_armSim              =
       new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio, 1.0, 0.3, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(2, 2);
-  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 1.0, 1.0);
-  private final MechanismLigament2d m_mechLigament      =
+  private final Mechanism2d         m_rotaryMech          = new Mechanism2d(2, 2);
+  private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 1.0, 1.0);
+  private final MechanismLigament2d m_mechLigament        =
       m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
   // Declare module variables
@@ -93,27 +94,27 @@ public class Intake extends SubsystemBase
   // Rotary variables
   private boolean                   m_rotaryValid;     // Health indicator for motor 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
-  private boolean                   m_debug             = true;
-  private static double             m_currentDegrees    = 0.0; // Current angle in degrees
-  private double                    m_targetDegrees     = 0.0; // Target angle in degrees
+  private boolean                   m_debug               = true;
+  private static double             m_currentDegrees      = 0.0; // Current angle in degrees
+  private double                    m_targetDegrees       = 0.0; // Target angle in degrees
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts      = new VoltageOut(0).withEnableFOC(false);
-  private RotaryMode                m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
+  private VoltageOut                m_requestVolts        = new VoltageOut(0).withEnableFOC(false);
+  private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
-  private Debouncer                 m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
+  private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
-  private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
+  private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
 
   // Status signals
-  private StatusSignal<Double>      m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_rotaryVelocity    = m_rotaryMotor.getRotorVelocity( );
-  private StatusSignal<Double>      m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
-  private StatusSignal<Double>      m_rotarySupplyCur   = m_rotaryMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_ccPosition        = m_CANCoder.getAbsolutePosition( );
+  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );
+  private StatusSignal<Double>      m_rotaryVelocity      = m_rotaryMotor.getRotorVelocity( );
+  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
+  private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
+  private StatusSignal<Double>      m_ccPosition          = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
 

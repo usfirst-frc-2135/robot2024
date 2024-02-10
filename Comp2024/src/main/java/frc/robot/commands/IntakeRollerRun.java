@@ -4,7 +4,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.INConsts.INRollerMode;
+import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.subsystems.Intake;
 
 //
@@ -13,10 +13,10 @@ import frc.robot.subsystems.Intake;
 public class IntakeRollerRun extends Command
 {
   // Member variables/objects
-  private final Intake       m_intake;
-  private final INRollerMode m_mode;
+  private final Intake     m_intake;
+  private final RollerMode m_mode;
 
-  public IntakeRollerRun(Intake intake, INRollerMode mode)
+  public IntakeRollerRun(Intake intake, RollerMode mode)
   {
     m_intake = intake;
     m_mode = mode;
@@ -29,7 +29,7 @@ public class IntakeRollerRun extends Command
   @Override
   public void initialize( )
   {
-    m_intake.setIntakeRollerSpeed(m_mode);
+    m_intake.setRollerSpeed(m_mode);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

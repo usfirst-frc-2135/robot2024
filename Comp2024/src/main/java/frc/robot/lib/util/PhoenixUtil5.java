@@ -42,7 +42,7 @@ public class PhoenixUtil5
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
     int fwVersion = 0;
-    String baseStr = name + " motor: ";
+    String baseStr = name + " motor:    ";
     boolean talonValid = false;
     boolean initialized = false;
 

@@ -49,57 +49,42 @@ import frc.robot.lib.util.PhoenixUtil6;
 //
 public class Intake extends SubsystemBase
 {
-  private static final boolean      kRollerInvertMotor  = true; // Motor direction for positive input
+  // Constants
+  private static final boolean      kRollerMotorInvert  = true;     // Motor direction for positive input
 
-  public static final double        kRotaryGearRatio    = 27.41;
   private static final double       kRollerSpeedAcquire = 0.5;
   private static final double       kRollerSpeedExpel   = -0.25;
 
-  private final double              kLigament2dOffset   = 0.0; // Offset from mechanism root for wrist ligament
-  public static final double        kAngleMin           = -2.0;
-  public static final double        kAngleStow          = 0.0;
-  public static final double        kAngleIdle          = 0.0;
-  public static final double        kAngleScoreLow      = 25.0;
-  public static final double        kAngleScoreMid      = 20.0;
-  public static final double        kAngleScoreHigh     = 20.0;
-  public static final double        kAngleScoreAuto     = 110.0;
-  public static final double        kAngleSubstation    = 0.0;
-  public static final double        kAngleMax           = 115.0;
+  private static final double       kRotaryGearRatio    = 27.41;
+  private static final double       kLigament2dOffset   = 0.0;      // Offset from mechanism root for ligament
+  private static final double       kManualSpeedVolts   = 3.5;      // Motor voltage during manual operation (joystick)
+  private static final double       kAngleMin           = -90.0;
+  private static final double       kAngleRetracted     = -88.0;
+  private static final double       kAngleHandoff       = 0.0;
+  private static final double       kAngleDeployed      = 112.0;
+  private static final double       kAngleMax           = 115.0;
 
-  public static final double        kManualSpeedVolts   = 3.0;            // Motor voltage during manual operation (joystick)
+  private static final double       kToleranceDegrees   = 2.0;      // PID tolerance in degrees
+  private static final double       kMMSafetyTimeout    = 3.0;
 
-  // Motion Magic config parameters
-  public static final double        kMMVelocity         = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
-  public static final double        kMMAcceleration     = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
-  public static final double        kMMSCurveStrength   = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
-  public static final double        kS                  = 0.0;            // Voltage constant to overcome friction
-  public static final double        kV                  = 0.1129;         // Voltage constant per desired RPM
-  public static final double        kPidKp              = 1.350;          // Wrist PID proportional constant
-  public static final double        kPidKi              = 0.0;            // Wrist PID integral constant
-  public static final double        kPidKd              = 0.0;            // Wrist PID derivative constant
-
-  public static final int           kAllowedError       = 0;              // Wrist PID allowable closed loop error in counts
-  public static final double        kToleranceDegrees   = 2.0;            // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-  public static final double        kMMSafetyTimeout    = 3;
-
-  // Member objects
-  private final WPI_TalonSRX        m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private final TalonFX             m_rotaryMotor       = new TalonFX(Ports.kCANID_IntakeRotary);
-  private final CANcoder            m_CANCoder          = new CANcoder(Ports.kCANID_IntakeCANCoder);
-  private final DigitalInput        m_noteInIntake      = new DigitalInput(Ports.kDIO0_NoteInIntake);
+  // Device and simulation objects
+  private static final WPI_TalonSRX m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
+  private static final TalonFX      m_rotaryMotor       = new TalonFX(Ports.kCANID_IntakeRotary);
+  private static final CANcoder     m_CANCoder          = new CANcoder(Ports.kCANID_IntakeCANCoder);
+  private static final DigitalInput m_noteInIntake      = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
   private final TalonFXSimState     m_rotarySim         = m_rotaryMotor.getSimState( );
   private final CANcoderSimState    m_CANCoderSim       = m_CANCoder.getSimState( );
   private final SingleJointedArmSim m_armSim            =
-      new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio, 1.0, 12, -Math.PI, Math.PI, false, 0.0);
-
-  // Declare module variables
+      new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio, 1.0, 0.3, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(3, 3);
-  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 1.5, 2);
+  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(2, 2);
+  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 1.0, 1.0);
   private final MechanismLigament2d m_mechLigament      =
-      m_mechRoot.append(new MechanismLigament2d("wrist", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
+      m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
+
+  // Declare module variables
 
   // Roller variables
   private boolean                   m_rollerValid;     // Health indicator for motor 
@@ -107,20 +92,21 @@ public class Intake extends SubsystemBase
   // Rotary variables
   private boolean                   m_rotaryValid;     // Health indicator for motor 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
-  private boolean                   m_calibrated        = true;
   private boolean                   m_debug             = true;
-
-  private RotaryMode                m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
-
   private static double             m_currentDegrees    = 0.0; // Current angle in degrees
   private double                    m_targetDegrees     = 0.0; // Target angle in degrees
+
+  // Manual mode config parameters
+  private VoltageOut                m_requestVolts      = new VoltageOut(0).withEnableFOC(false);
+  private RotaryMode                m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
+
+  // Motion Magic config parameters
+  private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
   private Debouncer                 m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
-
-  private VoltageOut                m_requestVolts      = new VoltageOut(0).withEnableFOC(false);
-  private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
-
   private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
+
+  // Status signals
   private StatusSignal<Double>      m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );
   private StatusSignal<Double>      m_rotaryVelocity    = m_rotaryMotor.getRotorVelocity( );
   private StatusSignal<Double>      m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
@@ -128,13 +114,8 @@ public class Intake extends SubsystemBase
   private StatusSignal<Double>      m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition        = m_CANCoder.getAbsolutePosition( );
 
-  private boolean                   m_intakeValid;
-
-  // Manual config parameters
-
-  //Devices and simulation objs
-
   // Constructor
+
   public Intake( )
   {
     setName("Intake");
@@ -142,15 +123,17 @@ public class Intake extends SubsystemBase
 
     m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller");
     SmartDashboard.putBoolean("HL_validIN", m_rollerValid);
-    m_rollerMotor.setInverted(kRollerInvertMotor);
+    m_rollerMotor.setInverted(kRollerMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
 
     m_rotaryValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Intake Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
     m_ccValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
+
     if (Robot.isReal( ))
-      m_rotaryMotor.setPosition(Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio));
+      m_currentDegrees = Units.rotationsToDegrees(m_ccPosition.refresh( ).getValue( ));
+    m_rotaryMotor.setPosition(Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio));
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
 
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -181,6 +164,8 @@ public class Intake extends SubsystemBase
     m_currentDegrees = getTalonFXDegrees( );
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
+    SmartDashboard.putNumber("IN_CCpostion", Units.rotationsToDegrees(m_ccPosition.refresh( ).getValueAsDouble( )));
+    SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
     if (m_debug)
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
@@ -193,6 +178,8 @@ public class Intake extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
+    // This method will be called once per scheduler run during simulation
+
     // Set input motor voltage from the motor setting
     m_rotarySim.setSupplyVoltage(RobotController.getInputVoltage( ));
     m_CANCoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
@@ -212,7 +199,6 @@ public class Intake extends SubsystemBase
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
     m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
-
   }
 
   // Initialize dashboard widgets
@@ -225,7 +211,7 @@ public class Intake extends SubsystemBase
     SmartDashboard.putData("RotaryMech", m_rotaryMech);
   }
 
-  // Put methods for controlling this subsystem here. Call these from Commands```````````````````````````````                 .
+  // Put methods for controlling this subsystem here. Call these from Commands.
 
   public void initialize( )
   {
@@ -372,9 +358,8 @@ public class Intake extends SubsystemBase
 
   public void moveToPositionExecute( )
   {
-    if (m_calibrated)
-      m_rotaryMotor
-          .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
+    m_rotaryMotor
+        .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 
   public boolean moveToPositionIsFinished( )
@@ -392,6 +377,11 @@ public class Intake extends SubsystemBase
     }
 
     return m_moveIsFinished;
+  }
+
+  public void moveToPositionEnd( )
+  {
+    m_safetyTimer.stop( );
   }
 
 }

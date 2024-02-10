@@ -2,9 +2,12 @@ package frc.robot.lib.util;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import frc.robot.Constants.SWConsts;
 import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
@@ -97,6 +100,16 @@ public final class CTREConfigs6
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
 
+    // // Motion Magic config parameters
+    // public static final double kMMVelocity = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
+    // public static final double kMMAcceleration = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
+    // public static final double kMMSCurveStrength = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
+    // public static final double kS = 0.0;            // Voltage constant to overcome friction
+    // public static final double kV = 0.1129;         // Voltage constant per desired RPM
+    // public static final double kPidKp = 1.350;          // Wrist PID proportional constant
+    // public static final double kPidKi = 0.0;            // Wrist PID integral constant
+    // public static final double kPidKd = 0.0;            // Wrist PID derivative constant
+
     // Closed Loop settings
     // inRotaryConfig.ClosedLoopGeneral.*
     // inRotaryConfig.ClosedLoopRamps.*
@@ -107,7 +120,7 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
     inRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 20.0;
+    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -154,6 +167,11 @@ public final class CTREConfigs6
   public static CANcoderConfiguration intakeRotaryCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
+
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    config.MagnetSensor.MagnetOffset = -0.891113;
+
     return config;
   }
 

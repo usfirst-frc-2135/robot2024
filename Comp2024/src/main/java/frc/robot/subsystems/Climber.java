@@ -5,7 +5,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Ports;
 
 //
 // Climber subsystem class
@@ -13,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase
 {
   // Member objects
-  private final TalonFX m_climberL = new TalonFX(0);
-  private final TalonFX m_climberR = new TalonFX(0);
+  private final TalonFX m_climberL = new TalonFX(Ports.kCANID_ClimberL);
+  private final TalonFX m_climberR = new TalonFX(Ports.kCANID_ClimberR);
 
   //Devices and simulation objs
 
@@ -42,4 +44,9 @@ public class Climber extends SubsystemBase
 
   public void initialize( )
   {}
+
+  public void faultDump( )
+  {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+  }
 }

@@ -125,7 +125,6 @@ public class Swerve extends SubsystemBase
 
     resetAnglesToAbsolute( );
     resetGyro(180.0); // All starting positions facing driver in field relative
-    resetOdometry(new Pose2d(0, 0, m_heading));
 
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
     m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -144,7 +143,7 @@ public class Swerve extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-    // This method will be called once per scheduler run when in simulation
+
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -192,7 +191,9 @@ public class Swerve extends SubsystemBase
       Pose2d rawPose = m_vision.getLimelightRawPose( );
 
       if (rawPose != null)
+      {
         resetOdometry(rawPose);
+      }
     }
 
     m_position = getPose( );
@@ -349,6 +350,7 @@ public class Swerve extends SubsystemBase
         tx, ty, m_limelightDistance, Math.abs(m_setPointDistance - m_limelightDistance), ((sanityCheck) ? "PASSED" : "FAILED")));
 
     return sanityCheck;
+
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -503,6 +505,10 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
+    DataLogManager.log("heading " + m_heading);
+    DataLogManager.log("positions " + getPositions( ));
+    DataLogManager.log("pose " + pose);
+
     m_poseEstimator.resetPosition(m_heading, getPositions( ), pose);
     DataLogManager.log(String.format("%s: Reset position   : %s Gyro : %s", getSubsystem( ),
         m_poseEstimator.getEstimatedPosition( ).toString( ), m_heading.toString( )));

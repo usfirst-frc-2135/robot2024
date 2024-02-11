@@ -7,8 +7,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Ports;
 
 //
 // Feeder subsystem class
@@ -16,10 +18,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Feeder extends SubsystemBase
 {
   // Member objects
-  private final WPI_TalonSRX m_feederRoller = new WPI_TalonSRX(0);
-  private final TalonFX      m_feederRotor  = new TalonFX(0);
-  private final CANcoder     m_CANCoder     = new CANcoder(0);
-  private final DigitalInput m_limitSwitch  = new DigitalInput(0);
+  private final WPI_TalonSRX m_feederRoller = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
+  private final TalonFX      m_feederRotary = new TalonFX(Ports.kCANID_FeederRotary);
+  private final CANcoder     m_CANCoder     = new CANcoder(Ports.kCANID_FeederCANCoder);
+  private final DigitalInput m_noteInFeeder = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
   //Devices and simulation objs
 
@@ -47,4 +49,9 @@ public class Feeder extends SubsystemBase
 
   public void initialize( )
   {}
+
+  public void faultDump( )
+  {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+  }
 }

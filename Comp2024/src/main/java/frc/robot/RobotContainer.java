@@ -6,21 +6,32 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.SHConsts.ShooterMode;
+import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.IntakeRollerRun;
+import frc.robot.commands.IntakeRotaryJoysticks;
+import frc.robot.commands.ShooterRun;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Power;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Telemetry;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,17 +41,39 @@ import frc.robot.commands.Dummy;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_instance;
+  private final boolean                        m_macOSXSim     = false;
+  private boolean                              m_isComp        = detectRobot( );
 
   // Joysticks
-  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
+  private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
-  private Field2d               m_field       = new Field2d( );
+  private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+  private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private Command                              m_autoCommand;
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric     drive           =
+      new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric driving in open loop
+  private final SwerveRequest.SwerveDriveBrake brake           = new SwerveRequest.SwerveDriveBrake( );
+  private final SwerveRequest.RobotCentric     forwardStraight =
+      new SwerveRequest.RobotCentric( ).withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.PointWheelsAt    point           = new SwerveRequest.PointWheelsAt( );
+
+  private final Telemetry                      logger          = new Telemetry(MaxSpeed);
 
   // The robot's shared subsystems
+  private final LED                            m_led           = new LED( );
+  private final Power                          m_power         = new Power( );
 
   // These subsystems can use LED or vision and must be created afterward
+  private final CommandSwerveDrivetrain        drivetrain      = TunerConstants.DriveTrain; // My drivetrain
+  private final Intake                         m_intake        = new Intake( );
+  private final Shooter                        m_shooter       = new Shooter( );
+  private final Feeder                         m_feeder        = new Feeder( );
+  private final Climber                        m_climber       = new Climber( );
+  public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 
@@ -55,18 +88,15 @@ public class RobotContainer
   }
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
-  private Command                      m_autoCommand;
-  PathPlannerTrajectory                m_autoTrajectory;
-
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-
-  // Command Scheduler
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer( )
   {
+    drivetrain.getDaqThread( ).setThreadPriority(99);
+
     addSmartDashboardWidgets( );
 
     configureButtonBindings( );
@@ -78,11 +108,29 @@ public class RobotContainer
     initOdometryChooser( );
   }
 
-  public static RobotContainer getInstance( )
+  private static boolean detectRobot( )
   {
-    if (m_instance == null)
-      m_instance = new RobotContainer( );
-    return m_instance;
+    // Detect which robot/RoboRIO
+    String serialNum = System.getenv("serialnum");
+    String robotName = "UNKNOWN";
+    boolean isComp = false;
+
+    DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
+
+    if (serialNum == null)
+      robotName = "SIMULATION";
+    else if (serialNum.equals(Constants.kCompSN)) // TODO: get this from Comp RoboRIO for 2024
+    {
+      isComp = true;
+      robotName = "COMPETITION (A)";
+    }
+    else if (serialNum.equals(Constants.kBetaSN)) // TODO: get this from Beta RoboRIO for 2024
+    {
+      isComp = false;
+      robotName = "PRACTICE/BETA (B)";
+    }
+    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+    return isComp;
   }
 
   /****************************************************************************
@@ -96,8 +144,8 @@ public class RobotContainer
     // For future work to set up Shuffleboard layout from code
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
+
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
-    SmartDashboard.putData("Field", m_field);
   }
 
   /****************************************************************************
@@ -112,97 +160,74 @@ public class RobotContainer
     //
     // Driver Controller Assignments
     //
-    final JoystickButton driverA = new JoystickButton(m_driverPad, XboxController.Button.kA.value);
-    final JoystickButton driverB = new JoystickButton(m_driverPad, XboxController.Button.kB.value);
-    final JoystickButton driverX = new JoystickButton(m_driverPad, XboxController.Button.kX.value);
-    final JoystickButton driverY = new JoystickButton(m_driverPad, XboxController.Button.kY.value);
-    //
-    final JoystickButton driverLeftBumper = new JoystickButton(m_driverPad, XboxController.Button.kLeftBumper.value);
-    final JoystickButton driverRightBumper = new JoystickButton(m_driverPad, XboxController.Button.kRightBumper.value);
-    final JoystickButton driverBack = new JoystickButton(m_driverPad, XboxController.Button.kBack.value); // aka View
-    final JoystickButton driverStart = new JoystickButton(m_driverPad, XboxController.Button.kStart.value); // aka Menu
-    //
-    final POVButton driverUp = new POVButton(m_driverPad, 0);
-    final POVButton driverRight = new POVButton(m_driverPad, 90);
-    final POVButton driverDown = new POVButton(m_driverPad, 180);
-    final POVButton driverLeft = new POVButton(m_driverPad, 270);
-    //
-    // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
-    final Trigger driverLeftTrigger = new Trigger(( ) -> m_driverPad.getLeftTriggerAxis( ) > Constants.kTriggerThreshold);
-    final Trigger driverRightTrigger = new Trigger(( ) -> m_driverPad.getRightTriggerAxis( ) > Constants.kTriggerThreshold);
-    // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    // final Trigger driverLeftTrigger = new Trigger(( )->m_driverPad.getRightX() > Constants.kTriggerThreshold);
-    // final Trigger driverRightTrigger = new Trigger(( )->m_driverPad.getRightY() > Constants.kTriggerThreshold);
-
     // Driver - A, B, X, Y
-    driverA.onTrue(new Dummy("driver A"));
-    driverB.whileTrue(new Dummy("driver B"));
-    driverX.whileTrue(new Dummy("driver X"));
-    driverY.whileTrue(new Dummy("driver Y"));
+    // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
+    // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
+    m_driverPad.x( ).onTrue(new Dummy("driver X"));
+    m_driverPad.y( ).onTrue(new Dummy("driver Y"));
     //
     // Driver - Bumpers, start, back
-    driverLeftBumper.onTrue(new Dummy("driver left bumper"));
-    driverRightBumper.onTrue(new Dummy("driver right bumper"));
-    driverBack.onTrue(new Dummy("driver back")); // aka View
-    driverStart.onTrue(new Dummy("driver start")); // aka Menu
+    // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
+    m_driverPad.rightBumper( ).onTrue(new Dummy("driver right bumper"));
+    m_driverPad.back( ).onTrue(new Dummy("driver back")); // aka View
+    m_driverPad.start( ).onTrue(new Dummy("driver start")); // aka Menu
     //
     // Driver - POV buttons
-    driverUp.onTrue(new Dummy("driver 0"));
-    driverRight.onTrue(new Dummy("driver 90"));
-    driverDown.onTrue(new Dummy("driver 180"));
-    driverLeft.onTrue(new Dummy("driver 270"));
+    // m_driverPad.pov(0).onTrue(new Dummy("driver 0"));                    // TODO: temporarily used for CTRE testing
+    m_driverPad.pov(90).onTrue(new Dummy("driver 90"));
+    // m_driverPad.pov(180).onTrue(new Dummy("driver 180"));                // TODO: temporarily used for CTRE testing
+    m_driverPad.pov(270).onTrue(new Dummy("driver 270"));
     //
     // Driver Left/Right Trigger
-    driverLeftTrigger.onTrue(new Dummy("driver left trigger"));
-    driverRightTrigger.onTrue(new Dummy("driver right trigger"));
+    // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
+    // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
+    m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver right trigger"));
 
     ///////////////////////////////////////////////////////
     //
     // Operator Controller Assignments
     //
-    final JoystickButton operA = new JoystickButton(m_operatorPad, XboxController.Button.kA.value);
-    final JoystickButton operB = new JoystickButton(m_operatorPad, XboxController.Button.kB.value);
-    final JoystickButton operX = new JoystickButton(m_operatorPad, XboxController.Button.kX.value);
-    final JoystickButton operY = new JoystickButton(m_operatorPad, XboxController.Button.kY.value);
-    //
-    final JoystickButton operLeftBumper = new JoystickButton(m_operatorPad, XboxController.Button.kLeftBumper.value);
-    final JoystickButton operRightBumper = new JoystickButton(m_operatorPad, XboxController.Button.kRightBumper.value);
-    final JoystickButton operBack = new JoystickButton(m_operatorPad, XboxController.Button.kBack.value); // aka View
-    final JoystickButton operStart = new JoystickButton(m_operatorPad, XboxController.Button.kStart.value); // aka Menu
-    //
-    final POVButton operUp = new POVButton(m_operatorPad, 0);
-    final POVButton operRight = new POVButton(m_operatorPad, 90);
-    final POVButton operDown = new POVButton(m_operatorPad, 180);
-    final POVButton operLeft = new POVButton(m_operatorPad, 270);
-    // 
-    // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
-    final Trigger operLeftTrigger = new Trigger(( ) -> m_operatorPad.getLeftTriggerAxis( ) > Constants.kTriggerThreshold);
-    final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightTriggerAxis( ) > Constants.kTriggerThreshold);
-    // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    // final Trigger operLeftTrigger = new Trigger(( ) -> m_operatorPad.getRightX( ) > Constants.kTriggerThreshold);
-    // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightY( ) > Constants.kTriggerThreshold);
-
     // Operator - A, B, X, Y
-    operA.onTrue(new Dummy("oper A"));
-    operB.whileTrue(new Dummy("oper B"));
-    operX.whileTrue(new Dummy("oper X"));
-    operY.whileTrue(new Dummy("oper Y"));
+    m_operatorPad.a( ).onTrue(new Dummy("oper A"));
+    m_operatorPad.b( ).onTrue(new Dummy("oper B"));
+    m_operatorPad.x( ).onTrue(new Dummy("oper X"));
+    m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new Dummy("oper left bumper"));
-    operRightBumper.onTrue(new Dummy("oper right bumper"));
-    operBack.onTrue(new Dummy("oper back")); // aka View
-    operStart.onTrue(new Dummy("oper start")); // aka Menu
+    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, RollerMode.ACQUIRE));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
+    m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, ShooterMode.STOP));
+
+    m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
+    m_operatorPad.start( ).onTrue(new Dummy("oper start")); // aka Menu
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy("oper 0"));
-    operRight.onTrue(new Dummy("oper 90"));
-    operDown.onTrue(new Dummy("oper 180"));
-    operLeft.onTrue(new Dummy("oper 270"));
+    m_operatorPad.pov(0).onTrue(new Dummy("oper 0"));
+    m_operatorPad.pov(90).onTrue(new Dummy("oper 90"));
+    m_operatorPad.pov(180).onTrue(new Dummy("oper 180"));
+    m_operatorPad.pov(270).onTrue(new Dummy("oper 270"));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new Dummy("oper left trigger"));
-    operRightTrigger.onTrue(new Dummy("oper right trigger"));
+    // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
+    // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, RollerMode.EXPEL));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
+
+    ///////////////////////////////////////////////////////
+    //
+    // From CTRE SwerveWithPathPlanner template - mainly for testing
+    m_driverPad.a( ).whileTrue(drivetrain.applyRequest(( ) -> brake));
+    m_driverPad.b( ).whileTrue(drivetrain
+        .applyRequest(( ) -> point.withModuleDirection(new Rotation2d(-m_driverPad.getLeftY( ), -m_driverPad.getLeftX( )))));
+
+    // reset the field-centric heading on left bumper press
+    m_driverPad.leftBumper( ).onTrue(drivetrain.runOnce(( ) -> drivetrain.seedFieldRelative( )));
+
+    m_driverPad.pov(0).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
+    m_driverPad.pov(180).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
   }
 
   /****************************************************************************
@@ -211,17 +236,36 @@ public class RobotContainer
    */
   private void initDefaultCommands( )
   {
-    // m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    if (!m_macOSXSim)
+      drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+          drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
+              // negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+          ).ignoringDisable(true));
+    else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
+      drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+          drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
+              // negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+          ).ignoringDisable(true));
+
+    // if (Utils.isSimulation()) {
+    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+    // }
+
+    drivetrain.registerTelemetry(logger::telemeterize);
 
     // // Default command - Motion Magic hold
-    // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    // m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension));
-    // m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
+    // m_intake.setDefaultCommand(new IntakeMoveToPosition(m_intake));
+    // m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
+    // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    //m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    //m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    //m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
+    // m_climber.setDefaultCommand(new ClimberRun(m_climber));
+    // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 
   /****************************************************************************
@@ -230,6 +274,7 @@ public class RobotContainer
    */
   private void initAutonomousChooser( )
   {
+
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
@@ -249,57 +294,33 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
-    String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
-    Alliance alliance = DriverStation.getAlliance( ).get( );
 
     // The selected command will be run in autonomous
     switch (mode)
     {
       default :
       case AUTOSTOP :
+        m_autoCommand = new AutoStop(drivetrain);
+        break;
       case AUTOPRELOADONLY :
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
+        m_autoCommand = drivetrain.getAutoPath("DriveS1");
+        break;
       case AUTOPRELOADANDLEAVE :
-        pathName = (alliance == Alliance.Red) ? "leaveStartingZoneRed" : "leaveStartingZoneBlue";
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOPRELOADSCOREANOTHER :
-        pathName = (alliance == Alliance.Red) ? "driveToAnotherRed" : "driveToAnotherBlue";
+        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        pathName = (alliance == Alliance.Red) ? "driveTestPathRed" : "driveTestPathBlue";
+        m_autoCommand = drivetrain.getAutoPath("Test");
         break;
     }
 
-    // if (pathName != null)
-    //   m_autoTrajectory =
-    //       new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d(0, 0));
-
-    // switch (mode)
-    // {
-    //   default :
-    //   case AUTOSTOP :
-    //     m_autoCommand = new AutoStop(m_swerve);
-    //     break;
-    //   case AUTOPRELOADONLY :
-    //     m_autoCommand = new AutoScorePreload(m_swerve);
-    //     break;
-    //   case AUTOLEAVE :
-    //     m_autoCommand = new AutoLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADANDLEAVE :
-    //     m_autoCommand = new AutoPreloadAndLeave(m_swerve, "leaveStartingZone", m_autoTrajectory);
-    //     break;
-    //   case AUTOPRELOADSCOREANOTHER :
-    //     m_autoCommand = new AutoPreloadAndScoreAnother(m_swerve, "driveToAnother", m_autoTrajectory);
-    //     break;
-    //   case AUTOTESTPATH :
-    //     m_autoCommand = new AutoTestPath(m_swerve, "AutoTestPath", m_autoTrajectory);
-    //     break;
-    // }
-
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));
 
     return m_autoCommand;
   }
@@ -325,9 +346,17 @@ public class RobotContainer
     m_odomChooser.addOption("ID6 - AprilTag", 6);
     m_odomChooser.addOption("ID7 - AprilTag", 7);
     m_odomChooser.addOption("ID8 - AprilTag", 8);
+    m_odomChooser.addOption("ID9 - AprilTag", 9);
+    m_odomChooser.addOption("ID10 - AprilTag", 10);
+    m_odomChooser.addOption("ID11 - AprilTag", 11);
+    m_odomChooser.addOption("ID12 - AprilTag", 12);
+    m_odomChooser.addOption("ID13 - AprilTag", 13);
+    m_odomChooser.addOption("ID14 - AprilTag", 14);
+    m_odomChooser.addOption("ID15 - AprilTag", 15);
+    m_odomChooser.addOption("ID16 - AprilTag", 16);
 
     // Configure odometry sendable chooser
-    SmartDashboard.putData("Reset Odometry Mode", m_odomChooser);
+    SmartDashboard.putData("Reset Odometry", m_odomChooser);
   }
 
   public Integer getOdometryOption( )
@@ -335,14 +364,44 @@ public class RobotContainer
     return m_odomChooser.getSelected( );
   }
 
-  public XboxController getDriver( )
+  /****************************************************************************
+   * 
+   * Gamepad interfaces
+   */
+  public CommandXboxController getDriver( )
   {
     return m_driverPad;
   }
 
-  public XboxController getOperator( )
+  public CommandXboxController getOperator( )
   {
     return m_operatorPad;
+  }
+
+  // Called by disabledInit - place subsystem initializations here
+
+  public void initialize( )
+  {
+    m_led.initialize( );
+    m_power.initialize( );
+
+    m_intake.initialize( );
+    m_shooter.initialize( );
+    m_feeder.initialize( );
+    m_climber.initialize( );
+  }
+
+  // Called when user button is pressed - place subsystem fault dumps here
+
+  public void faultDump( )
+  {
+    m_led.faultDump( );
+    m_power.faultDump( );
+
+    m_intake.faultDump( );
+    m_shooter.faultDump( );
+    m_feeder.faultDump( );
+    m_climber.faultDump( );
   }
 
 }

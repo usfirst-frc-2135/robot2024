@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase
   public static final double    kFlywheelGearRatio      = (18.0 / 18.0);
 
   public static final double    kFlywheelToleranceRPM   = 150.0;     // Tolerance band around target RPM
-  public static final double    kFlywheelLowerTargetRPM = 2150.0;    // RPM to score
+  public static double          kFlywheelLowerTargetRPM = 2150.0;    // RPM to score
 
   // Devices and simulation objects
   private final TalonFX         m_shooterLower          = new TalonFX(Ports.kCANID_ShooterLower);
@@ -65,6 +65,8 @@ public class Shooter extends SubsystemBase
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Upper", CTREConfigs6.shooterFXConfig( ));
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), true));
 
+    SmartDashboard.putNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
+
     initialize( );
   }
 
@@ -94,6 +96,7 @@ public class Shooter extends SubsystemBase
     SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
     SmartDashboard.putBoolean("SH_atDesiredSpeed", m_atDesiredSpeed);
     SmartDashboard.putNumber("SH_current", current);
+    kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
   }
 
   @Override

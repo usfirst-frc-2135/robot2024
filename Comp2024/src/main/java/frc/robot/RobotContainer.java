@@ -27,6 +27,7 @@ import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
 import frc.robot.commands.IntakeRotaryJoysticks;
+import frc.robot.commands.IntakingAction;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -201,7 +202,7 @@ public class RobotContainer
     m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, RollerMode.ACQUIRE));
+    m_operatorPad.rightBumper( ).onTrue(new IntakingAction(m_intake));
     m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
     m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, ShooterMode.STOP));

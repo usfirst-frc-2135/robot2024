@@ -32,11 +32,12 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
+  // private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
 
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
+  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
 
   private final SwerveRequest.ApplyChassisSpeeds autoRequest    = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -122,15 +123,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
-  public boolean checkIfNonZero(Pose2d llPose)
-  {
-    Pose2d origin = new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0));
-
-    return (!(llPose.getX( ) == origin.getX( ) && llPose.getY( ) == origin.getY( )
-        && llPose.getRotation( ) == origin.getRotation( )));
-
-  }
-
   @Override
   public void periodic( )
   {
@@ -140,9 +132,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
-      // DataLogManager.log(String.format("llPose: ", LimelightHelpers.getBotPose()));
 
-      if (lastResult.valid && checkIfNonZero(llPose))
+      if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }

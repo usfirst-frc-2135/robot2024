@@ -8,27 +8,28 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Power;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.INConsts.INRollerMode;
+import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
+import frc.robot.commands.IntakeRotaryJoysticks;
+import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 import frc.robot.subsystems.Vision;
@@ -41,8 +42,8 @@ import frc.robot.subsystems.Vision;
  */
 public class RobotContainer
 {
-  private final boolean                        m_macOSXSim     = true;
-  public boolean                               m_isComp        = false;
+  private final boolean                        m_macOSXSim     = false;
+  private boolean                              m_isComp        = detectRobot( );
 
   // Joysticks
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
@@ -64,15 +65,15 @@ public class RobotContainer
   private final Telemetry                      logger          = new Telemetry(MaxSpeed);
 
   // The robot's shared subsystems
+  private final LED                            m_led           = new LED( );
+  private final Power                          m_power         = new Power( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final CommandSwerveDrivetrain         drivetrain      = TunerConstants.DriveTrain; // My drivetrain
+  private final CommandSwerveDrivetrain        drivetrain      = TunerConstants.DriveTrain; // My drivetrain
   private final Intake                         m_intake        = new Intake( );
   private final Shooter                        m_shooter       = new Shooter( );
   private final Feeder                         m_feeder        = new Feeder( );
-
   private final Climber                        m_climber       = new Climber( );
-  //public final Power                           m_power         = new Power( );
 
   // Chooser for autonomous commands
 
@@ -87,19 +88,13 @@ public class RobotContainer
   }
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
-  PathPlannerTrajectory                m_autoTrajectory;
-
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-
-  // Command Scheduler
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer( )
   {
-    detectRobot( );
-
     drivetrain.getDaqThread( ).setThreadPriority(99);
 
     addSmartDashboardWidgets( );
@@ -113,27 +108,29 @@ public class RobotContainer
     initOdometryChooser( );
   }
 
-  private void detectRobot( )
+  private static boolean detectRobot( )
   {
     // Detect which robot/RoboRIO
     String serialNum = System.getenv("serialnum");
     String robotName = "UNKNOWN";
+    boolean isComp = false;
 
     DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
 
     if (serialNum == null)
       robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kCompSN))
+    else if (serialNum.equals(Constants.kCompSN)) // TODO: get this from Comp RoboRIO for 2024
     {
-      m_isComp = true;
+      isComp = true;
       robotName = "COMPETITION (A)";
     }
-    else if (serialNum.equals(Constants.kBetaSN))
+    else if (serialNum.equals(Constants.kBetaSN)) // TODO: get this from Beta RoboRIO for 2024
     {
-      m_isComp = false;
-      robotName = "PRACTICE (B)";
+      isComp = false;
+      robotName = "PRACTICE/BETA (B)";
     }
     DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+    return isComp;
   }
 
   /****************************************************************************
@@ -147,6 +144,7 @@ public class RobotContainer
     // For future work to set up Shuffleboard layout from code
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
+
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
   }
 
@@ -164,9 +162,9 @@ public class RobotContainer
     //
     // Driver - A, B, X, Y
     // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
-    // m_driverPad.b( ).whileTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
-    m_driverPad.x( ).whileTrue(new Dummy("driver X"));
-    m_driverPad.y( ).whileTrue(new Dummy("driver Y"));
+    // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
+    m_driverPad.x( ).onTrue(new Dummy("driver X"));
+    m_driverPad.y( ).onTrue(new Dummy("driver Y"));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
@@ -192,14 +190,16 @@ public class RobotContainer
     //
     // Operator - A, B, X, Y
     m_operatorPad.a( ).onTrue(new Dummy("oper A"));
-    m_operatorPad.b( ).whileTrue(new Dummy("oper B"));
-    m_operatorPad.x( ).whileTrue(new Dummy("oper X"));
-    m_operatorPad.y( ).whileTrue(new Dummy("oper Y"));
+    m_operatorPad.b( ).onTrue(new Dummy("oper B"));
+    m_operatorPad.x( ).onTrue(new Dummy("oper X"));
+    m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_ACQUIRE));
-    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
-    m_operatorPad.leftBumper( ).onTrue(new Dummy("oper left bumper"));
+    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, RollerMode.ACQUIRE));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
+    m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, ShooterMode.STOP));
+
     m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
     m_operatorPad.start( ).onTrue(new Dummy("oper start")); // aka Menu
     //
@@ -212,8 +212,8 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_EXPEL));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, INRollerMode.ROLLER_STOP));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, RollerMode.EXPEL));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
 
     ///////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ public class RobotContainer
     // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    // m_intake.setDefaultCommand(new IntakeRun(m_intake));
+    m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
 
@@ -295,10 +295,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
-
-    String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
-    Alliance alliance = DriverStation.getAlliance( ).get( );
 
     // The selected command will be run in autonomous
     switch (mode)
@@ -360,7 +357,7 @@ public class RobotContainer
     m_odomChooser.addOption("ID16 - AprilTag", 16);
 
     // Configure odometry sendable chooser
-    SmartDashboard.putData("Reset Odometry Mode", m_odomChooser);
+    SmartDashboard.putData("Reset Odometry", m_odomChooser);
   }
 
   public Integer getOdometryOption( )
@@ -385,13 +382,27 @@ public class RobotContainer
   // Called by disabledInit - place subsystem initializations here
 
   public void initialize( )
-  {}
+  {
+    m_led.initialize( );
+    m_power.initialize( );
+
+    m_intake.initialize( );
+    m_shooter.initialize( );
+    m_feeder.initialize( );
+    m_climber.initialize( );
+  }
 
   // Called when user button is pressed - place subsystem fault dumps here
 
   public void faultDump( )
   {
+    m_led.faultDump( );
+    m_power.faultDump( );
 
+    m_intake.faultDump( );
+    m_shooter.faultDump( );
+    m_feeder.faultDump( );
+    m_climber.faultDump( );
   }
 
 }

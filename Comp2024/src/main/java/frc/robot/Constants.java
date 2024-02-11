@@ -74,8 +74,8 @@ public class Constants
     public static final int    kCANID_FeederRotary   = 20;   // Falcon 500
     public static final int    kCANID_FeederCANCoder = 21;   // CANCoder
 
-    public static final int    kCANID_ShooterL       = 23;   // Falcon 500
-    public static final int    kCANID_ShooterR       = 24;   // Falcon 500
+    public static final int    kCANID_ShooterLower   = 23;   // Falcon 500
+    public static final int    kCANID_ShooterUpper   = 24;   // Falcon 500
     public static final int    kCANID_ShooterRotary  = 25;   // Falcon 500
 
     public static final int    kCANID_ClimberL       = 27;   // Falcon 500
@@ -117,7 +117,7 @@ public class Constants
   public static final class SnapConsts
   {
     public static final double                       kP                                      = 5.0;
-    public static final double                       kI                                      = 0;
+    public static final double                       kI                                      = 0.0;
     public static final double                       kD                                      = 0.0;
     public static final double                       kTimeout                                = 0.75;
     public static final double                       kEpsilon                                = 1.0;
@@ -156,24 +156,18 @@ public class Constants
   public static final class INConsts
   {
     // Global settings
-    public static final boolean kInvertMotor = true; // Motor direction for positive input
-    // Current limit settings - Roller
-    // Current limit settings - Rotary
 
     // Manual config parameters
-    public enum INRollerMode
+    public enum RollerMode
     {
-      ROLLER_STOP, ROLLER_ACQUIRE, ROLLER_EXPEL
+      STOP,    // Stop spinning
+      ACQUIRE, // Acquire a game piece
+      EXPEL    // Expel a game piece
     }
-
-    public static final double kIntakeRollerSpeedAcquire = 0.5;
-
-    public static final double kIntakeRollerSpeedExpel   = -0.25;
 
     // Manual config parameters
     public enum RotaryMode
     {
-      // Add these contants for the roller
       INIT,    // Initialize intake
       DOWN,    // IntakeRotar moving down
       STOPPED, // IntakeRotar stop and hold position
@@ -188,13 +182,9 @@ public class Constants
   {
     // Global settings
 
-    // Current limit settings - Roller
-    // Current limit settings - Rotary
-
     // Manual config parameters
     public enum RollerMode
     {
-
     }
 
     // Manual config parameters
@@ -212,12 +202,12 @@ public class Constants
   {
     // Global settings
 
-    // Current limit settings - Roller
-    // Current limit settings - Rotary
-
     // Manual config parameters
     public enum ShooterMode
     {
+      REVERSE,    // Shooter runs in reverse direction to handle jams
+      STOP,       // Shooter is stopped
+      SCORE,      // Shooter ramped to an initial speed before shooting
     }
 
     // Manual config parameters
@@ -234,8 +224,6 @@ public class Constants
   public static final class CLConsts
   {
     // Global settings
-
-    // Current limit settings - Winch
 
     // Manual config parameters
     public enum ClimberMode
@@ -285,49 +273,6 @@ public class Constants
         new Pose2d(new Translation2d(4.641342, 4.49834), new Rotation2d(Units.degreesToRadians(120))),      // AprilTag ID: 15
         new Pose2d(new Translation2d(4.641342, 3.713226), new Rotation2d(Units.degreesToRadians(240)))      // AprilTag ID: 16
     ));
-
-    // Direction of goal relative to AprilTag 
-    public enum VIGoalDirection
-    {
-      DIRECTION_LEFT,   // Left
-      DIRECTION_MIDDLE, // Middle
-      DIRECTION_RIGHT   // Right
-    }
-
-    /*
-     * (needs to be updated to new robot limelight position)
-     * public static final double kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth
-     * from limelight to front robot edge
-     */
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Limelight driving alignment
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class LLConsts
-  {
-    // Default calibration
-    public static final double kDistance1        = 48;    // distance from bumper in inches for first reference point
-    public static final double kVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
-    public static final double kDistance2        = 60;    // distance from bumper in inches for second reference point
-    public static final double kVertOffset2      = -4.85; // LL y reading in degrees for second reference point
-
-    // Limelight PID driving controls
-    public static final double kTurnConstant     = 0.0;
-    public static final double kTurnPidKp        = 0.005;
-    public static final double kTurnPidKi        = 0.0;
-    public static final double kTurnPidKd        = 0.0;
-    public static final double kTurnMax          = 0.4;
-    public static final double kThrottlePidKp    = 0.011;
-    public static final double kThrottlePidKi    = 0.0;
-    public static final double kThrottlePidKd    = 0.0;
-    public static final double kThrottleMax      = 0.2;
-    public static final double kThrottleShape    = 10.0;
-
-    public static final double kTargetAngle      = 0.0;   // Optimal shooting angle
-    public static final double kSetPointDistance = 60.0;  // Optimal shooting distance
-    public static final double kAngleThreshold   = 3.5;   // Degrees tolerance around optimal
-    public static final double kDistThreshold    = 6.0;   // Inches tolerance around optimal
   }
 
   /////////////////////////////////////////////////////////////////////////////

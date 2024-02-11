@@ -204,8 +204,8 @@ public final class CTREConfigs6
     // shooterConfig.MotorOutput.Inverted = false;
     // shooterConfig.MotorOutput.NeutralMode = NeutralMode.Coast;
 
-    // shooterConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.0;
-    // shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.0;
+    shooterConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.0;
+    shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.0;
 
     shooterConfig.Slot0.kS = 0.0;
     shooterConfig.Slot0.kV = 0.1129;

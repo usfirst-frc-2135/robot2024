@@ -74,7 +74,7 @@ public class RobotContainer
   private final Power                          m_power         = new Power( );
 
   // These subsystems can use LED or vision and must be created afterward
-  private final CommandSwerveDrivetrain        drivetrain      = TunerConstants.DriveTrain; // My drivetrain
+  private final CommandSwerveDrivetrain        m_drivetrain    = TunerConstants.DriveTrain; // My drivetrain
   private final Intake                         m_intake        = new Intake( );
   private final Shooter                        m_shooter       = new Shooter( );
   private final Feeder                         m_feeder        = new Feeder( );
@@ -102,7 +102,7 @@ public class RobotContainer
    */
   public RobotContainer( )
   {
-    drivetrain.getDaqThread( ).setThreadPriority(99);
+    m_drivetrain.getDaqThread( ).setThreadPriority(99);
 
     addSmartDashboardWidgets( );
 
@@ -226,15 +226,15 @@ public class RobotContainer
     ///////////////////////////////////////////////////////
     //
     // From CTRE SwerveWithPathPlanner template - mainly for testing
-    m_driverPad.a( ).whileTrue(drivetrain.applyRequest(( ) -> brake));
-    m_driverPad.b( ).whileTrue(drivetrain
+    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));
+    m_driverPad.b( ).whileTrue(m_drivetrain
         .applyRequest(( ) -> point.withModuleDirection(new Rotation2d(-m_driverPad.getLeftY( ), -m_driverPad.getLeftX( )))));
 
     // reset the field-centric heading on left bumper press
-    m_driverPad.leftBumper( ).onTrue(drivetrain.runOnce(( ) -> drivetrain.seedFieldRelative( )));
+    m_driverPad.leftBumper( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));
 
-    m_driverPad.pov(0).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
-    m_driverPad.pov(180).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
+    m_driverPad.pov(0).whileTrue(m_drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
+    m_driverPad.pov(180).whileTrue(m_drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
   }
 
   /****************************************************************************
@@ -244,25 +244,25 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     if (!m_macOSXSim)
-      drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
+      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
-      drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
+      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
 
     // if (Utils.isSimulation()) {
-    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+    //   m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     // }
 
-    drivetrain.registerTelemetry(logger::telemeterize);
+    m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // // Default command - Motion Magic hold
     // m_intake.setDefaultCommand(new IntakeMoveToPosition(m_intake));
@@ -323,9 +323,9 @@ public class RobotContainer
     }
 
     if (pathName == null)
-      m_autoCommand = new AutoStop(drivetrain);
+      m_autoCommand = new AutoStop(m_drivetrain);
     else
-      m_autoCommand = drivetrain.getAutoPath(pathName);
+      m_autoCommand = m_drivetrain.getAutoPath(pathName);
 
     // TODO: needs to be moved (doesn't work with path mirroring)
     if (autoTesting && pathName != null)
@@ -333,7 +333,7 @@ public class RobotContainer
       initial = new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d( ))
           .getInitialTargetHolonomicPose( );
       if (initial != null)
-        drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
+        m_drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
     }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));

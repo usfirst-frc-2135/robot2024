@@ -88,6 +88,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this);                                                        // Subsystem for requirements
   }
 
+  public void resetOdometry(Pose2d pose)
+  {
+    m_odometry.resetPosition(pose.getRotation( ), m_modulePositions, pose);
+  }
+
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)
   {
     return run(( ) -> this.setControl(requestSupplier.get( )));

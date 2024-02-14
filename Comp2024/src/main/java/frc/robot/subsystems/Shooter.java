@@ -96,9 +96,6 @@ public class Shooter extends SubsystemBase
     SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
     SmartDashboard.putBoolean("SH_atDesiredSpeed", m_atDesiredSpeed);
     SmartDashboard.putNumber("SH_current", current);
-
-    if (kFlywheelLowerTargetRPM != SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM))
-      kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
   }
 
   @Override
@@ -142,8 +139,9 @@ public class Shooter extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": set shooter mode " + mode);
 
-    // Select the shooter RPM from the requested mode - NEVER NEGATIVE!
+    kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
 
+    // Select the shooter RPM for the requested mode - NEVER NEGATIVE when running!
     switch (mode)
     {
       case STOP :

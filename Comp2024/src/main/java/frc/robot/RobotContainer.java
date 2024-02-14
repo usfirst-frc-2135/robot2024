@@ -309,24 +309,23 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-        m_autoCommand = new AutoStop(drivetrain);
-        break;
       case AUTOPRELOADONLY :
-        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
-        m_autoCommand = drivetrain.getAutoPath(pathName = "DriveS1");
+        pathName = "DriveS1";
         break;
       case AUTOPRELOADANDLEAVE :
-        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
-        break;
       case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        m_autoCommand = drivetrain.getAutoPath(pathName = "Test");
+        pathName = "Test";
         break;
     }
+
+    if (pathName == null)
+      m_autoCommand = new AutoStop(drivetrain);
+    else
+      m_autoCommand = drivetrain.getAutoPath(pathName);
 
     // TODO: needs to be moved (doesn't work with path mirroring)
     if (autoTesting && pathName != null)

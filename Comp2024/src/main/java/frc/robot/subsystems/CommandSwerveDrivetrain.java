@@ -103,11 +103,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return new PathPlannerAuto(pathName);
   }
 
-  public Pose2d getInitialPose2d(String pathName)
-  {
-    return new PathPlannerAuto(pathName).getStaringPoseFromAutoFile(pathName);
-  }
-
   public ChassisSpeeds getCurrentRobotChassisSpeeds( )
   {
     return m_kinematics.toChassisSpeeds(getState( ).ModuleStates);

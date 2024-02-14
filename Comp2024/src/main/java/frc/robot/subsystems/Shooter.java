@@ -96,7 +96,9 @@ public class Shooter extends SubsystemBase
     SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
     SmartDashboard.putBoolean("SH_atDesiredSpeed", m_atDesiredSpeed);
     SmartDashboard.putNumber("SH_current", current);
-    kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
+
+    if (kFlywheelLowerTargetRPM != SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM))
+      kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
   }
 
   @Override

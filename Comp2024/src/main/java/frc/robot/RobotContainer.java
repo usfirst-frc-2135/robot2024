@@ -8,7 +8,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
@@ -16,6 +15,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -92,10 +93,9 @@ public class RobotContainer
     AUTOTESTPATH             // Run a selected test path
   }
 
+  private static final boolean         m_autoTesting = false;
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-  private boolean                      autoTesting   = false;
-  private Pose2d                       initial       = null;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -123,7 +123,6 @@ public class RobotContainer
     boolean isComp = false;
 
     DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
-
     if (serialNum == null)
       robotName = "SIMULATION";
     else if (serialNum.equals(Constants.kCompSN)) // TODO: get this from Comp RoboRIO for 2024
@@ -137,6 +136,7 @@ public class RobotContainer
       robotName = "PRACTICE/BETA (B)";
     }
     DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+
     return isComp;
   }
 
@@ -327,11 +327,13 @@ public class RobotContainer
     else
       m_autoCommand = m_drivetrain.getAutoPath(pathName);
 
-    // TODO: needs to be moved (doesn't work with path mirroring)
-    if (autoTesting && pathName != null)
+    if (m_autoTesting && pathName != null)
     {
-      initial = new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d( ))
-          .getInitialTargetHolonomicPose( );
+      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+      if (DriverStation.getAlliance( ).equals(Alliance.Red))
+        path.flipPath( );
+
+      Pose2d initial = new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
       if (initial != null)
         m_drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
     }

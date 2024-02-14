@@ -101,8 +101,7 @@ public class Climber extends SubsystemBase
   public static final double        kLengthMin            = -0.5;  // Climber minimum allowable length (half inch less than stowed)
   public static final double        kLengthIn             = 0.25;  // By definition - Climber fully retracted
   public static final double        kLengthStop           = -0.25; // Slightly off mechanical hard stop
-  public static final double        kLengthOut            = 12.5;  // From Mech Design (floor, feet art 5" high), empirically checked
-  public static final double        kLengthSubstation     = 0.5;   // From Mech Design (3'1-38" above floor)
+  public static final double        kLengthOut            = 17.0;  // From Mech Design (floor, feet art 5" high), empirically checked
   public static final double        kLengthMax            = 18.25;  // Climber maximum allowable length (2" beyond high length)
   public static final double        kLengthClimber        = 1.0;
 

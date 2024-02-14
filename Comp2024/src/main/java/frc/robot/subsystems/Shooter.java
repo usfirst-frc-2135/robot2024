@@ -62,7 +62,7 @@ public class Shooter extends SubsystemBase
     setSubsystem("Shooter");
 
     m_valid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
-        && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Upper", CTREConfigs6.shooterFXConfig( ));
+        && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), true));
 
     SmartDashboard.putNumber("SH_targetRPM", kFlywheelLowerTargetRPM);

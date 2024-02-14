@@ -30,7 +30,8 @@ import frc.robot.commands.IntakeRollerRun;
 import frc.robot.commands.IntakeRotaryJoysticks;
 import frc.robot.commands.IntakingAction;
 import frc.robot.commands.ShooterRun;
-import frc.robot.generated.TunerConstants;
+import frc.robot.generated.TunerConstantsBeta;
+import frc.robot.generated.TunerConstantsComp;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -55,7 +56,7 @@ public class RobotContainer
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
   private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
-  private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+  private double                               MaxSpeed        = TunerConstantsComp.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private Command                              m_autoCommand;
 
@@ -75,11 +76,12 @@ public class RobotContainer
   private final Power                          m_power         = new Power( );
 
   // These subsystems can use LED or vision and must be created afterward
-  private final CommandSwerveDrivetrain        m_drivetrain    = TunerConstants.DriveTrain; // My drivetrain
-  private final Intake                         m_intake        = new Intake( );
-  private final Shooter                        m_shooter       = new Shooter( );
-  private final Feeder                         m_feeder        = new Feeder( );
-  private final Climber                        m_climber       = new Climber( );
+  private final CommandSwerveDrivetrain        m_drivetrain    =
+      (m_isComp) ? TunerConstantsComp.DriveTrain : TunerConstantsBeta.DriveTrain; // My drivetrain - different for each robot's offsets
+  private final Intake                         m_intake        = new Intake(m_isComp);
+  private final Shooter                        m_shooter       = new Shooter(m_isComp);
+  private final Feeder                         m_feeder        = new Feeder(m_isComp);
+  private final Climber                        m_climber       = new Climber(m_isComp);
 
   // Chooser for autonomous commands
 

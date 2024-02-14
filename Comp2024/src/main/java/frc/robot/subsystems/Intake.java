@@ -87,6 +87,7 @@ public class Intake extends SubsystemBase
       m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
   // Declare module variables
+  private static boolean            m_isComp;
 
   // Roller variables
   private boolean                   m_rollerValid;     // Health indicator for motor 
@@ -118,10 +119,11 @@ public class Intake extends SubsystemBase
 
   // Constructor
 
-  public Intake( )
+  public Intake(boolean isComp)
   {
     setName("Intake");
     setSubsystem("Intake");
+    m_isComp = isComp;
 
     m_rollerValid =
         PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller", CTREConfigs5.intakeRollerConfig( ));

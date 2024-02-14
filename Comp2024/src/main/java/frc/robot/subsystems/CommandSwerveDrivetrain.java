@@ -145,4 +145,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
+  public Command driveToSpeaker(CommandSwerveDrivetrain drivetrain)
+  {
+    Command toSpeaker = drivetrain.getAutoPath("pathToSpeaker");
+    toSpeaker.schedule( );
+    return toSpeaker;
+  }
+
 }

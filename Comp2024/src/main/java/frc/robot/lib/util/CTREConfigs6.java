@@ -8,6 +8,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import frc.robot.lib.math.Conversions;
+
 public final class CTREConfigs6
 {
 
@@ -218,4 +220,61 @@ public final class CTREConfigs6
     return shooterConfig;
   }
 
+  // Climber
+
+  public static TalonFXConfiguration climberLengthFXConfig( )
+  {
+    TalonFXConfiguration climberConfig = new TalonFXConfiguration( );
+
+    // Closed Loop settings
+    // exConfig.ClosedLoopGeneral.*
+    // exConfig.ClosedLoopRamps.*
+
+    // Current limit settings
+    climberConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
+    climberConfig.CurrentLimits.SupplyCurrentThreshold = 20.0;
+    climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
+    climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    climberConfig.CurrentLimits.StatorCurrentLimit = 45.0;
+    climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    // Feedback settings
+    // climberConfig.Feedback.*
+
+    // Hardware limit switches
+    // climberConfig.HardwareLimitSwitch.*
+
+    // Motion Magic settings
+    climberConfig.MotionMagic.MotionMagicCruiseVelocity = 79.75;
+    climberConfig.MotionMagic.MotionMagicAcceleration = 708.9;
+    climberConfig.MotionMagic.MotionMagicJerk = 3544;
+
+    // Motor output settings
+    climberConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
+    climberConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // Closed loop settings
+
+    // Open Loop settings
+    climberConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
+    // exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
+    climberConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+
+    // Slot settings
+    climberConfig.Slot0.kS = 0.0;
+    climberConfig.Slot0.kV = 0.1129;
+    climberConfig.Slot0.kP = 0.0451;
+    climberConfig.Slot0.kI = 0.001;
+    climberConfig.Slot0.kD = 0.4514;
+
+    // Software limit switches
+    climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);
+    climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToWinchRotations(18.25, 0.432);
+    climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+
+    return climberConfig;
+  }
 }

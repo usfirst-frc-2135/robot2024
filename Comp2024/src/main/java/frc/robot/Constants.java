@@ -169,9 +169,17 @@ public class Constants
     public enum RotaryMode
     {
       INIT,    // Initialize intake
-      DOWN,    // IntakeRotar moving down
-      STOPPED, // IntakeRotar stop and hold position
-      UP       // IntakeRotar moving up
+      DOWN,    // Intake Rotary moving down
+      STOPPED, // Intake Rotary stop and hold position
+      UP       // Intake Rotary moving up
+    }
+
+    // Manual config parameters
+    public enum RotaryPosition
+    {
+      RETRACTED, // Retracted to shooter
+      HANDOFF,   // Upright to handoff to feeder
+      DEPLOYED,  // Deployed to acquire game piece
     }
   }
 

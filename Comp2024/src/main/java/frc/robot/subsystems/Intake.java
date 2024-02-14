@@ -268,6 +268,11 @@ public class Intake extends SubsystemBase
     return m_currentDegrees;
   }
 
+  public boolean isNoteDetected( )
+  {
+    return m_noteInIntake.get( );
+  }
+
   private boolean isWithinTolerance(double targetDegrees)
   {
     return (Math.abs(targetDegrees - m_currentDegrees) < kToleranceDegrees);

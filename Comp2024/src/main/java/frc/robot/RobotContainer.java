@@ -8,8 +8,13 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +27,7 @@ import frc.robot.commands.AutoStop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
 import frc.robot.commands.IntakeRotaryJoysticks;
+import frc.robot.commands.IntakingAction;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -88,6 +94,8 @@ public class RobotContainer
 
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
+  private boolean                      autoTesting   = false;
+  private Pose2d                       initial       = null;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -194,7 +202,7 @@ public class RobotContainer
     m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.rightBumper( ).onTrue(new IntakeRollerRun(m_intake, RollerMode.ACQUIRE));
+    m_operatorPad.rightBumper( ).onTrue(new IntakingAction(m_intake));
     m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
     m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, ShooterMode.STOP));
@@ -293,6 +301,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
+    String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
 
     // The selected command will be run in autonomous
@@ -300,23 +309,31 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-        m_autoCommand = new AutoStop(drivetrain);
-        break;
       case AUTOPRELOADONLY :
-        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOLEAVE :
-        m_autoCommand = drivetrain.getAutoPath("DriveS1");
+        pathName = "DriveS1";
         break;
       case AUTOPRELOADANDLEAVE :
-        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
-        break;
       case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new AutoStop(drivetrain); // TODO: Update with Preload Command
         break;
       case AUTOTESTPATH :
-        m_autoCommand = drivetrain.getAutoPath("Test");
+        pathName = "Test";
         break;
+    }
+
+    if (pathName == null)
+      m_autoCommand = new AutoStop(drivetrain);
+    else
+      m_autoCommand = drivetrain.getAutoPath(pathName);
+
+    // TODO: needs to be moved (doesn't work with path mirroring)
+    if (autoTesting && pathName != null)
+    {
+      initial = new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d( ))
+          .getInitialTargetHolonomicPose( );
+      if (initial != null)
+        drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
     }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));

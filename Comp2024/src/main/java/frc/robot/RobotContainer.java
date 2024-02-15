@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.commands.AutoStop;
+import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
 import frc.robot.commands.IntakeRotaryJoysticks;
@@ -197,8 +198,8 @@ public class RobotContainer
     // Operator Controller Assignments
     //
     // Operator - A, B, X, Y
-    m_operatorPad.a( ).onTrue(new Dummy("oper A"));
-    m_operatorPad.b( ).onTrue(new Dummy("oper B"));
+    m_operatorPad.a( ).onTrue(new ClimberMoveToPosition(m_climber, Climber.kLengthIn));
+    m_operatorPad.b( ).onTrue(new ClimberMoveToPosition(m_climber, Climber.kLengthOut));
     m_operatorPad.x( ).onTrue(new Dummy("oper X"));
     m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //

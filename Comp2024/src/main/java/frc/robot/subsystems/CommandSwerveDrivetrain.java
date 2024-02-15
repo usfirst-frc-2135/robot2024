@@ -9,6 +9,8 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -37,7 +39,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
-  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
+  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
 
   private final SwerveRequest.ApplyChassisSpeeds autoRequest    = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -145,11 +147,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  public Command driveToSpeaker(CommandSwerveDrivetrain drivetrain)
-  {
-    Command toSpeaker = drivetrain.getAutoPath("pathToSpeaker");
-    toSpeaker.schedule( );
-    return toSpeaker;
-  }
+  // public PathPlannerPath driveToSpeaker(CommandSwerveDrivetrain drivetrain)
+  // {
+  //   in progress
+
+  //   Pose2d speakerEndGoal = (1.4,5.52,0)
+  //   PathConstraints speakerConstraints = 
+
+  //   PathPlannerPath driveToSpeaker = new PathPlannerPath (// odometry current pose, constraints, end goal);
+  //   return driveToSpeaker;
+
+  // }
 
 }

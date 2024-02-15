@@ -88,13 +88,7 @@ public class Vision extends SubsystemBase
   @Override
   public void simulationPeriodic( )
   {
-    // Pose2d llPose = getLimelightRawPose( );
-    // Pose2d currentPose = ;
 
-    // if (isLimelightPoseValid(llPose, currentPose))
-    // {
-    //   DataLogManager.log(String.format("llPose: ", getLimelightRawPose( ).toString( )));
-    // }
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.

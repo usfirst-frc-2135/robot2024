@@ -1,13 +1,14 @@
 package frc.robot.lib.util;
 
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import frc.robot.Constants.Ports;
 import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
@@ -124,7 +125,8 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
-    // inRotaryConfig.Feedback.*
+    inRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANCoder;
+    inRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
 
     // Hardware limit switches
     // inRotaryConfig.HardwareLimitSwitch.*
@@ -154,11 +156,9 @@ public final class CTREConfigs6
     inRotaryConfig.Slot0.kD = 0.0;
 
     // Software limit switches
-    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-    //     Conversions.degreesToInputRotations(WRConsts.kAngleMin, WRConsts.kGearRatio);
+    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations((robotType) ? kAngleMin : kAngleMin);
     // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-    //     Conversions.degreesToInputRotations(WRConsts.kAngleMax, WRConsts.kGearRatio);
+    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations((robotType) ? kAngleMin : kAngleMin);
     // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return inRotaryConfig;

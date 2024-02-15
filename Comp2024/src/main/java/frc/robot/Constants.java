@@ -236,6 +236,7 @@ public class Constants
     // Manual config parameters
     public enum ClimberMode
     {
+      INIT, STOP, IN, OUT
     }
 
     // Motion Magic config parameters

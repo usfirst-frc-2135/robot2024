@@ -59,6 +59,8 @@ public class Intake extends SubsystemBase
   private static final double       kLigament2dOffset     = 0.0;      // Offset from mechanism root for ligament
   private static final double       kRotaryGearRatio      = 27.41;
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
+
+  // Rotary angles
   private static final double       kRotaryRetracted      = -88.0;    // TODO: Tune me!
   private static final double       kRotaryHandoff        = 0.0;      // TODO: Tune me!
   private static final double       kRotaryDeployed       = 112.0;    // TODO: Tune me!
@@ -106,7 +108,6 @@ public class Intake extends SubsystemBase
   private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
   private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
   private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
-
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
 
   // Status signals

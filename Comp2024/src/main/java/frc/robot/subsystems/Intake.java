@@ -61,9 +61,9 @@ public class Intake extends SubsystemBase
   private static final double       kLigament2dOffset     = 0.0;      // Offset from mechanism root for ligament
   private static final double       kManualSpeedVolts     = 3.5;      // Motor voltage during manual operation (joystick)
   private static final double       kAngleMin             = -90.0;
-  private static final double       kAngleRetracted       = -88.0;
-  private static final double       kAngleHandoff         = 0.0;
-  private static final double       kAngleDeployed        = 112.0;
+  public static final double        kAngleRetracted       = -75.0;
+  public static final double        kAngleHandoff         = 0.0;
+  public static final double        kAngleDeployed        = 109.0;
   private static final double       kAngleMax             = 115.0;
 
   private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees

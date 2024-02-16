@@ -154,6 +154,7 @@ public class RobotContainer
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
+    SmartDashboard.putData("IntakingAction", new IntakingAction(m_intake));
   }
 
   /****************************************************************************
@@ -204,7 +205,7 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     m_operatorPad.rightBumper( ).onTrue(new IntakingAction(m_intake));
-    m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    //m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
     m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, ShooterMode.STOP));
 
@@ -220,8 +221,8 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, RollerMode.EXPEL));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    //m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, RollerMode.EXPEL));
+    //m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
 
     ///////////////////////////////////////////////////////
@@ -271,7 +272,7 @@ public class RobotContainer
     // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
+    //m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }

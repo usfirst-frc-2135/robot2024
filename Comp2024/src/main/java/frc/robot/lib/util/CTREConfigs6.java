@@ -130,9 +130,9 @@ public final class CTREConfigs6
     // inRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 0.0;
-    inRotaryConfig.MotionMagic.MotionMagicJerk = 0.0;
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 26.58;
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 472.6;
+    inRotaryConfig.MotionMagic.MotionMagicJerk = 2363;
 
     // Motor output settings
     inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
@@ -148,7 +148,7 @@ public final class CTREConfigs6
 
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;
-    inRotaryConfig.Slot0.kV = 0.0;
+    inRotaryConfig.Slot0.kV = 0.1129 / 4;
     inRotaryConfig.Slot0.kP = 0.0;
     inRotaryConfig.Slot0.kI = 0.0;
     inRotaryConfig.Slot0.kD = 0.0;

@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase
   // Declare module variables
   private static boolean        m_isComp;
 
-  private boolean               m_valid                 = false; // Health indicator for shooter talon 11
+  private boolean               m_shooterValid;
   private boolean               m_atDesiredSpeed        = false; // Indicates flywheel RPM is close to target
   private boolean               m_atDesiredSpeedPrevious;
 
@@ -64,12 +64,11 @@ public class Shooter extends SubsystemBase
     setSubsystem("Shooter");
     m_isComp = isComp;
 
-    m_valid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
+    m_shooterValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), true));
 
-    SmartDashboard.putNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
-
+    initSmartDashboard( );
     initialize( );
   }
 
@@ -81,7 +80,7 @@ public class Shooter extends SubsystemBase
     double current = 0.0;
 
     // Calculate flywheel RPM and display on dashboard
-    if (m_valid)
+    if (m_shooterValid)
     {
       m_flywheelRPM = m_flywheelFilter.calculate((m_shooterLower.getVelocity( ).refresh( ).getValue( ) * 60.0));
 
@@ -127,6 +126,13 @@ public class Shooter extends SubsystemBase
 
   // Put methods for controlling this subsystem here. Call these from Commands.
 
+  private void initSmartDashboard( )
+  {
+    SmartDashboard.putBoolean("HL_SHValid", m_shooterValid);
+
+    SmartDashboard.putNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
+  }
+
   public void initialize( )
   {
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
@@ -158,7 +164,7 @@ public class Shooter extends SubsystemBase
         break;
     }
 
-    if (m_valid)
+    if (m_shooterValid)
       m_shooterLower.setControl(
           m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(m_flywheelRPM / 60.0, kFlywheelGearRatio)));
     DataLogManager.log(getSubsystem( ) + ": target speed is " + m_flywheelRPM);

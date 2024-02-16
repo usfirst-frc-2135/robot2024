@@ -79,7 +79,7 @@ public class Climber extends SubsystemBase
   // Declare module variables
   private static boolean            m_isComp;
 
-  private boolean                   m_motorValid;                   // Health indicator for Falcon 
+  private boolean                   m_climberValid;               // Health indicator for Falcon 
   private boolean                   m_calibrated         = true;
   private boolean                   m_debug              = true;
   private double                    m_currentInches      = 0.0;    // Current length in inches
@@ -111,7 +111,7 @@ public class Climber extends SubsystemBase
     setSubsystem("Climber");
     m_isComp = isComp;
 
-    m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberLengthFXConfig( ))
+    m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberLengthFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberLengthFXConfig( ));
     m_climberR.setControl(new Follower(m_climberL.getDeviceID( ), false));
 
@@ -183,7 +183,8 @@ public class Climber extends SubsystemBase
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_validCL", m_motorValid);
+    SmartDashboard.putBoolean("HL_CLValid", m_climberValid);
+
     SmartDashboard.putNumber("CL_ArbFF", 0.0);
     SmartDashboard.putData("ClimberMech", m_climberMech);
   }
@@ -227,7 +228,7 @@ public class Climber extends SubsystemBase
 
   public void resetPositionToZero( )
   {
-    if (m_motorValid)
+    if (m_climberValid)
       m_climberL.setPosition(Conversions.inchesToWinchRotations(0, kRolloutRatio));
   }
 
@@ -348,7 +349,7 @@ public class Climber extends SubsystemBase
 
   public void moveToCalibrate( )
   {
-    if (m_motorValid)
+    if (m_climberValid)
       m_climberL.setControl(m_requestVolts.withOutput(kCalibrateSpeedVolts));
   }
 

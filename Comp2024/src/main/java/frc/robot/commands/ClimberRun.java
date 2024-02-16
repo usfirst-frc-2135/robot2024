@@ -31,7 +31,7 @@ public class ClimberRun extends Command
   @Override
   public void execute( )
   {
-    m_climber.moveWithJoystick(m_gamePad);
+    m_climber.moveWithJoystick(-m_gamePad.getRightY( ));
   }
 
   // Called once the command ends or is interrupted.

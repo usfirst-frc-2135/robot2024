@@ -47,6 +47,8 @@ public class Shooter extends SubsystemBase
   private LinearFilter          m_flywheelFilter        = LinearFilter.singlePoleIIR(0.1, 0.02);
 
   // Declare module variables
+  private static boolean        m_isComp;
+
   private boolean               m_valid                 = false; // Health indicator for shooter talon 11
   private boolean               m_atDesiredSpeed        = false; // Indicates flywheel RPM is close to target
   private boolean               m_atDesiredSpeedPrevious;
@@ -56,10 +58,11 @@ public class Shooter extends SubsystemBase
 
   // Constructor
 
-  public Shooter( )
+  public Shooter(boolean isComp)
   {
     setName("Shooter");
     setSubsystem("Shooter");
+    m_isComp = isComp;
 
     m_valid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));
@@ -96,9 +99,6 @@ public class Shooter extends SubsystemBase
     SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
     SmartDashboard.putBoolean("SH_atDesiredSpeed", m_atDesiredSpeed);
     SmartDashboard.putNumber("SH_current", current);
-
-    if (kFlywheelLowerTargetRPM != SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM))
-      kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
   }
 
   @Override
@@ -142,8 +142,9 @@ public class Shooter extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": set shooter mode " + mode);
 
-    // Select the shooter RPM from the requested mode - NEVER NEGATIVE!
+    kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
 
+    // Select the shooter RPM for the requested mode - NEVER NEGATIVE when running!
     switch (mode)
     {
       case STOP :

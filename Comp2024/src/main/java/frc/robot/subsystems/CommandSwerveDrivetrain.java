@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,26 +13,14 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants;
-import frc.robot.Constants.SWConsts;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 
@@ -153,32 +140,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }
-  }
-
-  private final SlewRateLimiter m_xSpeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_ySpeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_rotLimiter    = new SlewRateLimiter(3);
-
-  public Translation2d driveWithGamepad2(CommandSwerveDrivetrain swerve, XboxController driverPad, boolean fieldRelative)
-  {
-    // Get x speed. Invert this because Xbox controllers return negative values when pushing forward.
-    final var xSpeed =
-        -m_xSpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband)) * SWConsts.maxSpeed;
-
-    // Get y speed or sideways/strafe speed. Invert this because a positive value is needed when
-    // pulling left. Xbox controllers return positive values when pulling right by default.
-    final var ySpeed =
-        -m_ySpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband)) * SWConsts.maxSpeed;
-
-    // Get rate of angular rotation. Invert this because a positive value is needed when pulling to
-    // the left (CCW is positive in mathematics). Xbox controllers return positive values when pulling
-    // to the right by default.
-    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(driverPad.getRightX( ), 0.02)) * SWConsts.maxAngularVelocity;
-
-    Translation2d swerveTranslation = new Translation2d(xSpeed, ySpeed);
-
-    return swerveTranslation;
-
   }
 
 }

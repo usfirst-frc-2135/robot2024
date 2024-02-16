@@ -103,16 +103,12 @@ public class Constants
   public static final class SWConsts
   {
     /* Individual module constants */
-    public static final boolean gyroInvert                 = false; // Always ensure Gyro is CCW+ CW-
+    public static final boolean gyroInvert  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Controller Invert */
-    public static final boolean invertXAxis                = false;
-    public static final boolean invertYAxis                = false;
-    public static final boolean invertRAxis                = false;
-
-    /* Swerve Profiling Values */
-    public static final double  maxSpeed                   = 4.5;  // meters per second
-    public static final double  maxAngularVelocity         = 6.0;  // orginially 10.0
+    public static final boolean invertXAxis = false;
+    public static final boolean invertYAxis = false;
+    public static final boolean invertRAxis = false;
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -133,7 +129,6 @@ public class Constants
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-
   }
 
   /////////////////////////////////////////////////////////////////////////////

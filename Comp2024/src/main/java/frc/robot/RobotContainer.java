@@ -39,6 +39,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -172,7 +173,7 @@ public class RobotContainer
     // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
     // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
     m_driverPad.x( ).onTrue(new Dummy("driver X"));
-    m_driverPad.y( ).onTrue(new Dummy("driver Y"));
+    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
@@ -274,6 +275,7 @@ public class RobotContainer
     m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
+
   }
 
   /****************************************************************************

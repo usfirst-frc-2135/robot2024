@@ -47,8 +47,6 @@ public class Shooter extends SubsystemBase
   private LinearFilter          m_flywheelFilter        = LinearFilter.singlePoleIIR(0.1, 0.02);
 
   // Declare module variables
-  private static boolean        m_isComp;
-
   private boolean               m_shooterValid;
   private boolean               m_atDesiredSpeed        = false; // Indicates flywheel RPM is close to target
   private boolean               m_atDesiredSpeedPrevious;
@@ -58,11 +56,10 @@ public class Shooter extends SubsystemBase
 
   // Constructor
 
-  public Shooter(boolean isComp)
+  public Shooter( )
   {
     setName("Shooter");
     setSubsystem("Shooter");
-    m_isComp = isComp;
 
     m_shooterValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));

@@ -31,7 +31,7 @@ import frc.robot.commands.IntakeRollerRun;
 import frc.robot.commands.IntakeRotaryJoysticks;
 import frc.robot.commands.IntakingAction;
 import frc.robot.commands.ShooterRun;
-import frc.robot.generated.TunerConstantsBeta;
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstantsComp;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -76,14 +76,14 @@ public class RobotContainer
   // The robot's shared subsystems
   private final LED                            m_led           = new LED( );
   private final Power                          m_power         = new Power( );
+  private final Vision                         m_vision        = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  private final CommandSwerveDrivetrain        m_drivetrain    =
-      (m_isComp) ? TunerConstantsComp.DriveTrain : TunerConstantsBeta.DriveTrain; // My drivetrain - different for each robot's offsets
-  private final Intake                         m_intake        = new Intake(m_isComp);
-  private final Shooter                        m_shooter       = new Shooter(m_isComp);
-  private final Feeder                         m_feeder        = new Feeder(m_isComp);
-  private final Climber                        m_climber       = new Climber(m_isComp);
+  private final CommandSwerveDrivetrain        m_drivetrain    = TunerConstants.DriveTrain;
+  private final Intake                         m_intake        = new Intake( );
+  private final Shooter                        m_shooter       = new Shooter( );
+  private final Feeder                         m_feeder        = new Feeder( );
+  private final Climber                        m_climber       = new Climber( );
 
   // Chooser for autonomous commands
 
@@ -117,31 +117,6 @@ public class RobotContainer
     initAutonomousChooser( );
 
     initOdometryChooser( );
-  }
-
-  private static boolean detectRobot( )
-  {
-    // Detect which robot/RoboRIO
-    String serialNum = System.getenv("serialnum");
-    String robotName = "UNKNOWN";
-    boolean isComp = false;
-
-    DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
-    if (serialNum == null)
-      robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kCompSN)) // TODO: get this from Comp RoboRIO for 2024
-    {
-      isComp = true;
-      robotName = "COMPETITION (A)";
-    }
-    else if (serialNum.equals(Constants.kBetaSN)) // TODO: get this from Beta RoboRIO for 2024
-    {
-      isComp = false;
-      robotName = "PRACTICE/BETA (B)";
-    }
-    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
-
-    return isComp;
   }
 
   /****************************************************************************

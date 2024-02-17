@@ -19,7 +19,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot
 {
-  private final RobotContainer m_robotContainer = new RobotContainer( );
+  private static final boolean m_isComp         = detectRobot( );         // Detect which robot is in use
+  private final RobotContainer m_robotContainer = new RobotContainer( );  // Create that robot
   private Command              m_autonomousCommand;
   private boolean              m_faultsCleared  = false;
 
@@ -171,5 +172,38 @@ public class Robot extends TimedRobot
   @Override
   public void testPeriodic( )
   {}
+
+  /**
+   * Our robot detection process between competition and beta (practice) robots
+   */
+  public static boolean isComp( )
+  {
+    return m_isComp;
+  }
+
+  private static boolean detectRobot( )
+  {
+    // Detect which robot/RoboRIO
+    String serialNum = System.getenv("serialnum");
+    String robotName = "UNKNOWN";
+    boolean isComp = false;
+
+    DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
+    if (serialNum == null)
+      robotName = "SIMULATION";
+    else if (serialNum.equals(Constants.kCompSN))
+    {
+      isComp = true;
+      robotName = "COMPETITION (A)";
+    }
+    else if (serialNum.equals(Constants.kBetaSN))
+    {
+      isComp = false;
+      robotName = "PRACTICE/BETA (B)";
+    }
+    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+
+    return isComp;
+  }
 
 }

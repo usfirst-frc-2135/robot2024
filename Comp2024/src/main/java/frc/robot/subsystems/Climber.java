@@ -77,8 +77,6 @@ public class Climber extends SubsystemBase
       m_mechRoot.append(new MechanismLigament2d("climberr", kLengthClimber, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
-  private static boolean            m_isComp;
-
   private boolean                   m_climberValid;               // Health indicator for Falcon 
   private boolean                   m_calibrated         = true;
   private boolean                   m_debug              = true;
@@ -105,11 +103,10 @@ public class Climber extends SubsystemBase
 
   // Constructor
 
-  public Climber(boolean isComp)
+  public Climber( )
   {
     setName("Climber");
     setSubsystem("Climber");
-    m_isComp = isComp;
 
     m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberLengthFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberLengthFXConfig( ));
@@ -168,7 +165,7 @@ public class Climber extends SubsystemBase
     // update for 20 msec loop
     m_elevSim.update(0.020);
 
-    // // Finally, we set our simulated encoder's readings and simulated battery voltage
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_climberSim.setRawRotorPosition(
         Conversions.inchesToWinchRotations(Units.metersToInches(m_elevSim.getPositionMeters( )), kRolloutRatio));
     m_climberSim.setRotorVelocity(

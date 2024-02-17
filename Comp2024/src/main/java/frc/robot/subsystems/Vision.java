@@ -82,12 +82,13 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_skew", m_targetSkew);
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
     SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
+
   }
 
   @Override
   public void simulationPeriodic( )
   {
-    // This method will be called once per scheduler run when in simulation
+    // This method will be called once per scheduler run during simulation
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.

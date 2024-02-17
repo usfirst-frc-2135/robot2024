@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
 public class Constants
 {
   // bot serial nums
-  public static final String kCompSN               = "03238074";
+  public static final String kCompSN               = "03238074"; // TODO: get this from Comp RoboRIO for 2024
   public static final String kBetaSN               = "03260A3A";
 
   // Game controller definitions
@@ -34,7 +34,7 @@ public class Constants
 
   // Phoenix firmware versions expected
   public static final int    kPhoenix5MajorVersion = ((22 * 256) + 0);
-  public static final int    kPhoenix6MajorVersion = 23;
+  public static final int    kPhoenix6MajorVersion = 24;
 
   public static final double kAutonomousPeriodSecs = 15.0;
 

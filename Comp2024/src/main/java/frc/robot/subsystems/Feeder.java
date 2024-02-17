@@ -25,11 +25,15 @@ public class Feeder extends SubsystemBase
 
   //Devices and simulation objs
 
+  // Declare module variables
+
   // Constructor
+
   public Feeder( )
   {
     setName("Feeder");
     setSubsystem("Feeder");
+
     initialize( );
   }
 

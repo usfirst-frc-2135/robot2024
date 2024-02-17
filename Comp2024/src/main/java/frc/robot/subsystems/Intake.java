@@ -57,11 +57,12 @@ public class Intake extends SubsystemBase
   private static final double       kRollerSpeedToShooter = -0.6;
 
   private static final double       kLigament2dOffset     = 90.0;      // Offset from mechanism root for ligament
-  private static final double       kRotaryGearRatio      = 27.41;
+  private static final double       kRotaryGearRatio      = 27.0;
   private static final double       kRotaryLengthMeters   = 0.3;
+
   private static final double       kRotaryWeightKg       = 4.0;
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
-  private static final double       kLigament2dOffset     = 0.0;      // Offset from mechanism root for ligament
+
   private static final double       kManualSpeedVolts     = 3.5;      // Motor voltage during manual operation (joystick)
   private static final double       kAngleMin             = -90.0;
   public static final double        kAngleRetracted       = -75.0;

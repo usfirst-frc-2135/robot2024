@@ -105,16 +105,6 @@ public final class CTREConfigs6
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
 
-    // Motion Magic config parameters
-    // public static final double kMMVelocity = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
-    // public static final double kMMAcceleration = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
-    // public static final double kMMSCurveStrength = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
-    // public static final double kS = 0.0;            // Voltage constant to overcome friction
-    // public static final double kV = 0.1129;         // Voltage constant per desired RPM
-    // public static final double kPidKp = 1.350;          // Wrist PID proportional constant
-    // public static final double kPidKi = 0.0;            // Wrist PID integral constant
-    // public static final double kPidKd = 0.0;            // Wrist PID derivative constant
-
     // Closed Loop settings
     // inRotaryConfig.ClosedLoopGeneral.*
     // inRotaryConfig.ClosedLoopRamps.*
@@ -125,19 +115,21 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
     inRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 80.0;
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
-    inRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANCoder;
-    inRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // inRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANCoder;
+    // inRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // inRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
+    // inRotaryConfig.Feedback.RotorToSensorRatio = 27.41;
 
     // Hardware limit switches
     // inRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 0.0;
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 22.0;
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 44.0;
     inRotaryConfig.MotionMagic.MotionMagicJerk = 0.0;
 
     // Motor output settings
@@ -154,7 +146,7 @@ public final class CTREConfigs6
 
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;
-    inRotaryConfig.Slot0.kV = 0.0;
+    inRotaryConfig.Slot0.kV = 0.1129;
     inRotaryConfig.Slot0.kP = 0.0;
     inRotaryConfig.Slot0.kI = 0.0;
     inRotaryConfig.Slot0.kD = 0.0;

@@ -91,11 +91,11 @@ public class Intake extends SubsystemBase
   private static boolean            m_isComp;
 
   // Roller variables
-  private boolean                   m_rollerValid;     // Health indicator for motor 
+  private boolean                   m_inRollerValid;     // Health indicator for motor 
 
   // Rotary variables
-  private boolean                   m_rotaryValid;     // Health indicator for motor 
-  private boolean                   m_ccValid;         // Health indicator for CANCoder 
+  private boolean                   m_inRotaryValid;     // Health indicator for motor 
+  private boolean                   m_inCCValid;         // Health indicator for CANCoder 
   private boolean                   m_debug               = true;
   private static double             m_currentDegrees      = 0.0; // Current angle in degrees
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees
@@ -127,21 +127,22 @@ public class Intake extends SubsystemBase
     m_isComp = isComp;
 
     // Roller motor init
-    m_rollerValid =
+    m_inRollerValid =
         PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller", CTREConfigs5.intakeRollerConfig( ));
     m_rollerMotor.setInverted(kRollerMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
 
     // Rotary motor and CANcoder init
-    m_rotaryValid =
+    m_inRotaryValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Intake Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
-    m_ccValid =
+    m_inCCValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
 
-    Double ccRotations = (Robot.isReal( )) ? getCANCoderRotations( ) : 0.0;
+    Double ccRotations = (Robot.isReal( ) && m_inCCValid) ? getCANCoderRotations( ) : 0.0;
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
-    m_rotaryMotor.setPosition(ccRotations); // Not really used - CANcoder is remote sensor with absolute position
+    if (m_inRotaryValid)
+      m_rotaryMotor.setPosition(ccRotations); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -166,7 +167,7 @@ public class Intake extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    double currentDraw = m_rollerMotor.getStatorCurrent( );
+    double currentDraw = (m_inRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
     SmartDashboard.putNumber("INRoller_currentDraw", currentDraw);
 
     // CANcoder is the primary (remote) sensor for Motion Magic
@@ -175,7 +176,7 @@ public class Intake extends SubsystemBase
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("IN_rotaryDegrees", Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio));
     SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
-    if (m_debug)
+    if (m_debug && m_inRotaryValid)
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
       SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
@@ -215,9 +216,10 @@ public class Intake extends SubsystemBase
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_validINRoller", m_rollerValid);
-    SmartDashboard.putBoolean("HL_validINRotary", m_rotaryValid);
-    SmartDashboard.putBoolean("HL_validINCANCoder", m_ccValid);
+    SmartDashboard.putBoolean("HL_INValidRoller", m_inRollerValid);
+    SmartDashboard.putBoolean("HL_INValidNRotary", m_inRotaryValid);
+    SmartDashboard.putBoolean("HL_INValidCANCoder", m_inCCValid);
+
     SmartDashboard.putData("RotaryMech", m_rotaryMech);
   }
 
@@ -239,12 +241,12 @@ public class Intake extends SubsystemBase
 
   private double getRotaryRotations( )
   {
-    return m_rotaryPosition.refresh( ).getValue( );
+    return (m_inRotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
   }
 
   private double getCANCoderRotations( )
   {
-    return m_ccPosition.refresh( ).refresh( ).getValue( );
+    return (m_inCCValid) ? m_ccPosition.refresh( ).refresh( ).getValue( ) : 0.0;
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////

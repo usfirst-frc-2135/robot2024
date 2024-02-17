@@ -52,7 +52,6 @@ import frc.robot.subsystems.Vision;
 public class RobotContainer
 {
   private final boolean                        m_macOSXSim     = false;
-  private boolean                              m_isComp        = detectRobot( );
 
   // Joysticks
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);

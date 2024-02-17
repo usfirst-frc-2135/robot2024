@@ -63,10 +63,10 @@ public class RobotContainer
 
   //Poses for limelight paths
   private final Pose2d                         speakerPose     = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
-  private final Pose2d                         ampPose         = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(0));
-  private final Pose2d                         stageCenter     = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(0));
-  private final Pose2d                         stageLeft       = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(200));
-  private final Pose2d                         stageRight      = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(59));
+  private final Pose2d                         ampPose         = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
+  private final Pose2d                         stageCenter     = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(180));
+  private final Pose2d                         stageLeft       = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(-60));
+  private final Pose2d                         stageRight      = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(60));
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric     drive           =
@@ -154,9 +154,9 @@ public class RobotContainer
     //
     // Driver - A, B, X, Y
     m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
-    m_driverPad.b( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageCenter));                   // TODO: temporarily used for CTRE testing
+    m_driverPad.b( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageRight));    // TODO: temporarily used for CTRE testing
     m_driverPad.x( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageLeft));
-    m_driverPad.y( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageRight));
+    m_driverPad.y( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageCenter));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
@@ -211,9 +211,9 @@ public class RobotContainer
     ///////////////////////////////////////////////////////
     //
     // From CTRE SwerveWithPathPlanner template - mainly for testing
-    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));
-    m_driverPad.b( ).whileTrue(m_drivetrain
-        .applyRequest(( ) -> point.withModuleDirection(new Rotation2d(-m_driverPad.getLeftY( ), -m_driverPad.getLeftX( )))));
+    //    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));
+    //    m_driverPad.b( ).whileTrue(m_drivetrain
+    //        .applyRequest(( ) -> point.withModuleDirection(new Rotation2d(-m_driverPad.getLeftY( ), -m_driverPad.getLeftX( )))));
 
     // reset the field-centric heading on left bumper press
     m_driverPad.leftBumper( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));

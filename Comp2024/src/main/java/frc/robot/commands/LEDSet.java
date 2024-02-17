@@ -4,6 +4,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.LEDConsts.AnimationTypes;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.subsystems.LED;
 
@@ -14,6 +15,7 @@ public class LEDSet extends Command
 {
   private final LEDColor m_color;
   private final LED      m_led;
+  //private final AnimationTypes m_animation;
 
   public LEDSet(LED led, LEDColor color)
   {

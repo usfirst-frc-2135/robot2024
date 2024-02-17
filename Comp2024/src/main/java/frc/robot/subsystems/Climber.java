@@ -77,9 +77,7 @@ public class Climber extends SubsystemBase
       m_mechRoot.append(new MechanismLigament2d("climberr", kLengthClimber, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
-  private static boolean            m_isComp;
-
-  private boolean                   m_motorValid;                   // Health indicator for Falcon 
+  private boolean                   m_climberValid;               // Health indicator for Falcon 
   private boolean                   m_calibrated         = true;
   private boolean                   m_debug              = true;
   private double                    m_currentInches      = 0.0;    // Current length in inches
@@ -87,11 +85,11 @@ public class Climber extends SubsystemBase
   private int                       m_hardStopCounter    = 0;
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts       = new VoltageOut(0).withEnableFOC(false);
+  private VoltageOut                m_requestVolts       = new VoltageOut(0);
   private ClimberMode               m_mode               = ClimberMode.INIT;  // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts     = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private MotionMagicVoltage        m_requestMMVolts     = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance    = new Debouncer(0.060, DebounceType.kRising);
   private Timer                     m_safetyTimer        = new Timer( ); // Safety timer for movements
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
@@ -105,13 +103,12 @@ public class Climber extends SubsystemBase
 
   // Constructor
 
-  public Climber(boolean isComp)
+  public Climber( )
   {
     setName("Climber");
     setSubsystem("Climber");
-    m_isComp = isComp;
 
-    m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberLengthFXConfig( ))
+    m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberLengthFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberLengthFXConfig( ));
     m_climberR.setControl(new Follower(m_climberL.getDeviceID( ), false));
 
@@ -168,7 +165,7 @@ public class Climber extends SubsystemBase
     // update for 20 msec loop
     m_elevSim.update(0.020);
 
-    // // Finally, we set our simulated encoder's readings and simulated battery voltage
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_climberSim.setRawRotorPosition(
         Conversions.inchesToWinchRotations(Units.metersToInches(m_elevSim.getPositionMeters( )), kRolloutRatio));
     m_climberSim.setRotorVelocity(
@@ -183,7 +180,8 @@ public class Climber extends SubsystemBase
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_validCL", m_motorValid);
+    SmartDashboard.putBoolean("HL_CLValid", m_climberValid);
+
     SmartDashboard.putNumber("CL_ArbFF", 0.0);
     SmartDashboard.putData("ClimberMech", m_climberMech);
   }
@@ -227,7 +225,7 @@ public class Climber extends SubsystemBase
 
   public void resetPositionToZero( )
   {
-    if (m_motorValid)
+    if (m_climberValid)
       m_climberL.setPosition(Conversions.inchesToWinchRotations(0, kRolloutRatio));
   }
 
@@ -348,7 +346,7 @@ public class Climber extends SubsystemBase
 
   public void moveToCalibrate( )
   {
-    if (m_motorValid)
+    if (m_climberValid)
       m_climberL.setControl(m_requestVolts.withOutput(kCalibrateSpeedVolts));
   }
 

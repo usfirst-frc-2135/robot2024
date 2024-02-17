@@ -26,15 +26,13 @@ public class Feeder extends SubsystemBase
   //Devices and simulation objs
 
   // Declare module variables
-  private static boolean     m_isComp;
 
   // Constructor
 
-  public Feeder(boolean isComp)
+  public Feeder( )
   {
     setName("Feeder");
     setSubsystem("Feeder");
-    m_isComp = isComp;
 
     initialize( );
   }

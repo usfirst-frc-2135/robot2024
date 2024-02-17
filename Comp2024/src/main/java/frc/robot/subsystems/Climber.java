@@ -87,11 +87,11 @@ public class Climber extends SubsystemBase
   private int                       m_hardStopCounter    = 0;
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts       = new VoltageOut(0).withEnableFOC(false);
+  private VoltageOut                m_requestVolts       = new VoltageOut(0);
   private ClimberMode               m_mode               = ClimberMode.INIT;  // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts     = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private MotionMagicVoltage        m_requestMMVolts     = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance    = new Debouncer(0.060, DebounceType.kRising);
   private Timer                     m_safetyTimer        = new Timer( ); // Safety timer for movements
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity

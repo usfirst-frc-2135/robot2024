@@ -101,11 +101,11 @@ public class Intake extends SubsystemBase
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts        = new VoltageOut(0).withEnableFOC(false);
+  private VoltageOut                m_requestVolts        = new VoltageOut(0);
   private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
   private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)

@@ -8,7 +8,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
@@ -16,6 +15,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +32,7 @@ import frc.robot.commands.IntakeRotaryJoysticks;
 import frc.robot.commands.IntakingAction;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
+import frc.robot.generated.TunerConstantsComp;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -39,6 +41,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,7 +58,7 @@ public class RobotContainer
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
   private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
-  private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+  private double                               MaxSpeed        = TunerConstantsComp.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private Command                              m_autoCommand;
 
@@ -73,9 +76,10 @@ public class RobotContainer
   // The robot's shared subsystems
   private final LED                            m_led           = new LED( );
   private final Power                          m_power         = new Power( );
+  private final Vision                         m_vision        = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  private final CommandSwerveDrivetrain        drivetrain      = TunerConstants.DriveTrain; // My drivetrain
+  private final CommandSwerveDrivetrain        m_drivetrain    = TunerConstants.DriveTrain;
   private final Intake                         m_intake        = new Intake( );
   private final Shooter                        m_shooter       = new Shooter( );
   private final Feeder                         m_feeder        = new Feeder( );
@@ -93,17 +97,16 @@ public class RobotContainer
     AUTOTESTPATH             // Run a selected test path
   }
 
+  private static final boolean         m_autoTesting = false;
   private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
   private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
-  private boolean                      autoTesting   = false;
-  private Pose2d                       initial       = null;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer( )
   {
-    drivetrain.getDaqThread( ).setThreadPriority(99);
+    m_drivetrain.getDaqThread( ).setThreadPriority(99);
 
     addSmartDashboardWidgets( );
 
@@ -114,31 +117,6 @@ public class RobotContainer
     initAutonomousChooser( );
 
     initOdometryChooser( );
-  }
-
-  private static boolean detectRobot( )
-  {
-    // Detect which robot/RoboRIO
-    String serialNum = System.getenv("serialnum");
-    String robotName = "UNKNOWN";
-    boolean isComp = false;
-
-    DataLogManager.log(String.format("robotContainer: RoboRIO SN: %s", serialNum));
-
-    if (serialNum == null)
-      robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kCompSN)) // TODO: get this from Comp RoboRIO for 2024
-    {
-      isComp = true;
-      robotName = "COMPETITION (A)";
-    }
-    else if (serialNum.equals(Constants.kBetaSN)) // TODO: get this from Beta RoboRIO for 2024
-    {
-      isComp = false;
-      robotName = "PRACTICE/BETA (B)";
-    }
-    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
-    return isComp;
   }
 
   /****************************************************************************
@@ -173,7 +151,7 @@ public class RobotContainer
     // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
     // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
     m_driverPad.x( ).onTrue(new Dummy("driver X"));
-    m_driverPad.y( ).onTrue(new Dummy("driver Y"));
+    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
@@ -228,15 +206,15 @@ public class RobotContainer
     ///////////////////////////////////////////////////////
     //
     // From CTRE SwerveWithPathPlanner template - mainly for testing
-    m_driverPad.a( ).whileTrue(drivetrain.applyRequest(( ) -> brake));
-    m_driverPad.b( ).whileTrue(drivetrain
+    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));
+    m_driverPad.b( ).whileTrue(m_drivetrain
         .applyRequest(( ) -> point.withModuleDirection(new Rotation2d(-m_driverPad.getLeftY( ), -m_driverPad.getLeftX( )))));
 
     // reset the field-centric heading on left bumper press
-    m_driverPad.leftBumper( ).onTrue(drivetrain.runOnce(( ) -> drivetrain.seedFieldRelative( )));
+    m_driverPad.leftBumper( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));
 
-    m_driverPad.pov(0).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
-    m_driverPad.pov(180).whileTrue(drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
+    m_driverPad.pov(0).whileTrue(m_drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
+    m_driverPad.pov(180).whileTrue(m_drivetrain.applyRequest(( ) -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
   }
 
   /****************************************************************************
@@ -246,25 +224,25 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     if (!m_macOSXSim)
-      drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
+      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
-      drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
+      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
               // negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
 
     // if (Utils.isSimulation()) {
-    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+    //   m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     // }
 
-    drivetrain.registerTelemetry(logger::telemeterize);
+    m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // // Default command - Motion Magic hold
     // m_intake.setDefaultCommand(new IntakeMoveToPosition(m_intake));
@@ -275,6 +253,7 @@ public class RobotContainer
     //m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
+
   }
 
   /****************************************************************************
@@ -325,17 +304,19 @@ public class RobotContainer
     }
 
     if (pathName == null)
-      m_autoCommand = new AutoStop(drivetrain);
+      m_autoCommand = new AutoStop(m_drivetrain);
     else
-      m_autoCommand = drivetrain.getAutoPath(pathName);
+      m_autoCommand = m_drivetrain.getAutoPath(pathName);
 
-    // TODO: needs to be moved (doesn't work with path mirroring)
-    if (autoTesting && pathName != null)
+    if (m_autoTesting && pathName != null)
     {
-      initial = new PathPlannerTrajectory(PathPlannerPath.fromPathFile(pathName), new ChassisSpeeds( ), new Rotation2d( ))
-          .getInitialTargetHolonomicPose( );
+      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+      if (DriverStation.getAlliance( ).equals(Alliance.Red))
+        path.flipPath( );
+
+      Pose2d initial = new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
       if (initial != null)
-        drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
+        m_drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
     }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));

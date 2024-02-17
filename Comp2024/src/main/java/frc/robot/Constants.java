@@ -292,6 +292,11 @@ public class Constants
       LEDCOLOR_PURPLE,  // CANdle purple
       LEDCOLOR_DASH     // CANdle color taken from dashboard
     }
+
+    public enum AnimationTypes
+    {
+      ColorFlow, Fire, Larson, Rainbow, RgbFade, SingleFade, Strobe, Twinkle, TwinkleOff, SetAll, AnimationDash
+    }
   }
 
 }

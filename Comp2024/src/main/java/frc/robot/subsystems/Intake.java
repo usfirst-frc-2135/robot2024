@@ -178,8 +178,8 @@ public class Intake extends SubsystemBase
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
       SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_supplyCur", m_rotarySupplyCur.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_statorCur", m_rotaryStatorCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
     }
   }
 

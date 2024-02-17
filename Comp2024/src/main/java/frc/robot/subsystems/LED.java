@@ -40,7 +40,6 @@ public class LED extends SubsystemBase
     m_ledChooser.addOption("LED_Purple", LEDColor.LEDCOLOR_PURPLE);
 
     SmartDashboard.putData("LED_Color", m_ledChooser);
-    SmartDashboard.putBoolean("LED_normalMode", true);
 
     setColor(LEDColor.LEDCOLOR_BLUE);
     m_candle.configBrightnessScalar(0.7);

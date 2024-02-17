@@ -51,10 +51,6 @@ public class Vision extends SubsystemBase
 
     // Put all the needed widgets on the dashboard
     SmartDashboard.putNumberArray("VI_RobotPose", new double[ ] { });
-    SmartDashboard.putNumber("VI_area", m_targetArea);
-    SmartDashboard.putNumber("VI_skew", m_targetSkew);
-    SmartDashboard.putBoolean("VI_valid", m_targetValid);
-    SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
 
     m_botPoseSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
 
@@ -82,7 +78,6 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_skew", m_targetSkew);
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
     SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
-
   }
 
   @Override

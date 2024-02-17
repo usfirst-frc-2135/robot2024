@@ -19,6 +19,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -34,12 +36,10 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  // private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
-
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
-  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
+  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
 
   private final SwerveRequest.ApplyChassisSpeeds autoRequest    = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -147,16 +147,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  // public PathPlannerPath driveToSpeaker(CommandSwerveDrivetrain drivetrain)
-  // {
-  //   in progress
+  public Command driveToSpeaker(CommandSwerveDrivetrain drivetrain)
+  {
+    Pose2d targetPose = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
+    PathConstraints constraints = new PathConstraints(3, 3, Units.degreesToRadians(540 / 2), Units.degreesToRadians(720 / 2));
 
-  //   Pose2d speakerEndGoal = (1.4,5.52,0)
-  //   PathConstraints speakerConstraints = 
-
-  //   PathPlannerPath driveToSpeaker = new PathPlannerPath (// odometry current pose, constraints, end goal);
-  //   return driveToSpeaker;
-
-  // }
+    Command pathFindingCommand = AutoBuilder.pathfindToPose(targetPose, constraints, 0, 0.0);
+    return pathFindingCommand;
+  }
 
 }

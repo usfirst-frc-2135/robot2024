@@ -175,7 +175,7 @@ public class RobotContainer
     // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
     // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
     m_driverPad.x( ).onTrue(new Dummy("driver X"));
-    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));
+    m_driverPad.y( ).whileTrue(m_drivetrain.driveToSpeaker(m_drivetrain));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing

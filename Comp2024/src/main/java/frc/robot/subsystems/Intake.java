@@ -88,7 +88,6 @@ public class Intake extends SubsystemBase
       m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
   // Declare module variables
-  private static boolean            m_isComp;
 
   // Roller variables
   private boolean                   m_inRollerValid;     // Health indicator for motor 
@@ -120,11 +119,10 @@ public class Intake extends SubsystemBase
 
   // Constructor
 
-  public Intake(boolean isComp)
+  public Intake( )
   {
     setName("Intake");
     setSubsystem("Intake");
-    m_isComp = isComp;
 
     // Roller motor init
     m_inRollerValid =

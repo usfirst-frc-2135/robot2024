@@ -147,12 +147,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  public Command driveToSpeaker(CommandSwerveDrivetrain drivetrain)
+  public Command driveWithLL(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    Pose2d targetPose = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
     PathConstraints constraints = new PathConstraints(3, 3, Units.degreesToRadians(540 / 2), Units.degreesToRadians(720 / 2));
 
-    Command pathFindingCommand = AutoBuilder.pathfindToPose(targetPose, constraints, 0, 0.0);
+    Command pathFindingCommand = AutoBuilder.pathfindToPose(pose, constraints, 0, 0.0);
     return pathFindingCommand;
   }
 

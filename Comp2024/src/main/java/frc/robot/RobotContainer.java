@@ -61,6 +61,13 @@ public class RobotContainer
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private Command                              m_autoCommand;
 
+  //Poses for limelight paths
+  private final Pose2d                         speakerPose     = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
+  private final Pose2d                         ampPose         = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(0));
+  private final Pose2d                         stageCenter     = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(0));
+  private final Pose2d                         stageLeft       = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(200));
+  private final Pose2d                         stageRight      = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(59));
+
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric     drive           =
       new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -146,14 +153,14 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    // m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
-    // m_driverPad.b( ).onTrue(new Dummy("driver B"));                   // TODO: temporarily used for CTRE testing
-    m_driverPad.x( ).onTrue(new Dummy("driver X"));
-    m_driverPad.y( ).whileTrue(m_drivetrain.driveToSpeaker(m_drivetrain));
+    m_driverPad.a( ).onTrue(new Dummy("driver A"));                      // TODO: temporarily used for CTRE testing
+    m_driverPad.b( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageCenter));                   // TODO: temporarily used for CTRE testing
+    m_driverPad.x( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageLeft));
+    m_driverPad.y( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageRight));
     //
     // Driver - Bumpers, start, back
     // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
-    m_driverPad.rightBumper( ).onTrue(new Dummy("driver right bumper"));
+    m_driverPad.rightBumper( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, ampPose));
     m_driverPad.back( ).onTrue(new Dummy("driver back")); // aka View
     m_driverPad.start( ).onTrue(new Dummy("driver start")); // aka Menu
     //
@@ -167,7 +174,7 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver right trigger"));
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, speakerPose));
 
     ///////////////////////////////////////////////////////
     //

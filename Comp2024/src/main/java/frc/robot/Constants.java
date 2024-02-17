@@ -157,7 +157,7 @@ public class Constants
   {
     // Global settings
 
-    // Manual config parameters
+    // Roller intake parameters
     public enum RollerMode
     {
       STOP,    // Stop spinning
@@ -165,21 +165,21 @@ public class Constants
       EXPEL    // Expel a game piece
     }
 
-    // Manual config parameters
-    public enum RotaryMode
+    // Rotary manual move parameters
+    public enum RotaryManual
     {
       INIT,    // Initialize intake
-      DOWN,    // Intake Rotary moving down
+      INBOARD, // Intake Rotary moving into the robot
       STOPPED, // Intake Rotary stop and hold position
-      UP       // Intake Rotary moving up
+      OUTBOARD // Intake Rotary moving out of the robot
     }
 
-    // Manual config parameters
+    // Motion Magic move parameters
     public enum RotaryPosition
     {
       RETRACTED, // Retracted to shooter
       HANDOFF,   // Upright to handoff to feeder
-      DEPLOYED,  // Deployed to acquire game piece
+      DEPLOYED   // Deployed to acquire game piece
     }
   }
 
@@ -190,13 +190,18 @@ public class Constants
   {
     // Global settings
 
-    // Manual config parameters
+    // Feeder intake parameters
     public enum RollerMode
     {
     }
 
-    // Manual config parameters
-    public enum RotaryMode
+    // Rotary manual move parameters
+    public enum RotaryManual
+    {
+    }
+
+    // Motion Magic move parameters
+    public enum RotaryPosition
     {
     }
 
@@ -219,7 +224,7 @@ public class Constants
     }
 
     // Manual config parameters
-    public enum RotaryMode
+    public enum RotaryManual
     {
     }
 

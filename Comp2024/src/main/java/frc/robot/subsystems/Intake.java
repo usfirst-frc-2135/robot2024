@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
-import frc.robot.Constants.INConsts.RotaryMode;
+import frc.robot.Constants.INConsts.RotaryManual;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
@@ -56,8 +56,10 @@ public class Intake extends SubsystemBase
   private static final double       kRollerSpeedExpel     = -0.25;
   private static final double       kRollerSpeedToShooter = -0.6;
 
-  private static final double       kLigament2dOffset     = 0.0;      // Offset from mechanism root for ligament
+  private static final double       kLigament2dOffset     = 90.0;      // Offset from mechanism root for ligament
   private static final double       kRotaryGearRatio      = 27.41;
+  private static final double       kRotaryLengthMeters   = 0.3;
+  private static final double       kRotaryWeightKg       = 4.0;
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
 
   // Rotary angles
@@ -68,7 +70,7 @@ public class Intake extends SubsystemBase
   private static final double       kRotaryAngleMax       = 115.0;    // TODO: Tune me!
 
   private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout      = 3.0;
+  private static final double       kMMSafetyTimeout      = 2.0;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -78,8 +80,8 @@ public class Intake extends SubsystemBase
 
   private final TalonFXSimState     m_rotarySim           = m_rotaryMotor.getSimState( );
   private final CANcoderSimState    m_CANCoderSim         = m_CANCoder.getSimState( );
-  private final SingleJointedArmSim m_armSim              =
-      new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio, 1.0, 0.3, -Math.PI, Math.PI, false, 0.0);
+  private final SingleJointedArmSim m_armSim              = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
+      SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
   private final Mechanism2d         m_rotaryMech          = new Mechanism2d(2, 2);
@@ -101,7 +103,7 @@ public class Intake extends SubsystemBase
 
   // Manual mode config parameters
   private VoltageOut                m_requestVolts        = new VoltageOut(0);
-  private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
+  private RotaryManual              m_rotaryMode          = RotaryManual.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
   private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
@@ -136,7 +138,7 @@ public class Intake extends SubsystemBase
     m_inCCValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
 
-    Double ccRotations = (Robot.isReal( ) && m_inCCValid) ? getCANCoderRotations( ) : 0.0;
+    Double ccRotations = getCANCoderRotations( );
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_inRotaryValid)
@@ -165,8 +167,8 @@ public class Intake extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    double currentDraw = (m_inRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
-    SmartDashboard.putNumber("INRoller_currentDraw", currentDraw);
+    double rollerCurrent = (m_inRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
+    SmartDashboard.putNumber("IN_rollerCur", rollerCurrent);
 
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Units.rotationsToDegrees(getCANCoderRotations( ));
@@ -178,8 +180,8 @@ public class Intake extends SubsystemBase
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
       SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_supplyCur", m_rotarySupplyCur.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_statorCur", m_rotaryStatorCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
     }
   }
 
@@ -244,7 +246,9 @@ public class Intake extends SubsystemBase
 
   private double getCANCoderRotations( )
   {
-    return (m_inCCValid) ? m_ccPosition.refresh( ).refresh( ).getValue( ) : 0.0;
+    double ccRotations = (m_inCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0;
+    ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
+    return ccRotations;
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
@@ -301,14 +305,14 @@ public class Intake extends SubsystemBase
   public void moveRotaryWithJoystick(double axisValue)
   {
     boolean rangeLimited = false;
-    RotaryMode newMode = RotaryMode.INIT;
+    RotaryManual newMode = RotaryManual.INIT;
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if ((axisValue < 0.0) && (m_currentDegrees > kRotaryAngleMin))
-      newMode = INConsts.RotaryMode.DOWN;
+      newMode = INConsts.RotaryManual.INBOARD;
     else if ((axisValue > 0.0) && (m_currentDegrees < kRotaryAngleMax))
-      newMode = INConsts.RotaryMode.UP;
+      newMode = INConsts.RotaryManual.OUTBOARD;
     else
     {
       rangeLimited = true;
@@ -346,10 +350,11 @@ public class Intake extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        m_rotaryMotor.setControl(m_requestMMVolts.withPosition(Units.degreesToRotations(m_targetDegrees)));
+        double targetRotations = Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio);
+        m_rotaryMotor.setControl(m_requestMMVolts.withPosition(targetRotations));
         DataLogManager
-            .log(String.format("%s: Position move: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ), m_currentDegrees,
-                m_targetDegrees, Units.degreesToRotations(m_currentDegrees), Units.degreesToRotations(m_targetDegrees)));
+            .log(String.format("%s: Position move: %.1f -> %.1f degrees (%.3f -> %.3f)", getSubsystem( ), m_currentDegrees,
+                m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio), targetRotations));
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
@@ -364,7 +369,8 @@ public class Intake extends SubsystemBase
 
   public void moveToPositionExecute( )
   {
-    m_rotaryMotor.setControl(m_requestMMVolts.withPosition(Units.degreesToRotations(m_targetDegrees)));
+    m_rotaryMotor
+        .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 
   public boolean moveToPositionIsFinished( )

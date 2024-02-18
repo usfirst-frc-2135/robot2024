@@ -82,9 +82,6 @@ public class LED extends SubsystemBase
     SmartDashboard.putData("LED_Color", m_ledChooser);
     SmartDashboard.putData("LED_Animation", m_ledAnimationChooser);
 
-    setColor(LEDColor.LEDCOLOR_BLUE);
-    m_candle.configBrightnessScalar(0.7);
-
     initialize( );
   }
 
@@ -92,19 +89,19 @@ public class LED extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
+
   }
 
   @Override
   public void simulationPeriodic( )
   {
-    // This method will be called once per scheduler run during simulation
+
   }
 
   public void initialize( )
   {
-    setColor(LEDColor.LEDCOLOR_OFF);
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    setColor(LEDColor.LEDCOLOR_DASH);
+    //setColor(LEDColor.LEDCOLOR_DASH);
 
   }
 
@@ -121,6 +118,7 @@ public class LED extends SubsystemBase
     {
       if (color == (LEDColor.LEDCOLOR_DASH))
         color = m_ledChooser.getSelected( );
+      DataLogManager.log("Color Selected");
       // color = LEDColor.LEDCOLOR_PURPLE;
 
       switch (color)
@@ -161,6 +159,7 @@ public class LED extends SubsystemBase
       }
       DataLogManager.log(String.format("%s: COLOR IS NOW %s", getSubsystem( ), strName));
       m_previousColor = color;
+
     }
   }
 
@@ -168,10 +167,9 @@ public class LED extends SubsystemBase
   {
     final String strName;
 
-    // if (animation == (AnimationTypes.AnimationDash))
-    //   animation = m_ledAnimationChooser.getSelected( );
-    // //m_candle.animate(AnimationTypes.animation);
-    // DataLogManager.log("Animation Selected!");
+    if (animation == (AnimationTypes.AnimationDash))
+      animation = m_ledAnimationChooser.getSelected( );
+    DataLogManager.log("Animation Selected!");
 
     switch (animation)
     {
@@ -217,7 +215,6 @@ public class LED extends SubsystemBase
         m_toAnimate = null;
         break;
     }
-    m_candle.animate(m_toAnimate);
     DataLogManager.log(String.format("%s: ANIMATION IS NOW %s", getSubsystem( ), strName));
     //m_previousColor = color;
   }

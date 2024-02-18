@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.LEDConsts.AnimationTypes;
+import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberMoveToPosition;
@@ -30,6 +32,7 @@ import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeRollerRun;
 import frc.robot.commands.IntakeRotaryJoysticks;
 import frc.robot.commands.IntakingAction;
+import frc.robot.commands.LEDSet;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstantsComp;
@@ -131,6 +134,7 @@ public class RobotContainer
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
+    SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH, AnimationTypes.AnimationDash));
   }
 
   /****************************************************************************

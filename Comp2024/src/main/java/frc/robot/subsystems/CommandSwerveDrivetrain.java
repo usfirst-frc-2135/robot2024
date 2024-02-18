@@ -9,11 +9,15 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
@@ -21,7 +25,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.generated.TunerConstants;
+import frc.robot.generated.TunerConstantsComp;
 import frc.robot.lib.util.LimelightHelpers;
 
 /**
@@ -30,11 +34,12 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
+  // private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
 
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
+  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
 
   private final SwerveRequest.ApplyChassisSpeeds autoRequest    = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -71,8 +76,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this::seedFieldRelative,                                      // Consumer for seeding pose against auto
         this::getCurrentRobotChassisSpeeds,                           // Supplier of chassis speeds
         (speeds) -> this.setControl(autoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
-        new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
-            driveBaseRadius, new ReplanningConfig( )),                // Path following config
+        new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0),
+            TunerConstantsComp.kSpeedAt12VoltsMps, driveBaseRadius, new ReplanningConfig( )),                // Path following config
         ( ) ->                                                        // Red vs. Blue alliance
         {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
@@ -86,6 +91,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
           return false;
         },                                                            // Change this if the path needs to be flipped on red vs blue
         this);                                                        // Subsystem for requirements
+  }
+
+  public void resetOdometry(Pose2d pose)
+  {
+    m_odometry.resetPosition(pose.getRotation( ), m_modulePositions, pose);
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)
@@ -130,11 +140,23 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
-      if (lastResult.valid)
+      if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }
   }
+
+  // public PathPlannerPath driveToSpeaker(CommandSwerveDrivetrain drivetrain)
+  // {
+  //   in progress
+
+  //   Pose2d speakerEndGoal = (1.4,5.52,0)
+  //   PathConstraints speakerConstraints = 
+
+  //   PathPlannerPath driveToSpeaker = new PathPlannerPath (// odometry current pose, constraints, end goal);
+  //   return driveToSpeaker;
+
+  // }
 
 }

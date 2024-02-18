@@ -82,6 +82,9 @@ public class LED extends SubsystemBase
     SmartDashboard.putData("LED_Color", m_ledChooser);
     SmartDashboard.putData("LED_Animation", m_ledAnimationChooser);
 
+    setColor(LEDColor.LEDCOLOR_BLUE);
+    m_candle.configBrightnessScalar(0.7);
+
     initialize( );
   }
 
@@ -89,17 +92,17 @@ public class LED extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-
   }
 
   @Override
   public void simulationPeriodic( )
   {
-
+    // This method will be called once per scheduler run during simulation
   }
 
   public void initialize( )
   {
+    setColor(LEDColor.LEDCOLOR_OFF);
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setColor(LEDColor.LEDCOLOR_DASH);
 
@@ -158,7 +161,6 @@ public class LED extends SubsystemBase
       }
       DataLogManager.log(String.format("%s: COLOR IS NOW %s", getSubsystem( ), strName));
       m_previousColor = color;
-
     }
   }
 

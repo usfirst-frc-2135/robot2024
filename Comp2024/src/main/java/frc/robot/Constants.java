@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
 public class Constants
 {
   // bot serial nums
-  public static final String kCompSN               = "03238074";
+  public static final String kCompSN               = "03238074"; // TODO: get this from Comp RoboRIO for 2024
   public static final String kBetaSN               = "03260A3A";
 
   // Game controller definitions
@@ -34,7 +34,7 @@ public class Constants
 
   // Phoenix firmware versions expected
   public static final int    kPhoenix5MajorVersion = ((22 * 256) + 0);
-  public static final int    kPhoenix6MajorVersion = 23;
+  public static final int    kPhoenix6MajorVersion = 24;
 
   public static final double kAutonomousPeriodSecs = 15.0;
 
@@ -157,7 +157,7 @@ public class Constants
   {
     // Global settings
 
-    // Manual config parameters
+    // Roller intake parameters
     public enum RollerMode
     {
       STOP,    // Stop spinning
@@ -165,13 +165,21 @@ public class Constants
       EXPEL    // Expel a game piece
     }
 
-    // Manual config parameters
-    public enum RotaryMode
+    // Rotary manual move parameters
+    public enum RotaryManual
     {
       INIT,    // Initialize intake
-      DOWN,    // IntakeRotar moving down
-      STOPPED, // IntakeRotar stop and hold position
-      UP       // IntakeRotar moving up
+      INBOARD, // Intake Rotary moving into the robot
+      STOPPED, // Intake Rotary stop and hold position
+      OUTBOARD // Intake Rotary moving out of the robot
+    }
+
+    // Motion Magic move parameters
+    public enum RotaryPosition
+    {
+      RETRACTED, // Retracted to shooter
+      HANDOFF,   // Upright to handoff to feeder
+      DEPLOYED   // Deployed to acquire game piece
     }
   }
 
@@ -182,13 +190,18 @@ public class Constants
   {
     // Global settings
 
-    // Manual config parameters
+    // Feeder intake parameters
     public enum RollerMode
     {
     }
 
-    // Manual config parameters
-    public enum RotaryMode
+    // Rotary manual move parameters
+    public enum RotaryManual
+    {
+    }
+
+    // Motion Magic move parameters
+    public enum RotaryPosition
     {
     }
 
@@ -211,7 +224,7 @@ public class Constants
     }
 
     // Manual config parameters
-    public enum RotaryMode
+    public enum RotaryManual
     {
     }
 
@@ -228,6 +241,7 @@ public class Constants
     // Manual config parameters
     public enum ClimberMode
     {
+      INIT, STOP, IN, OUT
     }
 
     // Motion Magic config parameters

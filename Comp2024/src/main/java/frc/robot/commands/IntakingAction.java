@@ -23,19 +23,17 @@ public class IntakingAction extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Start rollers"),
-        new IntakeRollerRun(intake, INConsts.RollerMode.ACQUIRE).asProxy(),
-
         new PrintCommand(getName() + ": Deploy intake"),
-        new IntakeRotaryMoveToPosition(intake, Intake.kAngleDeployed).asProxy(),
+        new IntakeRollerRun(intake, INConsts.RollerMode.ACQUIRE, Intake.kAngleDeployed).asProxy(),
 
         new PrintCommand(getName() + ": Wait for note"),        
         new WaitUntilCommand(intake::isNoteDetected),
 
         new PrintCommand(getName() + ": Stop rollers"),
-        new IntakeRollerRun(intake, INConsts.RollerMode.STOP).asProxy(),
-
         new PrintCommand(getName() + ": Retract intake"),
-        new IntakeRotaryMoveToPosition(intake, Intake.kAngleRetracted).asProxy()
+
+        new IntakeRollerRun(intake, INConsts.RollerMode.STOP, Intake.kAngleRetracted).asProxy()
+ 
         // @formatter:on
     );
   }

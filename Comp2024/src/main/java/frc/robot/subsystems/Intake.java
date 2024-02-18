@@ -78,7 +78,7 @@ public class Intake extends SubsystemBase
   private static final double       kRotaryAngleMax       = 115.0;    // TODO: Tune me!
 
   private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout      = 2.0;
+  private static final double       kMMSafetyTimeout      = 3.5;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -150,7 +150,7 @@ public class Intake extends SubsystemBase
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_inRotaryValid)
-      m_rotaryMotor.setPosition(ccRotations); // Not really used - CANcoder is remote sensor with absolute position
+      m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -180,7 +180,8 @@ public class Intake extends SubsystemBase
 
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Units.rotationsToDegrees(getCANCoderRotations( ));
-    SmartDashboard.putNumber("IN_ccDegrees", m_currentDegrees);
+    SmartDashboard.putNumber("IN_ccDegrees", m_ccPosition.getValue( ));
+    SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("IN_rotaryDegrees", Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio));
     SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));

@@ -146,7 +146,7 @@ public final class CTREConfigs6
 
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;
-    inRotaryConfig.Slot0.kV = 0.1129 / 4;
+    inRotaryConfig.Slot0.kV = 0.1129;
     inRotaryConfig.Slot0.kP = 0.0;
     inRotaryConfig.Slot0.kI = 0.0;
     inRotaryConfig.Slot0.kD = 0.0;

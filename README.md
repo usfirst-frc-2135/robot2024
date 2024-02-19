@@ -9,4 +9,4 @@ Project list:
 - TunerXGeneratedBeta*: Auto-generated project created for our practice robot
 - TumerXGeneratedComp*: Auto-generated project created for our competition robot
 
-* Do not edit these projects directly since they are used only as references
+(*) Do not edit these projects directly since they are used only as references

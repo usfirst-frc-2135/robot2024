@@ -22,15 +22,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.Dummy;
-import frc.robot.commands.IntakeRollerRun;
-import frc.robot.commands.IntakeRotaryJoysticks;
-import frc.robot.commands.IntakingAction;
+import frc.robot.commands.IntakeActionAcquire;
+import frc.robot.commands.IntakeActionExpel;
+import frc.robot.commands.IntakeActionRetract;
+import frc.robot.commands.IntakeActionShoot;
+import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
@@ -134,9 +137,21 @@ public class RobotContainer
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
 
-    SmartDashboard.putData("IntakingAction", new IntakingAction(m_intake));
-
     SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
+
+    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake));
+    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake));
+    SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
+    SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
+
+    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE));
+    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL));
+    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP));
+    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD));
+
+    SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleDeployed));
+    SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleRetracted));
+    SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleHandoff));
   }
 
   /****************************************************************************
@@ -186,9 +201,9 @@ public class RobotContainer
     m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.rightBumper( ).onTrue(new IntakingAction(m_intake));
-    //m_operatorPad.rightBumper( ).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
-    m_operatorPad.leftBumper( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
+    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
     m_operatorPad.leftBumper( ).onFalse(new ShooterRun(m_shooter, ShooterMode.STOP));
 
     m_operatorPad.back( ).onTrue(new Dummy("oper back")); // aka View
@@ -203,8 +218,7 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    //m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeRollerRun(m_intake, RollerMode.EXPEL));
-    //m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onFalse(new IntakeRollerRun(m_intake, RollerMode.STOP));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionShoot(m_intake));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
 
     ///////////////////////////////////////////////////////
@@ -249,7 +263,7 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // // Default command - Motion Magic hold
-    // m_intake.setDefaultCommand(new IntakeMoveToPosition(m_intake));
+    // m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
     // m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
     // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
@@ -257,7 +271,6 @@ public class RobotContainer
     //m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberRun(m_climber));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
-
   }
 
   /****************************************************************************

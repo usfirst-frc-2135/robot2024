@@ -128,9 +128,9 @@ public final class CTREConfigs6
     // inRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 22.0;
-    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 44.0;
-    inRotaryConfig.MotionMagic.MotionMagicJerk = 0.0;
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0;
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0;
+    inRotaryConfig.MotionMagic.MotionMagicJerk = 360.0;
 
     // Motor output settings
     inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
@@ -152,9 +152,9 @@ public final class CTREConfigs6
     inRotaryConfig.Slot0.kD = 0.0;
 
     // Software limit switches
-    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations((robotType) ? kAngleMin : kAngleMin);
+    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations((Robot.isComp( )) ? kAngleMin : kAngleMin);
     // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations((robotType) ? kAngleMin : kAngleMin);
+    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations((Robot.isComp( )) ? kAngleMin : kAngleMin);
     // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return inRotaryConfig;

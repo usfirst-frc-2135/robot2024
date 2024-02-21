@@ -8,7 +8,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.Ports;
+import frc.robot.Constants.INConsts;;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 
@@ -107,15 +109,15 @@ public final class CTREConfigs6
 
     // Closed Loop settings
     // inRotaryConfig.ClosedLoopGeneral.*
-    // inRotaryConfig.ClosedLoopRamps.*
+    // inRotaryConfig.ClosedLoopRamps.*                           // Seconds to ramp
 
     // Current limit settings
-    inRotaryConfig.CurrentLimits.SupplyCurrentLimit = 25.0;
-    inRotaryConfig.CurrentLimits.SupplyCurrentThreshold = 25.0;
-    inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
+    inRotaryConfig.CurrentLimits.SupplyCurrentLimit = 25.0;       // Amps
+    inRotaryConfig.CurrentLimits.SupplyCurrentThreshold = 25.0;   // Amps
+    inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;     // Seconds
     inRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 80.0;
+    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 80.0;       // Amps
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -128,33 +130,31 @@ public final class CTREConfigs6
     // inRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0;
-    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0;
-    inRotaryConfig.MotionMagic.MotionMagicJerk = 360.0;
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0;  // Rotations / second
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0;    // Rotations / second ^ 2
+    inRotaryConfig.MotionMagic.MotionMagicJerk = 360.0;           // Rotations / second ^ 3
 
     // Motor output settings
-    inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
+    inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;  // Percentage
     inRotaryConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     inRotaryConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    // Closed loop settings
-
     // Open Loop settings
-    inRotaryConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
-    // inRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
-    inRotaryConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+    inRotaryConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0; // Seconds to ramp
+    // inRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod      // Seconds to ramp
+    inRotaryConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;   // Seconds to ramp
 
     // Slot settings
-    inRotaryConfig.Slot0.kS = 0.0;
-    inRotaryConfig.Slot0.kV = 0.1129;
-    inRotaryConfig.Slot0.kP = 0.0;
-    inRotaryConfig.Slot0.kI = 0.0;
-    inRotaryConfig.Slot0.kD = 0.0;
+    inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
+    inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
+    inRotaryConfig.Slot0.kP = 0.0;                                // Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
+    inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
-    // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations((Robot.isComp( )) ? kAngleMin : kAngleMin);
+    inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMin);  // Rotations
     // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations((Robot.isComp( )) ? kAngleMin : kAngleMin);
+    inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMax);  // Rotations
     // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return inRotaryConfig;
@@ -167,9 +167,9 @@ public final class CTREConfigs6
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.0 : -0.891113; // TODO: get comp value
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.0 : -0.891113; // Rotations TODO: get comp value
     else
-      config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default
+      config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
     return config;
   }
@@ -178,41 +178,38 @@ public final class CTREConfigs6
   {
     TalonFXConfiguration shooterConfig = new TalonFXConfiguration( );
 
-    // public static final int kVelocityMeasWindow = 1;
-    // public static final SensorVelocityMeasPeriod kVelocityMeasPeriod = SensorVelocityMeasPeriod.Period_10Ms;
-    // public static final double kFlywheelPidKf = 0.04775;
-    // public static final double kFlywheelPidKp = 0.2;
-    // public static final double kFlywheelPidKi = 0.0;
-    // public static final double kFlywheelPidKd = 0.0;
-    // public static final double kFlywheelNeutralDeadband = 0.01;
+    // Closed Loop settings
+    // inRotaryConfig.ClosedLoopGeneral.*
+    // inRotaryConfig.ClosedLoopRamps.*                           // Seconds to ramp
 
-    // shooterConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.0;
-    // shooterConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.0;
-
-    shooterConfig.CurrentLimits.SupplyCurrentLimit = 35.0;
-    shooterConfig.CurrentLimits.SupplyCurrentThreshold = 35.0;
-    shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
+    shooterConfig.CurrentLimits.SupplyCurrentLimit = 35.0;        // Amps
+    shooterConfig.CurrentLimits.SupplyCurrentThreshold = 35.0;    // Amps
+    shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 40.0;        // Amps
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // shooterConfig.Feedback.*
     // shooterConfig.HardwareLimitSwitch.*
     // shooterConfig.MotionMagic.*
 
+    // Motor output settings
     // shooterConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
-    // shooterConfig.MotorOutput.Inverted = false;
-    // shooterConfig.MotorOutput.NeutralMode = NeutralMode.Coast;
+    shooterConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    shooterConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.0;
-    shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.0;
+    // Open Loop settings
+    shooterConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.0;  // Seconds to ramp
+    // inRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod        // Seconds to ramp
+    shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.0;    // Seconds to ramp
 
-    shooterConfig.Slot0.kS = 0.0;
-    shooterConfig.Slot0.kV = 0.1129;
-    shooterConfig.Slot0.kP = 0.0;
-    shooterConfig.Slot0.kI = 0.0;
-    shooterConfig.Slot0.kD = 0.0;
+    // Slot settings
+    shooterConfig.Slot0.kS = 0.0;                                   // Voltage or duty cylce to overcome static friction
+    shooterConfig.Slot0.kV = 0.1129;                                // Voltage or duty cycle per requested RPS (velocity modes)
+    shooterConfig.Slot0.kP = 0.0;                                   // Voltage or duty cycle per velocity error (velocity modes)
+    shooterConfig.Slot0.kI = 0.0;                                   // Voltage or duty cycle per accumulated error
+    shooterConfig.Slot0.kD = 0.0;                                   // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // shooterConfig.SoftwareLimitSwitch.*
 
@@ -230,12 +227,12 @@ public final class CTREConfigs6
     // exConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    climberConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
-    climberConfig.CurrentLimits.SupplyCurrentThreshold = 20.0;
-    climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;
+    climberConfig.CurrentLimits.SupplyCurrentLimit = 20.0;        // Amps
+    climberConfig.CurrentLimits.SupplyCurrentThreshold = 20.0;    // Amps
+    climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    climberConfig.CurrentLimits.StatorCurrentLimit = 45.0;
+    climberConfig.CurrentLimits.StatorCurrentLimit = 45.0;        // Amps
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -245,33 +242,31 @@ public final class CTREConfigs6
     // climberConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    climberConfig.MotionMagic.MotionMagicCruiseVelocity = 79.75;
-    climberConfig.MotionMagic.MotionMagicAcceleration = 708.9;
-    climberConfig.MotionMagic.MotionMagicJerk = 3544;
+    climberConfig.MotionMagic.MotionMagicCruiseVelocity = 79.75;  // Rotations / second
+    climberConfig.MotionMagic.MotionMagicAcceleration = 708.9;    // Rotations / second ^ 2
+    climberConfig.MotionMagic.MotionMagicJerk = 3544;             // Rotations / second ^ 3
 
     // Motor output settings
-    climberConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;
+    climberConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;   // Percentage
     climberConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    // Closed loop settings
-
     // Open Loop settings
-    climberConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
-    // exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
-    climberConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+    climberConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;  // Seconds to ramp
+    // exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod            // Seconds to ramp
+    climberConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;    // Seconds to ramp
 
     // Slot settings
-    climberConfig.Slot0.kS = 0.0;
-    climberConfig.Slot0.kV = 0.1129;
-    climberConfig.Slot0.kP = 0.0451;
-    climberConfig.Slot0.kI = 0.001;
-    climberConfig.Slot0.kD = 0.4514;
+    climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
+    climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
+    climberConfig.Slot0.kP = 0.0;                                 // Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
+    climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
-    climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);
+    climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);   // Rotations
     climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToWinchRotations(18.25, 0.432);
+    climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToWinchRotations(18.25, 0.432); // Rotations
     climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return climberConfig;

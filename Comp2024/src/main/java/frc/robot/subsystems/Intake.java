@@ -57,20 +57,14 @@ public class Intake extends SubsystemBase
   private static final double       kRollerSpeedToShooter = -0.6;
 
   private static final double       kLigament2dOffset     = 90.0;      // Offset from mechanism root for ligament
-  private static final double       kRotaryGearRatio      = 27.41;
+  private static final double       kRotaryGearRatio      = 24.0;
   private static final double       kRotaryLengthMeters   = 0.3;
   private static final double       kRotaryWeightKg       = 4.0;
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
 
-  // Rotary angles
-  private static final double       kRotaryRetracted      = -88.0;    // TODO: Tune me!
-  private static final double       kRotaryHandoff        = 0.0;      // TODO: Tune me!
-  private static final double       kRotaryDeployed       = 112.0;    // TODO: Tune me!
-  private static final double       kRotaryAngleMin       = -90.0;    // TODO: Tune me!
-  private static final double       kRotaryAngleMax       = 115.0;    // TODO: Tune me!
-
+  // Rotary constants
   private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout      = 2.0;
+  private static final double       kMMSafetyTimeout      = 3.5;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -98,7 +92,7 @@ public class Intake extends SubsystemBase
   private boolean                   m_inRotaryValid;     // Health indicator for motor 
   private boolean                   m_inCCValid;         // Health indicator for CANCoder 
   private boolean                   m_debug               = true;
-  private static double             m_currentDegrees      = 0.0; // Current angle in degrees
+  private double                    m_currentDegrees      = 0.0; // Current angle in degrees
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees
 
   // Manual mode config parameters
@@ -142,7 +136,7 @@ public class Intake extends SubsystemBase
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_inRotaryValid)
-      m_rotaryMotor.setPosition(ccRotations); // Not really used - CANcoder is remote sensor with absolute position
+      m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -172,14 +166,15 @@ public class Intake extends SubsystemBase
 
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Units.rotationsToDegrees(getCANCoderRotations( ));
-    SmartDashboard.putNumber("IN_ccDegrees", m_currentDegrees);
+    SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("IN_rotaryDegrees", Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio));
     SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
     if (m_debug && m_inRotaryValid)
     {
       SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_curError",
+          Conversions.rotationsToOutputDegrees(m_rotaryCLoopError.refresh( ).getValue( ), kRotaryGearRatio));
       SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
       SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
     }
@@ -246,7 +241,7 @@ public class Intake extends SubsystemBase
 
   private double getCANCoderRotations( )
   {
-    double ccRotations = (m_inCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0;
+    double ccRotations = (m_inCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
     ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
     return ccRotations;
   }
@@ -257,21 +252,28 @@ public class Intake extends SubsystemBase
   {
     double output = 0.0;
 
-    switch (mode)
+    if (mode == RollerMode.HOLD)
     {
-      default :
-      case STOP :
-        output = 0.0;
-        break;
-      case ACQUIRE :
-        output = kRollerSpeedAcquire;
-        break;
-      case EXPEL :
-        output = kRollerSpeedExpel;
-        break;
+      DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_rollerMotor.get( )));
     }
-    DataLogManager.log(String.format("%s: Mode is now - %s", getSubsystem( ), mode));
-    m_rollerMotor.set(output);
+    else
+    {
+      switch (mode)
+      {
+        default :
+        case STOP :
+          output = 0.0;
+          break;
+        case ACQUIRE :
+          output = kRollerSpeedAcquire;
+          break;
+        case EXPEL :
+          output = kRollerSpeedExpel;
+          break;
+      }
+      DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));
+      m_rollerMotor.set(output);
+    }
   }
 
   public double getIntakePosition( )
@@ -297,7 +299,7 @@ public class Intake extends SubsystemBase
 
   private boolean isMoveValid(double degrees)
   {
-    return (degrees > kRotaryAngleMin) && (degrees < kRotaryAngleMax);
+    return (degrees > INConsts.kRotaryAngleMin) && (degrees < INConsts.kRotaryAngleMax);
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -309,9 +311,9 @@ public class Intake extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_currentDegrees > kRotaryAngleMin))
+    if ((axisValue < 0.0) && (m_currentDegrees > INConsts.kRotaryAngleMin))
       newMode = INConsts.RotaryManual.INBOARD;
-    else if ((axisValue > 0.0) && (m_currentDegrees < kRotaryAngleMax))
+    else if ((axisValue > 0.0) && (m_currentDegrees < INConsts.kRotaryAngleMax))
       newMode = INConsts.RotaryManual.OUTBOARD;
     else
     {
@@ -358,7 +360,7 @@ public class Intake extends SubsystemBase
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_targetDegrees, kRotaryAngleMin, kRotaryAngleMax));
+            m_targetDegrees, INConsts.kRotaryAngleMin, INConsts.kRotaryAngleMax));
     }
     else
     {

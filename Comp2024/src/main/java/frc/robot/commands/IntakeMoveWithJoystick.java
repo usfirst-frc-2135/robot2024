@@ -18,7 +18,7 @@ public class IntakeMoveWithJoystick extends Command
     m_intake = intake;
     m_gamePad = gamePad;
 
-    setName("IntakeRotaryJoysticks");
+    setName("IntakeMoveWithJoystick");
     addRequirements(m_intake);
   }
 

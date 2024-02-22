@@ -18,7 +18,7 @@ public class ClimberMoveWithJoystick extends Command
     m_climber = climber;
     m_gamePad = gamePad;
 
-    setName("ClimberRun");
+    setName("ClimberMoveWithJoystick");
     addRequirements(m_climber);
   }
 

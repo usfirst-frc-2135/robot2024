@@ -188,7 +188,7 @@ public class Intake extends SubsystemBase
     // Set input motor voltage from the motor setting
     m_rotarySim.setSupplyVoltage(RobotController.getInputVoltage( ));
     m_CANCoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
-    m_armSim.setInput(m_rotarySim.getMotorVoltage( ));
+    m_armSim.setInputVoltage(m_rotarySim.getMotorVoltage( ));
 
     // update for 20 msec loop
     m_armSim.update(0.020);

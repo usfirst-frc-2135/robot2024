@@ -3,14 +3,12 @@ package frc.robot.lib.util;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.Ports;
-import frc.robot.Constants.INConsts;;
+import frc.robot.Constants.INConsts;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 
@@ -147,7 +145,7 @@ public final class CTREConfigs6
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
     inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    inRotaryConfig.Slot0.kP = 0.0;                                // Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kP = 0.2;                                // Voltage or duty cycle per velocity error (velocity modes)
     inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
@@ -187,7 +185,7 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 40.0;        // Amps
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 80.0;        // Amps
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // shooterConfig.Feedback.*
@@ -207,7 +205,7 @@ public final class CTREConfigs6
     // Slot settings
     shooterConfig.Slot0.kS = 0.0;                                   // Voltage or duty cylce to overcome static friction
     shooterConfig.Slot0.kV = 0.1129;                                // Voltage or duty cycle per requested RPS (velocity modes)
-    shooterConfig.Slot0.kP = 0.0;                                   // Voltage or duty cycle per velocity error (velocity modes)
+    shooterConfig.Slot0.kP = 0.5;                                   // Voltage or duty cycle per velocity error (velocity modes)
     shooterConfig.Slot0.kI = 0.0;                                   // Voltage or duty cycle per accumulated error
     shooterConfig.Slot0.kD = 0.0;                                   // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

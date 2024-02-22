@@ -160,27 +160,27 @@ public class Constants
     // Roller intake parameters
     public enum RollerMode
     {
-      STOP,    // Stop spinning
-      ACQUIRE, // Acquire a game piece
-      EXPEL    // Expel a game piece
+      STOP,     // Stop spinning
+      ACQUIRE,  // Acquire a game piece
+      EXPEL,    // Expel a game piece
+      HOLD      // Keep existing setting
     }
 
     // Rotary manual move parameters
     public enum RotaryManual
     {
-      INIT,    // Initialize intake
-      INBOARD, // Intake Rotary moving into the robot
-      STOPPED, // Intake Rotary stop and hold position
-      OUTBOARD // Intake Rotary moving out of the robot
+      INIT,     // Initialize intake
+      INBOARD,  // Intake Rotary moving into the robot
+      STOPPED,  // Intake Rotary stop and hold position
+      OUTBOARD  // Intake Rotary moving out of the robot
     }
 
-    // Motion Magic move parameters
-    public enum RotaryPosition
-    {
-      RETRACTED, // Retracted to shooter
-      HANDOFF,   // Upright to handoff to feeder
-      DEPLOYED   // Deployed to acquire game piece
-    }
+    // Rotary angles - Motion Magic move parameters
+    public static final double kRotaryAngleRetracted = -80.0;    // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = 0.0;      // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 110.0;    // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -88.0;    // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 115.0;    // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////

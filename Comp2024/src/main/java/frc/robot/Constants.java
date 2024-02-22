@@ -167,7 +167,7 @@ public class Constants
     }
 
     // Rotary manual move parameters
-    public enum RotaryManual
+    public enum RotaryMode
     {
       INIT,     // Initialize intake
       INBOARD,  // Intake Rotary moving into the robot
@@ -196,16 +196,16 @@ public class Constants
     }
 
     // Rotary manual move parameters
-    public enum RotaryManual
+    public enum RotaryMode
     {
     }
 
-    // Motion Magic move parameters
+    // Rotary angles - Motion Magic move parameters
     public enum RotaryPosition
     {
     }
 
-    // Motion Magic config parameters
+    // Feeder angles - Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -222,13 +222,6 @@ public class Constants
       STOP,       // Shooter is stopped
       SCORE,      // Shooter ramped to an initial speed before shooting
     }
-
-    // Manual config parameters
-    public enum RotaryManual
-    {
-    }
-
-    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -238,13 +231,21 @@ public class Constants
   {
     // Global settings
 
-    // Manual config parameters
+    // Climber manual move parameters
     public enum ClimberMode
     {
-      INIT, STOP, IN, OUT
+      INIT,   // Initialize climber
+      UP,     // Climber move upward
+      STOP,   // Climber stop
+      DOWN    // Climber move downward
     }
 
-    // Motion Magic config parameters
+    // Climber lengths - Motion Magic config parameters
+    public static final double kLengthClimbed = 2.0;    // By definition - Climber fully climbed
+    public static final double kLengthFull    = 17.0;   // From Mech Design height needed to reach max chain
+    public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
+    public static final double kLengthMin     = -0.25;  // Climber minimum allowable length (quarter inch less than stowed)
+    public static final double kLengthMax     = 18.25;  // Climber maximum allowable length (2" beyond high length)
   }
 
   /////////////////////////////////////////////////////////////////////////////

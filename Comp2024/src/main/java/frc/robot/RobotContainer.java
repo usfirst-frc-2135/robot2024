@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
@@ -37,7 +38,6 @@ import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
-import frc.robot.generated.TunerConstantsComp;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -62,7 +62,7 @@ public class RobotContainer
   private static final CommandXboxController   m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
   private static final CommandXboxController   m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
-  private double                               MaxSpeed        = TunerConstantsComp.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+  private double                               MaxSpeed        = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                               MaxAngularRate  = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private Command                              m_autoCommand;
 
@@ -152,6 +152,13 @@ public class RobotContainer
     SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleDeployed));
     SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleRetracted));
     SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleHandoff));
+
+    SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
+    SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
+
+    SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
+    SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
+    SmartDashboard.putData("ClRunClimbed", new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
   }
 
   /****************************************************************************
@@ -195,10 +202,10 @@ public class RobotContainer
     // Operator Controller Assignments
     //
     // Operator - A, B, X, Y
-    m_operatorPad.a( ).onTrue(new ClimberMoveToPosition(m_climber, Climber.kLengthIn));
-    m_operatorPad.b( ).onTrue(new ClimberMoveToPosition(m_climber, Climber.kLengthOut));
-    m_operatorPad.x( ).onTrue(new Dummy("oper X"));
-    m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
+    m_operatorPad.a( ).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
+    m_operatorPad.b( ).onTrue(new Dummy("oper B"));
+    m_operatorPad.x( ).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
+    m_operatorPad.y( ).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     //
     // Operator - Bumpers, start, back
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));

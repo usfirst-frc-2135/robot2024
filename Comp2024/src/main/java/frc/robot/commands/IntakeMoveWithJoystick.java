@@ -7,13 +7,13 @@ import frc.robot.subsystems.Intake;
 /**
  *
  */
-public class IntakeRotaryJoysticks extends Command
+public class IntakeMoveWithJoystick extends Command
 {
 
   private final Intake   m_intake;
   private XboxController m_gamePad;
 
-  public IntakeRotaryJoysticks(Intake intake, XboxController gamePad)
+  public IntakeMoveWithJoystick(Intake intake, XboxController gamePad)
   {
     m_intake = intake;
     m_gamePad = gamePad;

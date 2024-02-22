@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
 public class Constants
 {
   // bot serial nums
-  public static final String kCompSN               = "03238074"; // TODO: get this from Comp RoboRIO for 2024
+  public static final String kCompSN               = "032B1F7E";
   public static final String kBetaSN               = "03260A3A";
 
   // Game controller definitions

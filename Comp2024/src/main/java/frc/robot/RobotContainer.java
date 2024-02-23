@@ -213,8 +213,8 @@ public class RobotContainer
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
-    m_operatorPad.back( ).onTrue(new Dummy("oper back")));                          // aka View
-    m_operatorPad.start( ).onTrue(new Dummy("oper start")));  // aka Menu
+    m_operatorPad.back( ).onTrue(new Dummy("oper back"));                          // aka View
+    m_operatorPad.start( ).onTrue(new Dummy("oper start"));  // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));

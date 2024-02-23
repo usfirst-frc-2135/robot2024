@@ -29,13 +29,11 @@ import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberMoveToPosition;
-import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeActionAcquire;
 import frc.robot.commands.IntakeActionExpel;
 import frc.robot.commands.IntakeActionRetract;
 import frc.robot.commands.IntakeActionShoot;
-import frc.robot.commands.IntakeMoveWithJoystick;
 import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ShooterRun;
@@ -174,17 +172,17 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    m_driverPad.a( ).onTrue(new Dummy("driver A"));                                           // Shoot note (prime and intake load)
-    m_driverPad.b( ).onTrue(new Dummy("driver B"));                                           // Drive to pose: stage right
-    m_driverPad.x( ).onTrue(new Dummy("driver X"));                                           // Drive to pose: stage left
-    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));                              // Drive to pose: stage center
+    m_driverPad.a( ).onTrue(new Dummy("driver A"));     // Shoot note (prime and intake load)
+    m_driverPad.b( ).onTrue(new Dummy("driver B"));     // Drive to pose: stage right
+    m_driverPad.x( ).onTrue(new Dummy("driver X"));     // Drive to pose: stage left
+    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));  // Drive to pose: stage center
     //
     // Driver - Bumpers, start, back
-    m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));                        // Drive to pose: amp
-    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));                           // Acquire game piece
-    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));                          // Retract when released
-    m_driverPad.back( ).onTrue(m_drivetrain.applyRequest(( ) -> brake));                            // aka View
-    m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));    // aka Menu
+    m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));  // Drive to pose: amp
+    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
+    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_driverPad.back( ).onTrue(m_drivetrain.applyRequest(( ) -> brake));                          // aka View
+    m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
     //
     // Driver - POV buttons
     m_driverPad.pov(0).whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(0.0))));
@@ -196,7 +194,7 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));  // Drive to pose: speaker
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionShoot(m_intake));        // Deliver field piece to shooter
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionExpel(m_intake));
 
     m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
@@ -213,10 +211,10 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
-    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));                        // Acquire game piece
-    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));                       // Retract when released
-    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
-    m_operatorPad.start( ).onTrue(new Dummy("oper start"));                                 // aka Menu
+    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_operatorPad.back( ).onTrue(new Dummy("oper back")));                          // aka View
+    m_operatorPad.start( ).onTrue(new Dummy("oper start")));  // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
@@ -227,10 +225,10 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionShoot(m_intake));
+    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
 
-    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
+    m_operatorPad.rightStick( ).onTrue(new Dummy("oper right stick"));
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
   }
 

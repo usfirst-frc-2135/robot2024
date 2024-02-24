@@ -14,6 +14,7 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -21,19 +22,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
+import frc.robot.commands.AutoPreload;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberMoveToPosition;
+import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeActionAcquire;
 import frc.robot.commands.IntakeActionExpel;
 import frc.robot.commands.IntakeActionRetract;
 import frc.robot.commands.IntakeActionShoot;
+import frc.robot.commands.IntakeMoveWithJoystick;
 import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ShooterRun;
@@ -99,9 +105,19 @@ public class RobotContainer
     AUTOTESTPATH             // Run a selected test path
   }
 
-  private static final boolean         m_autoTesting = false;
-  private SendableChooser<AutoChooser> m_autoChooser = new SendableChooser<>( );
-  private SendableChooser<Integer>     m_odomChooser = new SendableChooser<>( );
+  // Chooser for autonomous starting position
+
+  enum StartPosition
+  {
+    STARTPOS1, // Starting position 1 - blue left, red right
+    STARTPOS2, // Starting position 2 - blue/red middle
+    STARTPOS3  // Starting position 3 - blue right, red left
+  }
+
+  private static final boolean           m_autoTesting  = false;
+  private SendableChooser<AutoChooser>   m_autoChooser  = new SendableChooser<>( );
+  private SendableChooser<StartPosition> m_startChooser = new SendableChooser<>( );
+  private SendableChooser<Integer>       m_odomChooser  = new SendableChooser<>( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -132,6 +148,11 @@ public class RobotContainer
     // For future work to set up Shuffleboard layout from code
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
+
+    SmartDashboard.putData(m_intake);
+    SmartDashboard.putData(m_shooter);
+    SmartDashboard.putData(m_feeder);
+    SmartDashboard.putData(m_climber);
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
 
@@ -181,14 +202,18 @@ public class RobotContainer
     m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));  // Drive to pose: amp
     m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
-    m_driverPad.back( ).onTrue(m_drivetrain.applyRequest(( ) -> brake));                          // aka View
+    m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                          // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
     //
     // Driver - POV buttons
-    m_driverPad.pov(0).whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(0.0))));
-    m_driverPad.pov(90).whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(270.0))));
-    m_driverPad.pov(180).whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(180.0))));
-    m_driverPad.pov(270).whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(90.0))));
+    m_driverPad.pov(0)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(0.0)))));
+    m_driverPad.pov(90)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(270.0)))));
+    m_driverPad.pov(180)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(180.0)))));
+    m_driverPad.pov(270)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(90.0)))));
     //
     // Driver Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
@@ -205,7 +230,7 @@ public class RobotContainer
     //
     // Operator - A, B, X, Y
     m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
-    m_operatorPad.b( ).onTrue(new Dummy("oper B"));
+    m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
     m_operatorPad.x( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
     //
@@ -213,7 +238,7 @@ public class RobotContainer
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
-    m_operatorPad.back( ).onTrue(new Dummy("oper back"));                          // aka View
+    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));                          // aka View
     m_operatorPad.start( ).onTrue(new Dummy("oper start"));  // aka Menu
     //
     // Operator - POV buttons
@@ -228,8 +253,9 @@ public class RobotContainer
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionShoot(m_intake));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
 
-    m_operatorPad.rightStick( ).onTrue(new Dummy("oper right stick"));
+    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
+    // m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
   }
 
   /****************************************************************************
@@ -276,7 +302,6 @@ public class RobotContainer
    */
   private void initAutonomousChooser( )
   {
-
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
@@ -287,6 +312,15 @@ public class RobotContainer
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
+
+    // Autonomous Starting Position
+    m_startChooser.setDefaultOption("STARTPOS1", StartPosition.STARTPOS1);
+    m_startChooser.addOption("STARTPOS2", StartPosition.STARTPOS2);
+    m_startChooser.addOption("STARTPOS3", StartPosition.STARTPOS3);
+
+    // Configure starting position sendable chooser
+    SmartDashboard.putData("StartPosition", m_startChooser);
+
   }
 
   /**
@@ -298,29 +332,58 @@ public class RobotContainer
   {
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
+    StartPosition startPosition = m_startChooser.getSelected( );
 
-    // The selected command will be run in autonomous
-    switch (mode)
+    switch (startPosition)
     {
       default :
-      case AUTOSTOP :
-      case AUTOPRELOADONLY :
         break;
-      case AUTOLEAVE :
-        pathName = "DriveS1";
+      case STARTPOS1 :
+        pathName = "Pos1_Leave";
         break;
-      case AUTOPRELOADANDLEAVE :
-      case AUTOPRELOADSCOREANOTHER :
+      case STARTPOS2 :
+        pathName = "Pos2_Leave";
         break;
-      case AUTOTESTPATH :
-        pathName = "Test";
+      case STARTPOS3 :
+        pathName = "Pos3_Leave";
         break;
     }
 
+    // The selected command will be run in autonomous
     if (pathName == null)
       m_autoCommand = new AutoStop(m_drivetrain);
     else
-      m_autoCommand = m_drivetrain.getAutoPath(pathName);
+    {
+      switch (mode)
+      {
+        default :
+        case AUTOSTOP :
+          m_autoCommand = new AutoStop(m_drivetrain);
+          break;
+        case AUTOPRELOADONLY :
+          m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter);
+          break;
+        case AUTOLEAVE :
+          m_autoCommand = m_drivetrain.getAutoPath(pathName);
+          break;
+        case AUTOPRELOADANDLEAVE :
+          m_autoCommand = new SequentialCommandGroup(
+          // @formatter:off
+              new AutoPreload(m_drivetrain, m_intake, m_shooter),
+              m_drivetrain.getAutoPath(pathName)
+            // @formatter:on
+          );
+          break;
+        case AUTOPRELOADSCOREANOTHER :
+          m_autoCommand = new AutoStop(m_drivetrain);
+          break;
+        case AUTOTESTPATH :
+          m_autoCommand = m_drivetrain.getAutoPath("Test");
+          break;
+      }
+    }
+
+    // m_autoCommand = m_drivetrain.getAutoPath(pathName);
 
     if (m_autoTesting && pathName != null)
     {
@@ -333,7 +396,7 @@ public class RobotContainer
         m_drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s", mode));
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s %s", mode, startPosition));
 
     return m_autoCommand;
   }
@@ -369,12 +432,13 @@ public class RobotContainer
     m_odomChooser.addOption("ID16-AprilTag", 16);
 
     // Configure odometry sendable chooser
-    SmartDashboard.putData("ResetOdometry", m_odomChooser);
+    SmartDashboard.putData("AprilTagPose", m_odomChooser);
+    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setOdometry( )));
   }
 
-  public Integer getOdometryOption( )
+  public void setOdometry( )
   {
-    return m_odomChooser.getSelected( );
+    m_drivetrain.resetOdometry(Constants.VIConsts.kAprilTagPoses.get(m_odomChooser.getSelected( )));
   }
 
   /****************************************************************************

@@ -307,19 +307,9 @@ public class Constants
       LEDCOLOR_DASH     // CANdle color taken from dashboard
     }
 
-    public enum Animations
+    public enum AnimationTypes
     {
-      COLORFLOW, //
-      FIRE, //
-      LARSON, //
-      RAINBOW, // makes the LED go in rainbow colors
-      RGBFADE, // fades with red, green, and blue in between
-      SINGLEFADE, // blinks with a fade each second
-      STROBE, //
-      TWINKLE, // blinks each LED at a random time
-      TWINKLEOFF, //
-      SETALL, // turns everything off
-      ANIMATIONDASH // CANdle animation taken from dashboard
+      ColorFlow, Fire, Larson, Rainbow, RgbFade, SingleFade, Strobe, Twinkle, TwinkleOff, SetAll, AnimationDash
     }
   }
 

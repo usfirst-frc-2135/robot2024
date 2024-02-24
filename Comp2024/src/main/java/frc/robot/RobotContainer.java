@@ -28,6 +28,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.LEDConsts.Animations;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.commands.AutoPreload;
@@ -156,7 +157,7 @@ public class RobotContainer
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
 
-    SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
+    SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH, Animations.ANIMATIONDASH));
 
     SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake));
     SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake));

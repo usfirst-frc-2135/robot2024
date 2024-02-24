@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
 public class Constants
 {
   // bot serial nums
-  public static final String kCompSN               = "032B1F7E";
+  public static final String kCompSN               = "03238074"; // TODO: get this from Comp RoboRIO for 2024
   public static final String kBetaSN               = "03260A3A";
 
   // Game controller definitions
@@ -147,6 +147,7 @@ public class Constants
     // Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -159,27 +160,27 @@ public class Constants
     // Roller intake parameters
     public enum RollerMode
     {
-      STOP,     // Stop spinning
-      ACQUIRE,  // Acquire a game piece
-      EXPEL,    // Expel a game piece
-      HOLD      // Keep existing setting
+      STOP,    // Stop spinning
+      ACQUIRE, // Acquire a game piece
+      EXPEL    // Expel a game piece
     }
 
     // Rotary manual move parameters
-    public enum RotaryMode
+    public enum RotaryManual
     {
-      INIT,     // Initialize intake
-      INBOARD,  // Intake Rotary moving into the robot
-      STOPPED,  // Intake Rotary stop and hold position
-      OUTBOARD  // Intake Rotary moving out of the robot
+      INIT,    // Initialize intake
+      INBOARD, // Intake Rotary moving into the robot
+      STOPPED, // Intake Rotary stop and hold position
+      OUTBOARD // Intake Rotary moving out of the robot
     }
 
-    // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -80.0;    // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = 0.0;      // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 110.0;    // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -88.0;    // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 115.0;    // TODO: Tune me!
+    // Motion Magic move parameters
+    public enum RotaryPosition
+    {
+      RETRACTED, // Retracted to shooter
+      HANDOFF,   // Upright to handoff to feeder
+      DEPLOYED   // Deployed to acquire game piece
+    }
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -195,16 +196,16 @@ public class Constants
     }
 
     // Rotary manual move parameters
-    public enum RotaryMode
+    public enum RotaryManual
     {
     }
 
-    // Rotary angles - Motion Magic move parameters
+    // Motion Magic move parameters
     public enum RotaryPosition
     {
     }
 
-    // Feeder angles - Motion Magic config parameters
+    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -221,6 +222,13 @@ public class Constants
       STOP,       // Shooter is stopped
       SCORE,      // Shooter ramped to an initial speed before shooting
     }
+
+    // Manual config parameters
+    public enum RotaryManual
+    {
+    }
+
+    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -230,21 +238,13 @@ public class Constants
   {
     // Global settings
 
-    // Climber manual move parameters
+    // Manual config parameters
     public enum ClimberMode
     {
-      INIT,   // Initialize climber
-      UP,     // Climber move upward
-      STOP,   // Climber stop
-      DOWN    // Climber move downward
+      INIT, STOP, IN, OUT
     }
 
-    // Climber lengths - Motion Magic config parameters
-    public static final double kLengthClimbed = 2.0;    // By definition - Climber fully climbed
-    public static final double kLengthFull    = 17.0;   // From Mech Design height needed to reach max chain
-    public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
-    public static final double kLengthMin     = -0.25;  // Climber minimum allowable length (quarter inch less than stowed)
-    public static final double kLengthMax     = 18.25;  // Climber maximum allowable length (2" beyond high length)
+    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -307,9 +307,14 @@ public class Constants
       LEDCOLOR_DASH     // CANdle color taken from dashboard
     }
 
-    public enum AnimationTypes
+    public enum Animations
     {
-      ColorFlow, Fire, Larson, Rainbow, RgbFade, SingleFade, Strobe, Twinkle, TwinkleOff, SetAll, AnimationDash
+      COLORFLOW, FIRE, // makes the LEDs blink in a fire pattern
+      LARSON, RAINBOW, // makes the LEDs change in fading rainbow colors
+      RGBFADE, SINGLEFADE, // blinks with fade with a single color
+      STROBE, TWINKLE, // blinks different LEDs at different intervals
+      TWINKLEOFF, SETALL,  // turns all the LEDs off
+      ANIMATIONDASH // CANdle color taken from the dashboard
     }
   }
 

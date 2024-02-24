@@ -5,6 +5,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -44,6 +45,7 @@ public class Shooter extends SubsystemBase
   private final FlywheelSim     m_flywheelUpperSim       = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
 
   private VelocityVoltage       m_requestVelocity        = new VelocityVoltage(0.0);
+  private VoltageOut            m_requestVolts           = new VoltageOut(0);
   private LinearFilter          m_flywheelFilter         = LinearFilter.singlePoleIIR(0.1, 0.02);
 
   // Declare module variables
@@ -162,8 +164,13 @@ public class Shooter extends SubsystemBase
 
     double rotPerSecond = m_flywheelTargetRPM / 60.0;
     if (m_shooterValid)
-      m_shooterLower
-          .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
+    {
+      if (m_flywheelTargetRPM > 0.0)
+        m_shooterLower
+            .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
+      else
+        m_shooterLower.setControl(m_requestVolts);
+    }
     DataLogManager.log(String.format("%s: target rpm is %.1f rps %1f", getSubsystem( ), m_flywheelTargetRPM, rotPerSecond));
   }
 

@@ -66,7 +66,7 @@ public class PhoenixUtil5
           talonValid = true;
           if (fwVersion < Constants.kPhoenix5MajorVersion)
             DataLogManager.log(String.format("%s: ID %2d - %s - Incorrect FW version: %d - error %d", m_className, deviceID,
-                baseStr, (fwVersion / 256.0), error.value));
+                baseStr, (fwVersion / 256), error.value));
           break;
         }
 

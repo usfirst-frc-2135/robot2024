@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase
 
   // Rotary constants
   private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout      = 3.5;
+  private static final double       kMMSafetyTimeout      = 2.0;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);

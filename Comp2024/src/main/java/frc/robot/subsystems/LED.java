@@ -118,7 +118,7 @@ public class LED extends SubsystemBase
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    //setColor(LEDColor.LEDCOLOR_DASH);
+    setColor(LEDColor.LEDCOLOR_OFF);
 
   }
 

@@ -159,19 +159,19 @@ public class Constants
     // Roller intake parameters
     public enum RollerMode
     {
-      STOP,     // Stop spinning
-      ACQUIRE,  // Acquire a game piece
-      EXPEL,    // Expel a game piece
-      HOLD      // Keep existing setting
+      STOP,    // Stop spinning
+      ACQUIRE, // Acquire a game piece
+      EXPEL,   // Expel a game piece
+      HOLD     // Maintain existing setting
     }
 
     // Rotary manual move parameters
     public enum RotaryMode
     {
-      INIT,     // Initialize intake
-      INBOARD,  // Intake Rotary moving into the robot
-      STOPPED,  // Intake Rotary stop and hold position
-      OUTBOARD  // Intake Rotary moving out of the robot
+      INIT,    // Initialize intake
+      INBOARD, // Intake Rotary moving into the robot
+      STOPPED, // Intake Rotary stop and hold position
+      OUTBOARD // Intake Rotary moving out of the robot
     }
 
     // Rotary angles - Motion Magic move parameters
@@ -199,11 +199,6 @@ public class Constants
     {
     }
 
-    // Rotary angles - Motion Magic move parameters
-    public enum RotaryPosition
-    {
-    }
-
     // Feeder angles - Motion Magic config parameters
   }
 
@@ -221,6 +216,13 @@ public class Constants
       STOP,       // Shooter is stopped
       SCORE,      // Shooter ramped to an initial speed before shooting
     }
+
+    // Manual config parameters
+    public enum RotaryManual
+    {
+    }
+
+    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -296,15 +298,30 @@ public class Constants
   {
     public enum LEDColor
     {
-      LEDCOLOR_OFF,     // CANdle off
-      LEDCOLOR_WHITE,   // CANdle white
-      LEDCOLOR_RED,     // CANdle red
-      LEDCOLOR_ORANGE,  // CANdle orange
-      LEDCOLOR_YELLOW,  // CANdle yellow
-      LEDCOLOR_GREEN,   // CANdle green
-      LEDCOLOR_BLUE,    // CANdle blue
-      LEDCOLOR_PURPLE,  // CANdle purple
-      LEDCOLOR_DASH     // CANdle color taken from dashboard
+      OFF,      // CANdle off
+      WHITE,    // CANdle white
+      RED,      // CANdle red
+      ORANGE,   // CANdle orange
+      YELLOW,   // CANdle yellow
+      GREEN,    // CANdle green
+      BLUE,     // CANdle blue
+      PURPLE,   // CANdle purple
+      DASHBOARD // CANdle color taken from dashboard
+    }
+
+    public enum LEDAnimation
+    {
+      COLORFLOW,    // Single color flow through string
+      FIRE,         // Fire pattern from one end of string
+      LARSON,       // Ping-pong pattern bouncing between string ends
+      RAINBOW,      // Fading rainbow colors
+      RGBFADE,      // Fading red, then green, then blue
+      SINGLEFADE,   // Fading with a single color
+      STROBE,       // Strobe flashing with a single color
+      TWINKLE,      // Twinkles leds on
+      TWINKLEOFF,   // Twinkles leds off
+      CLEARALL,     // Clears animations
+      DASHBOARD     // Animation taken from the dashboard
     }
   }
 

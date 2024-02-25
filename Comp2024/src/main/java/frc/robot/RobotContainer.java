@@ -180,8 +180,8 @@ public class RobotContainer
     m_driverPad.y( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageCenter));   //drive to stage center
     //
     // Driver - Bumpers, start, back
-    // m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));   // TODO: temporarily used for CTRE testing
-    m_driverPad.rightBumper( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, ampPose));    //drive to amp
+    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, ampPose));    //drive to amp
+    m_driverPad.rightBumper( ).onTrue(new Dummy("driver left bumper"));
     m_driverPad.back( ).onTrue(new Dummy("driver back")); // aka View
     m_driverPad.start( ).onTrue(new Dummy("driver start")); // aka Menu
     //
@@ -194,8 +194,8 @@ public class RobotContainer
     // Driver Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, speakerPose));   //drive to speaker
+    m_driverPad.leftTrigger(Constants.kTriggerThreshold).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, speakerPose));   //drive to speaker
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));
 
     ///////////////////////////////////////////////////////
     //

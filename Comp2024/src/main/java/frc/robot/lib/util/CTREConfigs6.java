@@ -216,7 +216,7 @@ public final class CTREConfigs6
 
   // Climber
 
-  public static TalonFXConfiguration climberLengthFXConfig( )
+  public static TalonFXConfiguration climberFXConfig( )
   {
     TalonFXConfiguration climberConfig = new TalonFXConfiguration( );
 
@@ -225,12 +225,12 @@ public final class CTREConfigs6
     // exConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    climberConfig.CurrentLimits.SupplyCurrentLimit = 20.0;        // Amps
-    climberConfig.CurrentLimits.SupplyCurrentThreshold = 20.0;    // Amps
+    climberConfig.CurrentLimits.SupplyCurrentLimit = 30.0;        // Amps
+    climberConfig.CurrentLimits.SupplyCurrentThreshold = 30.0;    // Amps
     climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    climberConfig.CurrentLimits.StatorCurrentLimit = 45.0;        // Amps
+    climberConfig.CurrentLimits.StatorCurrentLimit = 80.0;        // Amps
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings

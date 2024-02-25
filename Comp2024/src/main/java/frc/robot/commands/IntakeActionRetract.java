@@ -22,7 +22,7 @@ public class IntakeActionRetract extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted).asProxy()
+        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
  
         // @formatter:on
     );

@@ -200,4 +200,10 @@ public class Vision extends SubsystemBase
     DataLogManager.log(String.format("%s: setCameraDisplay %d", getSubsystem( ), stream));
     m_table.getEntry("stream").setValue(stream);
   }
+
+  public void setCameraToSecondary( )
+  {
+    DataLogManager.log(String.format("%s: setCameraToSecondary %d", getSubsystem( ), VIConsts.PIP_SECONDARY));
+    m_table.getEntry("stream").setValue(VIConsts.PIP_SECONDARY);
+  }
 }

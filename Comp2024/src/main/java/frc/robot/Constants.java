@@ -218,7 +218,7 @@ public class Constants
     }
 
     // Manual config parameters
-    public enum RotaryManual
+    public enum RotaryMode
     {
     }
 

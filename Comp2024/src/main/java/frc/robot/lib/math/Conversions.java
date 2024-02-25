@@ -43,7 +43,7 @@ public class Conversions
   }
 
   /**
-   * @param degrees
+   * @param rotations
    *          Output Shaft Rotations of Mechanism
    * @param gearRatio
    *          Gear Ratio between Motor and Mechanism

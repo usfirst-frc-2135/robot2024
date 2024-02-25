@@ -9,15 +9,11 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -27,7 +23,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.generated.TunerConstantsComp;
+import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 
 /**
@@ -76,8 +72,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this::seedFieldRelative,                                      // Consumer for seeding pose against auto
         this::getCurrentRobotChassisSpeeds,                           // Supplier of chassis speeds
         (speeds) -> this.setControl(autoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
-        new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0),
-            TunerConstantsComp.kSpeedAt12VoltsMps, driveBaseRadius, new ReplanningConfig( )),                // Path following config
+        new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
+            driveBaseRadius, new ReplanningConfig( )),                // Path following config
         ( ) ->                                                        // Red vs. Blue alliance
         {
           // Boolean supplier that controls when the path will be mirrored for the red alliance

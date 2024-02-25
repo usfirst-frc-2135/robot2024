@@ -3,15 +3,13 @@
 //
 package frc.robot.subsystems;
 
-import javax.xml.crypto.Data;
-
-import org.ejml.dense.row.decomposition.svd.SafeSvd_DDRM;
-
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.ColorFlowAnimation;
+import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.LarsonAnimation;
+import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.RgbFadeAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
@@ -21,15 +19,10 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
-import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
-import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
-import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
-import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.Ports;
 
@@ -39,19 +32,29 @@ import frc.robot.Constants.Ports;
 public class LED extends SubsystemBase
 {
   // Member objects
-  private final CANdle                          m_candle              = new CANdle(Ports.kCANID_CANdle);
-  private final int                             LedCount              = 8;
-  private final SendableChooser<LEDColor>       m_ledChooser          = new SendableChooser<LEDColor>( );
-  private final SendableChooser<AnimationTypes> m_ledAnimationChooser = new SendableChooser<AnimationTypes>( );
-  private LEDColor                              m_previousColor       = LEDColor.LEDCOLOR_OFF;
-  private Animation                             m_toAnimate           = null;
+  private final CANdle                        m_candle              = new CANdle(Ports.kCANID_CANdle);
+  private final int                           LedCount              = 8;
+  private final SendableChooser<LEDColor>     m_ledChooser          = new SendableChooser<LEDColor>( );
+  private final SendableChooser<LEDAnimation> m_ledAnimationChooser = new SendableChooser<LEDAnimation>( );
+  private LEDColor                            m_previousColor       = LEDColor.LEDCOLOR_OFF;
+  private Animation                           m_toAnimate           = null;
 
-  public enum AnimationTypes
+  public enum LEDAnimation
   {
-    ColorFlow, Fire, Larson, Rainbow, RgbFade, SingleFade, Strobe, Twinkle, TwinkleOff, SetAll, AnimationDash
+    COLORFLOW,    // Slow flowing color
+    FIRE,         // Flickering single color from one end of string
+    LARSON,       // Ping-pong end-to-end
+    RAINBOW,      // Flowing rainbow
+    RGBFADE,      // Fade red, then green, then blue
+    SINGLEFADE,   // Single color fade in and out
+    STROBE,       // FLashing strobe of single color
+    TWINKLE,      // Twinkle colors on
+    TWINKLEOFF,   // Twinkle colors off
+    SETALL,       // 
+    ANIMATIONDASH // Select animation from dashboard chooser
   }
 
-  private AnimationTypes m_currentAnimation;
+  private LEDAnimation m_currentAnimation;
 
   // Constructor
   public LED( )
@@ -59,7 +62,7 @@ public class LED extends SubsystemBase
     setName("LED");
     setSubsystem("LED");
 
-    //setColor(LEDColor.LEDCOLOR_BLUE);
+    setColor(LEDColor.LEDCOLOR_BLUE);
     m_candle.configBrightnessScalar(0.7);
 
     // Add options for colors in SmartDashboard
@@ -72,16 +75,16 @@ public class LED extends SubsystemBase
     m_ledChooser.addOption("LED_Blue", LEDColor.LEDCOLOR_BLUE);
     m_ledChooser.addOption("LED_Purple", LEDColor.LEDCOLOR_PURPLE);
 
-    m_ledAnimationChooser.setDefaultOption("SetAll", AnimationTypes.SetAll);
-    m_ledAnimationChooser.addOption("ColorFlow", AnimationTypes.ColorFlow);
-    m_ledAnimationChooser.addOption("Fire", AnimationTypes.Fire);
-    m_ledAnimationChooser.addOption("Larson", AnimationTypes.Larson);
-    m_ledAnimationChooser.addOption("Rainbow", AnimationTypes.Rainbow);
-    m_ledAnimationChooser.addOption("RgbFade", AnimationTypes.RgbFade);
-    m_ledAnimationChooser.addOption("SingleFade", AnimationTypes.SingleFade);
-    m_ledAnimationChooser.addOption("Strobe", AnimationTypes.Strobe);
-    m_ledAnimationChooser.addOption("Twinkle", AnimationTypes.Twinkle);
-    m_ledAnimationChooser.addOption("TwinkleOff", AnimationTypes.TwinkleOff);
+    m_ledAnimationChooser.setDefaultOption("SetAll", LEDAnimation.SETALL);
+    m_ledAnimationChooser.addOption("ColorFlow", LEDAnimation.COLORFLOW);
+    m_ledAnimationChooser.addOption("Fire", LEDAnimation.FIRE);
+    m_ledAnimationChooser.addOption("Larson", LEDAnimation.LARSON);
+    m_ledAnimationChooser.addOption("Rainbow", LEDAnimation.RAINBOW);
+    m_ledAnimationChooser.addOption("RgbFade", LEDAnimation.RGBFADE);
+    m_ledAnimationChooser.addOption("SingleFade", LEDAnimation.SINGLEFADE);
+    m_ledAnimationChooser.addOption("Strobe", LEDAnimation.STROBE);
+    m_ledAnimationChooser.addOption("Twinkle", LEDAnimation.TWINKLE);
+    m_ledAnimationChooser.addOption("TwinkleOff", LEDAnimation.TWINKLEOFF);
 
     SmartDashboard.putData("LED_Color", m_ledChooser);
     SmartDashboard.putData("LED_Animation", m_ledAnimationChooser);
@@ -93,19 +96,18 @@ public class LED extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-
   }
 
   @Override
   public void simulationPeriodic( )
   {
-
+    // This method will be called once per scheduler run when in simulation
   }
 
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    setColor(LEDColor.LEDCOLOR_DASH);
+    setColor(LEDColor.LEDCOLOR_OFF);
 
   }
 
@@ -116,111 +118,86 @@ public class LED extends SubsystemBase
 
   public void setColor(LEDColor color)
   {
-    final String strName;
-
     if (m_previousColor != color)
     {
       if (color == (LEDColor.LEDCOLOR_DASH))
         color = m_ledChooser.getSelected( );
-      // color = LEDColor.LEDCOLOR_PURPLE;
 
       switch (color)
       {
         default :
-        case LEDCOLOR_WHITE :
-          strName = "WHITE";
-          m_candle.setLEDs(255, 255, 255); // white
-          break;
         case LEDCOLOR_OFF :
-          strName = "OFF";
           m_candle.setLEDs(0, 0, 0); // black
           break;
+        case LEDCOLOR_WHITE :
+          m_candle.setLEDs(255, 255, 255); // white
+          break;
         case LEDCOLOR_RED :
-          strName = "RED";
           m_candle.setLEDs(255, 0, 0); // red
           break;
         case LEDCOLOR_ORANGE :
-          strName = "ORANGE";
-          m_candle.setLEDs(255, 80, 0); // orange
+          m_candle.setLEDs(255, 48, 0); // orange
           break;
         case LEDCOLOR_YELLOW :
-          strName = "YELLOW";
           m_candle.setLEDs(255, 255, 0); // yellow
           break;
         case LEDCOLOR_GREEN :
-          strName = "GREEN";
           m_candle.setLEDs(0, 255, 0); // green
           break;
         case LEDCOLOR_BLUE :
-          strName = "BLUE";
           m_candle.setLEDs(0, 0, 255); // blue
           break;
         case LEDCOLOR_PURPLE :
-          strName = "PURPLE";
-          m_candle.setLEDs(144, 0, 255); // purple
+          m_candle.setLEDs(128, 0, 255); // purple
           break;
       }
-      DataLogManager.log(String.format("%s: COLOR IS NOW %s", getSubsystem( ), strName));
+      DataLogManager.log(String.format("%s: color is now %s", getSubsystem( ), color));
       m_previousColor = color;
 
     }
   }
 
-  public void setAnimation(AnimationTypes animation)
+  public void setAnimation(LEDAnimation animation)
   {
-    final String strName;
-
-    // if (animation == (AnimationTypes.AnimationDash))
-    //   animation = m_ledAnimationChooser.getSelected( );
-    // //m_candle.animate(AnimationTypes.animation);
-    // DataLogManager.log("Animation Selected!");
+    if (animation == LEDAnimation.ANIMATIONDASH)
+      animation = m_ledAnimationChooser.getSelected( );
 
     switch (animation)
     {
       default :
-      case ColorFlow :
-        strName = "ColorFlow";
+      case COLORFLOW :
         m_toAnimate = new ColorFlowAnimation(128, 20, 70, 0, 0.7, LedCount, Direction.Forward);
         break;
-      case Fire :
-        strName = "Fire";
+      case FIRE :
         m_toAnimate = new FireAnimation(0.5, 0.7, LedCount, 0.7, 0.5);
         break;
-      case Larson :
-        strName = "Larson";
+      case LARSON :
         m_toAnimate = new LarsonAnimation(0, 255, 46, 0, 1, LedCount, BounceMode.Front, 3);
         break;
-      case Rainbow :
-        strName = "Rainbow";
+      case RAINBOW :
         m_toAnimate = new RainbowAnimation(1, 0.1, LedCount);
         break;
-      case RgbFade :
-        strName = "RgbFade";
+      case RGBFADE :
         m_toAnimate = new RgbFadeAnimation(0.7, 0.4, LedCount);
         break;
-      case SingleFade :
-        strName = "SingleFade";
+      case SINGLEFADE :
         m_toAnimate = new SingleFadeAnimation(50, 2, 200, 0, 0.5, LedCount);
         break;
-      case Strobe :
-        strName = "Strobe";
+      case STROBE :
         m_toAnimate = new StrobeAnimation(240, 10, 180, 0, 98.0 / 256.0, LedCount);
         break;
-      case Twinkle :
-        strName = "Twinkle";
+      case TWINKLE :
         m_toAnimate = new TwinkleAnimation(30, 70, 60, 0, 0.4, LedCount, TwinklePercent.Percent64);
         break;
-      case TwinkleOff :
-        strName = "TwinkleOff";
+      case TWINKLEOFF :
         m_toAnimate = new TwinkleOffAnimation(70, 90, 175, 0, 0.8, LedCount, TwinkleOffPercent.Percent100);
         break;
-      case SetAll :
-        strName = "SetAll";
+      case SETALL :
         m_toAnimate = null;
         break;
     }
+
     m_candle.animate(m_toAnimate);
-    DataLogManager.log(String.format("%s: ANIMATION IS NOW %s", getSubsystem( ), strName));
-    //m_previousColor = color;
+    DataLogManager.log(String.format("%s: animation is now %s", getSubsystem( ), animation));
   }
 }

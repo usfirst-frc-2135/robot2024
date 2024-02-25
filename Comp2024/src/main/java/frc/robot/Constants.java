@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
 public class Constants
 {
   // bot serial nums
-  public static final String kCompSN               = "03238074"; // TODO: get this from Comp RoboRIO for 2024
+  public static final String kCompSN               = "032B1F7E";
   public static final String kBetaSN               = "03260A3A";
 
   // Game controller definitions
@@ -147,7 +147,6 @@ public class Constants
     // Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -162,11 +161,12 @@ public class Constants
     {
       STOP,    // Stop spinning
       ACQUIRE, // Acquire a game piece
-      EXPEL    // Expel a game piece
+      EXPEL,   // Expel a game piece
+      HOLD     // Maintain existing setting
     }
 
     // Rotary manual move parameters
-    public enum RotaryManual
+    public enum RotaryMode
     {
       INIT,    // Initialize intake
       INBOARD, // Intake Rotary moving into the robot
@@ -174,13 +174,12 @@ public class Constants
       OUTBOARD // Intake Rotary moving out of the robot
     }
 
-    // Motion Magic move parameters
-    public enum RotaryPosition
-    {
-      RETRACTED, // Retracted to shooter
-      HANDOFF,   // Upright to handoff to feeder
-      DEPLOYED   // Deployed to acquire game piece
-    }
+    // Rotary angles - Motion Magic move parameters
+    public static final double kRotaryAngleRetracted = -80.0;    // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = 0.0;      // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 110.0;    // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -88.0;    // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 115.0;    // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -196,16 +195,11 @@ public class Constants
     }
 
     // Rotary manual move parameters
-    public enum RotaryManual
+    public enum RotaryMode
     {
     }
 
-    // Motion Magic move parameters
-    public enum RotaryPosition
-    {
-    }
-
-    // Motion Magic config parameters
+    // Feeder angles - Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -238,13 +232,21 @@ public class Constants
   {
     // Global settings
 
-    // Manual config parameters
+    // Climber manual move parameters
     public enum ClimberMode
     {
-      INIT, STOP, IN, OUT
+      INIT,   // Initialize climber
+      UP,     // Climber move upward
+      STOP,   // Climber stop
+      DOWN    // Climber move downward
     }
 
-    // Motion Magic config parameters
+    // Climber lengths - Motion Magic config parameters
+    public static final double kLengthClimbed = 2.0;    // By definition - Climber fully climbed
+    public static final double kLengthFull    = 17.0;   // From Mech Design height needed to reach max chain
+    public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
+    public static final double kLengthMin     = -0.25;  // Climber minimum allowable length (quarter inch less than stowed)
+    public static final double kLengthMax     = 18.25;  // Climber maximum allowable length (2" beyond high length)
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -296,25 +298,30 @@ public class Constants
   {
     public enum LEDColor
     {
-      LEDCOLOR_OFF,     // CANdle off
-      LEDCOLOR_WHITE,   // CANdle white
-      LEDCOLOR_RED,     // CANdle red
-      LEDCOLOR_ORANGE,  // CANdle orange
-      LEDCOLOR_YELLOW,  // CANdle yellow
-      LEDCOLOR_GREEN,   // CANdle green
-      LEDCOLOR_BLUE,    // CANdle blue
-      LEDCOLOR_PURPLE,  // CANdle purple
-      LEDCOLOR_DASH     // CANdle color taken from dashboard
+      OFF,      // CANdle off
+      WHITE,    // CANdle white
+      RED,      // CANdle red
+      ORANGE,   // CANdle orange
+      YELLOW,   // CANdle yellow
+      GREEN,    // CANdle green
+      BLUE,     // CANdle blue
+      PURPLE,   // CANdle purple
+      DASHBOARD // CANdle color taken from dashboard
     }
 
-    public enum Animations
+    public enum LEDAnimation
     {
-      COLORFLOW, FIRE, // makes the LEDs blink in a fire pattern
-      LARSON, RAINBOW, // makes the LEDs change in fading rainbow colors
-      RGBFADE, SINGLEFADE, // blinks with fade with a single color
-      STROBE, TWINKLE, // blinks different LEDs at different intervals
-      TWINKLEOFF, SETALL,  // turns all the LEDs off
-      ANIMATIONDASH // CANdle color taken from the dashboard
+      COLORFLOW,    // Single color flow through string
+      FIRE,         // Fire pattern from one end of string
+      LARSON,       // Ping-pong pattern bouncing between string ends
+      RAINBOW,      // Fading rainbow colors
+      RGBFADE,      // Fading red, then green, then blue
+      SINGLEFADE,   // Fading with a single color
+      STROBE,       // Strobe flashing with a single color
+      TWINKLE,      // Twinkles leds on
+      TWINKLEOFF,   // Twinkles leds off
+      CLEARALL,     // Clears animations
+      DASHBOARD     // Animation taken from the dashboard
     }
   }
 

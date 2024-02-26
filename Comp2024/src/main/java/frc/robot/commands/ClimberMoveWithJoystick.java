@@ -1,41 +1,38 @@
-//
-// Intake Roller Run command - sets motors to desired mode
-//
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.INConsts.RollerMode;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Climber;
 
-//
-// Intake Roller Run command
-//
-public class IntakeRollerRun extends Command
+/**
+ *
+ */
+public class ClimberMoveWithJoystick extends Command
 {
-  // Member variables/objects
-  private final Intake     m_intake;
-  private final RollerMode m_mode;
+  private final Climber  m_climber;
 
-  public IntakeRollerRun(Intake intake, RollerMode mode)
+  private XboxController m_gamePad;
+
+  public ClimberMoveWithJoystick(Climber climber, XboxController gamePad)
   {
-    m_intake = intake;
-    m_mode = mode;
+    m_climber = climber;
+    m_gamePad = gamePad;
 
-    setName("IntakeRollerRun");
-    addRequirements(m_intake);
+    setName("ClimberMoveWithJoystick");
+    addRequirements(m_climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {
-    m_intake.setRollerSpeed(m_mode);
-  }
+  {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
-  {}
+  {
+    m_climber.moveWithJoystick(-m_gamePad.getRightY( ));
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -46,7 +43,7 @@ public class IntakeRollerRun extends Command
   @Override
   public boolean isFinished( )
   {
-    return true;
+    return false;
   }
 
   @Override

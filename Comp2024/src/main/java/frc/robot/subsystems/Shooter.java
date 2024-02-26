@@ -29,27 +29,27 @@ import frc.robot.lib.util.PhoenixUtil6;
 public class Shooter extends SubsystemBase
 {
   // Constants
-  public static final double    kFlywheelGearRatio      = (18.0 / 18.0);
+  private static final double   kFlywheelGearRatio       = (18.0 / 18.0);
 
-  public static final double    kFlywheelToleranceRPM   = 150.0;     // Tolerance band around target RPM
-  public static double          kFlywheelLowerTargetRPM = 2150.0;    // RPM to score
+  private static final double   kFlywheelToleranceRPM    = 150.0;     // Tolerance band around target RPM
+  private static final double   kFlywheelScoreRPM        = 2150.0;    // RPM to score
 
   // Devices and simulation objects
-  private final TalonFX         m_shooterLower          = new TalonFX(Ports.kCANID_ShooterLower);
-  private final TalonFX         m_shooterUpper          = new TalonFX(Ports.kCANID_ShooterUpper);
+  private final TalonFX         m_shooterLower           = new TalonFX(Ports.kCANID_ShooterLower);
+  private final TalonFX         m_shooterUpper           = new TalonFX(Ports.kCANID_ShooterUpper);
 
-  private final TalonFXSimState m_shooterLowerSim       = new TalonFXSimState(m_shooterLower);
-  private final TalonFXSimState m_shooterUpperSim       = new TalonFXSimState(m_shooterUpper);
-  private final FlywheelSim     m_flywheelLowerSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.005);
-  private final FlywheelSim     m_flywheelUpperSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.005);
+  private final TalonFXSimState m_shooterLowerSim        = new TalonFXSimState(m_shooterLower);
+  private final TalonFXSimState m_shooterUpperSim        = new TalonFXSimState(m_shooterUpper);
+  private final FlywheelSim     m_flywheelLowerSim       = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
+  private final FlywheelSim     m_flywheelUpperSim       = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
 
-  private VelocityVoltage       m_requestVelocity       = new VelocityVoltage(0.0);
-  private LinearFilter          m_flywheelFilter        = LinearFilter.singlePoleIIR(0.1, 0.02);
+  private VelocityVoltage       m_requestVelocity        = new VelocityVoltage(0.0);
+  private LinearFilter          m_flywheelFilter         = LinearFilter.singlePoleIIR(0.1, 0.02);
 
   // Declare module variables
   private boolean               m_shooterValid;
-  private boolean               m_atDesiredSpeed        = false; // Indicates flywheel RPM is close to target
-  private boolean               m_atDesiredSpeedPrevious;
+  private boolean               m_atDesiredSpeed         = false; // Indicates flywheel RPM is close to target
+  private boolean               m_atDesiredSpeedPrevious = false;
 
   private double                m_flywheelTargetRPM;     // Requested flywheel RPM
   private double                m_flywheelRPM;           // Current flywheel RPM
@@ -81,17 +81,19 @@ public class Shooter extends SubsystemBase
     {
       m_flywheelRPM = m_flywheelFilter.calculate((m_shooterLower.getVelocity( ).refresh( ).getValue( ) * 60.0));
 
-      m_atDesiredSpeed = (m_flywheelRPM > 30.0) && (Math.abs(m_flywheelTargetRPM - m_flywheelRPM) < kFlywheelToleranceRPM);
+      m_atDesiredSpeed =
+          (m_flywheelRPM > kFlywheelToleranceRPM) && (Math.abs(m_flywheelTargetRPM - m_flywheelRPM) < kFlywheelToleranceRPM);
 
       if (m_atDesiredSpeed != m_atDesiredSpeedPrevious)
       {
-        DataLogManager.log(getSubsystem( ) + ": at desired speed now " + m_flywheelTargetRPM);
+        DataLogManager.log(String.format("%s: at desired speed now: %.1f", getSubsystem( ), m_flywheelTargetRPM));
         m_atDesiredSpeedPrevious = m_atDesiredSpeed;
       }
 
       current = m_shooterLower.getStatorCurrent( ).refresh( ).getValue( );
     }
 
+    SmartDashboard.putNumber("SH_targetRPM", m_flywheelTargetRPM);
     SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
     SmartDashboard.putBoolean("SH_atDesiredSpeed", m_atDesiredSpeed);
     SmartDashboard.putNumber("SH_current", current);
@@ -127,12 +129,12 @@ public class Shooter extends SubsystemBase
   {
     SmartDashboard.putBoolean("HL_SHValid", m_shooterValid);
 
-    SmartDashboard.putNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
+    SmartDashboard.putNumber("SH_scoreRPM", kFlywheelScoreRPM);
   }
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setShooterMode(ShooterMode.STOP);
   }
 
@@ -145,26 +147,24 @@ public class Shooter extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": set shooter mode " + mode);
 
-    kFlywheelLowerTargetRPM = SmartDashboard.getNumber("SH_targetRPM", kFlywheelLowerTargetRPM);
-
     // Select the shooter RPM for the requested mode - NEVER NEGATIVE when running!
     switch (mode)
     {
+      default :
+        DataLogManager.log(String.format("%s: Shooter mode is invalid: %s", getSubsystem( ), mode));
       case STOP :
-        m_flywheelRPM = 0.0;
+        m_flywheelTargetRPM = 0.0;
         break;
       case SCORE :
-        m_flywheelRPM = kFlywheelLowerTargetRPM;
-        break;
-      default :
-        DataLogManager.log(getSubsystem( ) + ": invalid shooter mode requested " + mode);
+        m_flywheelTargetRPM = SmartDashboard.getNumber("SH_scoreRPM", m_flywheelTargetRPM);
         break;
     }
 
+    double rotPerSecond = m_flywheelTargetRPM / 60.0;
     if (m_shooterValid)
-      m_shooterLower.setControl(
-          m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(m_flywheelRPM / 60.0, kFlywheelGearRatio)));
-    DataLogManager.log(getSubsystem( ) + ": target speed is " + m_flywheelRPM);
+      m_shooterLower
+          .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
+    DataLogManager.log(String.format("%s: target rpm is %.1f rps %1f", getSubsystem( ), m_flywheelTargetRPM, rotPerSecond));
   }
 
   public boolean isAtDesiredSpeed( )

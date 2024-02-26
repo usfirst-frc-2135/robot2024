@@ -70,12 +70,12 @@ public class RobotContainer
   private static final CommandXboxController          m_operatorPad  = new CommandXboxController(Constants.kOperatorPadPort);
 
   private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-  private double                                      MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double                                      MaxAngularRate = 3.0 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private Command                                     m_autoCommand;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric            drive          =
-      new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.15).withRotationalDeadband(MaxAngularRate * 0.15) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // We want field-centric driving in open loop
   private final SwerveRequest.SwerveDriveBrake        brake          = new SwerveRequest.SwerveDriveBrake( );
   private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( );

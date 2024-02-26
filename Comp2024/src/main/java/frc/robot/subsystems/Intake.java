@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase
   private static final boolean      kRollerMotorInvert    = true;     // Motor direction for positive input
 
   private static final double       kRollerSpeedAcquire   = 0.5;
-  private static final double       kRollerSpeedExpel     = -0.25;
+  private static final double       kRollerSpeedExpel     = -0.4;
   private static final double       kRollerSpeedToShooter = -0.6;
 
   private static final double       kLigament2dOffset     = 90.0;      // Offset from mechanism root for ligament

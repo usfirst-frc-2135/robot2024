@@ -36,8 +36,9 @@ public class ShooterActionFire extends SequentialCommandGroup
         new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleRetracted),
 
         new WaitCommand(0.5),
-        new ShooterRun(shooter, ShooterMode.STOP)
- 
+        new ShooterRun(shooter, ShooterMode.STOP),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
+
         // @formatter:on
     );
   }

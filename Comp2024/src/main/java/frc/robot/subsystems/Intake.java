@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
 
   // Rotary constants
-  private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
+  private static final double       kToleranceDegrees     = 5.0;      // PID tolerance in degrees
   private static final double       kMMSafetyTimeout      = 2.0;
 
   // Device and simulation objects

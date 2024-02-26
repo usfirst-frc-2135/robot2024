@@ -290,7 +290,7 @@ public class RobotContainer
 
     // Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
-    // m_climber.setDefaultCommand(new ClimberRun(m_climber));
+    m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 

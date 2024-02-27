@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
-import frc.robot.Constants.INConsts.RotaryManual;
+import frc.robot.Constants.INConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase
 
   // Rotary constants
   private static final double       kToleranceDegrees     = 2.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout      = 3.5;
+  private static final double       kMMSafetyTimeout      = 2.0;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -78,8 +78,8 @@ public class Intake extends SubsystemBase
       SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_rotaryMech          = new Mechanism2d(2, 2);
-  private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 1.0, 1.0);
+  private final Mechanism2d         m_rotaryMech          = new Mechanism2d(1.0, 1.0);
+  private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
   private final MechanismLigament2d m_mechLigament        =
       m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
@@ -97,7 +97,7 @@ public class Intake extends SubsystemBase
 
   // Manual mode config parameters
   private VoltageOut                m_requestVolts        = new VoltageOut(0);
-  private RotaryManual              m_rotaryMode          = RotaryManual.INIT;     // Manual movement mode with joysticks
+  private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
   private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
@@ -188,7 +188,7 @@ public class Intake extends SubsystemBase
     // Set input motor voltage from the motor setting
     m_rotarySim.setSupplyVoltage(RobotController.getInputVoltage( ));
     m_CANCoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
-    m_armSim.setInput(m_rotarySim.getMotorVoltage( ));
+    m_armSim.setInputVoltage(m_rotarySim.getMotorVoltage( ));
 
     // update for 20 msec loop
     m_armSim.update(0.020);
@@ -261,6 +261,7 @@ public class Intake extends SubsystemBase
       switch (mode)
       {
         default :
+          DataLogManager.log(String.format("%s: Roller mode is invalid: %s", getSubsystem( ), mode));
         case STOP :
           output = 0.0;
           break;
@@ -307,14 +308,14 @@ public class Intake extends SubsystemBase
   public void moveRotaryWithJoystick(double axisValue)
   {
     boolean rangeLimited = false;
-    RotaryManual newMode = RotaryManual.INIT;
+    RotaryMode newMode = RotaryMode.INIT;
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if ((axisValue < 0.0) && (m_currentDegrees > INConsts.kRotaryAngleMin))
-      newMode = INConsts.RotaryManual.INBOARD;
+      newMode = INConsts.RotaryMode.INBOARD;
     else if ((axisValue > 0.0) && (m_currentDegrees < INConsts.kRotaryAngleMax))
-      newMode = INConsts.RotaryManual.OUTBOARD;
+      newMode = INConsts.RotaryMode.OUTBOARD;
     else
     {
       rangeLimited = true;

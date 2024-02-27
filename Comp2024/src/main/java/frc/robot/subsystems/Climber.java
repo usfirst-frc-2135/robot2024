@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.CLConsts.ClimberMode;
 import frc.robot.Constants.Ports;
 import frc.robot.lib.math.Conversions;
@@ -43,38 +44,31 @@ public class Climber extends SubsystemBase
 {
   // Constants
   private final double              kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
-  public static final double        kGearRatio           = 8.57;   // Gear reduction
-  public static final double        kDrumDiameterInches  = 1.375;  // Drum diameter in inches
-  public static final double        kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
-  public static final double        kDrumCircumInches    = kDrumDiameterInches * Math.PI;             // Drum diameter in inches
-  public static final double        kRolloutRatio        = kDrumCircumInches / kGearRatio; // inches per shaft rotation
-  public static final double        kCalibrateSpeedVolts = -1.4;   // Motor voltage during calibration
-  public static final double        kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
+  private static final double       kGearRatio           = 8.57;   // Gear reduction
+  private static final double       kClimberLengthMeters = 1.0;
+  private static final double       kDrumDiameterInches  = 1.375;  // Drum diameter in inches
+  private static final double       kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
+  private static final double       kDrumCircumInches    = kDrumDiameterInches * Math.PI;             // Drum diameter in inches
+  private static final double       kRolloutRatio        = kDrumCircumInches / kGearRatio; // inches per shaft rotation
+  private static final double       kCalibrateSpeedVolts = -1.4;   // Motor voltage during calibration
+  private static final double       kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
 
-  // Climber lengths
-  public static final double        kLengthIn            = 0.25;   // By definition - Climber fully retracted
-  public static final double        kLengthStop          = -0.25;  // Slightly off mechanical hard stop
-  public static final double        kLengthOut           = 17.0;   // From Mech Design (floor, feet art 5" high), empirically checked
-  public static final double        kLengthMin           = -0.5;   // Climber minimum allowable length (half inch less than stowed)
-  public static final double        kLengthMax           = 18.25;  // Climber maximum allowable length (2" beyond high length)
-  public static final double        kLengthClimber       = 1.0;
-
-  public static final double        kToleranceInches     = 0.5;    // Climber PID tolerance in inches
-  public static final double        kMMSafetyTimeout     = 2.0;    // Seconds allowed for a Motion Magic movement
+  private static final double       kToleranceInches     = 0.5;    // Climber PID tolerance in inches
+  private static final double       kMMSafetyTimeout     = 2.0;    // Seconds allowed for a Motion Magic movement
 
   // Device and simulation objects
   private final TalonFX             m_climberL           = new TalonFX(Ports.kCANID_ClimberL);
   private final TalonFX             m_climberR           = new TalonFX(Ports.kCANID_ClimberR);
 
   private final TalonFXSimState     m_climberSim         = m_climberL.getSimState( );
-  private final ElevatorSim         m_elevSim            =
-      new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, 2.0, kDrumRadiusMeters, -kLengthMax, kLengthMax, false, 0.0);
+  private final ElevatorSim         m_elevSim            = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, 2.0,
+      kDrumRadiusMeters, -CLConsts.kLengthMax, CLConsts.kLengthMax, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_climberMech        = new Mechanism2d(2, 2);
-  private final MechanismRoot2d     m_mechRoot           = m_climberMech.getRoot("Climber", 1.0, 1.0);
-  private final MechanismLigament2d m_mechLigament       =
-      m_mechRoot.append(new MechanismLigament2d("climberr", kLengthClimber, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
+  private final Mechanism2d         m_climberMech        = new Mechanism2d(1.0, 1.0);
+  private final MechanismRoot2d     m_mechRoot           = m_climberMech.getRoot("Climber", 0.5, 0.5);
+  private final MechanismLigament2d m_mechLigament       = m_mechRoot
+      .append(new MechanismLigament2d("climberr", kClimberLengthMeters, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_climberValid;               // Health indicator for Falcon 
@@ -174,8 +168,10 @@ public class Climber extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setLength(kLengthClimber + Units.inchesToMeters(m_currentInches));
+    m_mechLigament.setLength(0.1 + Units.inchesToMeters(m_currentInches));
   }
+
+  // Initialize dashboard widgets
 
   private void initSmartDashboard( )
   {
@@ -215,7 +211,7 @@ public class Climber extends SubsystemBase
 
   private boolean isMoveValid(double inches)
   {
-    return (inches > kLengthMin) && (inches < kLengthMax);
+    return (inches > CLConsts.kLengthMin) && (inches < CLConsts.kLengthMax);
   }
 
   private boolean isWithinTolerance(double targetInches)
@@ -251,10 +247,10 @@ public class Climber extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_currentInches > kLengthMin))
-      newMode = ClimberMode.IN;
-    else if ((axisValue > 0.0) && (m_currentInches < kLengthMax))
-      newMode = ClimberMode.OUT;
+    if ((axisValue < 0.0) && (m_currentInches > CLConsts.kLengthMin))
+      newMode = ClimberMode.DOWN;
+    else if ((axisValue > 0.0) && (m_currentInches < CLConsts.kLengthMax))
+      newMode = ClimberMode.UP;
     else
     {
       rangeLimited = true;
@@ -301,7 +297,7 @@ public class Climber extends SubsystemBase
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_targetInches, kLengthMin, kLengthMax));
+            m_targetInches, CLConsts.kLengthMin, CLConsts.kLengthMax));
 
     }
     else

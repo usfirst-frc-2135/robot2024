@@ -7,18 +7,18 @@ import frc.robot.subsystems.Climber;
 /**
  *
  */
-public class ClimberRun extends Command
+public class ClimberMoveWithJoystick extends Command
 {
   private final Climber  m_climber;
 
   private XboxController m_gamePad;
 
-  public ClimberRun(Climber climber, XboxController gamePad)
+  public ClimberMoveWithJoystick(Climber climber, XboxController gamePad)
   {
     m_climber = climber;
     m_gamePad = gamePad;
 
-    setName("ClimberRun");
+    setName("ClimberMoveWithJoystick");
     addRequirements(m_climber);
   }
 

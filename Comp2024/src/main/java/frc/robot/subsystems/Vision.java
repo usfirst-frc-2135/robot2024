@@ -22,8 +22,8 @@ import frc.robot.Constants.VIConsts;
 public class Vision extends SubsystemBase
 {
   // Objects
-  public MedianFilter           m_tyfilter      = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
-  public MedianFilter           m_tvfilter      = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
+  private MedianFilter          m_tyfilter      = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
+  private MedianFilter          m_tvfilter      = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
 
   // Declare module variables
   private NetworkTable          m_table;            // Network table reference for getting LL values

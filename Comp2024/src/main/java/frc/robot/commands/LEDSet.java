@@ -3,7 +3,9 @@
 //
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.subsystems.LED;
 
@@ -12,13 +14,15 @@ import frc.robot.subsystems.LED;
  */
 public class LEDSet extends Command
 {
-  private final LEDColor m_color;
-  private final LED      m_led;
+  private final LEDColor     m_color;
+  private final LED          m_led;
+  private final LEDAnimation m_animation;
 
-  public LEDSet(LED led, LEDColor color)
+  public LEDSet(LED led, LEDColor color, LEDAnimation animation)
   {
     m_led = led;
     m_color = color;
+    m_animation = animation;
 
     setName("LEDSet");
     addRequirements(m_led);
@@ -29,6 +33,7 @@ public class LEDSet extends Command
   public void initialize( )
   {
     m_led.setColor(m_color);
+    m_led.setAnimation(m_animation);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

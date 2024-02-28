@@ -23,16 +23,16 @@ public class IntakeActionShoot extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Hold rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD, INConsts.kRotaryAngleRetracted).asProxy(),
+        new IntakeRun(intake, INConsts.RollerMode.HOLD, INConsts.kRotaryAngleRetracted),
 
         new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),        
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL).asProxy(),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL),
 
         new PrintCommand(getName() + ": Wait for note to release"),
         new WaitCommand(0.5),
 
         new PrintCommand(getName() + ": Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD).asProxy()
+        new IntakeRun(intake, INConsts.RollerMode.HOLD)
  
         // @formatter:on
     );

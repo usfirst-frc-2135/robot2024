@@ -23,13 +23,13 @@ public class IntakeActionAcquire extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Start rollers & Deploy intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).asProxy(),
+        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
 
         new PrintCommand(getName() + ": Wait for note"),
         new WaitUntilCommand(intake::isNoteDetected),
 
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted).asProxy()
+        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
  
         // @formatter:on
     );

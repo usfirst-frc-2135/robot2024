@@ -9,20 +9,19 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants.PATHconsts;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 
@@ -143,11 +142,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  public Command driveWithLL(CommandSwerveDrivetrain drivetrain, Pose2d pose)
+  public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    PathConstraints constraints = new PathConstraints(3, 3, Units.degreesToRadians(540 / 2), Units.degreesToRadians(720 / 2));
+    Command pathFindingCommand = AutoBuilder.pathfindToPose(pose, PATHconsts.constraints, 0, 0.0);
 
-    Command pathFindingCommand = AutoBuilder.pathfindToPose(pose, constraints, 0, 0.0);
     return pathFindingCommand;
   }
 

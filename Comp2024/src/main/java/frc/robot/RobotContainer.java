@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
+import frc.robot.Constants.PATHconsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
@@ -72,13 +73,6 @@ public class RobotContainer
   private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double                                      MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private Command                                     m_autoCommand;
-
-  //Poses for limelight paths
-  private final Pose2d                         speakerPose     = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
-  private final Pose2d                         ampPose         = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
-  private final Pose2d                         stageCenter     = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(180));
-  private final Pose2d                         stageLeft       = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(-60));
-  private final Pose2d                         stageRight      = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(60));
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric            drive          =
@@ -202,12 +196,12 @@ public class RobotContainer
     //
     // Driver - A, B, X, Y
     m_driverPad.a( ).onTrue(new Dummy("driver A"));
-    m_driverPad.b( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageRight));    //drive to stage right
-    m_driverPad.x( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageLeft));     //drive to stage left
-    m_driverPad.y( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, stageCenter));   //drive to stage center
+    m_driverPad.b( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.stageRight));    //drive to stage right
+    m_driverPad.x( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.stageLeft));     //drive to stage left
+    m_driverPad.y( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.stageCenter));   //drive to stage center
     //
     // Driver - Bumpers, start, back
-    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, ampPose));    //drive to amp
+    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.ampPose));    //drive to amp
     m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                          // aka View
@@ -227,7 +221,8 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionExpel(m_intake));
-    m_driverPad.leftTrigger(Constants.kTriggerThreshold).whileTrue(m_drivetrain.driveWithLL(m_drivetrain, speakerPose));   //drive to speaker
+    m_driverPad.leftTrigger(Constants.kTriggerThreshold)
+        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.speakerPose));   //drive to speaker
 
     m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));

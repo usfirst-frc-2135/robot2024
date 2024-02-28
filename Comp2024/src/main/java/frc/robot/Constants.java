@@ -4,6 +4,8 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -86,6 +88,23 @@ public class Constants
     // Digital I/Os
     public static final int    kDIO0_NoteInIntake    = 0;
     public static final int    kDIO1_NoteInFeeder    = 1;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Path Constants
+  //////////////////////////////////////////////////////////////////////////////
+  public static final class PATHconsts
+  {
+    //Poses for limelight paths
+    public static final Pose2d          speakerPose = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
+    public static final Pose2d          ampPose     = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
+    public static final Pose2d          stageCenter = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(180));
+    public static final Pose2d          stageLeft   = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(-60));
+    public static final Pose2d          stageRight  = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(60));
+
+    //Path constraints
+    public static final PathConstraints constraints =
+        new PathConstraints(3, 3, Units.degreesToRadians(540 / 2), Units.degreesToRadians(720 / 2));
   }
 
   /////////////////////////////////////////////////////////////////////////////

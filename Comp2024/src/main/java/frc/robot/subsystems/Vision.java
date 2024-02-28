@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VIConsts;
+import frc.robot.lib.util.LimelightHelpers;
 
 /**
  *
@@ -199,5 +200,12 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: setCameraDisplay %d", getSubsystem( ), stream));
     m_table.getEntry("stream").setValue(stream);
+  }
+
+  public void setCameraToSecondary( )
+  {
+    DataLogManager.log(String.format("%s: setCameraToSecondary %d", getSubsystem( ), VIConsts.PIP_SECONDARY));
+    m_table.getEntry("stream").setValue(VIConsts.PIP_SECONDARY);
+    LimelightHelpers.setStreamMode_PiPSecondary("limelight");
   }
 }

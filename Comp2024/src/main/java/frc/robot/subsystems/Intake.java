@@ -284,7 +284,8 @@ public class Intake extends SubsystemBase
 
   public boolean isNoteDetected( )
   {
-    return m_noteInIntake.get( );
+    final Debouncer m_withinTolerance = new Debouncer(2.0);
+    return m_withinTolerance.calculate(m_noteInIntake.get( ));
   }
 
   private boolean isWithinTolerance(double targetDegrees)

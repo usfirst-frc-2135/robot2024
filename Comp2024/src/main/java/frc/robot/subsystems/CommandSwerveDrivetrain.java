@@ -16,6 +16,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -144,9 +145,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    Command pathFindingCommand = AutoBuilder.pathfindToPose(pose, PATHconsts.constraints, 0, 0.0);
-
-    return pathFindingCommand;
+    return AutoBuilder.pathfindToPoseFlipped(pose, PATHconsts.constraints, 0, 0.0);
   }
-
 }

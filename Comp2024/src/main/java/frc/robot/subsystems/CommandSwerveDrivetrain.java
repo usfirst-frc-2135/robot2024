@@ -16,13 +16,12 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants.PATHconsts;
+import frc.robot.Constants.VIConsts;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 
@@ -145,6 +144,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    return AutoBuilder.pathfindToPoseFlipped(pose, PATHconsts.constraints, 0, 0.0);
+    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.k_constraints, 0.0);
   }
 }

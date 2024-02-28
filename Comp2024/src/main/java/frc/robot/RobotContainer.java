@@ -24,14 +24,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.PATHconsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
+import frc.robot.Constants.VIConsts;
 import frc.robot.commands.AutoPreload;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberMoveToPosition;
@@ -196,12 +195,12 @@ public class RobotContainer
     //
     // Driver - A, B, X, Y
     m_driverPad.a( ).onTrue(new Dummy("driver A"));
-    m_driverPad.b( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.stageRight));    //drive to stage right
-    m_driverPad.x( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.stageLeft));     //drive to stage left
-    m_driverPad.y( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.stageCenter));   //drive to stage center
+    m_driverPad.b( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.k_stageRight));    //drive to stage right
+    m_driverPad.x( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.k_stageLeft));     //drive to stage left
+    m_driverPad.y( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.k_stageCenter));   //drive to stage center
     //
     // Driver - Bumpers, start, back
-    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.ampPose));    //drive to amp
+    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.k_ampPose));    //drive to amp
     m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                          // aka View
@@ -222,7 +221,7 @@ public class RobotContainer
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionExpel(m_intake));
     m_driverPad.leftTrigger(Constants.kTriggerThreshold)
-        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, PATHconsts.speakerPose));   //drive to speaker
+        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.k_speakerPose));   //drive to speaker
 
     m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));

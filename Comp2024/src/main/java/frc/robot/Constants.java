@@ -91,23 +91,6 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Path Constants
-  //////////////////////////////////////////////////////////////////////////////
-  public static final class PATHconsts
-  {
-    //Poses for limelight paths
-    public static final Pose2d          speakerPose = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
-    public static final Pose2d          ampPose     = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
-    public static final Pose2d          stageCenter = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(180));
-    public static final Pose2d          stageLeft   = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(-60));
-    public static final Pose2d          stageRight  = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(60));
-
-    //Path constraints
-    public static final PathConstraints constraints =
-        new PathConstraints(3, 3, Units.degreesToRadians(540 / 2), Units.degreesToRadians(720 / 2));
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
   // Falcon 500
   /////////////////////////////////////////////////////////////////////////////
   public static final class Falcon500
@@ -289,7 +272,7 @@ public class Constants
       VISION_TOGGLE // Toggle mode
     }
 
-    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
+    public static final List<Pose2d>    kAprilTagPoses = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
         new Pose2d(new Translation2d(15.079472, 0.245872), new Rotation2d(Units.degreesToRadians(120))),    // AprilTag ID: 1 
         new Pose2d(new Translation2d(16.185134, 0.883666), new Rotation2d(Units.degreesToRadians(120))),    // AprilTag ID: 2 
@@ -308,6 +291,17 @@ public class Constants
         new Pose2d(new Translation2d(4.641342, 4.49834), new Rotation2d(Units.degreesToRadians(120))),      // AprilTag ID: 15
         new Pose2d(new Translation2d(4.641342, 3.713226), new Rotation2d(Units.degreesToRadians(240)))      // AprilTag ID: 16
     ));
+
+    //Poses for limelight paths
+    public static final Pose2d          k_speakerPose  = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
+    public static final Pose2d          k_ampPose      = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
+    public static final Pose2d          k_stageCenter  = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(180));
+    public static final Pose2d          k_stageLeft    = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(-60));
+    public static final Pose2d          k_stageRight   = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(60));
+
+    //Path constraints
+    public static final PathConstraints k_constraints  =
+        new PathConstraints(3, 3, Units.degreesToRadians(540 / 2), Units.degreesToRadians(720 / 2));
   }
 
   /////////////////////////////////////////////////////////////////////////////

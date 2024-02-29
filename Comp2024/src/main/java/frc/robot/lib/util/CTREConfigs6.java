@@ -216,7 +216,7 @@ public final class CTREConfigs6
 
   // Climber
 
-  public static TalonFXConfiguration climberLengthFXConfig( )
+  public static TalonFXConfiguration climberFXConfig( )
   {
     TalonFXConfiguration climberConfig = new TalonFXConfiguration( );
 
@@ -225,12 +225,12 @@ public final class CTREConfigs6
     // exConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    climberConfig.CurrentLimits.SupplyCurrentLimit = 20.0;        // Amps
-    climberConfig.CurrentLimits.SupplyCurrentThreshold = 20.0;    // Amps
+    climberConfig.CurrentLimits.SupplyCurrentLimit = 30.0;        // Amps
+    climberConfig.CurrentLimits.SupplyCurrentThreshold = 30.0;    // Amps
     climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    climberConfig.CurrentLimits.StatorCurrentLimit = 45.0;        // Amps
+    climberConfig.CurrentLimits.StatorCurrentLimit = 80.0;        // Amps
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -246,7 +246,7 @@ public final class CTREConfigs6
 
     // Motor output settings
     climberConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;   // Percentage
-    climberConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    climberConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Open Loop settings
@@ -262,10 +262,10 @@ public final class CTREConfigs6
     climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
-    climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);   // Rotations
-    climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToWinchRotations(18.25, 0.432); // Rotations
-    climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);   // Rotations
+    // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    // climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToWinchRotations(18.25, 0.432); // Rotations
+    // climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return climberConfig;
   }

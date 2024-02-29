@@ -160,8 +160,8 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
 
-    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake));
-    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake));
+    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
+    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
 
@@ -202,8 +202,8 @@ public class RobotContainer
     //
     // Driver - Bumpers, start, back
     m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));  // Drive to pose: amp
-    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
-    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
+    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
     //
@@ -217,7 +217,7 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));  // Drive to pose: speaker
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
@@ -234,8 +234,8 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
-    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
-    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary));                    // aka Menu
     //
@@ -249,7 +249,7 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));

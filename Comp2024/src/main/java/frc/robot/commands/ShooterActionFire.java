@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -17,7 +18,7 @@ import frc.robot.subsystems.Shooter;
  */
 public class ShooterActionFire extends SequentialCommandGroup
 {
-  public ShooterActionFire(Shooter shooter, Intake intake)
+  public ShooterActionFire(Shooter shooter, Intake intake, LED led)
   {
     setName("ShooterActionFire");
 
@@ -27,7 +28,7 @@ public class ShooterActionFire extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand(getName() + ": Start shooter and retract intake"),
         new ShooterRun(shooter, ShooterMode.SCORE),
-        new IntakeActionRetract(intake),
+        new IntakeActionRetract(intake, led),
 
         new PrintCommand(getName() + ": Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtDesiredSpeed),

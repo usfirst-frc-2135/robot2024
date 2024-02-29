@@ -31,8 +31,7 @@ public class LEDSet extends Command
   @Override
   public void initialize( )
   {
-    m_led.setColor(m_color);
-    m_led.setAnimation(m_animation);
+    m_led.setLEDs(LEDColor.DASHBOARD, LEDAnimation.DASHBOARD);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

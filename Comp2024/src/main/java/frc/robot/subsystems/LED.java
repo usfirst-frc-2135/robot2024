@@ -123,7 +123,7 @@ public class LED extends SubsystemBase
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    setColor(LEDColor.OFF);
+    setLEDs(LEDColor.OFF, LEDAnimation.CLEARALL);
 
   }
 
@@ -132,52 +132,44 @@ public class LED extends SubsystemBase
     DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
   }
 
-  public void setColor(LEDColor color)
+  public void setLEDs(LEDColor color, LEDAnimation animation)
   {
-    if (m_previousColor != color)
+    if (color == LEDColor.DASHBOARD)
+      color = m_ledChooser.getSelected( );
+
+    else if (animation == LEDAnimation.DASHBOARD)
     {
-      if (color == LEDColor.DASHBOARD)
-        color = m_ledChooser.getSelected( );
-
-      switch (color)
-      {
-        default :
-        case OFF :
-          m_chosenColor = kColorOff;
-          break;
-        case WHITE :
-          m_chosenColor = kWhite;
-          break;
-        case RED :
-          m_chosenColor = kRed;
-          break;
-        case ORANGE :
-          m_chosenColor = kOrange;
-          break;
-        case YELLOW :
-          m_chosenColor = kYellow;
-          break;
-        case GREEN :
-          m_chosenColor = kGreen;
-          break;
-        case BLUE :
-          m_chosenColor = kBlue;
-          break;
-        case PURPLE :
-          m_chosenColor = kPurple;
-          break;
-      }
-
-      DataLogManager.log(String.format("%s: color is now %s", getSubsystem( ), color));
-      m_candle.setLEDs(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b);
-      m_previousColor = color;
-    }
-  }
-
-  public void setAnimation(LEDAnimation animation)
-  {
-    if (animation == (LEDAnimation.DASHBOARD))
       animation = m_ledAnimationChooser.getSelected( );
+    }
+
+    switch (color)
+    {
+      default :
+      case OFF :
+        m_chosenColor = kColorOff;
+        break;
+      case WHITE :
+        m_chosenColor = kWhite;
+        break;
+      case RED :
+        m_chosenColor = kRed;
+        break;
+      case ORANGE :
+        m_chosenColor = kOrange;
+        break;
+      case YELLOW :
+        m_chosenColor = kYellow;
+        break;
+      case GREEN :
+        m_chosenColor = kGreen;
+        break;
+      case BLUE :
+        m_chosenColor = kBlue;
+        break;
+      case PURPLE :
+        m_chosenColor = kPurple;
+        break;
+    }
 
     switch (animation)
     {
@@ -218,7 +210,12 @@ public class LED extends SubsystemBase
         break;
     }
 
-    DataLogManager.log(String.format("%s: animation is now %s", getSubsystem( ), animation));
+    DataLogManager.log(String.format("%s: color is now %s, %s", getSubsystem( ), color, animation));
     m_candle.animate(m_toAnimate);
+    if (animation == LEDAnimation.CLEARALL)
+    {
+      m_candle.setLEDs(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b);
+    }
+    m_previousColor = color;
   }
 }

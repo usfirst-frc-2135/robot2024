@@ -34,7 +34,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
-  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
+  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
 
   private final SwerveRequest.ApplyChassisSpeeds autoRequest    = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -144,6 +144,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.k_constraints, 0.0);
+    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
   }
 }

@@ -384,8 +384,6 @@ public class RobotContainer
       }
     }
 
-    // m_autoCommand = m_drivetrain.getAutoPath(pathName);
-
     if (m_autoTesting && pathName != null)
     {
       PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);

@@ -333,26 +333,26 @@ public class RobotContainer
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     StartPosition startPosition = m_startChooser.getSelected( );
+    int positionValue = 0;
 
     switch (startPosition)
     {
       default :
         break;
       case STARTPOS1 :
-        pathName = "Pos1_Leave";
+        positionValue = 1;
         break;
       case STARTPOS2 :
-        pathName = "Pos2_Leave";
+        positionValue = 2;
         break;
       case STARTPOS3 :
-        pathName = "Pos3_Leave";
+        positionValue = 3;
         break;
     }
+    pathName = "DriveP" + positionValue;
 
     // The selected command will be run in autonomous
-    if (pathName == null)
-      m_autoCommand = new AutoStop(m_drivetrain);
-    else
+    if (pathName != null)
     {
       m_drivetrain.resetOdometry(PathPlannerAuto.getStaringPoseFromAutoFile(pathName));
       switch (mode)
@@ -362,7 +362,12 @@ public class RobotContainer
           m_autoCommand = new AutoStop(m_drivetrain);
           break;
         case AUTOPRELOADONLY :
-          m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter);
+          m_autoCommand = new SequentialCommandGroup(
+          // @formatter:off
+            m_drivetrain.getAutoPath(pathName),
+            new AutoPreload(m_drivetrain, m_intake, m_shooter)
+            // @formatter:on
+          );
           break;
         case AUTOLEAVE :
           m_autoCommand = m_drivetrain.getAutoPath(pathName);
@@ -370,8 +375,9 @@ public class RobotContainer
         case AUTOPRELOADANDLEAVE :
           m_autoCommand = new SequentialCommandGroup(
           // @formatter:off
+              m_drivetrain.getAutoPath(pathName),
               new AutoPreload(m_drivetrain, m_intake, m_shooter),
-              m_drivetrain.getAutoPath(pathName)
+              m_drivetrain.getAutoPath("DriveS" + positionValue)
             // @formatter:on
           );
           break;

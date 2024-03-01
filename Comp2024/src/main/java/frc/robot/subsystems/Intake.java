@@ -271,6 +271,10 @@ public class Intake extends SubsystemBase
         case EXPEL :
           output = kRollerSpeedExpel;
           break;
+        case SHOOT :
+          output = kRollerSpeedToShooter;
+          break;
+
       }
       DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));
       m_rollerMotor.set(output);

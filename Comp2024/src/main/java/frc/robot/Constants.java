@@ -164,6 +164,7 @@ public class Constants
       STOP,    // Stop spinning
       ACQUIRE, // Acquire a game piece
       EXPEL,   // Expel a game piece
+      SHOOT,    // put into shooter 
       HOLD     // Maintain existing setting
     }
 

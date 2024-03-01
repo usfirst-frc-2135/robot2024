@@ -172,6 +172,7 @@ public class RobotContainer
     SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL));
     SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP));
     SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD));
+    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT));
 
     SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleDeployed));
     SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleRetracted));
@@ -249,7 +250,7 @@ public class RobotContainer
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
-    m_operatorPad.pov(90).onTrue(new Dummy("oper 90"));
+    m_operatorPad.pov(90).onTrue(new IntakeRun(m_intake, RollerMode.SHOOT));
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
     //

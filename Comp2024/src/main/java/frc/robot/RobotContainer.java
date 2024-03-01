@@ -205,8 +205,8 @@ public class RobotContainer
     //
     // Driver - Bumpers, start, back
     m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
-    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
-    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
+    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
     //
@@ -225,7 +225,7 @@ public class RobotContainer
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_driverPad.leftTrigger(Constants.kTriggerThreshold)
         .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose));           // drive to speaker
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
     m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));

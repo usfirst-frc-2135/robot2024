@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants.VIConsts;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 
@@ -30,8 +31,6 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  // private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
-
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
@@ -143,16 +142,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  // public PathPlannerPath driveToSpeaker(CommandSwerveDrivetrain drivetrain)
-  // {
-  //   in progress
-
-  //   Pose2d speakerEndGoal = (1.4,5.52,0)
-  //   PathConstraints speakerConstraints = 
-
-  //   PathPlannerPath driveToSpeaker = new PathPlannerPath (// odometry current pose, constraints, end goal);
-  //   return driveToSpeaker;
-
-  // }
-
+  public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
+  {
+    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
+  }
 }

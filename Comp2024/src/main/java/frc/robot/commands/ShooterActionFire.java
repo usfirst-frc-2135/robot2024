@@ -33,7 +33,7 @@ public class ShooterActionFire extends SequentialCommandGroup
         new WaitUntilCommand(shooter::isAtDesiredSpeed),
 
         new PrintCommand(getName() + ": Feed note from intake"),
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleRetracted),
+        new IntakeRun(intake, INConsts.RollerMode.SHOOT, INConsts.kRotaryAngleRetracted),
 
         new WaitCommand(2.0),
         new ShooterRun(shooter, ShooterMode.STOP),

@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.INConsts;
+import frc.robot.Constants.LEDConsts.LEDAnimation;
+import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
@@ -26,6 +28,10 @@ public class ShooterActionFire extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+
+        new PrintCommand(getName() + ": Change CANdle to green"),
+        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
+
         new PrintCommand(getName() + ": Start shooter and retract intake"),
         new ShooterRun(shooter, ShooterMode.SCORE),
         new IntakeActionRetract(intake, led),

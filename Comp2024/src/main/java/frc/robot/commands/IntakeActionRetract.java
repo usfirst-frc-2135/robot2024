@@ -27,12 +27,14 @@ public class IntakeActionRetract extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+        new PrintCommand(getName() + ": Change CANDle based on note detection"),
         new ConditionalCommand(
           new LEDSet(led, LEDColor.BLUE, LEDAnimation.CLEARALL), 
           new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL), 
-          intake::isNoteDetected)
+          intake::isNoteDetected),
+      
+        new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
     );
 
 

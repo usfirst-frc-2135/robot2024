@@ -33,8 +33,8 @@ public class IntakeActionRetract extends SequentialCommandGroup
       
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
+        //@formatter:on
     );
-
 
   }
 

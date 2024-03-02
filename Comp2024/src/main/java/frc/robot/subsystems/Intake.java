@@ -102,7 +102,7 @@ public class Intake extends SubsystemBase
   // Motion Magic config parameters
   private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
-  private Debouncer                 m_noteDetected        = new Debouncer(0.030, DebounceType.kRising);
+  private Debouncer                 m_noteDetected        = new Debouncer(0.030, DebounceType.kBoth);
   private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
 

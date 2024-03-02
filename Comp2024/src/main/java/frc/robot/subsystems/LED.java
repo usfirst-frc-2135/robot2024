@@ -51,11 +51,11 @@ public class LED extends SubsystemBase
 
   private final myColor                       kWhite                = new myColor(255, 255, 255);
   private final myColor                       kRed                  = new myColor(255, 0, 0);
-  private final myColor                       kOrange               = new myColor(255, 80, 0);
+  private final myColor                       kOrange               = new myColor(255, 48, 0);
   private final myColor                       kYellow               = new myColor(255, 255, 0);
   private final myColor                       kGreen                = new myColor(0, 255, 0);
   private final myColor                       kBlue                 = new myColor(0, 0, 255);
-  private final myColor                       kPurple               = new myColor(144, 0, 255);
+  private final myColor                       kPurple               = new myColor(128, 0, 128);
   private final myColor                       kColorOff             = new myColor(0, 0, 0);
 
   // Member objects

@@ -14,7 +14,9 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -30,6 +32,7 @@ import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
+import frc.robot.Constants.VIConsts;
 import frc.robot.commands.AutoPreload;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberCalibrate;
@@ -71,15 +74,16 @@ public class RobotContainer
   private static final CommandXboxController          m_operatorPad  = new CommandXboxController(Constants.kOperatorPadPort);
 
   private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-  private double                                      MaxAngularRate = 3.0 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double                                      MaxAngularRate = 3.0 * Math.PI;                     // 1.5 rotations per second max angular velocity
   private Command                                     m_autoCommand;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
-  private final SwerveRequest.FieldCentric            drive          =
-      new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.15).withRotationalDeadband(MaxAngularRate * 0.15) // Add a 10% deadband
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // We want field-centric driving in open loop
+  private final SwerveRequest.FieldCentric            drive          = new SwerveRequest.FieldCentric( )
+      .withDeadband(MaxSpeed * Constants.kStickDeadband).withRotationalDeadband(MaxAngularRate * Constants.kStickDeadband) // Add a 15% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // We want field-centric driving in open loop
   private final SwerveRequest.SwerveDriveBrake        brake          = new SwerveRequest.SwerveDriveBrake( );
-  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( );
+  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )
+      .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed).withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);
   private final SwerveRequest.PointWheelsAt           point          = new SwerveRequest.PointWheelsAt( );
 
   private final Telemetry                             logger         = new Telemetry(MaxSpeed);
@@ -161,8 +165,13 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
 
-    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake));
-    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake));
+    SmartDashboard.putNumber("SW_PoseX", 0.0);
+    SmartDashboard.putNumber("SW_PoseY", 0.0);
+    SmartDashboard.putNumber("SW_PoseRot", 0.0);
+    SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromPose( )).ignoringDisable(true));
+
+    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
+    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
 
@@ -197,32 +206,37 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    m_driverPad.a( ).onTrue(new Dummy("driver A"));     // Shoot note (prime and intake load)
-    m_driverPad.b( ).onTrue(new Dummy("driver B"));     // Drive to pose: stage right
-    m_driverPad.x( ).onTrue(new Dummy("driver X"));     // Drive to pose: stage left
-    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));  // Drive to pose: stage center
+    m_driverPad.a( ).onTrue(new Dummy("driver A"));
+    m_driverPad.b( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageRight));        // drive to stage right
+    m_driverPad.x( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
+    m_driverPad.y( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
     //
     // Driver - Bumpers, start, back
-    m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));  // Drive to pose: amp
-    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
-    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
+    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
+    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
     //
     // Driver - POV buttons
-    m_driverPad.pov(0).whileTrue(m_drivetrain.applyRequest(( ) -> point.withModuleDirection(Rotation2d.fromDegrees(0))));
-    m_driverPad.pov(90).whileTrue(m_drivetrain.applyRequest(( ) -> point.withModuleDirection(Rotation2d.fromDegrees(270))));
-    m_driverPad.pov(180).whileTrue(m_drivetrain.applyRequest(( ) -> point.withModuleDirection(Rotation2d.fromDegrees(180))));
-    m_driverPad.pov(270).whileTrue(m_drivetrain.applyRequest(( ) -> point.withModuleDirection(Rotation2d.fromDegrees(90))));
+    m_driverPad.pov(0)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(0.0)))));
+    m_driverPad.pov(90)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(270.0)))));
+    m_driverPad.pov(180)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(180.0)))));
+    m_driverPad.pov(270)
+        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(90.0)))));
     //
     // Driver Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));  // Drive to pose: speaker
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
+    m_driverPad.leftTrigger(Constants.kTriggerThreshold)
+        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose));           // drive to speaker
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
-    m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
+    m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
 
     ///////////////////////////////////////////////////////
     //
@@ -236,10 +250,10 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
-    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
-    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
+    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
+    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
-    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary));                    // aka Menu
+    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary).ignoringDisable(true)); // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
@@ -251,11 +265,11 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
-    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
     // m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
+    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
   }
 
   /****************************************************************************
@@ -265,18 +279,16 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     if (!m_macOSXSim)
-      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
-              // negative Y (forward)
-              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
-              .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+      m_drivetrain.setDefaultCommand(                                                               // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                                   // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate)                       // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
-      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
-              // negative Y (forward)
-              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
-              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+      m_drivetrain.setDefaultCommand(                                                               // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                                   // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate)              // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
 
     // if (Utils.isSimulation()) {
@@ -311,7 +323,7 @@ public class RobotContainer
     m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
     // Configure autonomous sendable chooser
-    SmartDashboard.putData("Auto Mode", m_autoChooser);
+    SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Autonomous Starting Position
     m_startChooser.setDefaultOption("STARTPOS1", StartPosition.STARTPOS1);
@@ -438,12 +450,21 @@ public class RobotContainer
 
     // Configure odometry sendable chooser
     SmartDashboard.putData("AprilTagPose", m_odomChooser);
-    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setOdometry( )));
+    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setOdometry( )).ignoringDisable(true));
   }
 
   public void setOdometry( )
   {
     m_drivetrain.resetOdometry(Constants.VIConsts.kAprilTagPoses.get(m_odomChooser.getSelected( )));
+  }
+
+  public void setOdometryFromPose( )
+  {
+    m_drivetrain.resetOdometry(new Pose2d(new Translation2d(                    // 
+        SmartDashboard.getNumber("SW_PoseX", 0.0),             //
+        SmartDashboard.getNumber("SW_PoseY", 0.0)),            //
+        Rotation2d.fromDegrees(SmartDashboard.getNumber("SW_PoseRot", 0.0)) //
+    ));
   }
 
   /****************************************************************************

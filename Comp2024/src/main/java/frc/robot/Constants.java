@@ -4,6 +4,8 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -218,7 +220,7 @@ public class Constants
     }
 
     // Manual config parameters
-    public enum RotaryManual
+    public enum RotaryMode
     {
     }
 
@@ -289,6 +291,30 @@ public class Constants
         new Pose2d(new Translation2d(4.641342, 4.49834), new Rotation2d(Units.degreesToRadians(120))),      // AprilTag ID: 15
         new Pose2d(new Translation2d(4.641342, 3.713226), new Rotation2d(Units.degreesToRadians(240)))      // AprilTag ID: 16
     ));
+
+    //Poses for limelight paths
+    public static final Pose2d       kSpeakerPose   = new Pose2d(1.4, 5.52, Rotation2d.fromDegrees(180));
+    public static final Pose2d       kAmpPose       = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
+    public static final Pose2d       kStageCenter   = new Pose2d(6.33, 4.13, Rotation2d.fromDegrees(180));
+    public static final Pose2d       kStageLeft     = new Pose2d(4.15, 5.52, Rotation2d.fromDegrees(-60));
+    public static final Pose2d       kStageRight    = new Pose2d(4.18, 2.67, Rotation2d.fromDegrees(60));
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Path on the fly trajectory constraints
+    /////////////////////////////////////////////////////////////////////////////
+    public static final class PATHConsts
+    {
+      public static final double kMaxVelocityMps                         = 3.0;
+      public static final double kMaxAccelerationMpsSq                   = 3.0;
+
+      public static final double kMaxAngularSpeedRadiansPerSecond        = 1.5 * Math.PI;
+      public static final double kMaxAngularSpeedRadiansPerSecondSquared = 2.0 * Math.PI;
+    }
+
+    //Path constraints
+    public static final PathConstraints kConstraints =
+        new PathConstraints(PATHConsts.kMaxVelocityMps, PATHConsts.kMaxAccelerationMpsSq,
+            PATHConsts.kMaxAngularSpeedRadiansPerSecond, PATHConsts.kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
   /////////////////////////////////////////////////////////////////////////////

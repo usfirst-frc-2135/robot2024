@@ -115,7 +115,7 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;     // Seconds
     inRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 80.0;       // Amps
+    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 100.0;       // Amps
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -185,7 +185,7 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 80.0;        // Amps
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // shooterConfig.Feedback.*

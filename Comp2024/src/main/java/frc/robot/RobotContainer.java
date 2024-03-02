@@ -14,6 +14,7 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -163,8 +164,13 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
 
-    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
-    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
+    SmartDashboard.putNumber("SW_PoseX", 0.0);
+    SmartDashboard.putNumber("SW_PoseY", 0.0);
+    SmartDashboard.putNumber("SW_PoseRot", 0.0);
+    SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromPose( )).ignoringDisable(true));
+
+    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake));
+    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
 
@@ -245,7 +251,7 @@ public class RobotContainer
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
-    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary));                    // aka Menu
+    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary).ignoringDisable(true)); // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
@@ -315,7 +321,7 @@ public class RobotContainer
     m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
     // Configure autonomous sendable chooser
-    SmartDashboard.putData("Auto Mode", m_autoChooser);
+    SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Autonomous Starting Position
     m_startChooser.setDefaultOption("STARTPOS1", StartPosition.STARTPOS1);
@@ -438,12 +444,21 @@ public class RobotContainer
 
     // Configure odometry sendable chooser
     SmartDashboard.putData("AprilTagPose", m_odomChooser);
-    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setOdometry( )));
+    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setOdometry( )).ignoringDisable(true));
   }
 
   public void setOdometry( )
   {
     m_drivetrain.resetOdometry(Constants.VIConsts.kAprilTagPoses.get(m_odomChooser.getSelected( )));
+  }
+
+  public void setOdometryFromPose( )
+  {
+    m_drivetrain.resetOdometry(new Pose2d(new Translation2d(                    // 
+        SmartDashboard.getNumber("SW_PoseX", 0.0),             //
+        SmartDashboard.getNumber("SW_PoseY", 0.0)),            //
+        Rotation2d.fromDegrees(SmartDashboard.getNumber("SW_PoseRot", 0.0)) //
+    ));
   }
 
   /****************************************************************************

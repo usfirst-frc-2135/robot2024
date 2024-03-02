@@ -9,14 +9,17 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.INConsts;
+import frc.robot.Constants.LEDConsts.LEDAnimation;
+import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 
 /**
  *
  */
 public class IntakeActionAcquire extends SequentialCommandGroup
 {
-  public IntakeActionAcquire(Intake intake)
+  public IntakeActionAcquire(Intake intake, LED led)
   {
     setName("IntakeActionAcquire");
 
@@ -24,6 +27,9 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+        new PrintCommand(getName() + ": Turn CANdle yellow"),
+        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
+
         new PrintCommand(getName() + ": Start rollers & Deploy intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
 
@@ -32,7 +38,6 @@ public class IntakeActionAcquire extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
- 
         // @formatter:on
     );
   }

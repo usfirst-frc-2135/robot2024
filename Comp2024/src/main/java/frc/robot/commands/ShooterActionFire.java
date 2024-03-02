@@ -29,8 +29,8 @@ public class ShooterActionFire extends SequentialCommandGroup
 
         // @formatter:off
 
-        new PrintCommand(getName() + ": Change CANdle to green"),
-        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
+        new PrintCommand(getName() + ": Change CANdle to red"),
+        new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
 
         new PrintCommand(getName() + ": Start shooter and retract intake"),
         new ShooterRun(shooter, ShooterMode.SCORE),
@@ -39,12 +39,18 @@ public class ShooterActionFire extends SequentialCommandGroup
         new PrintCommand(getName() + ": Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtDesiredSpeed),
 
+        new PrintCommand(getName() + ": Change CANdle to green"),
+        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
+
         new PrintCommand(getName() + ": Feed note from intake"),
         new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleRetracted),
 
         new WaitCommand(2.0),
         new ShooterRun(shooter, ShooterMode.STOP),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+
+        new PrintCommand(getName() + ": Turn CANdle off"),
+        new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL)
 
         // @formatter:on
     );

@@ -26,7 +26,7 @@ public class IntakeActionAcquire extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Turn CANdle yellow"),
-        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL), //how to add m_led into this?
+        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
 
         new PrintCommand(getName() + ": Start rollers & Deploy intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),

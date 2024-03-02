@@ -169,8 +169,8 @@ public class RobotContainer
     SmartDashboard.putNumber("SW_PoseRot", 0.0);
     SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromPose( )).ignoringDisable(true));
 
-    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake));
-    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake));
+    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
+    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
 

@@ -22,7 +22,6 @@ import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
@@ -56,11 +55,8 @@ public class LED extends SubsystemBase
   private final myColor                       kYellow               = new myColor(255, 255, 0);
   private final myColor                       kGreen                = new myColor(0, 255, 0);
   private final myColor                       kBlue                 = new myColor(0, 0, 255);
-  private final myColor                       kPurple               = new myColor(144, 0, 255);
+  private final myColor                       kPurple               = new myColor(128, 0, 128);
   private final myColor                       kColorOff             = new myColor(0, 0, 0);
-
-  // Example of existing Color8Bit class
-  private final Color8Bit                     kBlue8                = new Color8Bit(0, 0, 255);
 
   // Member objects
   private final CANdle                        m_candle              = new CANdle(Ports.kCANID_CANdle);

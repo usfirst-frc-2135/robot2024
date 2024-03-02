@@ -36,12 +36,10 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  // private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
-
+  private final boolean                              m_useLimelight = true; // set to false when no limelight to prevent sim errors
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
   private double                                     m_lastSimTime;
-  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
   private final Rotation2d                           BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
@@ -61,7 +59,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private SysIdRoutine                               SysIdRoutineTranslation         = new SysIdRoutine(
       new SysIdRoutine.Config(null, Volts.of(4), null, (state) -> SignalLogger.writeString("state", state.toString( ))),
       new SysIdRoutine.Mechanism((volts) -> setControl(TranslationCharacterization.withVolts(volts)), null, this));
-
   private final SysIdRoutine                         SysIdRoutineRotation            = new SysIdRoutine(
       new SysIdRoutine.Config(null, Volts.of(4), null, (state) -> SignalLogger.writeString("state", state.toString( ))),
       new SysIdRoutine.Mechanism((volts) -> setControl(RotationCharacterization.withVolts(volts)), null, this));
@@ -212,16 +209,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  // public PathPlannerPath driveToSpeaker(CommandSwerveDrivetrain drivetrain)
-  // {
-  //   in progress
-
-  //   Pose2d speakerEndGoal = (1.4,5.52,0)
-  //   PathConstraints speakerConstraints = 
-
-  //   PathPlannerPath driveToSpeaker = new PathPlannerPath (// odometry current pose, constraints, end goal);
-  //   return driveToSpeaker;
-
-  // }
-
+  public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
+  {
+    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
+  }
 }

@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase
   private static final double   kFlywheelGearRatio       = (18.0 / 18.0);
 
   private static final double   kFlywheelToleranceRPM    = 150.0;     // Tolerance band around target RPM
-  private static final double   kFlywheelScoreRPM        = 2150.0;    // RPM to score
+  private static final double   kFlywheelScoreRPM        = 3000.0;    // RPM to score
 
   // Devices and simulation objects
   private final TalonFX         m_shooterLower           = new TalonFX(Ports.kCANID_ShooterLower);

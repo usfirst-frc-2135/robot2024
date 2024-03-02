@@ -8,6 +8,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
@@ -24,13 +25,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
+import frc.robot.Constants.VIConsts;
 import frc.robot.commands.AutoPreload;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberMoveToPosition;
@@ -43,6 +44,7 @@ import frc.robot.commands.IntakeActionShoot;
 import frc.robot.commands.IntakeMoveWithJoystick;
 import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
+import frc.robot.commands.ShooterActionFire;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -70,15 +72,17 @@ public class RobotContainer
   private static final CommandXboxController          m_operatorPad  = new CommandXboxController(Constants.kOperatorPadPort);
 
   private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-  private double                                      MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double                                      MaxAngularRate = 3.0 * Math.PI;                     // 1.5 rotations per second max angular velocity
   private Command                                     m_autoCommand;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
-  private final SwerveRequest.FieldCentric            drive          =
-      new SwerveRequest.FieldCentric( ).withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // We want field-centric driving in open loop
+  private final SwerveRequest.FieldCentric            drive          = new SwerveRequest.FieldCentric( )
+      .withDeadband(MaxSpeed * Constants.kStickDeadband).withRotationalDeadband(MaxAngularRate * Constants.kStickDeadband) // Add a 15% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // We want field-centric driving in open loop
   private final SwerveRequest.SwerveDriveBrake        brake          = new SwerveRequest.SwerveDriveBrake( );
-  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( );
+  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )
+      .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed).withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);
+  private final SwerveRequest.PointWheelsAt           point          = new SwerveRequest.PointWheelsAt( );
 
   private final Telemetry                             logger         = new Telemetry(MaxSpeed);
 
@@ -194,16 +198,16 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    m_driverPad.a( ).onTrue(new Dummy("driver A"));     // Shoot note (prime and intake load)
-    m_driverPad.b( ).onTrue(new Dummy("driver B"));     // Drive to pose: stage right
-    m_driverPad.x( ).onTrue(new Dummy("driver X"));     // Drive to pose: stage left
-    // m_driverPad.y( ).onTrue(drivetrain.driveToSpeaker(drivetrain));  // Drive to pose: stage center
+    m_driverPad.a( ).onTrue(new Dummy("driver A"));
+    m_driverPad.b( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageRight));        // drive to stage right
+    m_driverPad.x( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
+    m_driverPad.y( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
     //
     // Driver - Bumpers, start, back
-    m_driverPad.leftBumper( ).onTrue(new Dummy("driver left bumper"));  // Drive to pose: amp
+    m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
     m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
-    m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                          // aka View
+    m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
     //
     // Driver - POV buttons
@@ -219,11 +223,12 @@ public class RobotContainer
     // Driver Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_driverPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("driver left trigger"));  // Drive to pose: speaker
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionExpel(m_intake));
+    m_driverPad.leftTrigger(Constants.kTriggerThreshold)
+        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose));           // drive to speaker
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
 
-    m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
+    m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
 
     ///////////////////////////////////////////////////////
     //
@@ -233,14 +238,14 @@ public class RobotContainer
     m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
     m_operatorPad.x( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
-    m_operatorPad.y( ).onTrue(new Dummy("oper Y"));
+    m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake));
     //
     // Operator - Bumpers, start, back
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake));
-    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));                          // aka View
-    m_operatorPad.start( ).onTrue(new Dummy("oper start"));  // aka Menu
+    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
+    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary));                    // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
@@ -251,12 +256,12 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new IntakeActionShoot(m_intake));
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake));
 
-    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
     // m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
+    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
   }
 
   /****************************************************************************
@@ -266,18 +271,16 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     if (!m_macOSXSim)
-      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
-              // negative Y (forward)
-              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
-              .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+      m_drivetrain.setDefaultCommand(                                                               // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                                   // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate)                       // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
-      m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with
-              // negative Y (forward)
-              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed) // Drive left with negative X (left)
-              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+      m_drivetrain.setDefaultCommand(                                                               // Drivetrain will execute this command periodically
+          m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                                   // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate)              // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true));
 
     // if (Utils.isSimulation()) {
@@ -293,7 +296,7 @@ public class RobotContainer
 
     // Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
-    // m_climber.setDefaultCommand(new ClimberRun(m_climber));
+    m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 
@@ -355,6 +358,7 @@ public class RobotContainer
       m_autoCommand = new AutoStop(m_drivetrain);
     else
     {
+      m_drivetrain.resetOdometry(PathPlannerAuto.getStaringPoseFromAutoFile(pathName));
       switch (mode)
       {
         default :

@@ -3,11 +3,13 @@
 //
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -31,8 +33,8 @@ public class Shooter extends SubsystemBase
   // Constants
   private static final double   kFlywheelGearRatio       = (18.0 / 18.0);
 
-  private static final double   kFlywheelToleranceRPM    = 150.0;     // Tolerance band around target RPM
   private static final double   kFlywheelScoreRPM        = 3000.0;    // RPM to score
+  private static final double   kToleranceRPM            = 100.0;     // Tolerance band around target RPM
 
   // Devices and simulation objects
   private final TalonFX         m_shooterLower           = new TalonFX(Ports.kCANID_ShooterLower);
@@ -44,14 +46,19 @@ public class Shooter extends SubsystemBase
   private final FlywheelSim     m_flywheelUpperSim       = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
 
   private VelocityVoltage       m_requestVelocity        = new VelocityVoltage(0.0);
-  private LinearFilter          m_flywheelFilter         = LinearFilter.singlePoleIIR(0.1, 0.02);
+  private LinearFilter          m_flywheelFilter         = LinearFilter.singlePoleIIR(0.060, 0.020);
+
+  // Status signals
+  private StatusSignal<Double>  m_shooterLVelocity       = m_shooterLower.getRotorVelocity( );
+  private StatusSignal<Double>  m_shooterLSupplyCur      = m_shooterLower.getSupplyCurrent( );
+  private StatusSignal<Double>  m_shooterLStatorCur      = m_shooterLower.getStatorCurrent( );
 
   // Declare module variables
   private boolean               m_shooterValid;
   private boolean               m_atDesiredSpeed         = false; // Indicates flywheel RPM is close to target
   private boolean               m_atDesiredSpeedPrevious = false;
 
-  private double                m_flywheelTargetRPM;     // Requested flywheel RPM
+  private double                m_targetRPM;             // Requested flywheel RPM
   private double                m_flywheelRPM;           // Current flywheel RPM
 
   // Constructor
@@ -65,6 +72,10 @@ public class Shooter extends SubsystemBase
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), true));
 
+    m_shooterLVelocity.setUpdateFrequency(50);
+    m_shooterLSupplyCur.setUpdateFrequency(25);
+    m_shooterLStatorCur.setUpdateFrequency(25);
+
     initSmartDashboard( );
     initialize( );
   }
@@ -74,29 +85,26 @@ public class Shooter extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    double current = 0.0;
-
     // Calculate flywheel RPM and display on dashboard
     if (m_shooterValid)
     {
       m_flywheelRPM = m_flywheelFilter.calculate((m_shooterLower.getVelocity( ).refresh( ).getValue( ) * 60.0));
 
-      m_atDesiredSpeed =
-          (m_flywheelRPM > kFlywheelToleranceRPM) && (Math.abs(m_flywheelTargetRPM - m_flywheelRPM) < kFlywheelToleranceRPM);
+      m_atDesiredSpeed = (m_flywheelRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_flywheelRPM, kToleranceRPM);
 
       if (m_atDesiredSpeed != m_atDesiredSpeedPrevious)
       {
-        DataLogManager.log(String.format("%s: at desired speed now: %.1f", getSubsystem( ), m_flywheelTargetRPM));
+        DataLogManager.log(String.format("%s: at desired speed now: %.1f", getSubsystem( ), m_targetRPM));
         m_atDesiredSpeedPrevious = m_atDesiredSpeed;
       }
 
-      current = m_shooterLower.getStatorCurrent( ).refresh( ).getValue( );
+      SmartDashboard.putNumber("SH_supCur", m_shooterLSupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("SH_current", m_shooterLStatorCur.refresh( ).getValue( ));
     }
 
-    SmartDashboard.putNumber("SH_targetRPM", m_flywheelTargetRPM);
+    SmartDashboard.putNumber("SH_targetRPM", m_targetRPM);
     SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
     SmartDashboard.putBoolean("SH_atDesiredSpeed", m_atDesiredSpeed);
-    SmartDashboard.putNumber("SH_current", current);
   }
 
   @Override
@@ -153,18 +161,18 @@ public class Shooter extends SubsystemBase
       default :
         DataLogManager.log(String.format("%s: Shooter mode is invalid: %s", getSubsystem( ), mode));
       case STOP :
-        m_flywheelTargetRPM = 0.0;
+        m_targetRPM = 0.0;
         break;
       case SCORE :
-        m_flywheelTargetRPM = SmartDashboard.getNumber("SH_scoreRPM", m_flywheelTargetRPM);
+        m_targetRPM = SmartDashboard.getNumber("SH_scoreRPM", m_targetRPM);
         break;
     }
 
-    double rotPerSecond = m_flywheelTargetRPM / 60.0;
+    double rotPerSecond = m_targetRPM / 60.0;
     if (m_shooterValid)
       m_shooterLower
           .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
-    DataLogManager.log(String.format("%s: target rpm is %.1f rps %1f", getSubsystem( ), m_flywheelTargetRPM, rotPerSecond));
+    DataLogManager.log(String.format("%s: target rpm is %.1f rps %1f", getSubsystem( ), m_targetRPM, rotPerSecond));
   }
 
   public boolean isAtDesiredSpeed( )

@@ -15,6 +15,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -34,7 +35,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private static final double                    kSimLoopPeriod = 0.005; // 5 ms
   private Notifier                               m_simNotifier  = null;
   private double                                 m_lastSimTime;
-  private final boolean                          m_useLimelight = false; // set to false when no limelight to prevent sim errors
+  private final boolean                          m_useLimelight = true; // set to false when no limelight to prevent sim errors
 
   private final SwerveRequest.ApplyChassisSpeeds autoRequest    = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -131,12 +132,20 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     // This method will be called once per scheduler run
     if (m_useLimelight)
     {
+      DataLogManager.log(String.format("using limelight"));
+
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
+      if (lastResult.valid)
+      {
+        DataLogManager.log(String.format("seeing valid id!----------"));
+      }
+
       if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {
+        DataLogManager.log(String.format("seeing valid id and not 0!-----------------"));
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }

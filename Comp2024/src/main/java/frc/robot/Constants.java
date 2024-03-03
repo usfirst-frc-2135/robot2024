@@ -304,8 +304,8 @@ public class Constants
     /////////////////////////////////////////////////////////////////////////////
     public static final class PATHConsts
     {
-      public static final double kMaxVelocityMps                         = 3.0;
-      public static final double kMaxAccelerationMpsSq                   = 3.0;
+      public static final double kMaxVelocityMps                         = 1.0;
+      public static final double kMaxAccelerationMpsSq                   = 1.0;
 
       public static final double kMaxAngularSpeedRadiansPerSecond        = 1.5 * Math.PI;
       public static final double kMaxAngularSpeedRadiansPerSecondSquared = 2.0 * Math.PI;

@@ -165,7 +165,9 @@ public class Constants
       ACQUIRE, // Acquire a game piece
       EXPEL,   // Expel a game piece
       SHOOT,    // put into shooter 
+      HANDOFF,  // put into feeder 
       HOLD     // Maintain existing setting
+
     }
 
     // Rotary manual move parameters

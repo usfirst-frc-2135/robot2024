@@ -54,7 +54,8 @@ public class Intake extends SubsystemBase
 
   private static final double       kRollerSpeedAcquire   = 0.5;
   private static final double       kRollerSpeedExpel     = -0.4;
-  private static final double       kRollerSpeedToShooter = -0.6;
+  private static final double       kRollerSpeedToShooter = -0.4;
+  private static final double       kRollerSpeedToFeeder  = -0.4;
 
   private static final double       kLigament2dOffset     = 90.0;      // Offset from mechanism root for ligament
   private static final double       kRotaryGearRatio      = 30.83;
@@ -275,6 +276,8 @@ public class Intake extends SubsystemBase
         case SHOOT :
           output = kRollerSpeedToShooter;
           break;
+        case HANDOFF :
+          output = kRollerSpeedToFeeder;
 
       }
       DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));

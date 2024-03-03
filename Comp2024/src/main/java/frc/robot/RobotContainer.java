@@ -40,6 +40,7 @@ import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.IntakeActionAcquire;
 import frc.robot.commands.IntakeActionExpel;
+import frc.robot.commands.IntakeActionHandoff;
 import frc.robot.commands.IntakeActionRetract;
 import frc.robot.commands.IntakeActionShoot;
 import frc.robot.commands.IntakeMoveWithJoystick;
@@ -173,6 +174,7 @@ public class RobotContainer
     SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
+    SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
     SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE));
     SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL));
@@ -256,7 +258,8 @@ public class RobotContainer
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
-    m_operatorPad.pov(90).onTrue(new IntakeRun(m_intake, RollerMode.SHOOT));
+    m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
+    ;
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
     //

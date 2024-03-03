@@ -115,7 +115,7 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;     // Seconds
     inRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 80.0;       // Amps
+    inRotaryConfig.CurrentLimits.StatorCurrentLimit = 100.0;       // Amps
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -165,7 +165,7 @@ public final class CTREConfigs6
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.0 : -0.891113; // Rotations TODO: get comp value
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.0 : -0.703613; // Rotations TODO: get comp value
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
@@ -185,7 +185,7 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 80.0;        // Amps
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // shooterConfig.Feedback.*

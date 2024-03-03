@@ -50,14 +50,14 @@ import frc.robot.lib.util.PhoenixUtil6;
 public class Intake extends SubsystemBase
 {
   // Constants
-  private static final boolean      kRollerMotorInvert    = true;     // Motor direction for positive input
+  private static final boolean      kRollerMotorInvert    = false;     // Motor direction for positive input
 
   private static final double       kRollerSpeedAcquire   = 0.5;
   private static final double       kRollerSpeedExpel     = -0.4;
   private static final double       kRollerSpeedToShooter = -0.6;
 
   private static final double       kLigament2dOffset     = 90.0;      // Offset from mechanism root for ligament
-  private static final double       kRotaryGearRatio      = 24.0;
+  private static final double       kRotaryGearRatio      = 30.83;
   private static final double       kRotaryLengthMeters   = 0.3;
   private static final double       kRotaryWeightKg       = 4.0;
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
@@ -102,6 +102,7 @@ public class Intake extends SubsystemBase
   // Motion Magic config parameters
   private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
+  private Debouncer                 m_noteDetected        = new Debouncer(0.030, DebounceType.kBoth);
   private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
   private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
 
@@ -284,7 +285,7 @@ public class Intake extends SubsystemBase
 
   public boolean isNoteDetected( )
   {
-    return m_noteInIntake.get( );
+    return m_noteDetected.calculate(m_noteInIntake.get( ));
   }
 
   private boolean isWithinTolerance(double targetDegrees)

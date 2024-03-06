@@ -217,12 +217,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
+    if (DriverStation.getAlliance( ).equals(Alliance.Red))
+    {
+      if (pose.equals(VIConsts.kStageLeft))
+      {
+        pose = VIConsts.kStageLeft;
+      }
+      else if (pose.equals(VIConsts.kStageRight))
+      {
+        pose = VIConsts.kStageLeft;
+      }
+    }
+
     DataLogManager.log(String.format("given alliance %s", DriverStation.getAlliance( )));
     DataLogManager.log(String.format("target pose: %s ", pose));
 
-    SmartDashboard.putNumber("target pose x", pose.getX( ));
-    SmartDashboard.putNumber("target pose y", pose.getY( ));
-
-    return AutoBuilder.pathfindToPose(pose, VIConsts.kConstraints, 0.0);
+    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
   }
 }

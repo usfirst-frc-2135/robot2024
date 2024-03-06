@@ -343,7 +343,10 @@ public class Climber extends SubsystemBase
   public void moveToCalibrate( )
   {
     if (m_climberValid)
+    {
       m_climberL.setControl(m_requestVolts.withOutput(kCalibrateSpeedVolts));
+      m_climberR.setControl(m_requestVolts.withOutput(-kCalibrateSpeedVolts));
+    }
   }
 
   public void endCalibration( )

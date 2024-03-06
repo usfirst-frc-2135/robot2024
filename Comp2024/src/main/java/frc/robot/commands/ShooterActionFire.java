@@ -43,7 +43,7 @@ public class ShooterActionFire extends SequentialCommandGroup
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
 
         new PrintCommand(getName() + ": Feed note from intake"),
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleRetracted),
+        new IntakeRun(intake, INConsts.RollerMode.SHOOT, INConsts.kRotaryAngleRetracted),
 
         new WaitCommand(2.0),
         new ShooterRun(shooter, ShooterMode.STOP),

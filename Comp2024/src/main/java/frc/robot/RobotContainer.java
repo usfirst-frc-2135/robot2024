@@ -205,9 +205,9 @@ public class RobotContainer
     //
     // Driver - A, B, X, Y
     m_driverPad.a( ).onTrue(new Dummy("driver A"));
-    m_driverPad.b( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageRight));        // drive to stage right
-    m_driverPad.x( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
-    m_driverPad.y( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
+    m_driverPad.b( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageRight));        // drive to stage right
+    m_driverPad.x( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
+    m_driverPad.y( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
     //
     // Driver - Bumpers, start, back
     m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp

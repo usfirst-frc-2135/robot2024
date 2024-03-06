@@ -39,7 +39,7 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
   private double                                     m_lastSimTime;
@@ -201,20 +201,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight)
     {
-      DataLogManager.log(String.format("using limelight"));
+      //DataLogManager.log(String.format("using limelight"));
 
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
-      if (lastResult.valid)
-      {
-        DataLogManager.log(String.format("seeing valid id!----------"));
-      }
-
       if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {
-        DataLogManager.log(String.format("seeing valid id and not 0!-----------------"));
+        //   DataLogManager.log(String.format("seeing valid id and not 0!-----------------"));
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }
@@ -222,6 +217,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
+    DataLogManager.log(String.format("given alliance %s", DriverStation.getAlliance( )));
+    DataLogManager.log(String.format("target pose: %s ", pose));
+
+    SmartDashboard.putNumber("target pose x", pose.getX( ));
+    SmartDashboard.putNumber("target pose y", pose.getY( ));
+
+    return AutoBuilder.pathfindToPose(pose, VIConsts.kConstraints, 0.0);
   }
 }

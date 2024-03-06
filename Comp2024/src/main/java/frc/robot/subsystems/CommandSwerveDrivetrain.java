@@ -19,6 +19,10 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -69,6 +73,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   /* Change this to the sysid routine you want to test */
   private final SysIdRoutine                         RoutineToApply                  = SysIdRoutineTranslation;
+
+  /* What to publish over networktables for telemetry */
+  private final NetworkTableInstance                 inst                            = NetworkTableInstance.getDefault( );
+
+  /* Robot pose for field positioning */
+  private final NetworkTable                         table                           = inst.getTable("Pose");
+  private final DoubleArrayPublisher                 fieldPub                        =
+      table.getDoubleArrayTopic("llPose").publish( );
+  private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
       SwerveModuleConstants... modules)
@@ -202,6 +215,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
+
+      fieldTypePub.set("Field2d");
+      fieldPub.set(new double[ ]
+      {
+          llPose.getX( ), llPose.getY( ), llPose.getRotation( ).getDegrees( )
+      });
 
       if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {

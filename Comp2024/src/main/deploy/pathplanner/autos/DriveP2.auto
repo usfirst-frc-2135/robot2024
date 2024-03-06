@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6113694395739754,
-      "y": 7.213875312195456
+      "x": 1.325730468864645,
+      "y": 5.539225686154654
     },
     "rotation": 0
   },
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos1_Leave"
+            "pathName": "DriveP2"
           }
         }
       ]

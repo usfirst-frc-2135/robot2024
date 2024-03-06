@@ -296,11 +296,11 @@ public class Constants
     ));
 
     //Poses for limelight paths
-    public static final Pose2d       kSpeakerPose   = new Pose2d(2.63, 4.03, Rotation2d.fromDegrees(180));
-    public static final Pose2d       kAmpPose       = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(90));
-    public static final Pose2d       kStageCenter   = new Pose2d(5.92, 4.13, Rotation2d.fromDegrees(180));
-    public static final Pose2d       kStageLeft     = new Pose2d(4.3, 5.0, Rotation2d.fromDegrees(-60));
-    public static final Pose2d       kStageRight    = new Pose2d(4.3, 3.2, Rotation2d.fromDegrees(60));
+    public static final Pose2d       kSpeakerPose   = new Pose2d(2.63, 4.03, Rotation2d.fromDegrees(0));
+    public static final Pose2d       kAmpPose       = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(-90));
+    public static final Pose2d       kStageCenter   = new Pose2d(5.92, 4.13, Rotation2d.fromDegrees(0));
+    public static final Pose2d       kStageLeft     = new Pose2d(4.3, 5.0, Rotation2d.fromDegrees(240));
+    public static final Pose2d       kStageRight    = new Pose2d(4.3, 3.2, Rotation2d.fromDegrees(-120));
 
     /////////////////////////////////////////////////////////////////////////////
     // Path on the fly trajectory constraints

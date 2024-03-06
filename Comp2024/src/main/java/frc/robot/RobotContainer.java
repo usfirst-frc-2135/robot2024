@@ -35,6 +35,7 @@ import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.Constants.VIConsts;
 import frc.robot.commands.AutoPreload;
 import frc.robot.commands.AutoStop;
+import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
@@ -189,6 +190,7 @@ public class RobotContainer
     SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
     SmartDashboard.putData("ClRunClimbed", new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
+    SmartDashboard.putData("CLCalibrate", new ClimberCalibrate(m_climber));
   }
 
   /****************************************************************************
@@ -297,12 +299,12 @@ public class RobotContainer
 
     // Default command - Motion Magic hold
     m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
-    // m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
+    m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
     // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
-    m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
+    //m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 
@@ -343,26 +345,26 @@ public class RobotContainer
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     StartPosition startPosition = m_startChooser.getSelected( );
+    int positionValue = 0;
 
     switch (startPosition)
     {
       default :
         break;
       case STARTPOS1 :
-        pathName = "Pos1_Leave";
+        positionValue = 1;
         break;
       case STARTPOS2 :
-        pathName = "Pos2_Leave";
+        positionValue = 2;
         break;
       case STARTPOS3 :
-        pathName = "Pos3_Leave";
+        positionValue = 3;
         break;
     }
+    pathName = "DriveP" + positionValue;
 
     // The selected command will be run in autonomous
-    if (pathName == null)
-      m_autoCommand = new AutoStop(m_drivetrain);
-    else
+    if (pathName != null)
     {
       m_drivetrain.resetOdometry(PathPlannerAuto.getStaringPoseFromAutoFile(pathName));
       switch (mode)
@@ -372,7 +374,12 @@ public class RobotContainer
           m_autoCommand = new AutoStop(m_drivetrain);
           break;
         case AUTOPRELOADONLY :
-          m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter);
+          m_autoCommand = new SequentialCommandGroup(
+          // @formatter:off
+            m_drivetrain.getAutoPath(pathName),
+            new AutoPreload(m_drivetrain, m_intake, m_shooter)
+            // @formatter:on
+          );
           break;
         case AUTOLEAVE :
           m_autoCommand = m_drivetrain.getAutoPath(pathName);
@@ -380,8 +387,9 @@ public class RobotContainer
         case AUTOPRELOADANDLEAVE :
           m_autoCommand = new SequentialCommandGroup(
           // @formatter:off
+              m_drivetrain.getAutoPath(pathName),
               new AutoPreload(m_drivetrain, m_intake, m_shooter),
-              m_drivetrain.getAutoPath(pathName)
+              m_drivetrain.getAutoPath("DriveS" + positionValue)
             // @formatter:on
           );
           break;
@@ -393,8 +401,6 @@ public class RobotContainer
           break;
       }
     }
-
-    // m_autoCommand = m_drivetrain.getAutoPath(pathName);
 
     if (m_autoTesting && pathName != null)
     {

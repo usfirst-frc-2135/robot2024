@@ -379,20 +379,20 @@ public class RobotContainer
         case AUTOPRELOADONLY :
           m_autoCommand = new SequentialCommandGroup(
           // @formatter:off
-            m_drivetrain.getAutoPath(pathName),
+            //m_drivetrain.getAutoPath(pathName),
             new AutoPreload(m_drivetrain, m_intake, m_shooter)
             // @formatter:on
           );
           break;
         case AUTOLEAVE :
-          m_autoCommand = m_drivetrain.getAutoPath(pathName);
+          m_autoCommand = m_drivetrain.getAutoPath("DriveS" + positionValue);
           break;
         case AUTOPRELOADANDLEAVE :
           m_autoCommand = new SequentialCommandGroup(
           // @formatter:off
-              m_drivetrain.getAutoPath(pathName),
-              new AutoPreload(m_drivetrain, m_intake, m_shooter),
-              m_drivetrain.getAutoPath("DriveS" + positionValue)
+              m_drivetrain.getAutoPath("DriveS" + positionValue),
+              new AutoPreload(m_drivetrain, m_intake, m_shooter)
+              //m_drivetrain.getAutoPath("DriveS" + positionValue)
             // @formatter:on
           );
           break;

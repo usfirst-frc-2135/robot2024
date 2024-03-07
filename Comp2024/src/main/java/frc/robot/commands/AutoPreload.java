@@ -28,9 +28,7 @@ public class AutoPreload extends ParallelCommandGroup
         new SequentialCommandGroup (
           new ShooterRun(shooter, ShooterMode.SCORE),
           new IntakeActionShoot(intake)
-        ),
-        new AutoStop(drivetrain)
- 
+        ) 
         // @formatter:on
     );
   }

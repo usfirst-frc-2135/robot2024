@@ -175,10 +175,8 @@ public class Intake extends SubsystemBase
     SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
     if (m_debug && m_inRotaryValid)
     {
-      SmartDashboard.putNumber("IN_velocity",
-          Conversions.rotationsToOutputDegrees(m_rotaryVelocity.refresh( ).getValue( ), kRotaryGearRatio));
-      SmartDashboard.putNumber("IN_curError",
-          Conversions.rotationsToOutputDegrees(m_rotaryCLoopError.refresh( ).getValue( ), kRotaryGearRatio));
+      SmartDashboard.putNumber("IN_rotaryRps", m_rotaryVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
       SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
       SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
     }

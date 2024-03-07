@@ -167,7 +167,8 @@ public class Intake extends SubsystemBase
     SmartDashboard.putNumber("IN_rollerCur", rollerCurrent);
 
     // CANcoder is the primary (remote) sensor for Motion Magic
-    m_currentDegrees = Units.rotationsToDegrees(getCANCoderRotations( ));
+    m_currentDegrees = Units.rotationsToDegrees(getRotaryRotations( ));
+    SmartDashboard.putNumber("IN_ccDegrees", getCANCoderRotations( ));
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("IN_rotaryDegrees", Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio));

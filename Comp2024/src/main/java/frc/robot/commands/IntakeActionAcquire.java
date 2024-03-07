@@ -7,6 +7,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
@@ -35,6 +36,14 @@ public class IntakeActionAcquire extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Wait for note"),
         new WaitUntilCommand(intake::isNoteDetected),
+  
+        
+        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+        new WaitCommand(0.1),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleRetracted),
+        new WaitCommand(0.1),
+        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleRetracted),
+        new WaitCommand(0.1),
 
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)

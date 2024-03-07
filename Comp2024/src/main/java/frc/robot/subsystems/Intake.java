@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase
   private static final double       kRotaryManualVolts    = 3.5;      // Motor voltage during manual operation (joystick)
 
   // Rotary constants
-  private static final double       kToleranceDegrees     = 5.0;      // PID tolerance in degrees
+  private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
   private static final double       kMMSafetyTimeout      = 2.0;
 
   // Device and simulation objects
@@ -87,11 +87,11 @@ public class Intake extends SubsystemBase
   // Declare module variables
 
   // Roller variables
-  private boolean                   m_inRollerValid;     // Health indicator for motor 
+  private boolean                   m_inRollerValid;      // Health indicator for motor 
 
   // Rotary variables
-  private boolean                   m_inRotaryValid;     // Health indicator for motor 
-  private boolean                   m_inCCValid;         // Health indicator for CANCoder 
+  private boolean                   m_inRotaryValid;      // Health indicator for motor 
+  private boolean                   m_inCCValid;          // Health indicator for CANCoder 
   private boolean                   m_debug               = true;
   private double                    m_currentDegrees      = 0.0; // Current angle in degrees
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees
@@ -105,7 +105,7 @@ public class Intake extends SubsystemBase
   private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
   private Debouncer                 m_noteDetected        = new Debouncer(0.030, DebounceType.kBoth);
   private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
-  private boolean                   m_moveIsFinished;  // Movement has completed (within tolerance)
+  private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
 
   // Status signals
   private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
@@ -167,15 +167,16 @@ public class Intake extends SubsystemBase
     SmartDashboard.putNumber("IN_rollerCur", rollerCurrent);
 
     // CANcoder is the primary (remote) sensor for Motion Magic
-    m_currentDegrees = Units.rotationsToDegrees(getRotaryRotations( ));
-    SmartDashboard.putNumber("IN_ccDegrees", getCANCoderRotations( ));
+    m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
+    SmartDashboard.putNumber("IN_ccDegrees", Units.rotationsToDegrees(getCANCoderRotations( )));
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
-    SmartDashboard.putNumber("IN_rotaryDegrees", Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio));
+    SmartDashboard.putNumber("IN_rotaryDegrees", m_currentDegrees); // reference is rotary encoder
     SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
     if (m_debug && m_inRotaryValid)
     {
-      SmartDashboard.putNumber("IN_velocity", m_rotaryVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("IN_velocity",
+          Conversions.rotationsToOutputDegrees(m_rotaryVelocity.refresh( ).getValue( ), kRotaryGearRatio));
       SmartDashboard.putNumber("IN_curError",
           Conversions.rotationsToOutputDegrees(m_rotaryCLoopError.refresh( ).getValue( ), kRotaryGearRatio));
       SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));

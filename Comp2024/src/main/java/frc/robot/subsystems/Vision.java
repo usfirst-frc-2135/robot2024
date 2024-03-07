@@ -52,6 +52,7 @@ public class Vision extends SubsystemBase
 
     // Put all the needed widgets on the dashboard
     SmartDashboard.putNumberArray("VI_RobotPose", new double[ ] { });
+    SmartDashboard.putNumber("VI_targetID", m_targetID);
 
     m_botPoseSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
 

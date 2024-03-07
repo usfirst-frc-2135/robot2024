@@ -403,8 +403,11 @@ public class RobotContainer
       path = path.flipPath( );
 
     if (m_autoTesting)
-      for (int i = 0; i < path.numPoints( ); i++)
-        DataLogManager.log(String.format("point: %s", path.getPoint(i).position));
+    {
+      List<Pose2d> poses = path.getPathPoses( );
+      for (int i = 0; i < poses.size( ); i++)
+        DataLogManager.log(String.format("pose: %s", poses.get(i)));
+    }
 
     Pose2d initial = new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
     if (initial != null)

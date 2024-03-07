@@ -5,6 +5,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -27,10 +28,8 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Turn CANdle yellow"),
-        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
-
         new PrintCommand(getName() + ": Start rollers & Deploy intake rotary"),
+        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
 
         new PrintCommand(getName() + ": Wait for note"),

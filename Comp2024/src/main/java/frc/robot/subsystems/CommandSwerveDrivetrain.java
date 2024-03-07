@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -23,6 +24,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -41,7 +43,7 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
   private double                                     m_lastSimTime;
@@ -224,6 +226,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
       if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {
+        //   DataLogManager.log(String.format("seeing valid id and not 0!-----------------"));
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }
@@ -231,6 +234,20 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
+    if (DriverStation.getAlliance( ).equals(Optional.of(Alliance.Red)))
+    {
+      if (pose.equals(VIConsts.kStageLeft))
+      {
+        pose = VIConsts.kStageLeft;
+      }
+      else if (pose.equals(VIConsts.kStageRight))
+      {
+        pose = VIConsts.kStageLeft;
+      }
+    }
+
+    DataLogManager.log(String.format("drivePathToPose: given alliance %s target pose %s", DriverStation.getAlliance( ), pose));
+
     return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
   }
 }

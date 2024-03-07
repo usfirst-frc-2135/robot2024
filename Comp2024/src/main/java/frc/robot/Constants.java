@@ -307,11 +307,11 @@ public class Constants
     /////////////////////////////////////////////////////////////////////////////
     public static final class PATHConsts
     {
-      public static final double kMaxVelocityMps                         = 1.0;
-      public static final double kMaxAccelerationMpsSq                   = 1.0;
+      public static final double kMaxVelocityMps                         = 1.0; // TODO: Slowed from 3.0 for testing
+      public static final double kMaxAccelerationMpsSq                   = 1.0; // TODO: Slowed from 3.0 for testing
 
-      public static final double kMaxAngularSpeedRadiansPerSecond        = 1.0 * Math.PI;
-      public static final double kMaxAngularSpeedRadiansPerSecondSquared = 1.0 * Math.PI;
+      public static final double kMaxAngularSpeedRadiansPerSecond        = 1.0 * Math.PI; // TODO: Slowed from 2.0 * Math.PI for testing
+      public static final double kMaxAngularSpeedRadiansPerSecondSquared = 1.0 * Math.PI; // TODO: Slowed from 1.5 * Math.PI for testing
     }
 
     //Path constraints

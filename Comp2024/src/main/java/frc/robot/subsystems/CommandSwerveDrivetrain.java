@@ -201,15 +201,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight)
     {
-      //DataLogManager.log(String.format("using limelight"));
-
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
 
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
       if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
       {
-        //   DataLogManager.log(String.format("seeing valid id and not 0!-----------------"));
         addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
       }
     }
@@ -217,17 +214,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    if (DriverStation.getAlliance( ).equals(Optional.of(Alliance.Red)))
-    {
-      if (pose.equals(VIConsts.kStageLeft))
-      {
-        pose = VIConsts.kStageLeft;
-      }
-      else if (pose.equals(VIConsts.kStageRight))
-      {
-        pose = VIConsts.kStageLeft;
-      }
-    }
+    // if (DriverStation.getAlliance( ).equals(Optional.of(Alliance.Red)))
+    // {
+    //   if (pose.equals(VIConsts.kStageLeft))
+    //   {
+    //     pose = VIConsts.kStageRight;
+    //   }
+    //   else if (pose.equals(VIConsts.kStageRight))
+    //   {
+    //     pose = VIConsts.kStageLeft;
+    //   }
+    // }
 
     DataLogManager.log(String.format("given alliance %s", DriverStation.getAlliance( )));
     DataLogManager.log(String.format("target pose: %s ", pose));

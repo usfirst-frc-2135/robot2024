@@ -4,7 +4,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -104,9 +103,11 @@ public class Climber extends SubsystemBase
 
     m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberFXConfig( ));
-    m_climberR.setControl(new Follower(m_climberL.getDeviceID( ), true));
+    // m_climberR.setControl(new Follower(m_climberL.getDeviceID( ), true));
 
     m_climberL.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
+    DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
+    m_climberR.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     // Simulation object initialization
@@ -222,19 +223,26 @@ public class Climber extends SubsystemBase
   public void resetPositionToZero( )
   {
     if (m_climberValid)
+    {
       m_climberL.setPosition(Conversions.inchesToWinchRotations(0, kRolloutRatio));
+      m_climberR.setPosition(Conversions.inchesToWinchRotations(0, kRolloutRatio));
+    }
+
   }
 
   public void setStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
     m_climberL.setControl(m_requestVolts.withOutput(0.0));
+    m_climberR.setControl(m_requestVolts.withOutput(0.0));
   }
 
   public void setMMPosition(double targetInches)
   {
     // y = mx + b, where 0 degrees is 0.0 climber and 90 degrees is 1/4 winch turn (the climber constant)
     m_climberL.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
+        .withFeedForward(m_totalArbFeedForward));
+    m_climberR.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
         .withFeedForward(m_totalArbFeedForward));
   }
 
@@ -267,6 +275,7 @@ public class Climber extends SubsystemBase
     m_targetInches = m_currentInches;
 
     m_climberL.setControl(m_requestVolts.withOutput(axisValue * kManualSpeedVolts));
+    m_climberR.setControl(m_requestVolts.withOutput(-axisValue * kManualSpeedVolts));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

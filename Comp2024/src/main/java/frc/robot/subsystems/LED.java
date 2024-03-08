@@ -32,13 +32,13 @@ import frc.robot.Constants.Ports;
 //
 public class LED extends SubsystemBase
 {
-  private class myColor
+  private class rgbColor
   {
     private int r;
     private int g;
     private int b;
 
-    private myColor(int red, int green, int blue)
+    private rgbColor(int red, int green, int blue)
     {
       r = red;
       g = green;
@@ -49,23 +49,29 @@ public class LED extends SubsystemBase
   // Constants
   private static final int                    kLEDCount             = 8;
 
-  private final myColor                       kWhite                = new myColor(255, 255, 255);
-  private final myColor                       kRed                  = new myColor(255, 0, 0);
-  private final myColor                       kOrange               = new myColor(255, 48, 0);
-  private final myColor                       kYellow               = new myColor(255, 255, 0);
-  private final myColor                       kGreen                = new myColor(0, 255, 0);
-  private final myColor                       kBlue                 = new myColor(0, 0, 255);
-  private final myColor                       kPurple               = new myColor(128, 0, 128);
-  private final myColor                       kColorOff             = new myColor(0, 0, 0);
+  private final rgbColor                      kRgbWhite             = new rgbColor(255, 255, 255);
+  private final rgbColor                      kRgbRed               = new rgbColor(255, 0, 0);
+  private final rgbColor                      kRgbOrange            = new rgbColor(255, 48, 0);
+  private final rgbColor                      kRgbYellow            = new rgbColor(255, 255, 0);
+  private final rgbColor                      kRgbGreen             = new rgbColor(0, 255, 0);
+  private final rgbColor                      kRgbBlue              = new rgbColor(0, 0, 255);
+  private final rgbColor                      kRgbPurple            = new rgbColor(128, 0, 128);
+  private final rgbColor                      kRgbOff               = new rgbColor(0, 0, 0);
+
+  private final int                           kWhiteness            = 0;    // White level for LED strings that support one
+  private final double                        kBrightness           = 0.7;  // Brightness level 0.0 - 1.0
+  private final double                        kSpeed                = 0.5;  // Animation speed 0.0 - 1.0
+  private final int                           kSlot                 = 0;
 
   // Member objects
   private final CANdle                        m_candle              = new CANdle(Ports.kCANID_CANdle);
   private final SendableChooser<LEDColor>     m_ledChooser          = new SendableChooser<LEDColor>( );
   private final SendableChooser<LEDAnimation> m_ledAnimationChooser = new SendableChooser<LEDAnimation>( );
-  private LEDColor                            m_previousColor       = LEDColor.OFF;
-  private Animation                           m_toAnimate           = null;
 
-  private myColor                             m_chosenColor;
+  private rgbColor                            m_rgb                 = kRgbOff;
+  private Animation                           m_animation           = null;
+  private rgbColor                            m_previousRgb         = kRgbOff;
+  private Animation                           m_previousAnimation   = null;
 
   // Constructor
 
@@ -74,7 +80,8 @@ public class LED extends SubsystemBase
     setName("LED");
     setSubsystem("LED");
 
-    m_candle.configBrightnessScalar(0.7);
+    m_candle.configBrightnessScalar(kBrightness);
+    m_candle.clearAnimation(kSlot);
 
     // Add options for colors in SmartDashboard
     m_ledChooser.setDefaultOption("OFF", LEDColor.OFF);
@@ -120,7 +127,6 @@ public class LED extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setLEDs(LEDColor.OFF, LEDAnimation.CLEARALL);
-
   }
 
   public void faultDump( )
@@ -133,85 +139,92 @@ public class LED extends SubsystemBase
     if (color == LEDColor.DASHBOARD)
       color = m_ledChooser.getSelected( );
 
-    else if (animation == LEDAnimation.DASHBOARD)
-    {
+    if (animation == LEDAnimation.DASHBOARD)
       animation = m_ledAnimationChooser.getSelected( );
-    }
 
     switch (color)
     {
       default :
       case OFF :
-        m_chosenColor = kColorOff;
+        m_rgb = kRgbOff;
         break;
       case WHITE :
-        m_chosenColor = kWhite;
+        m_rgb = kRgbWhite;
         break;
       case RED :
-        m_chosenColor = kRed;
+        m_rgb = kRgbRed;
         break;
       case ORANGE :
-        m_chosenColor = kOrange;
+        m_rgb = kRgbOrange;
         break;
       case YELLOW :
-        m_chosenColor = kYellow;
+        m_rgb = kRgbYellow;
         break;
       case GREEN :
-        m_chosenColor = kGreen;
+        m_rgb = kRgbGreen;
         break;
       case BLUE :
-        m_chosenColor = kBlue;
+        m_rgb = kRgbBlue;
         break;
       case PURPLE :
-        m_chosenColor = kPurple;
+        m_rgb = kRgbPurple;
         break;
     }
 
     switch (animation)
     {
       default :
+      case CLEARALL :
+        m_animation = null;
+        break;
       case COLORFLOW :
-        m_toAnimate =
-            new ColorFlowAnimation(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b, 0, 0.7, kLEDCount, Direction.Forward);
+        m_animation = new ColorFlowAnimation(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, kSpeed, kLEDCount, Direction.Forward);
         break;
       case FIRE :
-        m_toAnimate = new FireAnimation(0.5, 0.7, kLEDCount, 0.7, 0.5);
+        m_animation = new FireAnimation(kBrightness, kSpeed, kLEDCount, 0.7, 0.5);
         break;
       case LARSON :
-        m_toAnimate =
-            new LarsonAnimation(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b, 0, 1, kLEDCount, BounceMode.Front, 3);
+        m_animation = new LarsonAnimation(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, kSpeed, kLEDCount, BounceMode.Front, 3);
         break;
       case RAINBOW :
-        m_toAnimate = new RainbowAnimation(1, 0.1, kLEDCount);
+        m_animation = new RainbowAnimation(kBrightness, kSpeed, kLEDCount);
         break;
       case RGBFADE :
-        m_toAnimate = new RgbFadeAnimation(0.7, 0.4, kLEDCount);
+        m_animation = new RgbFadeAnimation(kBrightness, kSpeed, kLEDCount);
         break;
       case SINGLEFADE :
-        m_toAnimate = new SingleFadeAnimation(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b, 0, 0.5, kLEDCount);
+        m_animation = new SingleFadeAnimation(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, kSpeed, kLEDCount);
         break;
       case STROBE :
-        m_toAnimate = new StrobeAnimation(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b, 0, 98.0 / 256.0, kLEDCount);
+        m_animation = new StrobeAnimation(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, kSpeed, kLEDCount);
         break;
       case TWINKLE :
-        m_toAnimate =
-            new TwinkleAnimation(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b, 0, 0.4, kLEDCount, TwinklePercent.Percent64);
+        m_animation = new TwinkleAnimation(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, kSpeed, kLEDCount, TwinklePercent.Percent64);
         break;
       case TWINKLEOFF :
-        m_toAnimate = new TwinkleOffAnimation(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b, 0, 0.8, kLEDCount,
-            TwinkleOffPercent.Percent100);
-        break;
-      case CLEARALL :
-        m_toAnimate = null;
+        m_animation =
+            new TwinkleOffAnimation(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, kSpeed, kLEDCount, TwinkleOffPercent.Percent100);
         break;
     }
 
-    DataLogManager.log(String.format("%s: color is now %s, %s", getSubsystem( ), color, animation));
-    m_candle.animate(m_toAnimate);
-    if (animation == LEDAnimation.CLEARALL)
+    if (m_rgb == m_previousRgb && m_animation == m_previousAnimation)
     {
-      m_candle.setLEDs(m_chosenColor.r, m_chosenColor.g, m_chosenColor.b);
+      DataLogManager.log(String.format("%s: colors and animation already active - %s, %s", getName( ), color, animation));
+      return;
     }
-    m_previousColor = color;
+
+    DataLogManager.log(String.format("%s: color is now %s, %s", getSubsystem( ), color, animation));
+    if (m_animation != null)
+    {
+      m_candle.animate(m_animation, kSlot);
+    }
+    else
+    {
+      m_candle.clearAnimation(kSlot);
+      m_candle.setLEDs(m_rgb.r, m_rgb.g, m_rgb.b, kWhiteness, 0, kLEDCount);
+    }
+
+    m_previousRgb = m_rgb;
+    m_previousAnimation = m_animation;
   }
 }

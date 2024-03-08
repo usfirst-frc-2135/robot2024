@@ -27,7 +27,7 @@ public class IntakeActionAcquire extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Start rollers & Deploy intake rotary"),
-        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
+        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.STROBE),
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
 
         new PrintCommand(getName() + ": Wait for note"),

@@ -27,8 +27,8 @@ public class IntakeActionRetract extends SequentialCommandGroup
         // @formatter:off      
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
         new ConditionalCommand(
-          new LEDSet(led, LEDColor.BLUE, LEDAnimation.STROBE), 
-          new LEDSet(led, LEDColor.OFF, LEDAnimation.STROBE), 
+          new LEDSet(led, LEDColor.BLUE, LEDAnimation.CLEARALL), 
+          new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL), 
           intake::isNoteDetected),
         new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
         

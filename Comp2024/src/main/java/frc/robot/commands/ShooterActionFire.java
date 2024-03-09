@@ -30,7 +30,7 @@ public class ShooterActionFire extends SequentialCommandGroup
         // @formatter:off
 
         new PrintCommand(getName() + ": Start shooter and retract intake"),
-        new LEDSet(led, LEDColor.RED, LEDAnimation.STROBE),
+        new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
         new ShooterRun(shooter, ShooterMode.SCORE),
         new IntakeActionRetract(intake, led),
 
@@ -38,7 +38,7 @@ public class ShooterActionFire extends SequentialCommandGroup
         new WaitUntilCommand(shooter::isAtDesiredSpeed),
 
         new PrintCommand(getName() + ": Feed note from intake"),
-        new LEDSet(led, LEDColor.GREEN, LEDAnimation.STROBE),
+        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
         new IntakeRun(intake, INConsts.RollerMode.SHOOT, INConsts.kRotaryAngleRetracted),
 
         new WaitCommand(2.0),

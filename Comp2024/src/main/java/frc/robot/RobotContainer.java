@@ -6,6 +6,7 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
@@ -367,7 +369,7 @@ public class RobotContainer
         break;
     }
 
-    pathName = "DriveS" + positionValue;
+    pathName = "DriveP" + positionValue;
     DataLogManager.log(String.format("getAutonomousCommand: %s", pathName));
 
     // The selected command will be run in autonomous
@@ -391,7 +393,15 @@ public class RobotContainer
         );
         break;
       case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new AutoStop(m_drivetrain);
+        m_autoCommand = new SequentialCommandGroup(               //
+            m_drivetrain.getAutoCommand(pathName),   //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter),    //
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
+            m_drivetrain.getAutoCommand("DriveS" + positionValue), //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+            m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
+            new AutoPreload(m_drivetrain, m_intake, m_shooter),    //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP));
         break;
       case AUTOTESTPATH :
         m_autoCommand = m_drivetrain.getAutoCommand("Test");

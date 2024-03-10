@@ -6,6 +6,8 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -19,7 +21,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -103,6 +104,8 @@ public class RobotContainer
 
   // Chooser for autonomous commands
 
+  Command                                             m_autoCmd;
+
   enum AutoChooser
   {
     AUTOSTOP,                // AutoStop - do nothing
@@ -117,12 +120,12 @@ public class RobotContainer
 
   enum StartPosition
   {
-    STARTPOS1, // Starting position 1 - blue left, red right
-    STARTPOS2, // Starting position 2 - blue/red middle
-    STARTPOS3  // Starting position 3 - blue right, red left
+    POSE1, // Starting position 1 - blue left, red right
+    POSE2, // Starting position 2 - blue/red middle
+    POSE3  // Starting position 3 - blue right, red left
   }
 
-  private static final boolean           m_autoTesting  = false;
+  private static final boolean           m_autoTesting  = true;
   private SendableChooser<AutoChooser>   m_autoChooser  = new SendableChooser<>( );
   private SendableChooser<StartPosition> m_startChooser = new SendableChooser<>( );
   private SendableChooser<Integer>       m_odomChooser  = new SendableChooser<>( );
@@ -162,7 +165,7 @@ public class RobotContainer
     SmartDashboard.putData(m_feeder);
     SmartDashboard.putData(m_climber);
 
-    SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
+    SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( )));
 
     SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
 
@@ -306,8 +309,8 @@ public class RobotContainer
     // m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
 
     // Default command - manual mode
-    // m_intake.setDefaultCommand(new IntakeRotaryJoysticks(m_intake, m_operatorPad.getHID( )));
-    //m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
+    // m_intake.setDefaultCommand(new IntakeMoveWithJoysticks(m_intake, m_operatorPad.getHID( )));
+    // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder));
   }
 
@@ -317,25 +320,21 @@ public class RobotContainer
    */
   private void initAutonomousChooser( )
   {
-    // Autonomous Chooser
+
+    // Configure autonomous sendable chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
     m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
     m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
     m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
     m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
-
-    // Configure autonomous sendable chooser
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
-    // Autonomous Starting Position
-    m_startChooser.setDefaultOption("STARTPOS1", StartPosition.STARTPOS1);
-    m_startChooser.addOption("STARTPOS2", StartPosition.STARTPOS2);
-    m_startChooser.addOption("STARTPOS3", StartPosition.STARTPOS3);
-
     // Configure starting position sendable chooser
+    m_startChooser.setDefaultOption("POSE1", StartPosition.POSE1);
+    m_startChooser.addOption("POSE2", StartPosition.POSE2);
+    m_startChooser.addOption("POSE3", StartPosition.POSE3);
     SmartDashboard.putData("StartPosition", m_startChooser);
-
   }
 
   /**
@@ -348,83 +347,75 @@ public class RobotContainer
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     StartPosition startPosition = m_startChooser.getSelected( );
-    int positionValue = 0;
+    int positionValue = 1;
+
+    if (m_autoCommand != null)
+      m_autoCommand.cancel( );
 
     switch (startPosition)
     {
       default :
-        break;
-      case STARTPOS1 :
+        DataLogManager.log(String.format("RobotContainer: invalid position %s", startPosition));
+      case POSE1 :
         positionValue = 1;
         break;
-      case STARTPOS2 :
+      case POSE2 :
         positionValue = 2;
         break;
-      case STARTPOS3 :
+      case POSE3 :
         positionValue = 3;
         break;
     }
-    pathName = "DriveP" + positionValue;
+
+    pathName = "DriveS" + positionValue;
+    DataLogManager.log(String.format("getAutonomousCommand: %s", pathName));
 
     // The selected command will be run in autonomous
-    if (pathName != null)
+    switch (mode)
     {
-      m_drivetrain.resetOdometry(PathPlannerAuto.getStaringPoseFromAutoFile(pathName));
-      switch (mode)
-      {
-        default :
-        case AUTOSTOP :
-          m_autoCommand = new AutoStop(m_drivetrain);
-          break;
-        case AUTOPRELOADONLY :
-          m_autoCommand = new SequentialCommandGroup(
-          // @formatter:off
-            m_drivetrain.getAutoPath(pathName),
-            new AutoPreload(m_drivetrain, m_intake, m_shooter)
-            // @formatter:on
-          );
-          break;
-        case AUTOLEAVE :
-          m_autoCommand = m_drivetrain.getAutoPath(pathName);
-          break;
-        case AUTOPRELOADANDLEAVE :
-          m_autoCommand = new SequentialCommandGroup(
-          // @formatter:off
-              m_drivetrain.getAutoPath(pathName),
-              new AutoPreload(m_drivetrain, m_intake, m_shooter),
-              m_drivetrain.getAutoPath("DriveS" + positionValue)
-            // @formatter:on
-          );
-          break;
-        case AUTOPRELOADSCOREANOTHER :
-          m_autoCommand = new AutoStop(m_drivetrain);
-          break;
-        case AUTOTESTPATH :
-          m_autoCommand = m_drivetrain.getAutoPath("Test");
-          break;
-      }
+      default :
+      case AUTOSTOP :
+        m_autoCommand = new AutoStop(m_drivetrain);
+        break;
+      case AUTOPRELOADONLY :
+        m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter);
+        break;
+      case AUTOLEAVE :
+        m_autoCommand = m_drivetrain.getAutoCommand(pathName);
+        break;
+      case AUTOPRELOADANDLEAVE :
+        m_autoCommand = new SequentialCommandGroup(               //
+            m_drivetrain.getAutoCommand(pathName),   //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter)    //
+        //m_drivetrain.getAutoPath(pathName)  //
+        );
+        break;
+      case AUTOPRELOADSCOREANOTHER :
+        m_autoCommand = new AutoStop(m_drivetrain);
+        break;
+      case AUTOTESTPATH :
+        m_autoCommand = m_drivetrain.getAutoCommand("Test");
+        break;
     }
 
-    if (m_autoTesting && pathName != null)
-    {
-      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-      if (DriverStation.getAlliance( ).equals(Alliance.Red))
-        path.flipPath( );
+    PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
+      path = path.flipPath( );
 
-      Pose2d initial = new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
-      if (initial != null)
-        m_drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
+    if (m_autoTesting)
+    {
+      List<Pose2d> poses = path.getPathPoses( );
+      for (int i = 0; i < poses.size( ); i++)
+        DataLogManager.log(String.format("pose: %s", poses.get(i)));
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s %s", mode, startPosition));
+    Pose2d initial = new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
+    if (initial != null)
+      m_drivetrain.resetOdometry(new Pose2d(initial.getTranslation( ), initial.getRotation( )));
+
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s %s %s", mode, startPosition, m_autoCommand.getName( )));
 
     return m_autoCommand;
-  }
-
-  public void runAutonomousCommand( )
-  {
-    Command autoCmd = getAutonomousCommand( );
-    autoCmd.schedule( );
   }
 
   /****************************************************************************

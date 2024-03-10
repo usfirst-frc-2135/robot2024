@@ -230,7 +230,7 @@ public final class CTREConfigs6
     climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    climberConfig.CurrentLimits.StatorCurrentLimit = 80.0;        // Amps
+    climberConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings

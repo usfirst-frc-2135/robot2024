@@ -13,9 +13,10 @@ import frc.robot.subsystems.Climber;
  */
 public class ClimberCalibrate extends Command
 {
-  private Timer               m_calibrateTimer = new Timer( );
-  private Climber             m_climber;
   private static final double kTimeout         = 1.0;
+
+  private Climber             m_climber;
+  private Timer               m_calibrateTimer = new Timer( );
 
   public ClimberCalibrate(Climber climber)
   {
@@ -29,10 +30,10 @@ public class ClimberCalibrate extends Command
   @Override
   public void initialize( )
   {
+    DataLogManager.log(String.format("%s: Start up", getSubsystem( )));
     m_calibrateTimer.restart( );
     m_climber.moveToCalibrate( );
-    DataLogManager.log(String.format("%s: Starting calibrate %.3f FPGATime %.3f", getSubsystem( ), m_calibrateTimer.get( ),
-        Timer.getFPGATimestamp( )));
+    DataLogManager.log(String.format("%s: Start FPGATime %.3f", getSubsystem( ), Timer.getFPGATimestamp( )));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -44,8 +45,8 @@ public class ClimberCalibrate extends Command
   @Override
   public void end(boolean interrupted)
   {
-    DataLogManager.log(String.format("%s: Ending calibrate %.3f FPGATime %.3f", getSubsystem( ), m_calibrateTimer.get( ),
-        Timer.getFPGATimestamp( )));
+    DataLogManager
+        .log(String.format("%s: End FPGATime %.3f (%.3f)", getSubsystem( ), Timer.getFPGATimestamp( ), m_calibrateTimer.get( )));
     m_calibrateTimer.stop( );
     m_climber.endCalibration( );
     m_climber.setStopped( );

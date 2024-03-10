@@ -2,6 +2,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,6 +14,7 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VIConsts;
@@ -95,6 +98,16 @@ public class Vision extends SubsystemBase
 
     setLEDMode(VIConsts.LED_OFF);
     setCameraDisplay(VIConsts.PIP_SECONDARY);
+
+    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
+    {
+      setPriorityIdRed(4);
+    }
+    else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
+    {
+      setPriorityIdBlue(7);
+    }
+
   }
 
   public double getHorizOffsetDeg( )
@@ -194,6 +207,18 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: setLedMode %d", getSubsystem( ), mode));
     m_table.getEntry("ledMode").setValue(mode);
+  }
+
+  public void setPriorityIdRed(int id)
+  {
+    DataLogManager.log(String.format("%s: priority id red %d", getSubsystem( ), id));
+    m_table.getEntry("priorityid").setValue(id);
+  }
+
+  public void setPriorityIdBlue(int id)
+  {
+    DataLogManager.log(String.format("%s: priority id blue %d", getSubsystem( ), id));
+    m_table.getEntry("priorityid").setValue(id);
   }
 
   public void setCameraDisplay(int stream)

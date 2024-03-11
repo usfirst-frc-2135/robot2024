@@ -424,12 +424,12 @@ public class RobotContainer
       case AUTOPRELOADSCOREANOTHER :
         m_autoCommand = new SequentialCommandGroup(               //
             m_drivetrain.getAutoCommand(pathName),   //
-            new AutoPreload(m_drivetrain, m_intake, m_shooter),    //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
             new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
             m_drivetrain.getAutoCommand("DriveS" + positionValue), //
             new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
-            new AutoPreload(m_drivetrain, m_intake, m_shooter),    //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
             new IntakeRun(m_intake, INConsts.RollerMode.STOP));
         break;
       case AUTOTESTPATH :

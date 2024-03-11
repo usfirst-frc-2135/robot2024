@@ -24,13 +24,13 @@ public class IntakeActionHandoff extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),
             
-        new IntakeRun(intake, INConsts.RollerMode.HANDOFF),
+        new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake.getIntakePosition( )),
 
         new PrintCommand(getName() + ": Wait for note to release into feeder"),
         new WaitCommand(0.5),
 
         new PrintCommand(getName() + ": Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD)
+        new IntakeRun(intake, INConsts.RollerMode.HOLD, intake.getIntakePosition( ))
  
         // @formatter:on
     );

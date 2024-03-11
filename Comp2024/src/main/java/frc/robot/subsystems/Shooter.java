@@ -73,8 +73,8 @@ public class Shooter extends SubsystemBase
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), true));
 
     m_shooterLVelocity.setUpdateFrequency(50);
-    m_shooterLSupplyCur.setUpdateFrequency(25);
-    m_shooterLStatorCur.setUpdateFrequency(25);
+    m_shooterLSupplyCur.setUpdateFrequency(10);
+    m_shooterLStatorCur.setUpdateFrequency(10);
 
     initSmartDashboard( );
     initialize( );

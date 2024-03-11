@@ -115,10 +115,10 @@ public class Climber extends SubsystemBase
     m_motorPosition.setUpdateFrequency(50);
     if (m_debug)
     {
-      m_motorVelocity.setUpdateFrequency(50);
-      m_motorCLoopError.setUpdateFrequency(50);
-      m_motorSupplyCur.setUpdateFrequency(50);
-      m_motorStatorCur.setUpdateFrequency(50);
+      m_motorVelocity.setUpdateFrequency(10);
+      m_motorCLoopError.setUpdateFrequency(10);
+      m_motorSupplyCur.setUpdateFrequency(10);
+      m_motorStatorCur.setUpdateFrequency(10);
     }
 
     initSmartDashboard( );

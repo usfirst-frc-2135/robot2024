@@ -26,8 +26,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
@@ -36,7 +37,6 @@ import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.Constants.VIConsts;
-import frc.robot.commands.AutoPreload;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
@@ -63,7 +63,6 @@ import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 import frc.robot.subsystems.Vision;
-import pabeles.concurrency.IntOperatorTask.Max;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -210,11 +209,11 @@ public class RobotContainer
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
     SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
-    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE));
-    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL));
-    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP));
-    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD));
-    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT));
+    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake.getIntakePosition( )));
+    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake.getIntakePosition( )));
+    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake.getIntakePosition( )));
+    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake.getIntakePosition( )));
+    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake.getIntakePosition( )));
 
     SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleDeployed));
     SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleRetracted));
@@ -409,28 +408,36 @@ public class RobotContainer
         m_autoCommand = new AutoStop(m_drivetrain);
         break;
       case AUTOPRELOADONLY :
-        m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led);
+        m_autoCommand = new ShooterActionFire(m_shooter, m_intake, m_led);
         break;
       case AUTOLEAVE :
         m_autoCommand = m_drivetrain.getAutoCommand(pathName);
         break;
       case AUTOPRELOADANDLEAVE :
-        m_autoCommand = new SequentialCommandGroup(               //
-            m_drivetrain.getAutoCommand(pathName),   //
-            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led)    //
-        //m_drivetrain.getAutoPath(pathName)  //
+        m_autoCommand = new SequentialCommandGroup(       //
+            m_drivetrain.getAutoCommand(pathName),        //
+            new ShooterActionFire(m_shooter, m_intake, m_led)   //
+        //m_drivetrain.getAutoPath(pathName)              //
         );
         break;
       case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new SequentialCommandGroup(               //
-            m_drivetrain.getAutoCommand(pathName),   //
-            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
-            m_drivetrain.getAutoCommand("DriveS" + positionValue), //
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
-            m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
-            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP));
+        m_autoCommand = new SequentialCommandGroup(                   //
+            new PrintCommand(mode + ": Drive to scoring position"),   //
+            m_drivetrain.getAutoCommand(pathName),                    //
+            new PrintCommand(mode + ": Score preloaded note"),        //
+            new ShooterActionFire(m_shooter, m_intake, m_led),        //
+            new PrintCommand(mode + ": Deploy intake before moving"), //
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake.getIntakePosition( )), //
+            new PrintCommand(mode + ": Drive to spik while intaking"), //
+            new ParallelDeadlineGroup(                                //
+                m_drivetrain.getAutoCommand("DriveS" + positionValue), //
+                new IntakeActionAcquire(m_intake, m_led)              //
+            ),                                                        //
+            new PrintCommand(mode + ": Drive to scoring position"),   //
+            m_drivetrain.getAutoCommand("ScoreS" + positionValue),    //
+            new ShooterActionFire(m_shooter, m_intake, m_led),        //
+            new PrintCommand(mode + ": Turn off intake rollers")      //
+        );
         break;
       case AUTOTESTPATH :
         m_autoCommand = m_drivetrain.getAutoCommand("Test");

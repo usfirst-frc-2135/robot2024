@@ -165,7 +165,7 @@ public final class CTREConfigs6
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? -0.511719 : -0.703613; // Rotations TODO: get comp value
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.511719 : -0.703613; // Rotations TODO: get comp value
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
@@ -257,9 +257,9 @@ public final class CTREConfigs6
     // Slot settings
     climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
     climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
-    climberConfig.Slot0.kP = 0.0;                                 // Voltage or duty cycle per velocity error (velocity modes)
-    climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
-    climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
+    climberConfig.Slot0.kP = 0.0451;                              // Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kI = 0.001;                               // Voltage or duty cycle per accumulated error
+    climberConfig.Slot0.kD = 0.4514;                              // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
     // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);   // Rotations

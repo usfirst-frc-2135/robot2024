@@ -101,13 +101,12 @@ public class Vision extends SubsystemBase
 
     if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
     {
-      setPriorityIdRed(4);
+      setPriorityIdRed( );
     }
     else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
     {
-      setPriorityIdBlue(7);
+      setPriorityIdBlue( );
     }
-
   }
 
   public double getHorizOffsetDeg( )
@@ -209,16 +208,20 @@ public class Vision extends SubsystemBase
     m_table.getEntry("ledMode").setValue(mode);
   }
 
-  public void setPriorityIdRed(int id)
+  private void setPriorityId(int id, String alliance)
   {
-    DataLogManager.log(String.format("%s: priority id red %d", getSubsystem( ), id));
+    DataLogManager.log(String.format("%s: priority id %d (%s)", getSubsystem( ), id, alliance));
     m_table.getEntry("priorityid").setValue(id);
   }
 
-  public void setPriorityIdBlue(int id)
+  public void setPriorityIdRed( )
   {
-    DataLogManager.log(String.format("%s: priority id blue %d", getSubsystem( ), id));
-    m_table.getEntry("priorityid").setValue(id);
+    setPriorityId(4, "RED");
+  }
+
+  public void setPriorityIdBlue( )
+  {
+    setPriorityId(7, "BLUE");
   }
 
   public void setCameraDisplay(int stream)

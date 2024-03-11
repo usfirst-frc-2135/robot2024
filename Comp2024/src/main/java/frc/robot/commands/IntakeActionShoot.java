@@ -25,12 +25,11 @@ public class IntakeActionShoot extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
         new PrintCommand(getName() + ": Hold rollers & Retract intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.HOLD, INConsts.kRotaryAngleRetracted),
 
-        new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),
-            
+        new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),            
+        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
         new IntakeRun(intake, INConsts.RollerMode.SHOOT),
 
         new PrintCommand(getName() + ": Wait for note to release"),

@@ -38,7 +38,6 @@ public class AutoPreload extends SequentialCommandGroup
         new IntakeActionShoot(intake, led),
         new WaitCommand(0.5),
         
-        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
         new ShooterRun(shooter, ShooterMode.STOP)
  
         // @formatter:on

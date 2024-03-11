@@ -16,7 +16,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +44,7 @@ import frc.robot.lib.util.LimelightHelpers.PoseEstimate;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
   private double                                     m_lastSimTime;
@@ -217,8 +216,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     if (m_useLimelight && Robot.isReal( ))
     {
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
-      PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
       fieldTypePub.set("Field2d");
@@ -227,16 +224,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
           llPose.getX( ), llPose.getY( ), llPose.getRotation( ).getDegrees( )
       });
 
+      PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
       if (poseEstimate.tagCount >= 2)
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
       }
-
-      // if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
-      // {
-      //   addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
-      // }
     }
   }
 

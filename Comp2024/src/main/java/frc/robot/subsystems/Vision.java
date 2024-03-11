@@ -25,6 +25,13 @@ import frc.robot.lib.util.LimelightHelpers;
  */
 public class Vision extends SubsystemBase
 {
+  private enum streamMode
+  {
+    STANDARD, PIPMAIN, PIPSECONDARY
+  };
+
+  // Constants
+
   // Objects
   private MedianFilter          m_tyfilter      = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
   private MedianFilter          m_tvfilter      = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
@@ -41,6 +48,7 @@ public class Vision extends SubsystemBase
   private double                m_targetLatency;         // LL pipeline’s latency contribution (ms) Add at least 11ms for image capture latency.
   private int                   m_targetID;              // ID of the primary in-view AprilTag
   private boolean               m_targetIDFixed = false; // Override periodic reading of limelight targetIDs for testing
+  private streamMode            m_stream        = streamMode.STANDARD;
 
   /**
    *
@@ -101,13 +109,12 @@ public class Vision extends SubsystemBase
 
     if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
     {
-      setPriorityIdRed(4);
+      setPriorityIdRed( );
     }
     else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
     {
-      setPriorityIdBlue(7);
+      setPriorityIdBlue( );
     }
-
   }
 
   public double getHorizOffsetDeg( )
@@ -209,16 +216,20 @@ public class Vision extends SubsystemBase
     m_table.getEntry("ledMode").setValue(mode);
   }
 
-  public void setPriorityIdRed(int id)
+  private void setPriorityId(int id, String alliance)
   {
-    DataLogManager.log(String.format("%s: priority id red %d", getSubsystem( ), id));
+    DataLogManager.log(String.format("%s: priority id %d (%s)", getSubsystem( ), id, alliance));
     m_table.getEntry("priorityid").setValue(id);
   }
 
-  public void setPriorityIdBlue(int id)
+  public void setPriorityIdRed( )
   {
-    DataLogManager.log(String.format("%s: priority id blue %d", getSubsystem( ), id));
-    m_table.getEntry("priorityid").setValue(id);
+    setPriorityId(4, "RED");
+  }
+
+  public void setPriorityIdBlue( )
+  {
+    setPriorityId(7, "BLUE");
   }
 
   public void setCameraDisplay(int stream)
@@ -227,10 +238,23 @@ public class Vision extends SubsystemBase
     m_table.getEntry("stream").setValue(stream);
   }
 
-  public void setCameraToSecondary( )
+  public void rotateCameraStreamMode( )
   {
-    DataLogManager.log(String.format("%s: setCameraToSecondary %d", getSubsystem( ), VIConsts.PIP_SECONDARY));
-    m_table.getEntry("stream").setValue(VIConsts.PIP_SECONDARY);
-    LimelightHelpers.setStreamMode_PiPSecondary("limelight");
+    DataLogManager.log(String.format("%s: setStreamMode_PiPSecondary", getSubsystem( )));
+    switch (m_stream)
+    {
+      default :
+      case PIPSECONDARY :
+        m_stream = streamMode.PIPMAIN;
+        LimelightHelpers.setStreamMode_PiPMain("limelight");
+        break;
+      case PIPMAIN :
+        m_stream = streamMode.STANDARD;
+        LimelightHelpers.setStreamMode_Standard("limelight");
+        break;
+      case STANDARD :
+        m_stream = streamMode.PIPSECONDARY;
+        LimelightHelpers.setStreamMode_PiPSecondary("limelight");
+    }
   }
 }

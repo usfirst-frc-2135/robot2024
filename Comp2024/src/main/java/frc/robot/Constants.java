@@ -305,7 +305,7 @@ public class Constants
     /////////////////////////////////////////////////////////////////////////////
     // Path on the fly trajectory constraints
     /////////////////////////////////////////////////////////////////////////////
-    public static final class PATHConsts
+    public static final class PATHConsts //TODO: set back to original speeds
     {
       public static final double kMaxVelocityMps                         = 1.0; // TODO: Slowed from 3.0 for testing
       public static final double kMaxAccelerationMpsSq                   = 1.0; // TODO: Slowed from 3.0 for testing

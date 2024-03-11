@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -17,6 +16,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -37,6 +36,7 @@ import frc.robot.Constants.VIConsts;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
+import frc.robot.lib.util.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -216,7 +216,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     if (m_useLimelight && Robot.isReal( ))
     {
       var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
-
       Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
 
       fieldTypePub.set("Field2d");
@@ -225,28 +224,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
           llPose.getX( ), llPose.getY( ), llPose.getRotation( ).getDegrees( )
       });
 
-      if (lastResult.valid && llPose.getX( ) != 0 && llPose.getY( ) != 0)
+      PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
+      if (poseEstimate.tagCount >= 2)
       {
-        //   DataLogManager.log(String.format("seeing valid id and not 0!-----------------"));
-        addVisionMeasurement(llPose, Timer.getFPGATimestamp( ));
+        setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
       }
     }
   }
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    if (DriverStation.getAlliance( ).equals(Optional.of(Alliance.Red)))
-    {
-      if (pose.equals(VIConsts.kStageLeft))
-      {
-        pose = VIConsts.kStageLeft;
-      }
-      else if (pose.equals(VIConsts.kStageRight))
-      {
-        pose = VIConsts.kStageLeft;
-      }
-    }
-
     DataLogManager.log(String.format("drivePathToPose: given alliance %s target pose %s", DriverStation.getAlliance( ), pose));
 
     return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);

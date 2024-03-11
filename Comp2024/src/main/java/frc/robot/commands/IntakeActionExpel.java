@@ -8,13 +8,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.INConsts;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 
 /**
  *
  */
 public class IntakeActionExpel extends SequentialCommandGroup
 {
-  public IntakeActionExpel(Intake intake)
+  public IntakeActionExpel(Intake intake, LED led)
   {
     setName("IntakeActionExpel");
 

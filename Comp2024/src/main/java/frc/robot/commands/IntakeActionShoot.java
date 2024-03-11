@@ -36,7 +36,7 @@ public class IntakeActionShoot extends SequentialCommandGroup
         new WaitCommand(0.5),
 
         new PrintCommand(getName() + ": Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD)
+        new IntakeRun(intake, INConsts.RollerMode.STOP)
  
         // @formatter:on
     );

@@ -6,6 +6,7 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -177,7 +178,7 @@ public class RobotContainer
     SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
     SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
-    SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
+    SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
     SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
     SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE));
@@ -378,7 +379,7 @@ public class RobotContainer
         m_autoCommand = new AutoStop(m_drivetrain);
         break;
       case AUTOPRELOADONLY :
-        m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter);
+        m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led);
         break;
       case AUTOLEAVE :
         m_autoCommand = m_drivetrain.getAutoCommand(pathName);
@@ -386,7 +387,7 @@ public class RobotContainer
       case AUTOPRELOADANDLEAVE :
         m_autoCommand = new SequentialCommandGroup(               //
             m_drivetrain.getAutoCommand(pathName),   //
-            new AutoPreload(m_drivetrain, m_intake, m_shooter)    //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led)    //
         //m_drivetrain.getAutoPath(pathName)  //
         );
         break;

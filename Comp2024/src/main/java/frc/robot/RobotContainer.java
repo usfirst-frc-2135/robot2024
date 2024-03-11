@@ -118,6 +118,7 @@ public class RobotContainer
     AUTOLEAVE,               // Leave starting zone
     AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
     AUTOPRELOADSCOREANOTHER, // Score preload and score another
+    AUTOSCORE4,              // Score 4 Notes in Auto
     AUTOTESTPATH             // Run a selected test path
   }
 
@@ -358,7 +359,8 @@ public class RobotContainer
     m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
     m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
     m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
-    m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
+    m_autoChooser.addOption("6 - AutoTestPath", AutoChooser.AUTOTESTPATH);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Configure starting position sendable chooser
@@ -378,7 +380,9 @@ public class RobotContainer
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     StartPosition startPosition = m_startChooser.getSelected( );
-    int positionValue = 1;
+    int positionValue = 0;
+    int altpos1 = 0;
+    int altpos2 = 0;
 
     if (m_autoCommand != null)
       m_autoCommand.cancel( );
@@ -389,12 +393,18 @@ public class RobotContainer
         DataLogManager.log(String.format("RobotContainer: invalid position %s", startPosition));
       case POSE1 :
         positionValue = 1;
+        altpos1 = 2;
+        altpos2 = 3;
         break;
       case POSE2 :
         positionValue = 2;
+        altpos1 = 3;
+        altpos2 = 1;
         break;
       case POSE3 :
         positionValue = 3;
+        altpos1 = 2;
+        altpos2 = 1;
         break;
     }
 
@@ -429,6 +439,31 @@ public class RobotContainer
             m_drivetrain.getAutoCommand("DriveS" + positionValue), //
             new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP));
+        break;
+      case AUTOSCORE4 :
+        m_autoCommand = new SequentialCommandGroup(               //
+            //Preload Score
+            m_drivetrain.getAutoCommand(pathName),   //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
+            //Intake and Score Note 1
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
+            m_drivetrain.getAutoCommand("DriveS" + positionValue), //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+            m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
+            //Intake and Score Note 2
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
+            m_drivetrain.getAutoCommand("DriveS" + altpos1), //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+            m_drivetrain.getAutoCommand("ScoreS" + altpos1),//
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
+            //Intake and Score Note 3
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
+            m_drivetrain.getAutoCommand("DriveS" + altpos2), //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+            m_drivetrain.getAutoCommand("ScoreS" + altpos2),//
             new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
             new IntakeRun(m_intake, INConsts.RollerMode.STOP));
         break;

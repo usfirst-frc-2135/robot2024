@@ -10,7 +10,6 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.INConsts;
 import frc.robot.Robot;
-import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
 {

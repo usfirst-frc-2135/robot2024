@@ -250,7 +250,7 @@ public class Constants
     public static final double kLengthClimbed = 2.0;    // By definition - Climber fully climbed
     public static final double kLengthFull    = 17.0;   // From Mech Design height needed to reach max chain
     public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
-    public static final double kLengthMin     = -0.25;  // Climber minimum allowable length (quarter inch less than stowed)
+    public static final double kLengthMin     = 0.0;    // Climber minimum allowable length
     public static final double kLengthMax     = 18.25;  // Climber maximum allowable length (2" beyond high length)
   }
 
@@ -305,7 +305,7 @@ public class Constants
     /////////////////////////////////////////////////////////////////////////////
     // Path on the fly trajectory constraints
     /////////////////////////////////////////////////////////////////////////////
-    public static final class PATHConsts
+    public static final class PATHConsts //TODO: set back to original speeds
     {
       public static final double kMaxVelocityMps                         = 1.0; // TODO: Slowed from 3.0 for testing
       public static final double kMaxAccelerationMpsSq                   = 1.0; // TODO: Slowed from 3.0 for testing

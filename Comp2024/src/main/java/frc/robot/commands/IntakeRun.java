@@ -69,7 +69,7 @@ public class IntakeRun extends Command
   @Override
   public boolean isFinished( )
   {
-    return (m_holdAngle) ? false : m_intake.moveToPositionIsFinished( ); // Command exits if not holding a position
+    return (m_holdAngle) ? true : m_intake.moveToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

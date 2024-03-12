@@ -13,12 +13,13 @@ public class ClimberMoveToPosition extends Command
 {
   private final Climber m_climber;
   private boolean       m_holdPosition;
-  private double        m_newLength;
+  private double        m_newLength = 0.0;
 
   // Default command for holding current position
   public ClimberMoveToPosition(Climber climber)
   {
     m_climber = climber;
+    m_holdPosition = true;
     ClimberMoveToPositionCommon(true);
   }
 
@@ -26,13 +27,13 @@ public class ClimberMoveToPosition extends Command
   public ClimberMoveToPosition(Climber climber, double position)
   {
     m_climber = climber;
+    m_holdPosition = false;
     m_newLength = position;
     ClimberMoveToPositionCommon(false);
   }
 
   private void ClimberMoveToPositionCommon(boolean holdCurrentLength)
   {
-    m_holdPosition = holdCurrentLength;
     setName("ClimberMoveToPosition");
     addRequirements(m_climber);
   }

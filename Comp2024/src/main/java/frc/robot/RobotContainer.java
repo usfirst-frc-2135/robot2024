@@ -6,11 +6,11 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
@@ -24,8 +24,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.INConsts;
@@ -51,6 +53,7 @@ import frc.robot.commands.LEDSet;
 import frc.robot.commands.ShooterActionFire;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.util.LimelightHelpers;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -60,6 +63,7 @@ import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 import frc.robot.subsystems.Vision;
+import pabeles.concurrency.IntOperatorTask.Max;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -87,6 +91,7 @@ public class RobotContainer
   private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )
       .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed).withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);
   private final SwerveRequest.PointWheelsAt           point          = new SwerveRequest.PointWheelsAt( );
+  private final SwerveRequest.RobotCentric            aim            = new SwerveRequest.RobotCentric( );
 
   private final Telemetry                             logger         = new Telemetry(MaxSpeed);
 
@@ -148,6 +153,31 @@ public class RobotContainer
     initOdometryChooser( );
   }
 
+  public double limelight_aim_proportional(CommandSwerveDrivetrain drivetrain)
+  {
+    double kP = .01;
+    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+
+    // convert to radians per second for our drive method
+    targetingAngularVelocity *= MaxAngularRate;
+
+    // invert since tx is positive when the target is to the right of the crosshair
+    targetingAngularVelocity *= -1.0;
+
+    return targetingAngularVelocity;
+  }
+
+  public double limelight_range_proportional(CommandSwerveDrivetrain drivetrain)
+  {
+    double kP = .1;
+    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
+
+    targetingForwardSpeed *= MaxSpeed;
+    targetingForwardSpeed *= -1.0;
+
+    return targetingForwardSpeed;
+  }
+
   /****************************************************************************
    * 
    * Create general dashboard widgets for commands and subsystems
@@ -176,8 +206,8 @@ public class RobotContainer
 
     SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
     SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
-    SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake));
-    SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake));
+    SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake, m_led));
+    SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
     SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
     SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE));
@@ -212,7 +242,8 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    m_driverPad.a( ).onTrue(new Dummy("driver A"));
+    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim.withVelocityX(-limelight_range_proportional(m_drivetrain))
+        .withVelocityY(limelight_range_proportional(m_drivetrain)).withRotationalRate(limelight_aim_proportional(m_drivetrain))));
     m_driverPad.b( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageRight));        // drive to stage right
     m_driverPad.x( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
     m_driverPad.y( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
@@ -252,14 +283,14 @@ public class RobotContainer
     m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
     m_operatorPad.x( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
-    m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake));
+    m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake, m_led));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake));
+    m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake, m_led));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
-    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::setCameraToSecondary).ignoringDisable(true)); // aka Menu
+    m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
@@ -289,13 +320,13 @@ public class RobotContainer
           m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                                   // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate)                       // Drive counterclockwise with negative X (left)
-          ).ignoringDisable(true));
+          ).ignoringDisable(true).withName("CommandSwerveDrivetrain"));
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
       m_drivetrain.setDefaultCommand(                                                               // Drivetrain will execute this command periodically
           m_drivetrain.applyRequest(( ) -> drive.withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed) // Drive forward with negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                                   // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate)              // Drive counterclockwise with negative X (left)
-          ).ignoringDisable(true));
+          ).ignoringDisable(true).withName("CommandSwerveDrivetrain"));
 
     // if (Utils.isSimulation()) {
     //   m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
@@ -367,7 +398,7 @@ public class RobotContainer
         break;
     }
 
-    pathName = "DriveS" + positionValue;
+    pathName = "DriveP" + positionValue;
     DataLogManager.log(String.format("getAutonomousCommand: %s", pathName));
 
     // The selected command will be run in autonomous
@@ -378,7 +409,7 @@ public class RobotContainer
         m_autoCommand = new AutoStop(m_drivetrain);
         break;
       case AUTOPRELOADONLY :
-        m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter);
+        m_autoCommand = new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led);
         break;
       case AUTOLEAVE :
         m_autoCommand = m_drivetrain.getAutoCommand(pathName);
@@ -386,12 +417,20 @@ public class RobotContainer
       case AUTOPRELOADANDLEAVE :
         m_autoCommand = new SequentialCommandGroup(               //
             m_drivetrain.getAutoCommand(pathName),   //
-            new AutoPreload(m_drivetrain, m_intake, m_shooter)    //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led)    //
         //m_drivetrain.getAutoPath(pathName)  //
         );
         break;
       case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new AutoStop(m_drivetrain);
+        m_autoCommand = new SequentialCommandGroup(               //
+            m_drivetrain.getAutoCommand(pathName),   //
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed).until(m_intake::isNoteDetected),
+            m_drivetrain.getAutoCommand("DriveS" + positionValue), //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+            m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
+            new AutoPreload(m_drivetrain, m_intake, m_shooter, m_led),    //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP));
         break;
       case AUTOTESTPATH :
         m_autoCommand = m_drivetrain.getAutoCommand("Test");
@@ -481,6 +520,7 @@ public class RobotContainer
   {
     m_led.initialize( );
     m_power.initialize( );
+    m_vision.initialize( );
 
     m_intake.initialize( );
     m_shooter.initialize( );
@@ -501,4 +541,8 @@ public class RobotContainer
     m_climber.faultDump( );
   }
 
+  public void teleopInit( )
+  {
+    CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));
+  }
 }

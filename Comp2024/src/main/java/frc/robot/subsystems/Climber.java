@@ -322,7 +322,7 @@ public class Climber extends SubsystemBase
         DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f %s",
             getSubsystem( ), m_currentInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
-      m_moveIsFinished = true;
+      m_moveIsFinished = false;
     }
 
     return m_moveIsFinished;

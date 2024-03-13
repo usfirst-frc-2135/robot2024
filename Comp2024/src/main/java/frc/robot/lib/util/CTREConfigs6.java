@@ -184,7 +184,7 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 800.0;        // Amps
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // shooterConfig.Feedback.*
@@ -224,12 +224,12 @@ public final class CTREConfigs6
     // exConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    climberConfig.CurrentLimits.SupplyCurrentLimit = 30.0;        // Amps
-    climberConfig.CurrentLimits.SupplyCurrentThreshold = 30.0;    // Amps
+    climberConfig.CurrentLimits.SupplyCurrentLimit = 80.0;        // Amps
+    climberConfig.CurrentLimits.SupplyCurrentThreshold = 80.0;    // Amps
     climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    climberConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
+    climberConfig.CurrentLimits.StatorCurrentLimit = 800.0;        // Amps
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -256,7 +256,7 @@ public final class CTREConfigs6
     // Slot settings
     climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
     climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
-    climberConfig.Slot0.kP = 0.0;                                 // Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kP = 0.15;                                 // Voltage or duty cycle per velocity error (velocity modes)
     climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
     climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

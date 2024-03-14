@@ -377,7 +377,9 @@ public class RobotContainer
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     StartPosition startPosition = m_startChooser.getSelected( );
-    int positionValue = 1;
+    int positionValue = 0;
+    int altpos1 = 0;
+    int altpos2 = 0;
 
     if (m_autoCommand != null)
       m_autoCommand.cancel( );
@@ -388,12 +390,18 @@ public class RobotContainer
         DataLogManager.log(String.format("RobotContainer: invalid position %s", startPosition));
       case POSE1 :
         positionValue = 1;
+        altpos1 = 2;
+        altpos2 = 3;
         break;
       case POSE2 :
         positionValue = 2;
+        altpos1 = 3;
+        altpos2 = 1;
         break;
       case POSE3 :
         positionValue = 3;
+        altpos1 = 2;
+        altpos2 = 1;
         break;
     }
 

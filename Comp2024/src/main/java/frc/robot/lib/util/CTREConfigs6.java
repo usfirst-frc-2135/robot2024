@@ -184,8 +184,8 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 800.0;        // Amps
-    shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
+    shooterConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 
     // shooterConfig.Feedback.*
     // shooterConfig.HardwareLimitSwitch.*
@@ -230,7 +230,7 @@ public final class CTREConfigs6
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     climberConfig.CurrentLimits.StatorCurrentLimit = 800.0;        // Amps
-    climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    climberConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 
     // Feedback settings
     // climberConfig.Feedback.*

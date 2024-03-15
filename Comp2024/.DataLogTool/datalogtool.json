@@ -1,8 +1,8 @@
 {
   "download": {
     "deleteAfter": false,
-    "localDir": "/Users/gracemills/Desktop/untitled folder",
+    "localDir": "C:\\Users\\frc21\\Documents\\GitHub\\robot2024\\Comp2024\\logs",
     "remoteDir": "/media/sda1/logs",
-    "serverTeam": "10.21.35.2"
+    "serverTeam": "172.22.11.2"
   }
 }

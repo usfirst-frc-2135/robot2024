@@ -117,7 +117,7 @@ public class RobotContainer
     AUTOLEAVE,               // Leave starting zone
     AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
     AUTOPRELOADSCOREANOTHER, // Score preload and score another
-    AUTOTESTPATH             // Run a selected test path
+    AUTOSCORE4, AUTOTESTPATH             // Run a selected test path
   }
 
   // Chooser for autonomous starting position
@@ -358,6 +358,7 @@ public class RobotContainer
     m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
     m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
     m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("6 - AutoScore4", AutoChooser.AUTOSCORE4);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Configure starting position sendable chooser
@@ -419,14 +420,13 @@ public class RobotContainer
         m_autoCommand = new ShooterActionFire(m_shooter, m_intake, m_led);
         break;
       case AUTOLEAVE :
-        m_autoCommand = m_drivetrain.getAutoCommand(pathName);
+        m_autoCommand = m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue);
         break;
       case AUTOPRELOADANDLEAVE :
         m_autoCommand = new SequentialCommandGroup(       //
             m_drivetrain.getAutoCommand(pathName),        //
-            new ShooterActionFire(m_shooter, m_intake, m_led)   //
-        //m_drivetrain.getAutoPath(pathName)              //
-        );
+            new ShooterActionFire(m_shooter, m_intake, m_led),   //
+            m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
         break;
       case AUTOPRELOADSCOREANOTHER :
         m_autoCommand = new SequentialCommandGroup(                   //
@@ -436,7 +436,7 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),        //
             new PrintCommand(mode + ": Deploy intake before moving"), //
             new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake.getIntakePosition( )), //
-            new PrintCommand(mode + ": Drive to spik while intaking"), //
+            new PrintCommand(mode + ": Drive to spike while intaking"), //
             new ParallelDeadlineGroup(                                //
                 m_drivetrain.getAutoCommand("DriveS" + positionValue), //
                 new IntakeActionAcquire(m_intake, m_led)              //
@@ -444,8 +444,34 @@ public class RobotContainer
             new PrintCommand(mode + ": Drive to scoring position"),   //
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),    //
             new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new PrintCommand(mode + ": Turn off intake rollers")      //
-        );
+            new PrintCommand(mode + ": Turn off intake rollers"),      //
+            m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
+        break;
+      case AUTOSCORE4 :
+        m_autoCommand = new SequentialCommandGroup(               //
+            //Preload Score
+            m_drivetrain.getAutoCommand(pathName),   //
+            new ShooterActionFire(m_shooter, m_intake, m_led),        //
+            //Intake and Score Note 1
+            new ParallelDeadlineGroup(                                //
+                m_drivetrain.getAutoCommand("DriveS" + positionValue), //
+                new IntakeActionAcquire(m_intake, m_led)              //
+            ), m_drivetrain.getAutoCommand("ScoreS" + positionValue),//
+            new ShooterActionFire(m_shooter, m_intake, m_led),        //
+            //Intake and Score Note 2
+            m_drivetrain.getAutoCommand("S2toS3"), //
+            new ParallelDeadlineGroup(                                //
+                m_drivetrain.getAutoCommand("DriveS" + altpos1), //
+                new IntakeActionAcquire(m_intake, m_led)              //
+            ), m_drivetrain.getAutoCommand("ScoreS" + altpos1),//
+            new ShooterActionFire(m_shooter, m_intake, m_led),        //
+            //Intake and Score Note 3
+            new ParallelDeadlineGroup(                                //
+                m_drivetrain.getAutoCommand("DriveS" + altpos2), //
+                new IntakeActionAcquire(m_intake, m_led)              //
+            ), m_drivetrain.getAutoCommand("ScoreS" + altpos2),//
+            new ShooterActionFire(m_shooter, m_intake, m_led),        //
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP));
         break;
       case AUTOTESTPATH :
         m_autoCommand = m_drivetrain.getAutoCommand("Test");

@@ -230,7 +230,7 @@ public final class CTREConfigs6
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     climberConfig.CurrentLimits.StatorCurrentLimit = 800.0;        // Amps
-    climberConfig.CurrentLimits.StatorCurrentLimitEnable = false;
+    climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
     // climberConfig.Feedback.*
@@ -256,7 +256,7 @@ public final class CTREConfigs6
     // Slot settings
     climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
     climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
-    climberConfig.Slot0.kP = 0.15;                                 // Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kP = 4.80;                                 // Voltage or duty cycle per velocity error (velocity modes)
     climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
     climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

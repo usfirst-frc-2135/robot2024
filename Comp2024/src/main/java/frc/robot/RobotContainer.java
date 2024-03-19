@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -58,7 +57,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
@@ -119,7 +117,8 @@ public class RobotContainer
     AUTOLEAVE,               // Leave starting zone
     AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
     AUTOPRELOADSCOREANOTHER, // Score preload and score another
-    AUTOSCORE4, AUTOTESTPATH             // Run a selected test path
+    AUTOSCORE4,              //
+    AUTOTESTPATH             // Run a selected test path
   }
 
   // Chooser for autonomous starting position

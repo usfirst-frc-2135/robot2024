@@ -107,7 +107,6 @@ public class Climber extends SubsystemBase
     m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberFXConfig( ));
     m_climberR.setInverted(true);
-    // m_climberR.setControl(new Follower(m_climberL.getDeviceID( ), true));
 
     m_climberL.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
     m_climberR.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));

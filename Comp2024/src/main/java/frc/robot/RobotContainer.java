@@ -105,7 +105,7 @@ public class RobotContainer
   private final CommandSwerveDrivetrain               m_drivetrain   = TunerConstants.DriveTrain;
   private final Intake                                m_intake       = new Intake( );
   private final Shooter                               m_shooter      = new Shooter( );
-  private final Feeder                                m_feeder       = new Feeder( );
+  // private final Feeder                                m_feeder       = new Feeder( );
   private final Climber                               m_climber      = new Climber( );
 
   // Chooser for autonomous commands
@@ -193,7 +193,7 @@ public class RobotContainer
 
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_shooter);
-    SmartDashboard.putData(m_feeder);
+    // SmartDashboard.putData(m_feeder);
     SmartDashboard.putData(m_climber);
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( )));
@@ -574,7 +574,7 @@ public class RobotContainer
 
     m_intake.initialize( );
     m_shooter.initialize( );
-    m_feeder.initialize( );
+    // m_feeder.initialize( );
     m_climber.initialize( );
   }
 
@@ -587,7 +587,7 @@ public class RobotContainer
 
     m_intake.faultDump( );
     m_shooter.faultDump( );
-    m_feeder.faultDump( );
+    // m_feeder.faultDump( );
     m_climber.faultDump( );
   }
 

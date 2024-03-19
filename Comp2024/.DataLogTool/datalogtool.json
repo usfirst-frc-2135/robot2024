@@ -1,8 +1,0 @@
-{
-  "download": {
-    "deleteAfter": false,
-    "localDir": "C:\\Users\\frc21\\Documents\\GitHub\\robot2024\\Comp2024\\logs",
-    "remoteDir": "/media/sda1/logs",
-    "serverTeam": "172.22.11.2"
-  }
-}

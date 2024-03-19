@@ -94,20 +94,20 @@ public class Feeder extends SubsystemBase
 
   public Feeder( )
   {
-    setName("Intake");
-    setSubsystem("Intake");
+    setName("Feeder");
+    setSubsystem("Feeder");
 
     // Roller motor init
     m_fdRollerValid =
-        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_feederRoller, "Intake Roller", CTREConfigs5.intakeRollerConfig( ));
+        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_feederRoller, "Feeder Roller", CTREConfigs5.intakeRollerConfig( ));
     m_feederRoller.setInverted(kFeederMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_feederRoller, "setInverted");
 
     // Rotary motor and CANcoder init
     m_fdRotaryValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_feederRotary, "Intake Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_feederRotary, "Feeder Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
     m_fdCCValid =
-        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
+        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Feeder Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
 
     Double ccRotations = getCANCoderRotations( );
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
@@ -143,7 +143,7 @@ public class Feeder extends SubsystemBase
     SmartDashboard.putNumber("FD_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("FD_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("FD_rotaryDegrees", m_currentDegrees); // reference is rotary encoder
-    SmartDashboard.putBoolean("FD_noteInIntake", m_noteInFeeder.get( ));
+    SmartDashboard.putBoolean("FD_noteInFeeder", m_noteInFeeder.get( ));
     if (m_debug && m_fdRotaryValid)
     {
       SmartDashboard.putNumber("IN_rotaryRps", m_rotaryVelocity.refresh( ).getValue( ));
@@ -231,7 +231,7 @@ public class Feeder extends SubsystemBase
     }
   }
 
-  public double getIntakePosition( )
+  public double getFeederPosition( )
   {
     return m_currentDegrees;
   }
@@ -274,7 +274,7 @@ public class Feeder extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getIntakePosition( ),
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getFeederPosition( ),
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
@@ -290,7 +290,7 @@ public class Feeder extends SubsystemBase
     m_safetyTimer.restart( );
 
     if (holdPosition)
-      newAngle = getIntakePosition( );
+      newAngle = getFeederPosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))

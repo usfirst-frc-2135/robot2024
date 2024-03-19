@@ -1,3 +1,6 @@
+
+// Phoenix 6 configurations
+
 package frc.robot.lib.util;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -10,96 +13,11 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.INConsts;
 import frc.robot.Robot;
-import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
 {
 
-  // Swerve modules
-
-  public static TalonFXConfiguration exampleDriveFXConfig( )
-  {
-    TalonFXConfiguration driveConfig = new TalonFXConfiguration( );
-
-    // driveConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SWConsts.driveClosedLoopRamp;
-    // driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SWConsts.driveClosedLoopRamp;
-
-    // driveConfig.CurrentLimits.SupplyCurrentLimit = SWConsts.driveSupplyCurrentLimit;
-    // driveConfig.CurrentLimits.SupplyCurrentThreshold = SWConsts.driveSupplyCurrentThreshold;
-    // driveConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.driveSupplyTimeThreshold;
-    // driveConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.driveSupplyCurrentLimitEnable;
-
-    // // driveConfig.CurrentLimits.*
-    // // driveConfig.Feedback.*
-    // // driveConfig.HardwareLimitSwitch.*
-    // // driveConfig.MotionMagic.*
-
-    // // driveConfig.MotorOutput.DutyCycleNeutralDeadband
-    // driveConfig.MotorOutput.Inverted = SWConsts.driveMotorInvert;
-    // driveConfig.MotorOutput.NeutralMode = SWConsts.driveNeutralMode;
-
-    // driveConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SWConsts.driveOpenLoopRamp;
-    // driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SWConsts.driveOpenLoopRamp;
-
-    // driveConfig.Slot0.kS = SWConsts.driveFFKS;
-    // driveConfig.Slot0.kV = SWConsts.driveFFKV;
-    // driveConfig.Slot0.kP = SWConsts.driveKP;
-    // driveConfig.Slot0.kI = SWConsts.driveKI;
-    // driveConfig.Slot0.kD = SWConsts.driveKD;
-
-    // driveConfig.SoftwareLimitSwitch.*
-
-    return driveConfig;
-  }
-
-  public static TalonFXConfiguration exampleSteerFXConfig( )
-  {
-    TalonFXConfiguration angleConfig = new TalonFXConfiguration( );
-
-    // angleConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SWConsts.steerClosedLoopRamp;
-    // angleConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SWConsts.steerClosedLoopRamp;
-
-    // angleConfig.CurrentLimits.SupplyCurrentLimit = SWConsts.steerSupplyCurrentLimit;
-    // angleConfig.CurrentLimits.SupplyCurrentThreshold = SWConsts.steerSupplyCurrentThreshold;
-    // angleConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.steerSupplyTimeThreshold;
-    // angleConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.steerSupplyCurrentLimitEnable;
-
-    //  angleConfig.CurrentLimits.*
-    //  angleConfig.Feedback.*
-    //  angleConfig.HardwareLimitSwitch.*
-    //  angleConfig.MotionMagic.*
-
-    //  angleConfig.MotorOutput.DutyCycleNeutralDeadband
-    // angleConfig.MotorOutput.Inverted = SWConsts.steerMotorInvert;
-    // angleConfig.MotorOutput.NeutralMode = SWConsts.steerNeutralMode;
-
-    // angleConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SWConsts.steerOpenLoopRamp;
-    // angleConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SWConsts.steerOpenLoopRamp;
-
-    // angleConfig.Slot0.kS = SWConsts.steerFFKS;
-    // angleConfig.Slot0.kV = SWConsts.steerFFKV;
-    // angleConfig.Slot0.kP = SWConsts.steerKP;
-    // angleConfig.Slot0.kI = SWConsts.steerKI;
-    // angleConfig.Slot0.kD = SWConsts.steerKD;
-
-    //  angleConfig.SoftwareLimitSwitch.*
-
-    return angleConfig;
-  }
-
-  public static CANcoderConfiguration exampleCancoderConfig( )
-  {
-    CANcoderConfiguration config = new CANcoderConfiguration( );
-
-    // config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    // config.MagnetSensor.SensorDirection = SWConsts.steerCanCoderInvert;
-    // if (Robot.isReal( ))
-    //   config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.0 : 0.0;
-    // else
-    //   config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default
-
-    return config;
-  }
+  // Swerve module configs built into subsystem
 
   public static TalonFXConfiguration intakeRotaryFXConfig( )
   {
@@ -186,7 +104,7 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
-    shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    shooterConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 
     // shooterConfig.Feedback.*
     // shooterConfig.HardwareLimitSwitch.*
@@ -225,12 +143,12 @@ public final class CTREConfigs6
     // exConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    climberConfig.CurrentLimits.SupplyCurrentLimit = 30.0;        // Amps
-    climberConfig.CurrentLimits.SupplyCurrentThreshold = 30.0;    // Amps
+    climberConfig.CurrentLimits.SupplyCurrentLimit = 80.0;        // Amps
+    climberConfig.CurrentLimits.SupplyCurrentThreshold = 80.0;    // Amps
     climberConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     climberConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    climberConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
+    climberConfig.CurrentLimits.StatorCurrentLimit = 800.0;        // Amps
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
@@ -257,9 +175,9 @@ public final class CTREConfigs6
     // Slot settings
     climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
     climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
-    climberConfig.Slot0.kP = 0.0451;                              // Voltage or duty cycle per velocity error (velocity modes)
-    climberConfig.Slot0.kI = 0.001;                               // Voltage or duty cycle per accumulated error
-    climberConfig.Slot0.kD = 0.4514;                              // Voltage or duty cycle per unit of acceleration error (velocity modes)
+    climberConfig.Slot0.kP = 4.80;                                 // Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
+    climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
     // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);   // Rotations

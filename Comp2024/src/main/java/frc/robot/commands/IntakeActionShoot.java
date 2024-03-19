@@ -30,13 +30,13 @@ public class IntakeActionShoot extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),            
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
-        new IntakeRun(intake, INConsts.RollerMode.SHOOT),
+        new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake.getIntakePosition( )),
 
         new PrintCommand(getName() + ": Wait for note to release"),
         new WaitCommand(0.5),
 
         new PrintCommand(getName() + ": Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
  
         // @formatter:on
     );

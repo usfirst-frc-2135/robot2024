@@ -4,6 +4,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.lib.math.Conversions;
@@ -46,6 +48,7 @@ public class Shooter extends SubsystemBase
   private final FlywheelSim     m_flywheelUpperSim       = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
 
   private VelocityVoltage       m_requestVelocity        = new VelocityVoltage(0.0);
+  private DutyCycleOut          m_requestDutyCycleOut    = new DutyCycleOut(0.0);
   private LinearFilter          m_flywheelFilter         = LinearFilter.singlePoleIIR(0.060, 0.020);
 
   // Status signals
@@ -70,11 +73,11 @@ public class Shooter extends SubsystemBase
 
     m_shooterValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));
-    m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), true));
+    m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), (Robot.isComp( )) ? false : true));
 
     m_shooterLVelocity.setUpdateFrequency(50);
-    m_shooterLSupplyCur.setUpdateFrequency(25);
-    m_shooterLStatorCur.setUpdateFrequency(25);
+    m_shooterLSupplyCur.setUpdateFrequency(10);
+    m_shooterLStatorCur.setUpdateFrequency(10);
 
     initSmartDashboard( );
     initialize( );
@@ -170,8 +173,13 @@ public class Shooter extends SubsystemBase
 
     double rotPerSecond = m_targetRPM / 60.0;
     if (m_shooterValid)
-      m_shooterLower
-          .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
+    {
+      if (m_targetRPM > 100.0)
+        m_shooterLower
+            .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
+      else
+        m_shooterLower.setControl(m_requestDutyCycleOut);
+    }
     DataLogManager.log(String.format("%s: target rpm is %.1f rps %1f", getSubsystem( ), m_targetRPM, rotPerSecond));
   }
 

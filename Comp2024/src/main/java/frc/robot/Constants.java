@@ -180,11 +180,11 @@ public class Constants
     }
 
     // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -81.92;    // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = 0.0;      // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 118.56;    // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -83.92;    // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 120.56;    // TODO: Tune me!
+    public static final double kRotaryAngleRetracted = -84.92;    // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = 0.0;       // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 112.21;    // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -87.0;    // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 114.0;    // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -247,11 +247,11 @@ public class Constants
     }
 
     // Climber lengths - Motion Magic config parameters
-    public static final double kLengthClimbed = 2.0;    // By definition - Climber fully climbed
-    public static final double kLengthFull    = 17.0;   // From Mech Design height needed to reach max chain
+    public static final double kLengthClimbed = 0.0;    // By definition - Climber fully climbed
+    public static final double kLengthFull    = 19.5;   // From Mech Design height needed to reach max chain
     public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
     public static final double kLengthMin     = 0.0;    // Climber minimum allowable length
-    public static final double kLengthMax     = 18.25;  // Climber maximum allowable length (2" beyond high length)
+    public static final double kLengthMax     = 21.0;  // Climber maximum allowable length (2" beyond high length)
   }
 
   /////////////////////////////////////////////////////////////////////////////

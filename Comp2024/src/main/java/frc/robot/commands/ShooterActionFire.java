@@ -30,7 +30,6 @@ public class ShooterActionFire extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Start shooter and retract intake"),
         new ShooterRun(shooter, ShooterMode.SCORE),
-        new IntakeActionRetract(intake, led),
         new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
 
         new PrintCommand(getName() + ": Wait for desired speed"),

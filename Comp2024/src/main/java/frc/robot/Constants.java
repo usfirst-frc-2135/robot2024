@@ -164,10 +164,9 @@ public class Constants
       STOP,    // Stop spinning
       ACQUIRE, // Acquire a game piece
       EXPEL,   // Expel a game piece
-      SHOOT,    // put into shooter 
-      HANDOFF,  // put into feeder 
+      SHOOT,   // put into shooter 
+      HANDOFF, // put into feeder 
       HOLD     // Maintain existing setting
-
     }
 
     // Rotary manual move parameters
@@ -180,11 +179,11 @@ public class Constants
     }
 
     // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -84.92;    // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = 0.0;       // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 112.21;    // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -87.0;    // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 114.0;    // TODO: Tune me!
+    public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = 0.0;    // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 112.21; // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 114.0;  // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -197,14 +196,29 @@ public class Constants
     // Feeder intake parameters
     public enum RollerMode
     {
+      STOP,    // Stop spinning
+      ACQUIRE, // Acquire a game piece
+      EXPEL,   // Expel a game piece
+      SCORE,   // put into shooter 
+      HANDOFF, // put into feeder 
+      HOLD     // Maintain existing setting
     }
 
     // Rotary manual move parameters
     public enum RotaryMode
     {
+      INIT,    // Initialize intake
+      INBOARD, // Intake Rotary moving into the feeder
+      STOPPED, // Intake Rotary stop and hold position
+      OUTBOARD // Intake Rotary moving out of the feeder
     }
 
-    // Feeder angles - Motion Magic config parameters
+    // Rotary angles - Motion Magic move parameters
+    public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = 0.0;    // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 112.21; // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 114.0;  // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -56,6 +58,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private final Rotation2d                           RedAlliancePerspectiveRotation  = Rotation2d.fromDegrees(180);
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean                                    hasAppliedOperatorPerspective   = false;
+  /* Speaker AprilTag Pose for calculating distance */
+  private Pose2d                                     m_allianceSpeakerATPose         = new Pose2d( );
 
   private final SwerveRequest.ApplyChassisSpeeds     AutoRequest                     = new SwerveRequest.ApplyChassisSpeeds( );
 
@@ -219,9 +223,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       {
         this.setOperatorPerspectiveForward(
             allianceColor == Alliance.Red ? RedAlliancePerspectiveRotation : BlueAlliancePerspectiveRotation);
+        m_allianceSpeakerATPose = VIConsts.kAprilTagPoses.get((allianceColor == Alliance.Red) ? 4 : 7);
         hasAppliedOperatorPerspective = true;
       });
     }
+
+    double speakerTagDistance = this.getState( ).Pose.getTranslation( ).getDistance(m_allianceSpeakerATPose.getTranslation( ));
+    SmartDashboard.putNumber("SW_shootDistance", Units.metersToInches(speakerTagDistance));
 
     if (m_useLimelight && Robot.isReal( ))
     {

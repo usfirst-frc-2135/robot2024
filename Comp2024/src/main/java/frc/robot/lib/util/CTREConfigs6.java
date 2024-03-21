@@ -19,6 +19,8 @@ public final class CTREConfigs6
 
   // Swerve module configs built into subsystem
 
+  // Intake
+
   public static TalonFXConfiguration intakeRotaryFXConfig( )
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
@@ -83,12 +85,14 @@ public final class CTREConfigs6
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.511719 : -0.703613; // Rotations TODO: get comp value
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.511719 : -0.703613;
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
     return config;
   }
+
+  // Shooter
 
   public static TalonFXConfiguration shooterFXConfig( )
   {
@@ -130,6 +134,79 @@ public final class CTREConfigs6
     // shooterConfig.SoftwareLimitSwitch.*
 
     return shooterConfig;
+  }
+
+  // Feeder
+
+  public static TalonFXConfiguration feederRotaryFXConfig( )
+  {
+    TalonFXConfiguration fdRotaryConfig = new TalonFXConfiguration( );
+
+    // Closed Loop settings
+    // fdRotaryConfig.ClosedLoopGeneral.*
+    // fdRotaryConfig.ClosedLoopRamps.*                           // Seconds to ramp
+
+    // Current limit settings
+    fdRotaryConfig.CurrentLimits.SupplyCurrentLimit = 25.0;       // Amps
+    fdRotaryConfig.CurrentLimits.SupplyCurrentThreshold = 25.0;   // Amps
+    fdRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;     // Seconds
+    fdRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    fdRotaryConfig.CurrentLimits.StatorCurrentLimit = 100.0;       // Amps
+    fdRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    // Feedback settings
+    // fdRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANCoder;
+    // fdRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // fdRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
+    // fdRotaryConfig.Feedback.RotorToSensorRatio = 27.41;
+
+    // Hardware limit switches
+    // fdRotaryConfig.HardwareLimitSwitch.*
+
+    // Motion Magic settings
+    fdRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0;  // Rotations / second
+    fdRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0;    // Rotations / second ^ 2
+    fdRotaryConfig.MotionMagic.MotionMagicJerk = 360.0;           // Rotations / second ^ 3
+
+    // Motor output settings
+    fdRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;  // Percentage
+    fdRotaryConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    fdRotaryConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // Open Loop settings
+    fdRotaryConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0; // Seconds to ramp
+    // fdRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod      // Seconds to ramp
+    fdRotaryConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;   // Seconds to ramp
+
+    // Slot settings
+    fdRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
+    fdRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
+    fdRotaryConfig.Slot0.kP = 0.2;                                // Voltage or duty cycle per velocity error (velocity modes)
+    fdRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
+    fdRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
+
+    // Software limit switches
+    fdRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMin);  // Rotations
+    // fdRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    fdRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMax);  // Rotations
+    // fdRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+
+    return fdRotaryConfig;
+  }
+
+  public static CANcoderConfiguration feederRotaryCancoderConfig( )
+  {
+    CANcoderConfiguration config = new CANcoderConfiguration( );
+
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    if (Robot.isReal( ))
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.511719 : -0.703613;
+    else
+      config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
+
+    return config;
   }
 
   // Climber

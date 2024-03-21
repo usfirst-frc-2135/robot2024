@@ -12,6 +12,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -146,9 +147,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return run(( ) -> this.setControl(requestSupplier.get( )));
   }
 
-  public Command getAutoCommand(String pathName)
+  public Command getAutoCommand(String autoName)
   {
-    return new PathPlannerAuto(pathName).withName("swervePPAuto");
+    return new PathPlannerAuto(autoName).withName("swervePPAuto");
+  }
+
+  public Command getPathCommand(String pathName)
+  {
+    // Load the path you want to follow using its name in the GUI
+    PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+
+    // Create a path following command using AutoBuilder. This will also trigger event markers.
+    return AutoBuilder.followPath(path).withName("swervePPPath");
   }
 
   /*

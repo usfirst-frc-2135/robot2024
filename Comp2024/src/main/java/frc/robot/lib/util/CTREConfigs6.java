@@ -65,7 +65,7 @@ public final class CTREConfigs6
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
     inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    inRotaryConfig.Slot0.kP = 0.35;                                // Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kP = 0.0625;                                // Voltage or duty cycle per velocity error (velocity modes)
     inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
@@ -126,7 +126,7 @@ public final class CTREConfigs6
 
     // Slot settings
     shooterConfig.Slot0.kS = 0.0;                                   // Voltage or duty cylce to overcome static friction
-    shooterConfig.Slot0.kV = 0.1129;                                // Voltage or duty cycle per requested RPS (velocity modes)
+    shooterConfig.Slot0.kV = 0.1140;                                // Voltage or duty cycle per requested RPS (velocity modes)
     shooterConfig.Slot0.kP = 0.25;                                   // Voltage or duty cycle per velocity error (velocity modes)
     shooterConfig.Slot0.kI = 0.0;                                   // Voltage or duty cycle per accumulated error
     shooterConfig.Slot0.kD = 0.0;                                   // Voltage or duty cycle per unit of acceleration error (velocity modes)

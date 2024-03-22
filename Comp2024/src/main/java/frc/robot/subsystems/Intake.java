@@ -147,12 +147,12 @@ public class Intake extends SubsystemBase
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
     {
-      m_rotaryVelocity.setUpdateFrequency(25);
-      m_rotaryCLoopError.setUpdateFrequency(25);
-      m_rotarySupplyCur.setUpdateFrequency(25);
-      m_rotaryStatorCur.setUpdateFrequency(25);
+      m_rotaryVelocity.setUpdateFrequency(10);
+      m_rotaryCLoopError.setUpdateFrequency(10);
+      m_rotarySupplyCur.setUpdateFrequency(10);
+      m_rotaryStatorCur.setUpdateFrequency(10);
     }
-    m_ccPosition.setUpdateFrequency(50);
+    m_ccPosition.setUpdateFrequency(10);
 
     initSmartDashboard( );
     initialize( );

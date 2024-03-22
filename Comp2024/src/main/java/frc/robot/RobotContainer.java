@@ -106,7 +106,7 @@ public class RobotContainer
   private final CommandSwerveDrivetrain               m_drivetrain   = TunerConstants.DriveTrain;
   private final Intake                                m_intake       = new Intake( );
   private final Shooter                               m_shooter      = new Shooter( );
-  private final Feeder                                m_feeder       = new Feeder( );
+  // private final Feeder                                m_feeder       = new Feeder( );
   private final Climber                               m_climber      = new Climber( );
 
   // Chooser for autonomous commands
@@ -198,7 +198,7 @@ public class RobotContainer
 
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_shooter);
-    SmartDashboard.putData(m_feeder);
+    // SmartDashboard.putData(m_feeder);
     SmartDashboard.putData(m_climber);
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( )));
@@ -229,15 +229,15 @@ public class RobotContainer
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
 
-    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, RollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, RollerMode.EXPEL, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, RollerMode.STOP, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, RollerMode.HOLD, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollShoot", new FeederRun(m_feeder, RollerMode.SHOOT, m_feeder.getFeederPosition( )));
+    // SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, RollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
+    // SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, RollerMode.EXPEL, m_feeder.getFeederPosition( )));
+    // SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, RollerMode.STOP, m_feeder.getFeederPosition( )));
+    // SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, RollerMode.HOLD, m_feeder.getFeederPosition( )));
+    // SmartDashboard.putData("FdRollShoot", new FeederRun(m_feeder, RollerMode.SHOOT, m_feeder.getFeederPosition( )));
 
-    SmartDashboard.putData("FdRotDeploy", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleDeployed));
-    SmartDashboard.putData("FdRotRetract", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleRetracted));
-    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
+    // SmartDashboard.putData("FdRotDeploy", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleDeployed));
+    // SmartDashboard.putData("FdRotRetract", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleRetracted));
+    // SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
 
     SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -360,7 +360,7 @@ public class RobotContainer
 
     // Default command - Motion Magic hold
     m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
-    m_feeder.setDefaultCommand(new FeederRun(m_feeder, RollerMode.HOLD));
+    // m_feeder.setDefaultCommand(new FeederRun(m_feeder, RollerMode.HOLD));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
     // Default command - manual mode
@@ -606,7 +606,7 @@ public class RobotContainer
 
     m_intake.initialize( );
     m_shooter.initialize( );
-    m_feeder.initialize( );
+    // m_feeder.initialize( );
     m_climber.initialize( );
   }
 
@@ -619,7 +619,7 @@ public class RobotContainer
 
     m_intake.faultDump( );
     m_shooter.faultDump( );
-    m_feeder.faultDump( );
+    // m_feeder.faultDump( );
     m_climber.faultDump( );
   }
 

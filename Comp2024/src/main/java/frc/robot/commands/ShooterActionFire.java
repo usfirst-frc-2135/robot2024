@@ -42,7 +42,8 @@ public class ShooterActionFire extends SequentialCommandGroup
         new WaitCommand(0.75),
 
         new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL),
-        new ShooterRun(shooter, ShooterMode.STOP),
+        new ShooterRun(shooter, ShooterMode.SCORE), 
+        // changed from STOP
         new IntakeActionRetract(intake, led)
 
         // @formatter:on

@@ -146,7 +146,8 @@ public class Shooter extends SubsystemBase
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    setShooterMode(ShooterMode.STOP);
+    setShooterMode(ShooterMode.SCORE);
+    // changed from STOP 
   }
 
   public void faultDump( )

@@ -236,8 +236,8 @@ public final class CTREConfigs6
 
     // Motion Magic settings
     climberConfig.MotionMagic.MotionMagicCruiseVelocity = 79.75;  // Rotations / second
-    climberConfig.MotionMagic.MotionMagicAcceleration = 708.9;    // Rotations / second ^ 2
-    climberConfig.MotionMagic.MotionMagicJerk = 3544;             // Rotations / second ^ 3
+    climberConfig.MotionMagic.MotionMagicAcceleration = 159.5;    // Rotations / second ^ 2
+    climberConfig.MotionMagic.MotionMagicJerk = 3544;             // Rotations / second ^ 3 
 
     // Motor output settings
     climberConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;   // Percentage

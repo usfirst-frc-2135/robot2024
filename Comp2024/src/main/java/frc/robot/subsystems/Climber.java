@@ -4,7 +4,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -46,10 +45,10 @@ public class Climber extends SubsystemBase
   private final double              kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
   private static final double       kGearRatio           = 8.57;   // Gear reduction
   private static final double       kClimberLengthMeters = 1.0;
+  private static final double       kCarriageMassKg      = 2.0;
   private static final double       kDrumDiameterInches  = 1.375;  // Drum diameter in inches
   private static final double       kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
-  private static final double       kDrumCircumInches    = kDrumDiameterInches * Math.PI;             // Drum diameter in inches
-  private static final double       kRolloutRatio        = kDrumCircumInches / kGearRatio; // inches per shaft rotation
+  private static final double       kRolloutRatio        = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
   private static final double       kCalibrateSpeedVolts = -1.4;   // Motor voltage during calibration
   private static final double       kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
 
@@ -61,7 +60,7 @@ public class Climber extends SubsystemBase
   private final TalonFX             m_climberR           = new TalonFX(Ports.kCANID_ClimberR);
 
   private final TalonFXSimState     m_climberSim         = m_climberL.getSimState( );
-  private final ElevatorSim         m_elevSim            = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, 2.0,
+  private final ElevatorSim         m_elevSim            = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, kCarriageMassKg,
       kDrumRadiusMeters, -CLConsts.kLengthMax, CLConsts.kLengthMax, false, 0.0);
 
   // Mechanism2d
@@ -71,7 +70,7 @@ public class Climber extends SubsystemBase
       .append(new MechanismLigament2d("climberr", kClimberLengthMeters, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
-  private boolean                   m_climberValid;               // Health indicator for Falcon 
+  private boolean                   m_climberValid;                // Health indicator for Falcon 
   private boolean                   m_calibrated         = true;
   private boolean                   m_debug              = true;
   private double                    m_currentInches      = 0.0;    // Current length in inches
@@ -104,9 +103,10 @@ public class Climber extends SubsystemBase
 
     m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberFXConfig( ));
-    m_climberR.setControl(new Follower(m_climberL.getDeviceID( ), true));
+    m_climberR.setInverted(true);
 
     m_climberL.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
+    m_climberR.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     // Simulation object initialization
@@ -115,10 +115,10 @@ public class Climber extends SubsystemBase
     m_motorPosition.setUpdateFrequency(50);
     if (m_debug)
     {
-      m_motorVelocity.setUpdateFrequency(50);
-      m_motorCLoopError.setUpdateFrequency(50);
-      m_motorSupplyCur.setUpdateFrequency(50);
-      m_motorStatorCur.setUpdateFrequency(50);
+      m_motorVelocity.setUpdateFrequency(10);
+      m_motorCLoopError.setUpdateFrequency(10);
+      m_motorSupplyCur.setUpdateFrequency(10);
+      m_motorStatorCur.setUpdateFrequency(10);
     }
 
     initSmartDashboard( );
@@ -186,8 +186,9 @@ public class Climber extends SubsystemBase
   {
     setStopped( );
     m_calibrated = false;
+    SmartDashboard.putBoolean("CL_calibrated", m_calibrated);
 
-    m_currentInches = 0.5; // Allow calibration routine to run for up to this length
+    m_currentInches = 0.0; // Allow calibration routine to run for up to this length
     m_targetInches = m_currentInches;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
@@ -211,30 +212,31 @@ public class Climber extends SubsystemBase
 
   private boolean isMoveValid(double inches)
   {
-    return (inches > CLConsts.kLengthMin) && (inches < CLConsts.kLengthMax);
-  }
-
-  private boolean isWithinTolerance(double targetInches)
-  {
-    return (Math.abs(targetInches - m_currentInches) < kToleranceInches);
+    return (inches >= CLConsts.kLengthMin) && (inches <= CLConsts.kLengthMax);
   }
 
   public void resetPositionToZero( )
   {
     if (m_climberValid)
+    {
       m_climberL.setPosition(Conversions.inchesToWinchRotations(0, kRolloutRatio));
+      m_climberR.setPosition(Conversions.inchesToWinchRotations(0, kRolloutRatio));
+    }
   }
 
   public void setStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
     m_climberL.setControl(m_requestVolts.withOutput(0.0));
+    m_climberR.setControl(m_requestVolts.withOutput(0.0));
   }
 
   public void setMMPosition(double targetInches)
   {
     // y = mx + b, where 0 degrees is 0.0 climber and 90 degrees is 1/4 winch turn (the climber constant)
     m_climberL.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
+        .withFeedForward(m_totalArbFeedForward));
+    m_climberR.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
         .withFeedForward(m_totalArbFeedForward));
   }
 
@@ -267,6 +269,7 @@ public class Climber extends SubsystemBase
     m_targetInches = m_currentInches;
 
     m_climberL.setControl(m_requestVolts.withOutput(axisValue * kManualSpeedVolts));
+    m_climberR.setControl(m_requestVolts.withOutput(axisValue * kManualSpeedVolts));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -280,7 +283,7 @@ public class Climber extends SubsystemBase
       newLength = getCurrentInches( );
 
     // Decide if a new position request
-    if (holdPosition || newLength != m_targetInches || !isWithinTolerance(newLength))
+    if (holdPosition || newLength != m_targetInches || !MathUtil.isNear(newLength, m_currentInches, kToleranceInches))
     {
       // Validate the position request
       if (isMoveValid(newLength))
@@ -298,7 +301,6 @@ public class Climber extends SubsystemBase
       else
         DataLogManager.log(String.format("%s: Position move %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
             m_targetInches, CLConsts.kLengthMin, CLConsts.kLengthMax));
-
     }
     else
     {
@@ -345,7 +347,7 @@ public class Climber extends SubsystemBase
     if (m_climberValid)
     {
       m_climberL.setControl(m_requestVolts.withOutput(kCalibrateSpeedVolts));
-      m_climberR.setControl(m_requestVolts.withOutput(-kCalibrateSpeedVolts));
+      m_climberR.setControl(m_requestVolts.withOutput(kCalibrateSpeedVolts));
     }
   }
 

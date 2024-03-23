@@ -8,13 +8,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.INConsts;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 
 /**
  *
  */
 public class IntakeActionExpel extends SequentialCommandGroup
 {
-  public IntakeActionExpel(Intake intake)
+  public IntakeActionExpel(Intake intake, LED led)
   {
     setName("IntakeActionExpel");
 
@@ -26,13 +27,13 @@ public class IntakeActionExpel extends SequentialCommandGroup
         new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed),
 
         new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),        
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleDeployed),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake.getIntakePosition( )),
 
         new PrintCommand(getName() + ": Wait for note to release"),
         new WaitCommand(0.5),
 
         new PrintCommand(getName() + ": Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
  
         // @formatter:on
     );

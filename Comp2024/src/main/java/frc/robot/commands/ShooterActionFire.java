@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants.INConsts;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
@@ -30,21 +29,21 @@ public class ShooterActionFire extends SequentialCommandGroup
         // @formatter:off
 
         new PrintCommand(getName() + ": Start shooter and retract intake"),
-        new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
         new ShooterRun(shooter, ShooterMode.SCORE),
-        new IntakeActionRetract(intake, led),
+        new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
 
         new PrintCommand(getName() + ": Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtDesiredSpeed),
 
         new PrintCommand(getName() + ": Feed note from intake"),
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
-        new IntakeRun(intake, INConsts.RollerMode.SHOOT, INConsts.kRotaryAngleRetracted),
+        new IntakeActionShoot(intake, led),
 
-        new WaitCommand(2.0),
+        new WaitCommand(0.75),
+
         new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL),
         new ShooterRun(shooter, ShooterMode.STOP),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
+        new IntakeActionRetract(intake, led)
 
         // @formatter:on
     );

@@ -147,12 +147,12 @@ public class Intake extends SubsystemBase
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
     {
-      m_rotaryVelocity.setUpdateFrequency(25);
-      m_rotaryCLoopError.setUpdateFrequency(25);
-      m_rotarySupplyCur.setUpdateFrequency(25);
-      m_rotaryStatorCur.setUpdateFrequency(25);
+      m_rotaryVelocity.setUpdateFrequency(10);
+      m_rotaryCLoopError.setUpdateFrequency(10);
+      m_rotarySupplyCur.setUpdateFrequency(10);
+      m_rotaryStatorCur.setUpdateFrequency(10);
     }
-    m_ccPosition.setUpdateFrequency(50);
+    m_ccPosition.setUpdateFrequency(10);
 
     initSmartDashboard( );
     initialize( );
@@ -295,11 +295,6 @@ public class Intake extends SubsystemBase
     return m_noteDetected.calculate(m_noteInIntake.get( ));
   }
 
-  private boolean isWithinTolerance(double targetDegrees)
-  {
-    return (Math.abs(targetDegrees - m_currentDegrees) < kToleranceDegrees);
-  }
-
   public void setRotaryStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
@@ -308,7 +303,7 @@ public class Intake extends SubsystemBase
 
   private boolean isMoveValid(double degrees)
   {
-    return (degrees > INConsts.kRotaryAngleMin) && (degrees < INConsts.kRotaryAngleMax);
+    return (degrees >= INConsts.kRotaryAngleMin) && (degrees <= INConsts.kRotaryAngleMax);
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -352,7 +347,7 @@ public class Intake extends SubsystemBase
       newAngle = getIntakePosition( );
 
     // Decide if a new position request
-    if (holdPosition || newAngle != m_targetDegrees || !isWithinTolerance(newAngle))
+    if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))
     {
       // Validate the position request
       if (isMoveValid(newAngle))

@@ -4,7 +4,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.subsystems.Feeder;
 
 //
@@ -13,12 +13,12 @@ import frc.robot.subsystems.Feeder;
 public class FeederRun extends Command
 {
   // Member variables/objects
-  private final Feeder     m_feeder;
-  private final RollerMode m_mode;
-  private final boolean    m_holdAngle;
-  private double           m_newAngle = 0.0;
+  private final Feeder       m_feeder;
+  private final FDRollerMode m_mode;
+  private final boolean      m_holdAngle;
+  private double             m_newAngle = 0.0;
 
-  public FeederRun(Feeder feeder, RollerMode mode)
+  public FeederRun(Feeder feeder, FDRollerMode mode)
   {
     m_feeder = feeder;
     m_mode = mode;
@@ -27,7 +27,7 @@ public class FeederRun extends Command
     FeederRunCommon( );
   }
 
-  public FeederRun(Feeder feeder, RollerMode mode, double newAngle)
+  public FeederRun(Feeder feeder, FDRollerMode mode, double newAngle)
   {
     m_feeder = feeder;
     m_mode = mode;

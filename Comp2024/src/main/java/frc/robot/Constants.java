@@ -194,7 +194,7 @@ public class Constants
     // Global settings
 
     // Feeder intake parameters
-    public enum RollerMode
+    public enum FDRollerMode
     {
       STOP,    // Stop spinning
       ACQUIRE, // Acquire a game piece
@@ -214,11 +214,11 @@ public class Constants
     }
 
     // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = 0.0;    // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 112.21; // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 114.0;  // TODO: Tune me!
+    public static final double kRotaryAngleBack    = -60.0;    // TODO: Tune me!
+    public static final double kRotaryAngleHandoff = 88.75;    // TODO: Tune me!
+    public static final double kRotaryAngleAmp     = -33.0;    // TODO: Tune me!
+    public static final double kRotaryAngleMin     = -61.89;   // TODO: Tune me!
+    public static final double kRotaryAngleMax     = 90.0;     // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////

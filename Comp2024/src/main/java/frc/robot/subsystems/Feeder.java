@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.INConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
@@ -62,7 +62,6 @@ public class Feeder extends SubsystemBase
 
   private static final double  kRollerSpeedAcquire = 0.5;
   private static final double  kRollerSpeedExpel   = -0.4;
-  private static final double  kRollerSpeedToShoot = -0.4;
 
   // Rotary variables
   private boolean              m_fdRotaryValid;      // Health indicator for motor 
@@ -105,9 +104,9 @@ public class Feeder extends SubsystemBase
 
     // Rotary motor and CANcoder init
     m_fdRotaryValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_feederRotary, "Feeder Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_feederRotary, "Feeder Rotary", CTREConfigs6.feederRotaryFXConfig( ));
     m_fdCCValid =
-        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Feeder Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
+        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
 
     Double ccRotations = getCANCoderRotations( );
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
@@ -173,7 +172,7 @@ public class Feeder extends SubsystemBase
 
   public void initialize( )
   {
-    setRollerSpeed(RollerMode.STOP);
+    setRollerSpeed(FDRollerMode.STOP);
     setRotaryStopped( );
 
     m_targetDegrees = m_currentDegrees;
@@ -199,11 +198,11 @@ public class Feeder extends SubsystemBase
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
 
-  public void setRollerSpeed(RollerMode mode)
+  public void setRollerSpeed(FDRollerMode mode)
   {
     double output = 0.0;
 
-    if (mode == RollerMode.HOLD)
+    if (mode == FDRollerMode.HOLD)
     {
       DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_feederRoller.get( )));
     }
@@ -221,9 +220,6 @@ public class Feeder extends SubsystemBase
           break;
         case EXPEL :
           output = kRollerSpeedExpel;
-          break;
-        case SHOOT :
-          output = kRollerSpeedToShoot;
           break;
       }
       DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));

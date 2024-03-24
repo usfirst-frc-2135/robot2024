@@ -172,7 +172,7 @@ public class RobotContainer
 
   public double limelight_range_proportional(CommandSwerveDrivetrain drivetrain)
   {
-    double kP = .07;
+    double kP = .06;
     double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
 
     // convert to meters per second

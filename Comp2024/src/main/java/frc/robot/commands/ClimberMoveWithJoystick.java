@@ -1,3 +1,6 @@
+
+// ROBOTBUILDER TYPE: Command.
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;

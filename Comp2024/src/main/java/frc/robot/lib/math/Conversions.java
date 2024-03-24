@@ -1,3 +1,6 @@
+
+// Conversions - useful unit conversion utilities
+
 package frc.robot.lib.math;
 
 public class Conversions

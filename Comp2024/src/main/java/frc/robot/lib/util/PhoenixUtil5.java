@@ -1,3 +1,6 @@
+
+// Phoenix 5 initialization utilities
+
 package frc.robot.lib.util;
 
 import com.ctre.phoenix.ErrorCode;

@@ -1,3 +1,6 @@
+
+// Pigeon IMU initialization utilities
+
 package frc.robot.lib.util;
 
 import com.ctre.phoenix6.hardware.Pigeon2;

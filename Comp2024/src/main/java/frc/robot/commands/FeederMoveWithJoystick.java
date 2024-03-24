@@ -5,24 +5,24 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Feeder;
 
 /**
  *
  */
-public class IntakeMoveWithJoystick extends Command
+public class FeederMoveWithJoystick extends Command
 {
 
-  private final Intake   m_intake;
+  private final Feeder   m_feeder;
   private XboxController m_gamePad;
 
-  public IntakeMoveWithJoystick(Intake intake, XboxController gamePad)
+  public FeederMoveWithJoystick(Feeder feeder, XboxController gamePad)
   {
-    m_intake = intake;
+    m_feeder = feeder;
     m_gamePad = gamePad;
 
-    setName("IntakeMoveWithJoystick");
-    addRequirements(m_intake);
+    setName("FeederMoveWithJoystick");
+    addRequirements(m_feeder);
   }
 
   // Called when the command is initially scheduled.
@@ -34,7 +34,7 @@ public class IntakeMoveWithJoystick extends Command
   @Override
   public void execute( )
   {
-    m_intake.moveRotaryWithJoystick(-m_gamePad.getRightY( ));
+    m_feeder.moveRotaryWithJoystick(-m_gamePad.getRightY( ));
   }
 
   // Called once the command ends or is interrupted.

@@ -36,13 +36,13 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         
         new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
         new WaitCommand(0.1),
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, INConsts.kRotaryAngleRetracted),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake.getIntakePosition( )),
         new WaitCommand(0.1),
-        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleRetracted),
+        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake.getIntakePosition( )),
         new WaitCommand(0.1),
 
         new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
         // @formatter:on
     );
   }

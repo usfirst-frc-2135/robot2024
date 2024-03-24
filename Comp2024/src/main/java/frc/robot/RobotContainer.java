@@ -478,8 +478,8 @@ public class RobotContainer
             new PrintCommand(mode + ": Drive to scoring position"),   //
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),    //
             new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new PrintCommand(mode + ": Turn off intake rollers"),      //
-            m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
+            new PrintCommand(mode + ": Turn off intake rollers"));      //
+        //m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
         break;
 
       case AUTOSCORE4 :

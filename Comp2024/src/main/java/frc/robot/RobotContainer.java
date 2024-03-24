@@ -44,6 +44,7 @@ import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
 import frc.robot.commands.IntakeActionExpel;
@@ -106,8 +107,8 @@ public class RobotContainer
   private final CommandSwerveDrivetrain               m_drivetrain   = TunerConstants.DriveTrain;
   private final Intake                                m_intake       = new Intake( );
   private final Shooter                               m_shooter      = new Shooter( );
-  // private final Feeder                                m_feeder       = new Feeder( );
-  // private final Climber                               m_climber      = new Climber( );
+  private final Feeder                                m_feeder       = new Feeder( );
+  private final Climber                               m_climber      = new Climber( );
 
   // Chooser for autonomous commands
 
@@ -198,8 +199,8 @@ public class RobotContainer
 
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_shooter);
-    // SmartDashboard.putData(m_feeder);
-    // SmartDashboard.putData(m_climber);
+    SmartDashboard.putData(m_feeder);
+    SmartDashboard.putData(m_climber);
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( )));
 
@@ -229,20 +230,20 @@ public class RobotContainer
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
 
-    // SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, RollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
-    // SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, RollerMode.EXPEL, m_feeder.getFeederPosition( )));
-    // SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, RollerMode.STOP, m_feeder.getFeederPosition( )));
-    // SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, RollerMode.HOLD, m_feeder.getFeederPosition( )));
-    // SmartDashboard.putData("FdRollShoot", new FeederRun(m_feeder, RollerMode.SHOOT, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, RollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, RollerMode.EXPEL, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, RollerMode.STOP, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, RollerMode.HOLD, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollShoot", new FeederRun(m_feeder, RollerMode.SHOOT, m_feeder.getFeederPosition( )));
 
-    // SmartDashboard.putData("FdRotDeploy", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleDeployed));
-    // SmartDashboard.putData("FdRotRetract", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleRetracted));
-    // SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
+    SmartDashboard.putData("FdRotDeploy", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleDeployed));
+    SmartDashboard.putData("FdRotRetract", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleRetracted));
+    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
 
-    // SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
-    // SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
-    // SmartDashboard.putData("ClRunClimbed", new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
-    // SmartDashboard.putData("CLCalibrate", new ClimberCalibrate(m_climber));
+    SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
+    SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
+    SmartDashboard.putData("ClRunClimbed", new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
+    SmartDashboard.putData("CLCalibrate", new ClimberCalibrate(m_climber));
   }
 
   /****************************************************************************
@@ -307,16 +308,16 @@ public class RobotContainer
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake, m_led));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
-    // m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
+    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
-        // new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
+        new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
         new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
-    // m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
-    // m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
+    m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
+    m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
     //
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
@@ -325,7 +326,7 @@ public class RobotContainer
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
-    // m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
+    m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
   }
 
@@ -360,10 +361,10 @@ public class RobotContainer
 
     // Default command - Motion Magic hold
     m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
-    // m_feeder.setDefaultCommand(new FeederRun(m_feeder, RollerMode.HOLD));
-    // m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
+    m_feeder.setDefaultCommand(new FeederRun(m_feeder, RollerMode.HOLD));
+    m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
-    // Default command - manual mode
+    //Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeMoveWithJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
@@ -619,12 +620,12 @@ public class RobotContainer
 
     m_intake.faultDump( );
     m_shooter.faultDump( );
-    // m_feeder.faultDump( );
-    // m_climber.faultDump( );
+    m_feeder.faultDump( );
+    m_climber.faultDump( );
   }
 
   public void teleopInit( )
   {
-    // CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));
+    CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));
   }
 }

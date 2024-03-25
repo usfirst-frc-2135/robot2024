@@ -20,7 +20,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -40,6 +39,7 @@ import frc.robot.Constants.VIConsts;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.util.LimelightHelpers;
+import frc.robot.lib.util.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -233,7 +233,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight && Robot.isReal( ))
     {
-      LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
       if (poseEstimate.tagCount >= 2)
       {

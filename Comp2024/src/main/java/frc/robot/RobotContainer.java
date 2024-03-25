@@ -44,6 +44,8 @@ import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.FeederAmpScore;
+import frc.robot.commands.FeederHandoff;
 import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
@@ -304,10 +306,10 @@ public class RobotContainer
     // Operator Controller Assignments
     //
     // Operator - A, B, X, Y
-    m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
+    m_operatorPad.a( ).onTrue(new FeederRun(m_feeder, FDRollerMode.STOP, FDConsts.kRotaryAngleBack));
     m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
-    m_operatorPad.x( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
-    m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake, m_led));
+    m_operatorPad.x( ).onTrue(new FeederHandoff(m_intake, m_feeder));
+    m_operatorPad.y( ).onTrue(new FeederAmpScore(m_feeder));
     //
     // Operator - Bumpers, start, back
     m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake, m_led));
@@ -317,7 +319,8 @@ public class RobotContainer
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
     //
     // Operator - POV buttons
-    m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
+    m_operatorPad.pov(0).onTrue(new ParallelCommandGroup( //
+        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, FDConsts.kRotaryAngleAmp),
         new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
         new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakeDeployed)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));

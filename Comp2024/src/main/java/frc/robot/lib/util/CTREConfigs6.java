@@ -182,7 +182,7 @@ public final class CTREConfigs6
     // Slot settings
     fdRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
     fdRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    fdRotaryConfig.Slot0.kP = 0.2;                                // Voltage or duty cycle per velocity error (velocity modes)
+    fdRotaryConfig.Slot0.kP = 2.4;                                // Voltage or duty cycle per velocity error (velocity modes)
     fdRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     fdRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

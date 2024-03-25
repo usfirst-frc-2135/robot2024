@@ -174,7 +174,7 @@ public class RobotContainer
 
   public double limelight_range_proportional(CommandSwerveDrivetrain drivetrain)
   {
-    double kP = .1;
+    double kP = .06;
     double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
 
     // convert to meters per second
@@ -326,7 +326,7 @@ public class RobotContainer
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
-    // m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
+    m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
   }
 
@@ -364,7 +364,7 @@ public class RobotContainer
     m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
-    // Default command - manual mode
+    //Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeMoveWithJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));

@@ -26,7 +26,6 @@ public class ShooterActionFire extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-
         new PrintCommand(getName() + ": Start shooter and retract intake"),
         // new ShooterRun(shooter, ShooterMode.SCORE),  // Already running
         new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
@@ -38,9 +37,8 @@ public class ShooterActionFire extends SequentialCommandGroup
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
         new IntakeActionShoot(intake, led),
 
-        new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL),
+        new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL)
         // new ShooterRun(shooter, ShooterMode.STOP), // Don't turn off
-        new IntakeActionRetract(intake, led)
 
         // @formatter:on
     );

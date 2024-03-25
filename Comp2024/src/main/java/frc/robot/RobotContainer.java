@@ -44,6 +44,7 @@ import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
 import frc.robot.commands.IntakeActionExpel;
@@ -172,7 +173,7 @@ public class RobotContainer
 
   public double limelight_range_proportional(CommandSwerveDrivetrain drivetrain)
   {
-    double kP = .07;
+    double kP = .06;
     double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
 
     // convert to meters per second
@@ -325,7 +326,7 @@ public class RobotContainer
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
-    // m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
+    m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
   }
 
@@ -363,7 +364,7 @@ public class RobotContainer
     m_feeder.setDefaultCommand(new FeederRun(m_feeder, RollerMode.HOLD));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
-    // Default command - manual mode
+    //Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeMoveWithJoysticks(m_intake, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederRun(m_feeder, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
@@ -606,8 +607,8 @@ public class RobotContainer
 
     m_intake.initialize( );
     m_shooter.initialize( );
-    // m_feeder.initialize( );
-    // m_climber.initialize( );
+    m_feeder.initialize( );
+    m_climber.initialize( );
   }
 
   // Called when user button is pressed - place subsystem fault dumps here
@@ -625,6 +626,6 @@ public class RobotContainer
 
   public void teleopInit( )
   {
-    // CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));
+    CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));
   }
 }

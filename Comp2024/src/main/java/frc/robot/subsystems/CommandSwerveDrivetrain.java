@@ -233,21 +233,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight && Robot.isReal( ))
     {
-      var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
-      Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
-
-      fieldTypePub.set("Field2d");
-      fieldPub.set(new double[ ]
-      {
-          llPose.getX( ), llPose.getY( ), llPose.getRotation( ).getDegrees( )
-      });
-
       PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
       if (poseEstimate.tagCount >= 2)
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+
+        fieldTypePub.set("Field2d");
+        fieldPub.set(new double[ ]
+        {
+            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
+        });
       }
     }
   }

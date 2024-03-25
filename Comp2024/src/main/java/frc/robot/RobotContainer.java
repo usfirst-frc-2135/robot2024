@@ -607,8 +607,8 @@ public class RobotContainer
 
     m_intake.initialize( );
     m_shooter.initialize( );
-    // m_feeder.initialize( );
-    // m_climber.initialize( );
+    m_feeder.initialize( );
+    m_climber.initialize( );
   }
 
   // Called when user button is pressed - place subsystem fault dumps here

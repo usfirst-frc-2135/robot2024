@@ -218,16 +218,16 @@ public class RobotContainer
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
     SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
-    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollHandoff", new IntakeRun(m_intake, RollerMode.HANDOFF, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake.getIntakePosition( )));
+    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollHandoff", new IntakeRun(m_intake, RollerMode.HANDOFF, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition));
 
-    SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleDeployed));
-    SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleRetracted));
-    SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleHandoff));
+    SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeDeployed));
+    SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeRetracted));
+    SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeHandoff));
 
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
@@ -319,7 +319,7 @@ public class RobotContainer
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
         new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
-        new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed)));
+        new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakeDeployed)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -365,7 +365,7 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
-    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
+    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition, true));
     m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
@@ -483,7 +483,7 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Deploy intake before moving"),
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
 
             new WaitCommand(0.5), // TODO - do we need this? The intake command will run to completion first
 
@@ -500,7 +500,7 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
             
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake.getIntakePosition( ))
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition)
         // @formatter:on
         );  //
         break;
@@ -515,7 +515,7 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Deploy intake before moving"),
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
 
             new WaitCommand(0.5),  // TODO - do we need this? The intake command will run to completion first
 
@@ -558,7 +558,7 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP)
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition)
         // @formatter:on
         );
         break;

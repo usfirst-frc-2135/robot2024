@@ -27,21 +27,21 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         // @formatter:off
         new LogCommand(getName(), "Start rollers & Deploy intake rotary"),
         new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
-        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
+        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Wait for note"),
         new WaitUntilCommand(intake::isNoteDetected),
   
         
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),
         new WaitCommand(0.1),
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake.getIntakePosition( )),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getRotaryPosition),
         new WaitCommand(0.1),
-        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake.getIntakePosition( )),
+        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake::getRotaryPosition),
         new WaitCommand(0.1),
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getRotaryPosition)
         // @formatter:on
     );
   }

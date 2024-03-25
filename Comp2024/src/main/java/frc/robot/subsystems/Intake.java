@@ -285,9 +285,24 @@ public class Intake extends SubsystemBase
     }
   }
 
-  public double getIntakePosition( )
+  public double getRotaryPosition( )
   {
     return m_currentDegrees;
+  }
+
+  public double getIntakeRetracted( )
+  {
+    return INConsts.kRotaryAngleRetracted;
+  }
+
+  public double getIntakeHandoff( )
+  {
+    return INConsts.kRotaryAngleHandoff;
+  }
+
+  public double getIntakeDeployed( )
+  {
+    return INConsts.kRotaryAngleDeployed;
   }
 
   public boolean isNoteDetected( )
@@ -328,7 +343,7 @@ public class Intake extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getIntakePosition( ),
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getRotaryPosition( ),
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
@@ -344,7 +359,7 @@ public class Intake extends SubsystemBase
     m_safetyTimer.restart( );
 
     if (holdPosition)
-      newAngle = getIntakePosition( );
+      newAngle = getRotaryPosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))

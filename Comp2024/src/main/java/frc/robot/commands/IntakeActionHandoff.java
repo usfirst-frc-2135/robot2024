@@ -22,16 +22,16 @@ public class IntakeActionHandoff extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Hold rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD, INConsts.kRotaryAngleHandoff),
+        new IntakeRun(intake, INConsts.RollerMode.HOLD, intake::getIntakeHandoff),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake.getIntakePosition( )),
+        new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake::getRotaryPosition),
 
         new LogCommand(getName(), "Wait for note to release into feeder"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD, intake.getIntakePosition( ))
+        new IntakeRun(intake, INConsts.RollerMode.HOLD, intake::getRotaryPosition)
  
         // @formatter:on
     );

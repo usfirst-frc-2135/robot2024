@@ -23,16 +23,16 @@ public class IntakeActionExpel extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),        
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake.getIntakePosition( )),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getRotaryPosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getRotaryPosition)
  
         // @formatter:on
     );

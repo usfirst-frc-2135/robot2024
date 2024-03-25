@@ -65,7 +65,7 @@ public final class CTREConfigs6
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
     inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    inRotaryConfig.Slot0.kP = 0.0625;                                // Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kP = 0.2;                                // Voltage or duty cycle per velocity error (velocity modes)
     inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
@@ -127,7 +127,7 @@ public final class CTREConfigs6
     // Slot settings
     shooterConfig.Slot0.kS = 0.0;                                   // Voltage or duty cylce to overcome static friction
     shooterConfig.Slot0.kV = 0.1140;                                // Voltage or duty cycle per requested RPS (velocity modes)
-    shooterConfig.Slot0.kP = 0.25;                                   // Voltage or duty cycle per velocity error (velocity modes)
+    shooterConfig.Slot0.kP = 0.25;                                  // Voltage or duty cycle per velocity error (velocity modes)
     shooterConfig.Slot0.kI = 0.0;                                   // Voltage or duty cycle per accumulated error
     shooterConfig.Slot0.kD = 0.0;                                   // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
@@ -202,7 +202,7 @@ public final class CTREConfigs6
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.511719 : -0.703613;
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.0715 : 0.0;
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
@@ -236,7 +236,7 @@ public final class CTREConfigs6
 
     // Motion Magic settings
     climberConfig.MotionMagic.MotionMagicCruiseVelocity = 79.75;  // Rotations / second
-    climberConfig.MotionMagic.MotionMagicAcceleration = 708.9;    // Rotations / second ^ 2
+    climberConfig.MotionMagic.MotionMagicAcceleration = 159.5;    // Rotations / second ^ 2
     climberConfig.MotionMagic.MotionMagicJerk = 3544;             // Rotations / second ^ 3
 
     // Motor output settings

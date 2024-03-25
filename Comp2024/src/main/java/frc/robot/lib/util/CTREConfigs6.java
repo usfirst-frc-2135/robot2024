@@ -241,7 +241,7 @@ public final class CTREConfigs6
 
     // Motor output settings
     climberConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;   // Percentage
-    climberConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    climberConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Open Loop settings

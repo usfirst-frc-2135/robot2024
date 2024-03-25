@@ -47,7 +47,7 @@ import frc.robot.lib.util.LimelightHelpers.PoseEstimate;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
   private double                                     m_lastSimTime;
@@ -233,21 +233,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight && Robot.isReal( ))
     {
-      var lastResult = LimelightHelpers.getLatestResults("limelight").targetingResults;
-      Pose2d llPose = lastResult.getBotPose2d_wpiBlue( );
-
-      fieldTypePub.set("Field2d");
-      fieldPub.set(new double[ ]
-      {
-          llPose.getX( ), llPose.getY( ), llPose.getRotation( ).getDegrees( )
-      });
-
       PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
       if (poseEstimate.tagCount >= 2)
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+
+        fieldTypePub.set("Field2d");
+        fieldPub.set(new double[ ]
+        {
+            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
+        });
       }
     }
   }

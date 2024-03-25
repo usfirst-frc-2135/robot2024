@@ -44,6 +44,7 @@ import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.FeederMoveToPosition;
 import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
@@ -230,15 +231,14 @@ public class RobotContainer
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
 
-    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, RollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, RollerMode.EXPEL, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, RollerMode.STOP, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, RollerMode.HOLD, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollShoot", new FeederRun(m_feeder, RollerMode.SHOOT, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, FDConsts.FDRollerMode.ACQUIRE));
+    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, FDConsts.FDRollerMode.EXPEL));
+    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP));
+    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD));
 
-    SmartDashboard.putData("FdRotDeploy", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleDeployed));
-    SmartDashboard.putData("FdRotRetract", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleRetracted));
-    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, RollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
+    SmartDashboard.putData("FdRotBack", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleBack));
+    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleAmp));
+    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
 
     SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -361,12 +361,12 @@ public class RobotContainer
 
     // Default command - Motion Magic hold
     m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
-    m_feeder.setDefaultCommand(new FeederRun(m_feeder, RollerMode.HOLD));
+    m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
     //Default command - manual mode
     // m_intake.setDefaultCommand(new IntakeMoveWithJoysticks(m_intake, m_operatorPad.getHID( )));
-    // m_feeder.setDefaultCommand(new FeederRun(m_feeder, m_operatorPad.getHID( )));
+    // m_feeder.setDefaultCommand(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
   }
 
@@ -383,8 +383,8 @@ public class RobotContainer
     m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
     m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
     m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
-    m_autoChooser.addOption("5 - AutoTestPath", AutoChooser.AUTOTESTPATH);
-    m_autoChooser.addOption("6 - AutoScore4", AutoChooser.AUTOSCORE4);
+    m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
+    m_autoChooser.addOption("6 - AutoTestPath", AutoChooser.AUTOTESTPATH);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Configure starting position sendable chooser
@@ -478,8 +478,8 @@ public class RobotContainer
             new PrintCommand(mode + ": Drive to scoring position"),   //
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),    //
             new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new PrintCommand(mode + ": Turn off intake rollers"),      //
-            m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
+            new PrintCommand(mode + ": Turn off intake rollers"));      //
+        //m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
         break;
 
       case AUTOSCORE4 :

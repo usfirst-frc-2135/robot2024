@@ -26,13 +26,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.FDConsts;
+import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
@@ -44,7 +44,6 @@ import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
-import frc.robot.commands.FeederMoveToPosition;
 import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
@@ -55,6 +54,7 @@ import frc.robot.commands.IntakeActionShoot;
 import frc.robot.commands.IntakeMoveWithJoystick;
 import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
+import frc.robot.commands.LogCommand;
 import frc.robot.commands.ShooterActionFire;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
@@ -218,23 +218,28 @@ public class RobotContainer
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
     SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
-    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake.getIntakePosition( )));
-    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake.getIntakePosition( )));
+    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollHandoff", new IntakeRun(m_intake, RollerMode.HANDOFF, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition));
 
-    SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleDeployed));
-    SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleRetracted));
-    SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, INConsts.kRotaryAngleHandoff));
+    SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeDeployed));
+    SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeRetracted));
+    SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeHandoff));
 
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
 
-    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, FDConsts.FDRollerMode.ACQUIRE));
-    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, FDConsts.FDRollerMode.EXPEL));
-    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP));
-    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD));
+    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollAcquire",
+        new FeederRun(m_feeder, FDConsts.FDRollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, FDConsts.FDRollerMode.EXPEL, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollHandoff",
+        new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder.getFeederPosition( )));
 
     SmartDashboard.putData("FdRotBack", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleBack));
     SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleAmp));
@@ -314,7 +319,7 @@ public class RobotContainer
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
         new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
-        new IntakeRun(m_intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed)));
+        new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakeDeployed)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -360,8 +365,8 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
-    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD));
-    m_feeder.setDefaultCommand(new FeederMoveToPosition(m_feeder));
+    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition, true));
+    m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
     //Default command - manual mode
@@ -455,63 +460,107 @@ public class RobotContainer
         break;
 
       case AUTOPRELOADANDLEAVE :
-        m_autoCommand = new SequentialCommandGroup(       //
-            m_drivetrain.getAutoCommand(pathName),        //
-            new ShooterActionFire(m_shooter, m_intake, m_led),   //
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand(pathName),
+
+            new LogCommand(mode.toString(), "Score preloaded note"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+
+            new LogCommand(mode.toString(), "Leave zone"),
             m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
+        // @formatter:on
         break;
 
       case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new SequentialCommandGroup(                   //
-            new PrintCommand(mode + ": Drive to scoring position"),   //
-            m_drivetrain.getAutoCommand(pathName),                    //
-            new PrintCommand(mode + ": Score preloaded note"),        //
-            new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new PrintCommand(mode + ": Deploy intake before moving"), //
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed), //
-            new WaitCommand(0.5), //
-            new PrintCommand(mode + ": Drive to spike while intaking"),//
-            new ParallelDeadlineGroup(                                 //
-                m_drivetrain.getAutoCommand("DriveS" + positionValue), //
-                new IntakeActionAcquire(m_intake, m_led)              //
-            ),                                                        //
-            new PrintCommand(mode + ": Drive to scoring position"),   //
-            m_drivetrain.getAutoCommand("ScoreS" + positionValue),    //
-            new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new PrintCommand(mode + ": Turn off intake rollers"));      //
-        //m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand(pathName), 
+
+            new LogCommand(mode.toString(), "Score preloaded note"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+
+            new LogCommand(mode.toString(), "Deploy intake before moving"),
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
+
+            new WaitCommand(0.5), // TODO - do we need this? The intake command will run to completion first
+
+            new LogCommand(mode.toString(), "Drive to spike while intaking"),
+            new ParallelCommandGroup(
+                m_drivetrain.getAutoCommand("DriveS" + positionValue),
+                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+            ),
+            
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand("ScoreS" + positionValue),
+
+            new LogCommand(mode.toString(), "Score note"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+            
+            new LogCommand(mode.toString(), "Turn off intake rollers"), 
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition)
+        // @formatter:on
+        );  //
         break;
 
       case AUTOSCORE4 :
-        m_autoCommand = new SequentialCommandGroup(                   //
-            //Preload Score
-            m_drivetrain.getAutoCommand(pathName),                    //
-            new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new PrintCommand(mode + ": Deploy intake before moving"), //
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed), //
-            new WaitCommand(0.5), //
-            //Intake and Score Note 1
-            new ParallelDeadlineGroup(                                //
-                m_drivetrain.getAutoCommand("DriveS" + positionValue), //
-                new IntakeActionAcquire(m_intake, m_led)              //
-            ),             //
-            new PrintCommand(mode + ": Drive to scoring position"),   //
-            m_drivetrain.getAutoCommand("ScoreS" + positionValue),    //
-            new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            //Intake and Score Note 2
-            m_drivetrain.getAutoCommand("S2toS3"),           //
-            new ParallelDeadlineGroup(                                //
-                m_drivetrain.getAutoCommand("DriveS" + altpos1),      //
-                new IntakeActionAcquire(m_intake, m_led)              //
-            ), m_drivetrain.getAutoCommand("ScoreS" + altpos1),//
-            new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            //Intake and Score Note 3
-            new ParallelDeadlineGroup(                                //
-                m_drivetrain.getAutoCommand("DriveS" + altpos2),      //
-                new IntakeActionAcquire(m_intake, m_led)              //
-            ), m_drivetrain.getAutoCommand("ScoreS" + altpos2),       //
-            new ShooterActionFire(m_shooter, m_intake, m_led),        //
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP));
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand(pathName),
+
+            new LogCommand(mode.toString(), "Score preloaded note"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+
+            new LogCommand(mode.toString(), "Deploy intake before moving"),
+            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
+
+            new WaitCommand(0.5),  // TODO - do we need this? The intake command will run to completion first
+
+            new LogCommand(mode.toString(), "Drive to spike while intaking"),
+            new ParallelCommandGroup( 
+                m_drivetrain.getAutoCommand("DriveS" + positionValue),
+                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+            ),
+
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand("ScoreS" + positionValue),
+
+            new LogCommand(mode.toString(), "Score note 2"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+
+            m_drivetrain.getAutoCommand("S2toS3"), // TODO - why are we driving here?
+
+            new LogCommand(mode.toString(), "Drive to spike while intaking"),
+            new ParallelCommandGroup(
+                m_drivetrain.getAutoCommand("DriveS" + altpos1),
+                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+            ),
+
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand("ScoreS" + altpos1),
+
+            new LogCommand(mode.toString(), "Score note 3"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+
+            new LogCommand(mode.toString(), "Drive to spike while intaking"),
+            new ParallelCommandGroup(
+                m_drivetrain.getAutoCommand("DriveS" + altpos2),
+                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+            ), 
+            
+            new LogCommand(mode.toString(), "Drive to scoring position"),
+            m_drivetrain.getAutoCommand("ScoreS" + altpos2),
+
+            new LogCommand(mode.toString(), "Score note 4"),
+            new ShooterActionFire(m_shooter, m_intake, m_led),
+
+            new LogCommand(mode.toString(), "Turn off intake rollers"), 
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition)
+        // @formatter:on
+        );
         break;
 
       case AUTOTESTPATH :

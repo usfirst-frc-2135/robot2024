@@ -3,6 +3,8 @@
 //
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.subsystems.Intake;
@@ -15,24 +17,34 @@ public class IntakeRun extends Command
   // Member variables/objects
   private final Intake     m_intake;
   private final RollerMode m_mode;
-  private final boolean    m_holdAngle;
-  private double           m_newAngle = 0.0;
+  private final boolean    m_holdPosition;
+  private DoubleSupplier   m_getPosition = null;
 
   public IntakeRun(Intake intake, RollerMode mode)
   {
     m_intake = intake;
     m_mode = mode;
-    m_holdAngle = true;
+    m_holdPosition = true;
 
     IntakeRunCommon( );
   }
 
-  public IntakeRun(Intake intake, RollerMode mode, double newAngle)
+  public IntakeRun(Intake intake, RollerMode mode, DoubleSupplier getPosition, boolean hold)
   {
     m_intake = intake;
     m_mode = mode;
-    m_holdAngle = false;
-    m_newAngle = newAngle;
+    m_holdPosition = hold;
+    m_getPosition = getPosition;
+
+    IntakeRunCommon( );
+  }
+
+  public IntakeRun(Intake intake, RollerMode mode, DoubleSupplier getPosition)
+  {
+    m_intake = intake;
+    m_mode = mode;
+    m_holdPosition = false;
+    m_getPosition = getPosition;
 
     IntakeRunCommon( );
   }
@@ -48,7 +60,7 @@ public class IntakeRun extends Command
   public void initialize( )
   {
     m_intake.setRollerSpeed(m_mode);
-    m_intake.moveToPositionInit(m_newAngle, m_holdAngle);
+    m_intake.moveToPositionInit(m_getPosition.getAsDouble( ), m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -69,7 +81,7 @@ public class IntakeRun extends Command
   @Override
   public boolean isFinished( )
   {
-    return (m_holdAngle) ? false : m_intake.moveToPositionIsFinished( ); // Command exits if not holding a position
+    return (m_holdPosition) ? false : m_intake.moveToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

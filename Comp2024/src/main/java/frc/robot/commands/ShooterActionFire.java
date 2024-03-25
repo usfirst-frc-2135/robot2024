@@ -3,9 +3,7 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
@@ -26,14 +24,14 @@ public class ShooterActionFire extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Start shooter and retract intake"),
+        new LogCommand(getName(), "Start shooter and retract intake"),
         // new ShooterRun(shooter, ShooterMode.SCORE),  // Already running
         new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
 
-        new PrintCommand(getName() + ": Wait for desired speed"),
+        new LogCommand(getName(), "Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtDesiredSpeed),
 
-        new PrintCommand(getName() + ": Feed note from intake"),
+        new LogCommand(getName(), "Feed note from intake"),
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
         new IntakeActionShoot(intake, led),
 

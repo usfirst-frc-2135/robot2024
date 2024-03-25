@@ -3,7 +3,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -26,11 +25,11 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Start rollers & Deploy intake rotary"),
+        new LogCommand(getName(), "Start rollers & Deploy intake rotary"),
         new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, INConsts.kRotaryAngleDeployed),
 
-        new PrintCommand(getName() + ": Wait for note"),
+        new LogCommand(getName(), "Wait for note"),
         new WaitUntilCommand(intake::isNoteDetected),
   
         
@@ -41,7 +40,7 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake.getIntakePosition( )),
         new WaitCommand(0.1),
 
-        new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
+        new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
         // @formatter:on
     );

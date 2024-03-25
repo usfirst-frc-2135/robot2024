@@ -62,6 +62,7 @@ public class Feeder extends SubsystemBase
 
   private static final double  kRollerSpeedAcquire = 0.5;
   private static final double  kRollerSpeedExpel   = -0.4;
+  private static final double  kRollerSpeedHandoff = -0.4;
 
   // Rotary variables
   private boolean              m_fdRotaryValid;      // Health indicator for motor 
@@ -220,6 +221,9 @@ public class Feeder extends SubsystemBase
           break;
         case EXPEL :
           output = kRollerSpeedExpel;
+          break;
+        case HANDOFF :
+          output = kRollerSpeedHandoff;
           break;
       }
       DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));

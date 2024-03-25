@@ -534,8 +534,6 @@ public class RobotContainer
             new LogCommand(mode.toString(), "Score note 2"),
             new ShooterActionFire(m_shooter, m_intake, m_led),
 
-            m_drivetrain.getAutoCommand("S2toS3"), // TODO - why are we driving here?
-
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
                 m_drivetrain.getAutoCommand("DriveS" + altpos1),

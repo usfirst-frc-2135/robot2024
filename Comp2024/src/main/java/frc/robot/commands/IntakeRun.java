@@ -20,15 +20,6 @@ public class IntakeRun extends Command
   private final boolean    m_holdPosition;
   private DoubleSupplier   m_getPosition = null;
 
-  public IntakeRun(Intake intake, RollerMode mode)
-  {
-    m_intake = intake;
-    m_mode = mode;
-    m_holdPosition = true;
-
-    IntakeRunCommon( );
-  }
-
   public IntakeRun(Intake intake, RollerMode mode, DoubleSupplier getPosition, boolean hold)
   {
     m_intake = intake;

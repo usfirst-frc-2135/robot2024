@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FDConsts.FDRollerMode;
-import frc.robot.Constants.INConsts;
-import frc.robot.Constants.INConsts.RotaryMode;
+import frc.robot.Constants.FDConsts;
+import frc.robot.Constants.FDConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
@@ -146,10 +146,10 @@ public class Feeder extends SubsystemBase
     SmartDashboard.putBoolean("FD_noteInFeeder", m_noteInFeeder.get( ));
     if (m_debug && m_fdRotaryValid)
     {
-      SmartDashboard.putNumber("IN_rotaryRps", m_rotaryVelocity.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("FD_rotaryRps", m_rotaryVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("FD_curError", m_rotaryCLoopError.refresh( ).getValue( ));
+      SmartDashboard.putNumber("FD_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("FD_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
     }
   }
 
@@ -164,9 +164,9 @@ public class Feeder extends SubsystemBase
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_INValidRoller", m_fdRollerValid);
-    SmartDashboard.putBoolean("HL_INValidNRotary", m_fdRotaryValid);
-    SmartDashboard.putBoolean("HL_INValidCANCoder", m_fdCCValid);
+    SmartDashboard.putBoolean("HL_FDValidRoller", m_fdRollerValid);
+    SmartDashboard.putBoolean("HL_FDValidNRotary", m_fdRotaryValid);
+    SmartDashboard.putBoolean("HL_FDValidCANCoder", m_fdCCValid);
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -249,7 +249,7 @@ public class Feeder extends SubsystemBase
 
   private boolean isMoveValid(double degrees)
   {
-    return (degrees >= INConsts.kRotaryAngleMin) && (degrees <= INConsts.kRotaryAngleMax);
+    return (degrees >= FDConsts.kRotaryAngleMin) && (degrees <= FDConsts.kRotaryAngleMax);
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -261,10 +261,10 @@ public class Feeder extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_currentDegrees > INConsts.kRotaryAngleMin))
-      newMode = INConsts.RotaryMode.INBOARD;
-    else if ((axisValue > 0.0) && (m_currentDegrees < INConsts.kRotaryAngleMax))
-      newMode = INConsts.RotaryMode.OUTBOARD;
+    if ((axisValue < 0.0) && (m_currentDegrees > FDConsts.kRotaryAngleMin))
+      newMode = FDConsts.RotaryMode.INBOARD;
+    else if ((axisValue > 0.0) && (m_currentDegrees < FDConsts.kRotaryAngleMax))
+      newMode = FDConsts.RotaryMode.OUTBOARD;
     else
     {
       rangeLimited = true;
@@ -310,7 +310,7 @@ public class Feeder extends SubsystemBase
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_targetDegrees, INConsts.kRotaryAngleMin, INConsts.kRotaryAngleMax));
+            m_targetDegrees, FDConsts.kRotaryAngleMin, FDConsts.kRotaryAngleMax));
     }
     else
     {

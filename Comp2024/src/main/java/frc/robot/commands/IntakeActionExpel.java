@@ -3,7 +3,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.INConsts;
@@ -23,17 +22,17 @@ public class IntakeActionExpel extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Stop rollers & Deploy intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleDeployed),
+        new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeDeployed),
 
-        new PrintCommand(getName() + ": Expel rollers & Hold intake rotary in same position"),        
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake.getIntakePosition( )),
+        new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),        
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getRotaryPosition),
 
-        new PrintCommand(getName() + ": Wait for note to release"),
+        new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
-        new PrintCommand(getName() + ": Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake.getIntakePosition( ))
+        new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getRotaryPosition)
  
         // @formatter:on
     );

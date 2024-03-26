@@ -43,13 +43,13 @@ public class Climber extends SubsystemBase
 {
   // Constants
   private final double              kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
-  private static final double       kGearRatio           = 8.57;   // Gear reduction
+  private static final double       kGearRatio           = 16.0;   // Gear reduction
   private static final double       kClimberLengthMeters = 1.0;
   private static final double       kCarriageMassKg      = 2.0;
   private static final double       kDrumDiameterInches  = 1.375;  // Drum diameter in inches
   private static final double       kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
   private static final double       kRolloutRatio        = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
-  private static final double       kCalibrateSpeedVolts = -1.4;   // Motor voltage during calibration
+  private static final double       kCalibrateSpeedVolts = -1.0;   // Motor voltage during calibration
   private static final double       kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
 
   private static final double       kToleranceInches     = 0.5;    // Climber PID tolerance in inches

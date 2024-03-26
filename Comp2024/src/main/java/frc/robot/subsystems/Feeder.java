@@ -33,8 +33,8 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.FDConsts;
+import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.FDConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
@@ -279,9 +279,24 @@ public class Feeder extends SubsystemBase
     }
   }
 
-  public double getFeederPosition( )
+  public double getRotaryPosition( )
   {
     return m_currentDegrees;
+  }
+
+  public double getFeederBack( )
+  {
+    return FDConsts.kRotaryAngleBack;
+  }
+
+  public double getFeederAmp( )
+  {
+    return FDConsts.kRotaryAngleAmp;
+  }
+
+  public double getFeederHandoff( )
+  {
+    return FDConsts.kRotaryAngleHandoff;
   }
 
   public boolean isNoteDetected( )
@@ -322,7 +337,7 @@ public class Feeder extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getFeederPosition( ),
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getRotaryPosition( ),
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
@@ -338,7 +353,7 @@ public class Feeder extends SubsystemBase
     m_safetyTimer.restart( );
 
     if (holdPosition)
-      newAngle = getFeederPosition( );
+      newAngle = getRotaryPosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))

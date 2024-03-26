@@ -234,18 +234,16 @@ public class RobotContainer
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
 
-    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollAcquire",
-        new FeederRun(m_feeder, FDConsts.FDRollerMode.ACQUIRE, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, FDConsts.FDRollerMode.EXPEL, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollHandoff",
-        new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder.getFeederPosition( )));
-    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder.getFeederPosition( )));
+    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getRotaryPosition));
+    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, FDConsts.FDRollerMode.ACQUIRE, m_feeder::getRotaryPosition));
+    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, FDConsts.FDRollerMode.EXPEL, m_feeder::getRotaryPosition));
+    SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getRotaryPosition));
+    SmartDashboard.putData("FdRollHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder::getRotaryPosition));
+    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryPosition));
 
-    SmartDashboard.putData("FdRotBack", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleBack));
-    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleAmp));
-    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, FDConsts.kRotaryAngleHandoff));
+    SmartDashboard.putData("FdRotBack", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederBack));
+    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederAmp));
+    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederHandoff));
 
     SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -368,7 +366,7 @@ public class RobotContainer
 
     // Default command - Motion Magic hold
     m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition, true));
-    m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD));
+    m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD, m_feeder::getRotaryPosition, true));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
     //Default command - manual mode

@@ -9,15 +9,28 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.ChassisReference;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FDConsts.FDRollerMode;
@@ -38,57 +51,67 @@ public class Feeder extends SubsystemBase
 {
 
   // Constants
-  private static final boolean kFeederMotorInvert  = false;     // Motor direction for positive input
-  private static final double  kRotaryGearRatio    = 27.0;
+  private static final boolean      kFeederMotorInvert  = false;     // Motor direction for positive input
+  private static final double       kRotaryGearRatio    = 27.0;
 
-  private static final double  kRotaryLengthMeters = 16.0;
-  private static final double  kRotaryWeightKg     = 5.5;
-  private static final double  kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
+  private static final double       kRotaryLengthMeters = 16.0;
+  private static final double       kRotaryWeightKg     = 5.5;
+  private static final double       kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
 
   // Rotary constants
-  private static final double  kToleranceDegrees   = 4.0;      // PID tolerance in degrees
-  private static final double  kMMSafetyTimeout    = 2.0;
+  private static final double       kToleranceDegrees   = 4.0;      // PID tolerance in degrees
+  private static final double       kMMSafetyTimeout    = 2.0;
 
   // Member objects
-  private final WPI_TalonSRX   m_feederRoller      = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
-  private final TalonFX        m_feederRotary      = new TalonFX(Ports.kCANID_FeederRotary);
-  private final CANcoder       m_CANCoder          = new CANcoder(Ports.kCANID_FeederCANCoder);
-  private final DigitalInput   m_noteInFeeder      = new DigitalInput(Ports.kDIO1_NoteInFeeder);
+  private final WPI_TalonSRX        m_feederRoller      = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
+  private final TalonFX             m_feederRotary      = new TalonFX(Ports.kCANID_FeederRotary);
+  private final CANcoder            m_CANCoder          = new CANcoder(Ports.kCANID_FeederCANCoder);
+  private final DigitalInput        m_noteInFeeder      = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
   // Declare module variables
+  // Mechanism2d
+  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(1.0, 1.0);
+  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
+  private final MechanismLigament2d m_mechLigament      =
+      m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kAliceBlue)));
+  private static final double       kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
+  private final TalonFXSimState     m_rotarySim         = m_feederRotary.getSimState( );
+  private final CANcoderSimState    m_CANCoderSim       = m_CANCoder.getSimState( );
+  private final SingleJointedArmSim m_armSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
+      SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
   // Roller variables
-  private boolean              m_fdRollerValid;      // Health indicator for motor 
+  private boolean                   m_fdRollerValid;      // Health indicator for motor 
 
-  private static final double  kRollerSpeedAcquire = 0.5;
-  private static final double  kRollerSpeedExpel   = -0.4;
-  private static final double  kRollerSpeedHandoff = -0.4;
+  private static final double       kRollerSpeedAcquire = 0.5;
+  private static final double       kRollerSpeedExpel   = -0.4;
+  private static final double       kRollerSpeedHandoff = -0.4;
 
   // Rotary variables
-  private boolean              m_fdRotaryValid;      // Health indicator for motor 
-  private boolean              m_fdCCValid;          // Health indicator for CANCoder 
-  private boolean              m_debug             = true;
-  private double               m_currentDegrees    = 0.0; // Current angle in degrees
-  private double               m_targetDegrees     = 0.0; // Target angle in degrees
+  private boolean                   m_fdRotaryValid;      // Health indicator for motor 
+  private boolean                   m_fdCCValid;          // Health indicator for CANCoder 
+  private boolean                   m_debug             = true;
+  private double                    m_currentDegrees    = 0.0; // Current angle in degrees
+  private double                    m_targetDegrees     = 0.0; // Target angle in degrees
 
   // Manual mode config parameters
-  private VoltageOut           m_requestVolts      = new VoltageOut(0);
-  private RotaryMode           m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
+  private VoltageOut                m_requestVolts      = new VoltageOut(0);
+  private RotaryMode                m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage   m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0);
-  private Debouncer            m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
-  private Debouncer            m_noteDetected      = new Debouncer(0.030, DebounceType.kBoth);
-  private Timer                m_safetyTimer       = new Timer( ); // Safety timer for movements
-  private boolean              m_moveIsFinished;     // Movement has completed (within tolerance)
+  private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0);
+  private Debouncer                 m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
+  private Debouncer                 m_noteDetected      = new Debouncer(0.030, DebounceType.kBoth);
+  private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
+  private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
 
   // Status signals
-  private StatusSignal<Double> m_rotaryPosition    = m_feederRotary.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
-  private StatusSignal<Double> m_rotaryVelocity    = m_feederRotary.getRotorVelocity( );
-  private StatusSignal<Double> m_rotaryCLoopError  = m_feederRotary.getClosedLoopError( );
-  private StatusSignal<Double> m_rotarySupplyCur   = m_feederRotary.getSupplyCurrent( );
-  private StatusSignal<Double> m_rotaryStatorCur   = m_feederRotary.getStatorCurrent( );
-  private StatusSignal<Double> m_ccPosition        = m_CANCoder.getAbsolutePosition( );
+  private StatusSignal<Double>      m_rotaryPosition    = m_feederRotary.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
+  private StatusSignal<Double>      m_rotaryVelocity    = m_feederRotary.getRotorVelocity( );
+  private StatusSignal<Double>      m_rotaryCLoopError  = m_feederRotary.getClosedLoopError( );
+  private StatusSignal<Double>      m_rotarySupplyCur   = m_feederRotary.getSupplyCurrent( );
+  private StatusSignal<Double>      m_rotaryStatorCur   = m_feederRotary.getStatorCurrent( );
+  private StatusSignal<Double>      m_ccPosition        = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
 
@@ -114,6 +137,10 @@ public class Feeder extends SubsystemBase
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_fdRotaryValid)
       m_feederRotary.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
+
+    // Simulation object initialization
+    m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
+    m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
@@ -157,6 +184,26 @@ public class Feeder extends SubsystemBase
   public void simulationPeriodic( )
   {
     // This method will be called once per scheduler run during simulation
+
+    // Set input motor voltage from the motor setting
+    m_rotarySim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_CANCoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_armSim.setInputVoltage(m_rotarySim.getMotorVoltage( ));
+
+    // update for 20 msec loop
+    m_armSim.update(0.020);
+
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_rotarySim.setRawRotorPosition(Conversions.radiansToInputRotations(m_armSim.getAngleRads( ), kRotaryGearRatio));
+    m_rotarySim.setRotorVelocity(Conversions.radiansToInputRotations(m_armSim.getVelocityRadPerSec( ), kRotaryGearRatio));
+
+    m_CANCoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
+    m_CANCoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
+
+    // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
+
+    m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
   }
 
   // Initialize dashboard widgets
@@ -167,6 +214,7 @@ public class Feeder extends SubsystemBase
     SmartDashboard.putBoolean("HL_FDValidRoller", m_fdRollerValid);
     SmartDashboard.putBoolean("HL_FDValidNRotary", m_fdRotaryValid);
     SmartDashboard.putBoolean("HL_FDValidCANCoder", m_fdCCValid);
+    SmartDashboard.putData("FDRotaryMech", m_rotaryMech);
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.

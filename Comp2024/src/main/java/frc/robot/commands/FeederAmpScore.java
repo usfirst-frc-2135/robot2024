@@ -22,14 +22,14 @@ public class FeederAmpScore extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Align Feeder to Amp"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, FDConsts.kRotaryAngleHandoff),
+        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getRotaryAmp),
 
-        new LogCommand(getName(), "Score Note"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.ACQUIRE),
-        new WaitCommand(1.0),
+        new LogCommand(getName(), "Score Note to Amp"),
+        new FeederRun(feeder, FDConsts.FDRollerMode.SCORE, feeder::getRotaryPosition),
+        new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP)
+        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getRotaryHandoff)
         // @formatter:on
     );
   }

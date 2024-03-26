@@ -44,6 +44,8 @@ import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.FeederAmpScore;
+import frc.robot.commands.FeederHandoff;
 import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
@@ -304,11 +306,11 @@ public class RobotContainer
     // Operator - A, B, X, Y
     m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
-    m_operatorPad.x( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
+    m_operatorPad.x( ).onTrue(new Dummy("oper X"));
     m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake, m_led));
     //
     // Operator - Bumpers, start, back
-    m_operatorPad.leftBumper( ).onTrue(new IntakeActionExpel(m_intake, m_led));
+    m_operatorPad.leftBumper( ).onTrue(new FeederHandoff(m_intake, m_feeder));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
@@ -316,6 +318,7 @@ public class RobotContainer
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
+        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, FDConsts.kRotaryAngleAmp),
         new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
         new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakeDeployed)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
@@ -325,10 +328,9 @@ public class RobotContainer
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
-    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new Dummy("oper left trigger"));
+    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new FeederAmpScore(m_feeder));
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
-    m_operatorPad.leftStick( ).onTrue(new Dummy("oper left stick"));
     m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
   }
@@ -528,8 +530,6 @@ public class RobotContainer
 
             new LogCommand(mode.toString(), "Score note 2"),
             new ShooterActionFire(m_shooter, m_intake, m_led),
-
-            m_drivetrain.getAutoCommand("S2toS3"), // TODO - why are we driving here?
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(

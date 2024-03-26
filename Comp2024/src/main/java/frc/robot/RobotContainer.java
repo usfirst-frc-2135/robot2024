@@ -234,16 +234,17 @@ public class RobotContainer
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
 
+    SmartDashboard.putData("FdAmpScore", new FeederAmpScore(m_feeder));
+    SmartDashboard.putData("FdHandoff", new FeederHandoff(m_intake, m_feeder));
+
     SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getRotaryPosition));
-    SmartDashboard.putData("FdRollAcquire", new FeederRun(m_feeder, FDConsts.FDRollerMode.ACQUIRE, m_feeder::getRotaryPosition));
-    SmartDashboard.putData("FdRollExpel", new FeederRun(m_feeder, FDConsts.FDRollerMode.EXPEL, m_feeder::getRotaryPosition));
     SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getRotaryPosition));
     SmartDashboard.putData("FdRollHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder::getRotaryPosition));
     SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryPosition));
 
-    SmartDashboard.putData("FdRotBack", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederBack));
-    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederAmp));
-    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederHandoff));
+    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryAmp));
+    SmartDashboard.putData("FdRotClimb", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryClimb));
+    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryHandoff));
 
     SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -320,7 +321,7 @@ public class RobotContainer
     //
     // Operator - POV buttons
     m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
-        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, FDConsts.kRotaryAngleAmp),
+        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getRotaryAmp),
         new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
         new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakeDeployed)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));

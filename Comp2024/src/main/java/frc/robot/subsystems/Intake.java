@@ -217,7 +217,7 @@ public class Intake extends SubsystemBase
     SmartDashboard.putBoolean("HL_INValidNRotary", m_inRotaryValid);
     SmartDashboard.putBoolean("HL_INValidCANCoder", m_inCCValid);
 
-    SmartDashboard.putData("RotaryMech", m_rotaryMech);
+    SmartDashboard.putData("INRotaryMech", m_rotaryMech);
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.

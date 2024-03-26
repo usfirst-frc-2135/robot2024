@@ -52,40 +52,39 @@ public class Feeder extends SubsystemBase
 
   // Constants
   private static final boolean      kFeederMotorInvert  = false;     // Motor direction for positive input
-  private static final double       kRotaryGearRatio    = 27.0;
 
-  private static final double       kRotaryLengthMeters = 16.0;
-  private static final double       kRotaryWeightKg     = 5.5;
+  private static final double       kRollerSpeedScore   = -0.5;
+  private static final double       kRollerSpeedHandoff = -0.4;
+
+  private static final double       kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
+  private static final double       kRotaryGearRatio    = 27.0;
+  private static final double       kRotaryLengthMeters = 0.5;
+  private static final double       kRotaryWeightKg     = 4.0;
   private static final double       kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
 
   // Rotary constants
   private static final double       kToleranceDegrees   = 4.0;      // PID tolerance in degrees
   private static final double       kMMSafetyTimeout    = 2.0;
 
-  // Member objects
-  private final WPI_TalonSRX        m_feederRoller      = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
-  private final TalonFX             m_feederRotary      = new TalonFX(Ports.kCANID_FeederRotary);
+  // Device and simulation objects
+  private final WPI_TalonSRX        m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
+  private final TalonFX             m_rotaryMotor       = new TalonFX(Ports.kCANID_FeederRotary);
   private final CANcoder            m_CANCoder          = new CANcoder(Ports.kCANID_FeederCANCoder);
   private final DigitalInput        m_noteInFeeder      = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
-  // Declare module variables
-  // Mechanism2d
-  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(1.0, 1.0);
-  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
-  private final MechanismLigament2d m_mechLigament      =
-      m_mechRoot.append(new MechanismLigament2d("intake", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kAliceBlue)));
-  private static final double       kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
-  private final TalonFXSimState     m_rotarySim         = m_feederRotary.getSimState( );
+  private final TalonFXSimState     m_rotarySim         = m_rotaryMotor.getSimState( );
   private final CANcoderSimState    m_CANCoderSim       = m_CANCoder.getSimState( );
   private final SingleJointedArmSim m_armSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
       SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
+  // Mechanism2d
+  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(1.0, 1.0);
+  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
+  private final MechanismLigament2d m_mechLigament      =
+      m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kBlue)));
+
   // Roller variables
   private boolean                   m_fdRollerValid;      // Health indicator for motor 
-
-  private static final double       kRollerSpeedAcquire = 0.5;
-  private static final double       kRollerSpeedExpel   = -0.4;
-  private static final double       kRollerSpeedHandoff = -0.4;
 
   // Rotary variables
   private boolean                   m_fdRotaryValid;      // Health indicator for motor 
@@ -106,11 +105,11 @@ public class Feeder extends SubsystemBase
   private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
 
   // Status signals
-  private StatusSignal<Double>      m_rotaryPosition    = m_feederRotary.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
-  private StatusSignal<Double>      m_rotaryVelocity    = m_feederRotary.getRotorVelocity( );
-  private StatusSignal<Double>      m_rotaryCLoopError  = m_feederRotary.getClosedLoopError( );
-  private StatusSignal<Double>      m_rotarySupplyCur   = m_feederRotary.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rotaryStatorCur   = m_feederRotary.getStatorCurrent( );
+  private StatusSignal<Double>      m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
+  private StatusSignal<Double>      m_rotaryVelocity    = m_rotaryMotor.getRotorVelocity( );
+  private StatusSignal<Double>      m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
+  private StatusSignal<Double>      m_rotarySupplyCur   = m_rotaryMotor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition        = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
@@ -122,13 +121,13 @@ public class Feeder extends SubsystemBase
 
     // Roller motor init
     m_fdRollerValid =
-        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_feederRoller, "Feeder Roller", CTREConfigs5.intakeRollerConfig( ));
-    m_feederRoller.setInverted(kFeederMotorInvert);
-    PhoenixUtil5.getInstance( ).talonSRXCheckError(m_feederRoller, "setInverted");
+        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Feeder Roller", CTREConfigs5.intakeRollerConfig( ));
+    m_rollerMotor.setInverted(kFeederMotorInvert);
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
 
     // Rotary motor and CANcoder init
     m_fdRotaryValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_feederRotary, "Feeder Rotary", CTREConfigs6.feederRotaryFXConfig( ));
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Feeder Rotary", CTREConfigs6.feederRotaryFXConfig( ));
     m_fdCCValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
 
@@ -136,7 +135,7 @@ public class Feeder extends SubsystemBase
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_fdRotaryValid)
-      m_feederRotary.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
+      m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -161,7 +160,7 @@ public class Feeder extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    double rollerCurrent = (m_fdRollerValid) ? m_feederRoller.getStatorCurrent( ) : 0.0;
+    double rollerCurrent = (m_fdRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
     SmartDashboard.putNumber("FD_rollerCur", rollerCurrent);
 
     // CANcoder is the primary (remote) sensor for Motion Magic
@@ -253,7 +252,7 @@ public class Feeder extends SubsystemBase
 
     if (mode == FDRollerMode.HOLD)
     {
-      DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_feederRoller.get( )));
+      DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_rollerMotor.get( )));
     }
     else
     {
@@ -264,18 +263,15 @@ public class Feeder extends SubsystemBase
         case STOP :
           output = 0.0;
           break;
-        case ACQUIRE :
-          output = kRollerSpeedAcquire;
-          break;
-        case EXPEL :
-          output = kRollerSpeedExpel;
+        case SCORE :
+          output = kRollerSpeedScore;
           break;
         case HANDOFF :
           output = kRollerSpeedHandoff;
           break;
       }
       DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));
-      m_feederRoller.set(output);
+      m_rollerMotor.set(output);
     }
   }
 
@@ -284,17 +280,17 @@ public class Feeder extends SubsystemBase
     return m_currentDegrees;
   }
 
-  public double getFeederBack( )
-  {
-    return FDConsts.kRotaryAngleBack;
-  }
-
-  public double getFeederAmp( )
+  public double getRotaryAmp( )
   {
     return FDConsts.kRotaryAngleAmp;
   }
 
-  public double getFeederHandoff( )
+  public double getRotaryClimb( )
+  {
+    return FDConsts.kRotaryAngleClimb;
+  }
+
+  public double getRotaryHandoff( )
   {
     return FDConsts.kRotaryAngleHandoff;
   }
@@ -307,7 +303,7 @@ public class Feeder extends SubsystemBase
   public void setRotaryStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
-    m_feederRotary.setControl(m_requestVolts.withOutput(0.0));
+    m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
   }
 
   private boolean isMoveValid(double degrees)
@@ -343,7 +339,7 @@ public class Feeder extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_feederRotary.setControl(m_requestVolts.withOutput(axisValue * kRotaryManualVolts));
+    m_rotaryMotor.setControl(m_requestVolts.withOutput(axisValue * kRotaryManualVolts));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -366,7 +362,7 @@ public class Feeder extends SubsystemBase
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
         double targetRotations = Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio);
-        m_feederRotary.setControl(m_requestMMVolts.withPosition(targetRotations));
+        m_rotaryMotor.setControl(m_requestMMVolts.withPosition(targetRotations));
         DataLogManager
             .log(String.format("%s: Position move: %.1f -> %.1f degrees (%.3f -> %.3f)", getSubsystem( ), m_currentDegrees,
                 m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio), targetRotations));
@@ -384,7 +380,7 @@ public class Feeder extends SubsystemBase
 
   public void moveToPositionExecute( )
   {
-    m_feederRotary
+    m_rotaryMotor
         .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 

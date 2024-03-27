@@ -180,8 +180,8 @@ public class Constants
 
     // Rotary angles - Motion Magic move parameters
     public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = -35.0;    // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 115.0; // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = -32.0;  // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 115.0;  // TODO: Tune me!
     public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
     public static final double kRotaryAngleMax       = 117.0;  // TODO: Tune me!
   }

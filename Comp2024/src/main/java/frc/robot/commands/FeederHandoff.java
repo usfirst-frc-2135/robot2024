@@ -29,16 +29,18 @@ public class FeederHandoff extends SequentialCommandGroup
 
         new LogCommand(getName(), "Transfer Note"),
         new FeederRun(feeder, FDConsts.FDRollerMode.HANDOFF, feeder::getRotaryPosition),
-        new WaitCommand(0.2),
         new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake::getRotaryPosition),
-        new WaitCommand(0.5),
+        
+        new WaitCommand(0.1),
 
         new LogCommand(getName(), "Stop rollers"),
         new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getRotaryPosition),
 
-        new LogCommand(getName(), "Ensure Intake releases Note"),
         new WaitCommand(0.2),
+
+        new LogCommand(getName(), "Ensure Intake releases Note"),
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+
         // @formatter:on
     );
   }

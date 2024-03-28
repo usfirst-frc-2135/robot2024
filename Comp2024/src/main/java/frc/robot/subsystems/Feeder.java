@@ -51,10 +51,10 @@ public class Feeder extends SubsystemBase
 {
 
   // Constants
-  private static final boolean      kFeederMotorInvert  = false;     // Motor direction for positive input
+  private static final boolean      kFeederMotorInvert  = true;     // Motor direction for positive input
 
   private static final double       kRollerSpeedScore   = -0.5;
-  private static final double       kRollerSpeedHandoff = -0.4;
+  private static final double       kRollerSpeedHandoff = -0.35;
 
   private static final double       kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
   private static final double       kRotaryGearRatio    = 27.0;

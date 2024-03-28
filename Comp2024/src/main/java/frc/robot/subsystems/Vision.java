@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VIConsts;
 import frc.robot.lib.util.LimelightHelpers;
@@ -231,6 +232,30 @@ public class Vision extends SubsystemBase
   public void setPriorityIdBlue( )
   {
     setPriorityId(7, "BLUE");
+  }
+
+  public void setAmpId( )
+  {
+    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
+    {
+      setPriorityId(5, "RED");
+    }
+    else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
+    {
+      setPriorityId(6, "BLUE");
+    }
+  }
+
+  public void setSpeakerId( )
+  {
+    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
+    {
+      setPriorityId(4, "RED");
+    }
+    else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
+    {
+      setPriorityId(7, "BLUE");
+    }
   }
 
   public void setCameraDisplay(int stream)

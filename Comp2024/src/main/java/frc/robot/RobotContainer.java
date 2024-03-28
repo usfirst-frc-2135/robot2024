@@ -265,11 +265,13 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim //
-        .withVelocityX(-limelight_range_proportional(m_drivetrain)) //
-        .withVelocityY(0) //
-        .withRotationalRate(limelight_aim_proportional(m_drivetrain))));
-    m_driverPad.b( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageRight));        // drive to stage right
+    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim.withVelocityX(-limelight_range_proportional(m_drivetrain))
+        .withVelocityY(0).withRotationalRate(limelight_aim_proportional(m_drivetrain))));
+    m_driverPad.b( )
+        .whileTrue(new SequentialCommandGroup(new InstantCommand(m_vision::setAmpId),
+            m_drivetrain.applyRequest(( ) -> aim.withVelocityX(-limelight_range_proportional(m_drivetrain)).withVelocityY(0)
+                .withRotationalRate(limelight_aim_proportional(m_drivetrain)))));
+    m_driverPad.b( ).onFalse(new InstantCommand(m_vision::setSpeakerId));
     m_driverPad.x( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
     m_driverPad.y( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
     //

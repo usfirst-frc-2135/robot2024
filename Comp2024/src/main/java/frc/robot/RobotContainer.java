@@ -267,10 +267,7 @@ public class RobotContainer
     // Driver - A, B, X, Y
     m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim.withVelocityX(-limelight_range_proportional(m_drivetrain))
         .withVelocityY(0).withRotationalRate(limelight_aim_proportional(m_drivetrain))));
-    m_driverPad.b( )
-        .whileTrue(new SequentialCommandGroup(new InstantCommand(m_vision::setAmpId),
-            m_drivetrain.applyRequest(( ) -> aim.withVelocityX(-limelight_range_proportional(m_drivetrain)).withVelocityY(0)
-                .withRotationalRate(limelight_aim_proportional(m_drivetrain)))));
+    m_driverPad.b( ).onTrue(new Dummy("driver b"));
     m_driverPad.b( ).onFalse(new InstantCommand(m_vision::setSpeakerId));
     m_driverPad.x( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
     m_driverPad.y( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
@@ -320,10 +317,9 @@ public class RobotContainer
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
     //
     // Operator - POV buttons
-    m_operatorPad.pov(0).onTrue(new SequentialCommandGroup( //
+    m_operatorPad.pov(0).onTrue(new ParallelCommandGroup( //
         new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getRotaryAmp),
-        new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull),
-        new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakeDeployed)));
+        new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -503,7 +499,9 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
             
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition)
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition),
+
+            m_drivetrain.getAutoCommand("LeaveS" + positionValue)
         // @formatter:on
         );  //
         break;

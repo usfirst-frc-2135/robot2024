@@ -179,11 +179,11 @@ public class Constants
     }
 
     // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = -32.0;  // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 115.0;  // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 117.0;  // TODO: Tune me!
+    public static final double kRotaryAngleRetracted = -97.5; // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = -49.9;  // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 99.4;  // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -99.0;  // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 101.4;  // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ public class Constants
 
     // Climber lengths - Motion Magic config parameters
     public static final double kLengthClimbed = 0.0;    // By definition - Climber fully climbed
-    public static final double kLengthFull    = 19.5;   // From Mech Design height needed to reach max chain
+    public static final double kLengthFull    = 16.5;   // From Mech Design height needed to reach max chain
     public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
     public static final double kLengthMin     = 0.0;    // Climber minimum allowable length
     public static final double kLengthMax     = 21.0;  // Climber maximum allowable length (2" beyond high length)

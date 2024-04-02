@@ -125,6 +125,8 @@ public class RobotContainer
     AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
     AUTOPRELOADSCOREANOTHER, // Score preload and score another
     AUTOSCORE4,              //
+    AUTOP0LEAVE, //
+    AUTOP4LEAVE, //
     AUTOTESTPATH             // Run a selected test path
   }
 
@@ -389,6 +391,8 @@ public class RobotContainer
     m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
     m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
     m_autoChooser.addOption("6 - AutoTestPath", AutoChooser.AUTOTESTPATH);
+    m_autoChooser.addOption("7 - AutoPreloadP0AndLeave", AutoChooser.AUTOP0LEAVE);
+    m_autoChooser.addOption("8 - AutoPreloadP4AndLeave", AutoChooser.AUTOP4LEAVE);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Configure starting position sendable chooser
@@ -561,7 +565,14 @@ public class RobotContainer
         // @formatter:on
         );
         break;
-
+      case AUTOP0LEAVE :
+        m_autoCommand = new SequentialCommandGroup(m_drivetrain.getAutoCommand("DriveP0"),
+            new ShooterActionFire(m_shooter, m_intake, m_led), m_drivetrain.getAutoCommand("LeaveS1"));
+        break;
+      case AUTOP4LEAVE :
+        m_autoCommand = new SequentialCommandGroup(new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
+            new ShooterActionFire(m_shooter, m_intake, m_led), m_drivetrain.getAutoCommand("LeaveS3"));
+        break;
       case AUTOTESTPATH :
         m_autoCommand = m_drivetrain.getAutoCommand("Test");
         break;

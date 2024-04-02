@@ -89,6 +89,7 @@ public class Climber extends SubsystemBase
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
 
   private StatusSignal<Double>      m_motorPosition      = m_climberL.getRotorPosition( );
+  private StatusSignal<Double>      m_motorPositionR     = m_climberR.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity      = m_climberL.getRotorVelocity( );
   private StatusSignal<Double>      m_motorCLoopError    = m_climberL.getClosedLoopError( );
   private StatusSignal<Double>      m_motorSupplyCur     = m_climberL.getSupplyCurrent( );
@@ -135,6 +136,7 @@ public class Climber extends SubsystemBase
       setClimberToZero( );
 
     SmartDashboard.putNumber("CL_curInches", m_currentInches);
+    SmartDashboard.putNumber("CL_curInchesR", getCurrentInchesR( ));
     SmartDashboard.putNumber("CL_targetInches", m_targetInches);
     SmartDashboard.putNumber("CL_curRotations", Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
     SmartDashboard.putNumber("CL_totalFF", m_totalArbFeedForward);
@@ -208,6 +210,11 @@ public class Climber extends SubsystemBase
   private double getCurrentInches( )
   {
     return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), kRolloutRatio);
+  }
+
+  private double getCurrentInchesR( )
+  {
+    return Conversions.rotationsToWinchInches(m_motorPositionR.refresh( ).getValue( ), kRolloutRatio);
   }
 
   private boolean isMoveValid(double inches)

@@ -85,7 +85,7 @@ public final class CTREConfigs6
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? 0.6863 : -0.703613;
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? -0.3518 : -0.703613;
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
@@ -252,7 +252,7 @@ public final class CTREConfigs6
     // Slot settings
     climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
     climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
-    climberConfig.Slot0.kP = 4.80;                                 // Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kP = 9.60;                                 // Voltage or duty cycle per velocity error (velocity modes)
     climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
     climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

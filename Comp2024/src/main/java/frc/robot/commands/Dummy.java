@@ -7,12 +7,18 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- *
+ * Dummy (placeholder) command
  */
 public class Dummy extends Command
 {
   private final String m_string;
 
+  /**
+   * Command placeholder that prints a button name
+   * 
+   * @param string
+   *          message to print when run
+   */
   public Dummy(String string)
   {
     m_string = string;

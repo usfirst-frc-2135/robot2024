@@ -1,3 +1,6 @@
+//
+// Swerve Subystem - command-based swerve subsystem
+//
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
@@ -38,8 +41,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VIConsts;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
-import frc.robot.lib.util.LimelightHelpers;
-import frc.robot.lib.util.LimelightHelpers.PoseEstimate;
+import frc.robot.lib.LimelightHelpers;
+import frc.robot.lib.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -253,6 +256,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   {
     DataLogManager.log(String.format("drivePathToPose: given alliance %s target pose %s", DriverStation.getAlliance( ), pose));
 
-    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kConstraints, 0.0);
+    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kPathFindConstraints, 0.0);
   }
 }

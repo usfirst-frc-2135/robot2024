@@ -1,7 +1,7 @@
-
+//
 // Phoenix 6 initialization utilities
-
-package frc.robot.lib.util;
+//
+package frc.robot.lib.phoenix;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -17,6 +17,10 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
+/****************************************************************************
+ * 
+ * Phoenix 6 initialization class
+ */
 public class PhoenixUtil6
 {
   private static PhoenixUtil6 m_instance  = null;
@@ -24,9 +28,19 @@ public class PhoenixUtil6
   private static final String m_className = "PhoenixUtil6";
   private static double       m_timeout   = 0.100;
 
+  /****************************************************************************
+   * 
+   * Constructor
+   */
   PhoenixUtil6( )
   {}
 
+  /****************************************************************************
+   * 
+   * Retrieve instance of this class (singleton)
+   * 
+   * @return reference to this (singleton) class
+   */
   public static PhoenixUtil6 getInstance( )
   {
     if (m_instance == null)
@@ -35,9 +49,19 @@ public class PhoenixUtil6
     return m_instance;
   }
 
-  // Talon FX handler
-
-  public boolean talonFXInitialize6(TalonFX motor, String name, TalonFXConfiguration config)
+  /****************************************************************************
+   * 
+   * Initialize a Talon FX motor and display the result
+   * 
+   * @param talonFX
+   *          reference to an FX controlled motor
+   * @param name
+   *          descriptive name of the FX controlled motor
+   * @param config
+   *          the talon FX configuration to be programmed
+   * @return true if successfully initialized
+   */
+  public boolean talonFXInitialize6(TalonFX talonFX, String name, TalonFXConfiguration config)
   {
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     int deviceID = 0;
@@ -48,14 +72,14 @@ public class PhoenixUtil6
     boolean talonValid = false;
 
     // Display Talon firmware versions
-    deviceID = motor.getDeviceID( );
+    deviceID = talonFX.getDeviceID( );
 
     Timer.delay(0.25);
 
     // This can take multiple attempts before ready
     for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {
-      StatusSignal<Integer> statusSignal = motor.getVersion( );
+      StatusSignal<Integer> statusSignal = talonFX.getVersion( );
       status = statusSignal.getStatus( );
       if (status.isOK( ))
       {
@@ -71,29 +95,39 @@ public class PhoenixUtil6
     talonValid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
-      if ((status = motor.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %2d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
+      if ((status = talonFX.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
+        DataLogManager.log(String.format("%s: ID %2d - %s talonFX: getConfigurator.apply - %s!", m_className, deviceID, name,
             status.getDescription( )));
 
-    if ((status = motor.setControl(new VoltageOut(0))) != StatusCode.OK)
+    if ((status = talonFX.setControl(new VoltageOut(0))) != StatusCode.OK)
       DataLogManager
-          .log(String.format("%s: ID %2d - %s motor: setControl - %s!", m_className, deviceID, name, status.getDescription( )));
+          .log(String.format("%s: ID %2d - %s talonFX: setControl - %s!", m_className, deviceID, name, status.getDescription( )));
 
     // Configure sensor settings
-    if ((status = motor.setPosition(0.0)) != StatusCode.OK)
-      DataLogManager.log(
-          String.format("%s: ID %2d - %s motor: setRotorPosition - %s!", m_className, deviceID, name, status.getDescription( )));
+    if ((status = talonFX.setPosition(0.0)) != StatusCode.OK)
+      DataLogManager.log(String.format("%s: ID %2d - %s talonFX: setRotorPosition - %s!", m_className, deviceID, name,
+          status.getDescription( )));
 
-    motor.setSafetyEnabled(false);
+    talonFX.setSafetyEnabled(false);
 
-    DataLogManager.log(String.format("%s: ID %2d - %s motor:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
+    DataLogManager.log(String.format("%s: ID %2d - %s talonFX:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
         fwvMinor, fwvBugfix, fwvBuild, (talonValid) ? "VALID" : "URESPONSIVE"));
 
     return talonValid;
   }
 
-  // CANCoder handler
-
+  /****************************************************************************
+   * 
+   * Initialize a CANcoder and display the result
+   * 
+   * @param canCoder
+   *          reference to a CANcoder
+   * @param name
+   *          descriptive name of the CANcoder
+   * @param config
+   *          the CANcoder configuration to be programmed
+   * @return true if successfully initialized
+   */
   public boolean canCoderInitialize6(CANcoder canCoder, String name, CANcoderConfiguration config)
   {
     StatusCode status = StatusCode.StatusCodeNotInitialized;
@@ -127,17 +161,25 @@ public class PhoenixUtil6
 
     if (config != null)
       if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %2d - %s CANCoder: getConfigurator.apply - %s!", m_className, deviceID, name,
+        DataLogManager.log(String.format("%s: ID %2d - %s CANcoder: getConfigurator.apply - %s!", m_className, deviceID, name,
             status.getDescription( )));
 
-    DataLogManager.log(String.format("%s: ID %2d - %s CANCoder: ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
+    DataLogManager.log(String.format("%s: ID %2d - %s CANcoder: ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
         fwvMinor, fwvBugfix, fwvBuild, (canCoderValid) ? "VALID" : "URESPONSIVE"));
 
     return canCoderValid;
   }
 
-  //   // Pigeon IMU handler
-
+  /****************************************************************************
+   * 
+   * Initialize a Pigeon2 IMU and display the result
+   * 
+   * @param pigeon2
+   *          reference to a pigeon2
+   * @param config
+   *          the pigeon2 configuration to be programmed
+   * @return true if successfully initialized
+   */
   public boolean pigeon2Initialize6(Pigeon2 pigeon2, Pigeon2Configuration config)
   {
     StatusCode status = StatusCode.StatusCodeNotInitialized;

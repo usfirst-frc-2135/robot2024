@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 
 /**
- *
+ * Climber calibration command
  */
 public class ClimberCalibrate extends Command
 {
@@ -18,6 +18,11 @@ public class ClimberCalibrate extends Command
   private Climber             m_climber;
   private Timer               m_calibrateTimer = new Timer( );
 
+  /**
+   * Command the climber subsystem to do a calibration
+   * 
+   * @param climber
+   */
   public ClimberCalibrate(Climber climber)
   {
     m_climber = climber;
@@ -32,7 +37,7 @@ public class ClimberCalibrate extends Command
   {
     DataLogManager.log(String.format("%s: Start up", getName( )));
     m_calibrateTimer.restart( );
-    m_climber.moveToCalibrate( );
+    m_climber.climberCalibrateInit( );
     DataLogManager.log(String.format("%s: Start FPGATime %.3f", getName( ), Timer.getFPGATimestamp( )));
   }
 
@@ -48,15 +53,14 @@ public class ClimberCalibrate extends Command
     DataLogManager
         .log(String.format("%s: End FPGATime %.3f (%.3f)", getName( ), Timer.getFPGATimestamp( ), m_calibrateTimer.get( )));
     m_calibrateTimer.stop( );
-    m_climber.endCalibration( );
-    m_climber.setStopped( );
+    m_climber.climberCalibrateEnd( );
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return m_calibrateTimer.hasElapsed(kTimeout);
+    return (m_calibrateTimer.hasElapsed(kTimeout) || m_climber.climberCalibrateIsFinished( ));
   }
 
   @Override

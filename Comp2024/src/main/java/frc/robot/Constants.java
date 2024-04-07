@@ -9,11 +9,10 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
+ * The Constants class provides a convenient place to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be
  * declared globally (i.e. public static). Do not put anything functional in this class.
  *
@@ -38,8 +37,6 @@ public class Constants
   public static final int    kPhoenix5MajorVersion = ((22 * 256) + 0);
   public static final int    kPhoenix6MajorVersion = 24;
 
-  public static final double kAutonomousPeriodSecs = 15.0;
-
   /////////////////////////////////////////////////////////////////////////////
   // CAN IDs and PWM IDs
   /////////////////////////////////////////////////////////////////////////////
@@ -51,30 +48,30 @@ public class Constants
     // CANivore CAN IDs - Swerve
     public static final int    kCANID_DriveLF        = 1;    // Falcon 500
     public static final int    kCANID_SteerLF        = 2;    // Falcon 500
-    public static final int    kCANID_CANCoderLF     = 3;    // CANCoder
+    public static final int    kCANID_CANcoderLF     = 3;    // CANcoder
 
     public static final int    kCANID_DriveRF        = 4;    //Falcon 500     
     public static final int    kCANID_SteerRF        = 5;    // Falcon 500
-    public static final int    kCANID_CANCoderRF     = 6;    // CANCoder
+    public static final int    kCANID_CANcoderRF     = 6;    // CANcoder
 
     public static final int    kCANID_DriveLR        = 7;    //Falcon 500
     public static final int    kCANID_SteerLR        = 8;    // Falcon 500
-    public static final int    kCANID_CANCoderLR     = 9;    // CANCoder
+    public static final int    kCANID_CANcoderLR     = 9;    // CANcoder
 
     public static final int    kCANID_DriveRR        = 10;   //Falcon 500
     public static final int    kCANID_SteerRR        = 11;   // Falcon 500
-    public static final int    kCANID_CANCoderRR     = 12;   // CANCoder
+    public static final int    kCANID_CANcoderRR     = 12;   // CANcoder
 
     public static final int    kCANID_Pigeon2        = 13;   // Pigeon2 IMU
 
     // RoboRIO CAN IDs
     public static final int    kCANID_IntakeRoller   = 15;   // Talon SRX - 775Pro
     public static final int    kCANID_IntakeRotary   = 16;   // Falcon 500
-    public static final int    kCANID_IntakeCANCoder = 17;   // CANCoder
+    public static final int    kCANID_IntakeCANcoder = 17;   // CANcoder
 
     public static final int    kCANID_FeederRoller   = 19;   // Talon SRX - 775Pro
     public static final int    kCANID_FeederRotary   = 20;   // Falcon 500
-    public static final int    kCANID_FeederCANCoder = 21;   // CANCoder
+    public static final int    kCANID_FeederCANcoder = 21;   // CANcoder
 
     public static final int    kCANID_ShooterLower   = 23;   // Falcon 500
     public static final int    kCANID_ShooterUpper   = 24;   // Falcon 500
@@ -91,73 +88,10 @@ public class Constants
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // Falcon 500
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class Falcon500
-  {
-    public static final int    kMaxRPM     = 6380; // free speed for Falcon 500 motor
-    public static final double kEncoderCPR = 2048; // CPR is from Falcon 500 Manual
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Swerve drive
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class SWConsts
-  {
-    /* Individual module constants */
-    public static final boolean gyroInvert  = false; // Always ensure Gyro is CCW+ CW-
-
-    /* Controller Invert */
-    public static final boolean invertXAxis = false;
-    public static final boolean invertYAxis = false;
-    public static final boolean invertRAxis = false;
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Swerve snap constraints
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class SnapConsts
-  {
-    public static final double                       kP                                      = 5.0;
-    public static final double                       kI                                      = 0.0;
-    public static final double                       kD                                      = 0.0;
-    public static final double                       kTimeout                                = 0.75;
-    public static final double                       kEpsilon                                = 1.0;
-
-    // Constraints for the profiled angle controller
-    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 2.0 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
-        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
-
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Autonomous trajectory constraints
-  /////////////////////////////////////////////////////////////////////////////
-  public static final class AutoConsts
-  {
-    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 1.2 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
-        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
-
-    public static final double                       kPXController                           = 1;
-    public static final double                       kPYController                           = 1;
-    public static final double                       kPThetaController                       = 5;
-
-    // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
   // Intake subsystem
   /////////////////////////////////////////////////////////////////////////////
   public static final class INConsts
   {
-    // Global settings
-
     // Roller intake parameters
     public enum RollerMode
     {
@@ -180,10 +114,11 @@ public class Constants
 
     // Rotary angles - Motion Magic move parameters
     public static final double kRotaryAngleRetracted = -97.5; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = -49.9;  // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = -49.9; // TODO: Tune me!
     public static final double kRotaryAngleDeployed  = 99.4;  // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -99.0;  // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 101.4;  // TODO: Tune me!
+
+    public static final double kRotaryAngleMin       = -99.0; // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 101.4; // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -191,8 +126,6 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class FDConsts
   {
-    // Global settings
-
     // Feeder intake parameters
     public enum FDRollerMode
     {
@@ -215,6 +148,7 @@ public class Constants
     public static final double kRotaryAngleAmp     = -33.0;    // TODO: Tune me!
     public static final double kRotaryAngleClimb   = 60.0;     // TODO: Tune me!
     public static final double kRotaryAngleHandoff = 88.75;    // TODO: Tune me!
+
     public static final double kRotaryAngleMin     = -61.89;   // TODO: Tune me!
     public static final double kRotaryAngleMax     = 90.0;     // TODO: Tune me!
   }
@@ -224,8 +158,6 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class SHConsts
   {
-    // Global settings
-
     // Manual config parameters
     public enum ShooterMode
     {
@@ -233,13 +165,6 @@ public class Constants
       STOP,       // Shooter is stopped
       SCORE,      // Shooter ramped to an initial speed before shooting
     }
-
-    // Manual config parameters
-    public enum RotaryMode
-    {
-    }
-
-    // Motion Magic config parameters
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -247,8 +172,6 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class CLConsts
   {
-    // Global settings
-
     // Climber manual move parameters
     public enum ClimberMode
     {
@@ -262,8 +185,9 @@ public class Constants
     public static final double kLengthClimbed = 0.0;    // By definition - Climber fully climbed
     public static final double kLengthFull    = 18.0;   // From Mech Design height needed to reach max chain
     public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
+
     public static final double kLengthMin     = 0.0;    // Climber minimum allowable length
-    public static final double kLengthMax     = 21.0;  // Climber maximum allowable length (2" beyond high length)
+    public static final double kLengthMax     = 21.0;   // Climber maximum allowable length (2" beyond high length)
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -271,22 +195,7 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class VIConsts
   {
-    // Limelight-defined streaming states
-    public static final int STANDARD      = 0;  // Both cameras side-by-side
-    public static final int PIP_MAIN      = 1;  // Limelight with second camera inset
-    public static final int PIP_SECONDARY = 2;  // Second camera with limelight inset
-
-    // Limelight-defined LED mode states
-    public static final int LED_OFF       = 1;
-    public static final int LED_ON        = 3;
-
-    public enum VIRequests
-    {
-      VISION_OFF,   // Disable limelight LED and enable secondary camera mode
-      VISION_ON,    // Enable limelight LED and disable secondary camera mode
-      VISION_TOGGLE // Toggle mode
-    }
-
+    // Field locations of AprilTags
     public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
         new Pose2d(new Translation2d(15.079472, 0.245872), new Rotation2d(Units.degreesToRadians(120))),    // AprilTag ID: 1 
@@ -317,7 +226,7 @@ public class Constants
     /////////////////////////////////////////////////////////////////////////////
     // Path on the fly trajectory constraints
     /////////////////////////////////////////////////////////////////////////////
-    public static final class PATHConsts //TODO: set back to original speeds
+    public static final class PathFindConsts                                    // TODO: set back to original speeds
     {
       public static final double kMaxVelocityMps                         = 1.0; // TODO: Slowed from 3.0 for testing
       public static final double kMaxAccelerationMpsSq                   = 1.0; // TODO: Slowed from 3.0 for testing
@@ -327,9 +236,12 @@ public class Constants
     }
 
     //Path constraints
-    public static final PathConstraints kConstraints =
-        new PathConstraints(PATHConsts.kMaxVelocityMps, PATHConsts.kMaxAccelerationMpsSq,
-            PATHConsts.kMaxAngularSpeedRadiansPerSecond, PATHConsts.kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final PathConstraints kPathFindConstraints = new PathConstraints( //
+        PathFindConsts.kMaxVelocityMps,                         //
+        PathFindConsts.kMaxAccelerationMpsSq,                   //
+        PathFindConsts.kMaxAngularSpeedRadiansPerSecond,        //
+        PathFindConsts.kMaxAngularSpeedRadiansPerSecondSquared  //
+    );
   }
 
   /////////////////////////////////////////////////////////////////////////////

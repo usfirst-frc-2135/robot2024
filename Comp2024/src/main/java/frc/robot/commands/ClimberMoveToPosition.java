@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 
 /**
- *
+ * Climber MoveToPosition command
  */
 public class ClimberMoveToPosition extends Command
 {
@@ -15,7 +15,12 @@ public class ClimberMoveToPosition extends Command
   private boolean       m_holdPosition;
   private double        m_newLength = 0.0;
 
-  // Default command for holding current position
+  /**
+   * Command the climber subsystem to hold the current position (default command)
+   * 
+   * @param climber
+   *          climber subsystem
+   */
   public ClimberMoveToPosition(Climber climber)
   {
     m_climber = climber;
@@ -23,6 +28,14 @@ public class ClimberMoveToPosition extends Command
     ClimberMoveToPositionCommon(true);
   }
 
+  /**
+   * Command the climber subsystem to hold the current position (default command)
+   * 
+   * @param climber
+   *          climber subsystem
+   * @param position
+   *          new position to move to
+   */
   // Motion Magic movement to a new position
   public ClimberMoveToPosition(Climber climber, double position)
   {

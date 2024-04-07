@@ -9,8 +9,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 /**
  * A command that logs a string when initialized.
  *
- * <p>
- * This class is provided by the NewCommands VendorDep
  */
 public class LogCommand extends InstantCommand
 {
@@ -20,7 +18,7 @@ public class LogCommand extends InstantCommand
    * @param prefix
    *          the prefix before the message
    * @param message
-   *          the message to print
+   *          the message to log and print
    */
   public LogCommand(String prefix, String msg)
   {

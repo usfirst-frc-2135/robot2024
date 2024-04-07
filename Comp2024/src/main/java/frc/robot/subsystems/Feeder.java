@@ -39,14 +39,15 @@ import frc.robot.Constants.FDConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
-import frc.robot.lib.util.CTREConfigs5;
-import frc.robot.lib.util.CTREConfigs6;
-import frc.robot.lib.util.PhoenixUtil5;
-import frc.robot.lib.util.PhoenixUtil6;
+import frc.robot.lib.phoenix.CTREConfigs5;
+import frc.robot.lib.phoenix.CTREConfigs6;
+import frc.robot.lib.phoenix.PhoenixUtil5;
+import frc.robot.lib.phoenix.PhoenixUtil6;
 
-//
-// Feeder subsystem class
-//
+/****************************************************************************
+ * 
+ * Feeder subsystem class
+ */
 public class Feeder extends SubsystemBase
 {
 
@@ -69,11 +70,11 @@ public class Feeder extends SubsystemBase
   // Device and simulation objects
   private final WPI_TalonSRX        m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
   private final TalonFX             m_rotaryMotor       = new TalonFX(Ports.kCANID_FeederRotary);
-  private final CANcoder            m_CANCoder          = new CANcoder(Ports.kCANID_FeederCANCoder);
+  private final CANcoder            m_CANcoder          = new CANcoder(Ports.kCANID_FeederCANcoder);
   private final DigitalInput        m_noteInFeeder      = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
   private final TalonFXSimState     m_rotarySim         = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState    m_CANCoderSim       = m_CANCoder.getSimState( );
+  private final CANcoderSimState    m_CANcoderSim       = m_CANcoder.getSimState( );
   private final SingleJointedArmSim m_armSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
       SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
@@ -88,7 +89,7 @@ public class Feeder extends SubsystemBase
 
   // Rotary variables
   private boolean                   m_fdRotaryValid;      // Health indicator for motor 
-  private boolean                   m_fdCCValid;          // Health indicator for CANCoder 
+  private boolean                   m_fdCCValid;          // Health indicator for CANcoder 
   private boolean                   m_debug             = true;
   private double                    m_currentDegrees    = 0.0; // Current angle in degrees
   private double                    m_targetDegrees     = 0.0; // Target angle in degrees
@@ -110,10 +111,12 @@ public class Feeder extends SubsystemBase
   private StatusSignal<Double>      m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur   = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_ccPosition        = m_CANCoder.getAbsolutePosition( );
+  private StatusSignal<Double>      m_ccPosition        = m_CANcoder.getAbsolutePosition( );
 
-  // Constructor
-
+  /****************************************************************************
+   * 
+   * Constructor
+   */
   public Feeder( )
   {
     setName("Feeder");
@@ -121,7 +124,7 @@ public class Feeder extends SubsystemBase
 
     // Roller motor init
     m_fdRollerValid =
-        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Feeder Roller", CTREConfigs5.intakeRollerConfig( ));
+        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Feeder Roller", CTREConfigs5.feederRollerConfig( ));
     m_rollerMotor.setInverted(kFeederMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
 
@@ -129,17 +132,17 @@ public class Feeder extends SubsystemBase
     m_fdRotaryValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Feeder Rotary", CTREConfigs6.feederRotaryFXConfig( ));
     m_fdCCValid =
-        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
+        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
 
-    Double ccRotations = getCANCoderRotations( );
+    Double ccRotations = getCANcoderRotations( );
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
-    DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
+    DataLogManager.log(String.format("%s: CANcoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_fdRotaryValid)
       m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
-    m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
+    m_CANcoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
@@ -155,6 +158,10 @@ public class Feeder extends SubsystemBase
     initialize( );
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec)
+   */
   @Override
   public void periodic( )
   {
@@ -165,7 +172,7 @@ public class Feeder extends SubsystemBase
 
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
-    SmartDashboard.putNumber("FD_ccDegrees", Units.rotationsToDegrees(getCANCoderRotations( )));
+    SmartDashboard.putNumber("FD_ccDegrees", Units.rotationsToDegrees(getCANcoderRotations( )));
     SmartDashboard.putNumber("FD_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("FD_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("FD_rotaryDegrees", m_currentDegrees); // reference is rotary encoder
@@ -179,6 +186,10 @@ public class Feeder extends SubsystemBase
     }
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec) during simulation
+   */
   @Override
   public void simulationPeriodic( )
   {
@@ -186,7 +197,7 @@ public class Feeder extends SubsystemBase
 
     // Set input motor voltage from the motor setting
     m_rotarySim.setSupplyVoltage(RobotController.getInputVoltage( ));
-    m_CANCoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_CANcoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
     m_armSim.setInputVoltage(m_rotarySim.getMotorVoltage( ));
 
     // update for 20 msec loop
@@ -196,8 +207,8 @@ public class Feeder extends SubsystemBase
     m_rotarySim.setRawRotorPosition(Conversions.radiansToInputRotations(m_armSim.getAngleRads( ), kRotaryGearRatio));
     m_rotarySim.setRotorVelocity(Conversions.radiansToInputRotations(m_armSim.getVelocityRadPerSec( ), kRotaryGearRatio));
 
-    m_CANCoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
-    m_CANCoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
+    m_CANcoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
+    m_CANcoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
@@ -205,48 +216,113 @@ public class Feeder extends SubsystemBase
     m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
   }
 
-  // Initialize dashboard widgets
-
+  /****************************************************************************
+   * 
+   * Initialize dashboard widgets
+   */
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_FDValidRoller", m_fdRollerValid);
     SmartDashboard.putBoolean("HL_FDValidNRotary", m_fdRotaryValid);
-    SmartDashboard.putBoolean("HL_FDValidCANCoder", m_fdCCValid);
+    SmartDashboard.putBoolean("HL_FDValidCANcoder", m_fdCCValid);
     SmartDashboard.putData("FDRotaryMech", m_rotaryMech);
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
 
+  /****************************************************************************
+   * 
+   * Initialize subsystem during mode changes
+   */
   public void initialize( )
   {
-    setRollerSpeed(FDRollerMode.STOP);
+    setRollerMode(FDRollerMode.STOP);
     setRotaryStopped( );
 
     m_targetDegrees = m_currentDegrees;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Degrees: %.1f", getSubsystem( ), m_targetDegrees));
   }
 
+  /****************************************************************************
+   * 
+   * Write out hardware faults and reset sticky faults
+   */
   public void faultDump( )
   {
     DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+    DataLogManager.log(String.format("%s: faultDump %x", getSubsystem( ), m_rotaryMotor.getFaultField( ).getValue( )));
+    m_rollerMotor.clearStickyFaults( );
+    m_rotaryMotor.clearStickyFaults( );
   }
 
-  private double getRotaryRotations( )
-  {
-    return (m_fdRotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
-  }
-
-  private double getCANCoderRotations( )
-  {
-    double ccRotations = (m_fdCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
-    ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
-    return ccRotations;
-  }
-
+  ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
-  public void setRollerSpeed(FDRollerMode mode)
+  /****************************************************************************
+   * 
+   * Return current feeder position
+   * 
+   * @return current feeder rotary angle
+   */
+  public double getFeederPosition( )
+  {
+    return m_currentDegrees;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder angle for amp scoring state
+   * 
+   * @return amp scoring state angle
+   */
+  public double getFeederAmp( )
+  {
+    return FDConsts.kRotaryAngleAmp;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder angle for climb state
+   * 
+   * @return climb state angle
+   */
+  public double getFeederClimb( )
+  {
+    return FDConsts.kRotaryAngleClimb;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder angle for handoff state
+   * 
+   * @return handoff state angle
+   */
+  public double getFeederHandoff( )
+  {
+    return FDConsts.kRotaryAngleHandoff;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder note sensor state
+   * 
+   * @return true if note detected in feeder
+   */
+  public boolean isNoteDetected( )
+  {
+    return m_noteDetected.calculate(m_noteInFeeder.get( ));
+  }
+
+  /****************************************************************************
+   * 
+   * Set roller speed based on requested mode
+   * 
+   * @param mode
+   *          requested speed
+   */
+  public void setRollerMode(FDRollerMode mode)
   {
     double output = 0.0;
 
@@ -275,44 +351,15 @@ public class Feeder extends SubsystemBase
     }
   }
 
-  public double getRotaryPosition( )
-  {
-    return m_currentDegrees;
-  }
-
-  public double getRotaryAmp( )
-  {
-    return FDConsts.kRotaryAngleAmp;
-  }
-
-  public double getRotaryClimb( )
-  {
-    return FDConsts.kRotaryAngleClimb;
-  }
-
-  public double getRotaryHandoff( )
-  {
-    return FDConsts.kRotaryAngleHandoff;
-  }
-
-  public boolean isNoteDetected( )
-  {
-    return m_noteDetected.calculate(m_noteInFeeder.get( ));
-  }
-
-  public void setRotaryStopped( )
-  {
-    DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
-    m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
-  }
-
-  private boolean isMoveValid(double degrees)
-  {
-    return (degrees >= FDConsts.kRotaryAngleMin) && (degrees <= FDConsts.kRotaryAngleMax);
-  }
-
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
+  /****************************************************************************
+   * 
+   * Move motors proportional to a joystick axis value
+   * 
+   * @param axisValue
+   *          proportional input
+   */
   public void moveRotaryWithJoystick(double axisValue)
   {
     boolean rangeLimited = false;
@@ -333,7 +380,7 @@ public class Feeder extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getRotaryPosition( ),
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getFeederPosition( ),
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
@@ -344,12 +391,21 @@ public class Feeder extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
+  /****************************************************************************
+   * 
+   * Initialize a Motion Magic movement
+   * 
+   * @param newAngle
+   *          rotation to move
+   * @param holdPosition
+   *          hold previous position if true
+   */
   public void moveToPositionInit(double newAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
     if (holdPosition)
-      newAngle = getRotaryPosition( );
+      newAngle = getFeederPosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))
@@ -378,12 +434,22 @@ public class Feeder extends SubsystemBase
     }
   }
 
+  /****************************************************************************
+   * 
+   * Continuously update Motion Magic setpoint
+   */
   public void moveToPositionExecute( )
   {
     m_rotaryMotor
         .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 
+  /****************************************************************************
+   * 
+   * Detect Motion Magic finished state
+   * 
+   * @return true when command has completed
+   */
   public boolean moveToPositionIsFinished( )
   {
     boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
@@ -401,9 +467,63 @@ public class Feeder extends SubsystemBase
     return m_moveIsFinished;
   }
 
+  /****************************************************************************
+   * 
+   * Wrap up a Motion Magic movement
+   */
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
+  }
+
+  ///////////////////////// PRIVATE HELPERS ///////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Set feeder rotary motor to stopped
+   * 
+   */
+  private void setRotaryStopped( )
+  {
+    DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
+    m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
+  }
+
+  /****************************************************************************
+   * 
+   * Get feeder rotary rotations
+   * 
+   * @return feeder rotary rotations
+   */
+  private double getRotaryRotations( )
+  {
+    return (m_fdRotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
+  }
+
+  /****************************************************************************
+   * 
+   * Get feeder CANcoder rotations
+   * 
+   * @return feeder rotary CANcoder rotations
+   */
+  private double getCANcoderRotations( )
+  {
+    double ccRotations = (m_fdCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
+    ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
+    return ccRotations;
+  }
+
+  /****************************************************************************
+   * 
+   * Validate requested feeder move
+   * 
+   * @param degrees
+   *          angle requested
+   * @return true if move is within range
+   */
+  private boolean isMoveValid(double degrees)
+  {
+    return (degrees >= FDConsts.kRotaryAngleMin) && (degrees <= FDConsts.kRotaryAngleMax);
   }
 
 }

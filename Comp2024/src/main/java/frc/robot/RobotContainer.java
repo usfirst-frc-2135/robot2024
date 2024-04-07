@@ -6,7 +6,6 @@
 
 package frc.robot;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -50,7 +49,6 @@ import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
 import frc.robot.commands.IntakeActionAcquire;
 import frc.robot.commands.IntakeActionExpel;
-import frc.robot.commands.IntakeActionHandoff;
 import frc.robot.commands.IntakeActionRetract;
 import frc.robot.commands.IntakeActionShoot;
 import frc.robot.commands.IntakeMoveWithJoystick;
@@ -60,7 +58,6 @@ import frc.robot.commands.LogCommand;
 import frc.robot.commands.ShooterActionFire;
 import frc.robot.commands.ShooterRun;
 import frc.robot.generated.TunerConstants;
-import frc.robot.lib.util.LimelightHelpers;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -71,11 +68,12 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Telemetry;
 import frc.robot.subsystems.Vision;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
+/****************************************************************************
+ * 
+ * This class is where the bulk of the robot is declared. Since Command-based is a "declarative"
+ * paradigm, very little robot logic should actually be handled in the Robot periodic methods (other
+ * than the scheduler calls). Instead, the structure of the robot (including subsystems, commands,
+ * and button mappings) should be declared here.
  */
 public class RobotContainer
 {
@@ -85,17 +83,19 @@ public class RobotContainer
   private static final CommandXboxController          m_driverPad    = new CommandXboxController(Constants.kDriverPadPort);
   private static final CommandXboxController          m_operatorPad  = new CommandXboxController(Constants.kOperatorPadPort);
 
-  private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // desired top speed
+  private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // Maximum top speed
   private double                                      MaxAngularRate = 3.0 * Math.PI;                     // 1.5 rotations per second max angular velocity
   private Command                                     m_autoCommand;
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
-  private final SwerveRequest.FieldCentric            drive          = new SwerveRequest.FieldCentric( )
-      .withDeadband(MaxSpeed * Constants.kStickDeadband).withRotationalDeadband(MaxAngularRate * Constants.kStickDeadband)
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // We want field-centric driving in open loop
+  // Setting up bindings for necessary control of the swerve drive platform
+  private final SwerveRequest.FieldCentric            drive          = new SwerveRequest.FieldCentric( ) //
+      .withDeadband(MaxSpeed * Constants.kStickDeadband)                  //
+      .withRotationalDeadband(MaxAngularRate * Constants.kStickDeadband)  //
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);            // We want field-centric driving in open loop
   private final SwerveRequest.SwerveDriveBrake        brake          = new SwerveRequest.SwerveDriveBrake( );
-  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )
-      .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed).withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);
+  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )  //
+      .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                 //
+      .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);                // Field centric drive facing a direction
   private final SwerveRequest.PointWheelsAt           point          = new SwerveRequest.PointWheelsAt( );
   private final SwerveRequest.RobotCentric            aim            = new SwerveRequest.RobotCentric( );
 
@@ -106,17 +106,16 @@ public class RobotContainer
   private final Power                                 m_power        = new Power( );
   private final Vision                                m_vision       = new Vision( );
 
-  // These subsystems can use LED or vision and must be created afterward
+  // These subsystems may use LED or vision and must be created afterward
   private final CommandSwerveDrivetrain               m_drivetrain   = TunerConstants.DriveTrain;
   private final Intake                                m_intake       = new Intake( );
   private final Shooter                               m_shooter      = new Shooter( );
   private final Feeder                                m_feeder       = new Feeder( );
   private final Climber                               m_climber      = new Climber( );
 
-  // Chooser for autonomous commands
-
   Command                                             m_autoCmd;
 
+  // Chooser for autonomous commands
   enum AutoChooser
   {
     AUTOSTOP,                // AutoStop - do nothing
@@ -124,70 +123,41 @@ public class RobotContainer
     AUTOLEAVE,               // Leave starting zone
     AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
     AUTOPRELOADSCOREANOTHER, // Score preload and score another
-    AUTOSCORE4,              //
-    AUTOP0LEAVE, //
-    AUTOP4LEAVE, //
+    AUTOSCORE4,              // Score preload and 3 spike notes
+    AUTOP0LEAVE,             // Score preload and leave starting zone
+    AUTOP4LEAVE,             // Score preload and leave starting zone
     AUTOTESTPATH             // Run a selected test path
   }
 
   // Chooser for autonomous starting position
-
   enum StartPosition
   {
-    POSE1, // Starting position 1 - blue left, red right
-    POSE2, // Starting position 2 - blue/red middle
-    POSE3  // Starting position 3 - blue right, red left
+    POSE1, // Starting position 1 - blue left, red right (driver perspective)
+    POSE2, // Starting position 2 - blue/red middle (driver perspective)
+    POSE3  // Starting position 3 - blue right, red left (driver perspective)
   }
 
-  private static final boolean           m_autoTesting  = true;
   private SendableChooser<AutoChooser>   m_autoChooser  = new SendableChooser<>( );
   private SendableChooser<StartPosition> m_startChooser = new SendableChooser<>( );
   private SendableChooser<Integer>       m_odomChooser  = new SendableChooser<>( );
 
-  /**
+  /****************************************************************************
+   * 
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer( )
   {
-    m_drivetrain.getDaqThread( ).setThreadPriority(99);
+    m_drivetrain.getDaqThread( ).setThreadPriority(99);   // Start swerve telemetry thread
 
-    addSmartDashboardWidgets( );
+    addSmartDashboardWidgets( );                    // Add dashboard widgets for commands
 
-    configureButtonBindings( );
+    configureButtonBindings( );                     // Configure game controller buttons
 
-    initDefaultCommands( );
+    initDefaultCommands( );                         // Initialize subsystem default commands
 
-    initAutonomousChooser( );
+    initAutonomousChooser( );                       // Build autonomous chooser and put on dashboard
 
-    initOdometryChooser( );
-  }
-
-  public double limelight_aim_proportional(CommandSwerveDrivetrain drivetrain)
-  {
-    double kP = .01;
-    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
-
-    // convert to radians per second for our drive method
-    targetingAngularVelocity *= MaxAngularRate;
-
-    // invert since tx is positive when the target is to the right of the crosshair
-    targetingAngularVelocity *= -1.0;
-
-    return targetingAngularVelocity;
-  }
-
-  public double limelight_range_proportional(CommandSwerveDrivetrain drivetrain)
-  {
-    double kP = .06;
-    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
-
-    // convert to meters per second
-    targetingForwardSpeed *= MaxSpeed;
-
-    // invert since ty is positive when the target is above the crosshair
-    targetingForwardSpeed *= -1.0;
-
-    return targetingForwardSpeed;
+    initOdometryChooser( );                         // Build odometry chooser and put on dashboard
   }
 
   /****************************************************************************
@@ -196,12 +166,11 @@ public class RobotContainer
    */
   private void addSmartDashboardWidgets( )
   {
-    // SmartDashboard Buttons
-
     // For future work to set up Shuffleboard layout from code
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
 
+    // SmartDashboard Buttons
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_shooter);
     SmartDashboard.putData(m_feeder);
@@ -211,23 +180,21 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
 
-    SmartDashboard.putNumber("SW_PoseX", 0.0);
-    SmartDashboard.putNumber("SW_PoseY", 0.0);
-    SmartDashboard.putNumber("SW_PoseRot", 0.0);
-    SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromPose( )).ignoringDisable(true));
+    SmartDashboard.putNumber("SW_SetPoseX", 0.0);
+    SmartDashboard.putNumber("SW_SetPoseY", 0.0);
+    SmartDashboard.putNumber("SW_SetPoseRot", 0.0);
+    SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromDashboard( )).ignoringDisable(true));
 
     SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
     SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
     SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake, m_led));
     SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
-    SmartDashboard.putData("InActionHandoff", new IntakeActionHandoff(m_intake));
 
-    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake::getRotaryPosition));
-    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake::getRotaryPosition));
-    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake::getRotaryPosition));
-    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake::getRotaryPosition));
-    SmartDashboard.putData("InRollHandoff", new IntakeRun(m_intake, RollerMode.HANDOFF, m_intake::getRotaryPosition));
-    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition));
+    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakePosition));
 
     SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeDeployed));
     SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeRetracted));
@@ -239,14 +206,14 @@ public class RobotContainer
     SmartDashboard.putData("FdAmpScore", new FeederAmpScore(m_feeder));
     SmartDashboard.putData("FdHandoff", new FeederHandoff(m_intake, m_feeder));
 
-    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getRotaryPosition));
-    SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getRotaryPosition));
-    SmartDashboard.putData("FdRollHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder::getRotaryPosition));
-    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryPosition));
+    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederPosition));
 
-    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryAmp));
-    SmartDashboard.putData("FdRotClimb", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryClimb));
-    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getRotaryHandoff));
+    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederAmp));
+    SmartDashboard.putData("FdRotClimb", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederClimb));
+    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederHandoff));
 
     SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
     SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -256,9 +223,8 @@ public class RobotContainer
 
   /****************************************************************************
    * 
-   * Use this method to define your button-command mappings. Buttons can be created by instantiating
-   * a GenericHID or one of its subclasses (Joystick or XboxController), and then passing it to a
-   * JoystickButton.
+   * Define button-command mappings. Buttons are created by instantiating a GenericHID or one of its
+   * subclasses (Joystick or XboxController), and then passing it to a JoystickButton.
    */
   private void configureButtonBindings( )
   {
@@ -267,21 +233,27 @@ public class RobotContainer
     // Driver Controller Assignments
     //
     // Driver - A, B, X, Y
-    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim.withVelocityX(-limelight_range_proportional(m_drivetrain))
-        .withVelocityY(0).withRotationalRate(limelight_aim_proportional(m_drivetrain))));
-    m_driverPad.b( ).onTrue(new Dummy("driver b"));
-    m_driverPad.b( ).onFalse(new InstantCommand(m_vision::setSpeakerId));
-    m_driverPad.x( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageLeft));         // drive to stage left
-    m_driverPad.y( ).onTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kStageCenter));       // drive to stage center
+    //
+    m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim                 //
+        .withVelocityX(-m_vision.limelight_range_proportional(MaxSpeed))            //
+        .withVelocityY(0)                                                 //
+        .withRotationalRate(m_vision.limelight_aim_proportional(MaxAngularRate))));
+    m_driverPad.b( ).onTrue(new Dummy("driver b")); // drive to stage right
+    m_driverPad.x( ).onTrue(new Dummy("driver x")); // drive to stage left
+    m_driverPad.y( ).onTrue(new Dummy("driver y")); // drive to stage center
+
     //
     // Driver - Bumpers, start, back
+    //
     m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
     m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
     m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
+
     //
     // Driver - POV buttons
+    //
     m_driverPad.pov(0)
         .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(0.0)))));
     m_driverPad.pov(90)
@@ -294,8 +266,9 @@ public class RobotContainer
     // Driver Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
+    //
     m_driverPad.leftTrigger(Constants.kTriggerThreshold)
-        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose));           // drive to speaker
+        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose)); // drive to speaker
     m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
@@ -306,29 +279,36 @@ public class RobotContainer
     // Operator Controller Assignments
     //
     // Operator - A, B, X, Y
+    //
     m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
     m_operatorPad.x( ).onTrue(new Dummy("oper X"));
     m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake, m_led));
+
     //
     // Operator - Bumpers, start, back
+    //
     m_operatorPad.leftBumper( ).onTrue(new FeederHandoff(m_intake, m_feeder));
     m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
+
     //
     // Operator - POV buttons
+    //
     m_operatorPad.pov(0).onTrue(new ParallelCommandGroup( //
-        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getRotaryAmp),
+        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getFeederAmp),
         new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull)));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
+
     //
     // Operator Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
+    //
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new FeederAmpScore(m_feeder));
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
 
@@ -343,6 +323,7 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     if (!m_macOSXSim)
+    {
       m_drivetrain.setDefaultCommand(                                                  // Drivetrain will execute this command periodically
           m_drivetrain.applyRequest(( ) -> drive                                       //
               .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                      // Drive forward with negative Y (forward)
@@ -350,7 +331,9 @@ public class RobotContainer
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate)          // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true)                                  //
               .withName("CommandSwerveDrivetrain"));
+    }
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
+    {
       m_drivetrain.setDefaultCommand(                                                   // Drivetrain will execute this command periodically
           m_drivetrain.applyRequest(( ) -> drive                                        //
               .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                       // Drive forward with negative Y (forward)
@@ -358,6 +341,7 @@ public class RobotContainer
               .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate)  // Drive counterclockwise with negative X (left)
           ).ignoringDisable(true)                                   //
               .withName("CommandSwerveDrivetrain"));
+    }
 
     // if (Utils.isSimulation()) {
     //   m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
@@ -366,8 +350,8 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
-    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getRotaryPosition, true));
-    m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD, m_feeder::getRotaryPosition, true));
+    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakePosition, true));
+    m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD, m_feeder::getFeederPosition, true));
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
     //Default command - manual mode
@@ -382,7 +366,6 @@ public class RobotContainer
    */
   private void initAutonomousChooser( )
   {
-
     // Configure autonomous sendable chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
@@ -390,9 +373,9 @@ public class RobotContainer
     m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
     m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
     m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
-    m_autoChooser.addOption("6 - AutoTestPath", AutoChooser.AUTOTESTPATH);
-    m_autoChooser.addOption("7 - AutoPreloadP0AndLeave", AutoChooser.AUTOP0LEAVE);
-    m_autoChooser.addOption("8 - AutoPreloadP4AndLeave", AutoChooser.AUTOP4LEAVE);
+    m_autoChooser.addOption("6 - AutoPreloadP0AndLeave", AutoChooser.AUTOP0LEAVE);
+    m_autoChooser.addOption("7 - AutoPreloadP4AndLeave", AutoChooser.AUTOP4LEAVE);
+    m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
     // Configure starting position sendable chooser
@@ -402,8 +385,9 @@ public class RobotContainer
     SmartDashboard.putData("StartPosition", m_startChooser);
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
+  /****************************************************************************
+   * 
+   * Use this to pass the autonomous command to the main Robot class.
    *
    * @return the command to run in autonomous
    */
@@ -503,7 +487,7 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
             
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition),
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition),
 
             m_drivetrain.getAutoCommand("LeaveS" + positionValue)
         // @formatter:on
@@ -561,38 +545,48 @@ public class RobotContainer
             new ShooterActionFire(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getRotaryPosition)
+            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition)
         // @formatter:on
         );
         break;
       case AUTOP0LEAVE :
-        m_autoCommand = new SequentialCommandGroup(m_drivetrain.getAutoCommand("DriveP0"),
-            new ShooterActionFire(m_shooter, m_intake, m_led), m_drivetrain.getAutoCommand("LeaveS1"));
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            m_drivetrain.getAutoCommand("DriveP0"),
+            new ShooterActionFire(m_shooter, m_intake, m_led), 
+            m_drivetrain.getAutoCommand("LeaveS1")
+        // @formatter:on
+        );
         break;
       case AUTOP4LEAVE :
-        m_autoCommand = new SequentialCommandGroup(new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
-            new ShooterActionFire(m_shooter, m_intake, m_led), m_drivetrain.getAutoCommand("LeaveS3"));
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
+            new ShooterActionFire(m_shooter, m_intake, m_led), 
+            m_drivetrain.getAutoCommand("LeaveS3")
+        // @formatter:on
+        );
         break;
       case AUTOTESTPATH :
         m_autoCommand = m_drivetrain.getAutoCommand("Test");
         break;
     }
 
-    PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
-      path = path.flipPath( );
-
-    if (m_autoTesting)
     {
-      List<Pose2d> poses = path.getPathPoses( );
-      for (int i = 0; i < poses.size( ); i++)
-        DataLogManager.log(String.format("pose: %s", poses.get(i)));
-    }
+      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+      if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
+        path = path.flipPath( );
 
-    Pose2d initialPose =
-        new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
-    if (initialPose != null)
-      m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
+      // List<Pose2d> poses = path.getPathPoses( );
+      // for (int i = 0; i < poses.size( ); i++)
+      //   DataLogManager.log(String.format("pose: %s", poses.get(i)));
+
+      Pose2d initialPose =
+          new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
+
+      if (initialPose != null)
+        m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
+    }
 
     DataLogManager.log(String.format("getAutonomousCommand: mode is %s %s %s", mode, startPosition, m_autoCommand.getName( )));
 
@@ -625,20 +619,20 @@ public class RobotContainer
 
     // Configure odometry sendable chooser
     SmartDashboard.putData("AprilTagPose", m_odomChooser);
-    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setOdometry( )).ignoringDisable(true));
+    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setAprilTagOdometry( )).ignoringDisable(true));
   }
 
-  public void setOdometry( )
+  private void setAprilTagOdometry( )
   {
     m_drivetrain.resetOdometry(Constants.VIConsts.kAprilTagPoses.get(m_odomChooser.getSelected( )));
   }
 
-  public void setOdometryFromPose( )
+  private void setOdometryFromDashboard( )
   {
-    m_drivetrain.resetOdometry(new Pose2d(new Translation2d(                    // 
-        SmartDashboard.getNumber("SW_PoseX", 0.0),             //
-        SmartDashboard.getNumber("SW_PoseY", 0.0)),            //
-        Rotation2d.fromDegrees(SmartDashboard.getNumber("SW_PoseRot", 0.0)) //
+    m_drivetrain.resetOdometry(new Pose2d(new Translation2d(            // 
+        SmartDashboard.getNumber("SW_SetPoseX", 0.0),  //
+        SmartDashboard.getNumber("SW_SetPoseY", 0.0)), //
+        Rotation2d.fromDegrees(SmartDashboard.getNumber("SW_SetPoseRot", 0.0)) //
     ));
   }
 
@@ -656,8 +650,10 @@ public class RobotContainer
     return m_operatorPad;
   }
 
-  // Called by disabledInit - place subsystem initializations here
-
+  /****************************************************************************
+   * 
+   * Called by disabledInit - place subsystem initializations here
+   */
   public void initialize( )
   {
     m_led.initialize( );
@@ -670,8 +666,10 @@ public class RobotContainer
     m_climber.initialize( );
   }
 
-  // Called when user button is pressed - place subsystem fault dumps here
-
+  /****************************************************************************
+   * 
+   * Called when user button is pressed - place subsystem fault dumps here
+   */
   public void faultDump( )
   {
     m_led.faultDump( );
@@ -683,6 +681,10 @@ public class RobotContainer
     m_climber.faultDump( );
   }
 
+  /****************************************************************************
+   * 
+   * Called during teleopInit to start any needed commands
+   */
   public void teleopInit( )
   {
     CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));

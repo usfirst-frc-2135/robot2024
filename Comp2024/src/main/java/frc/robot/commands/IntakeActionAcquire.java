@@ -13,10 +13,18 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
 /**
- *
+ * Intake ActionAcquire command
  */
 public class IntakeActionAcquire extends SequentialCommandGroup
 {
+  /**
+   * Group command to use the intake to acquire a note from the floor
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param led
+   *          led subsystem
+   */
   public IntakeActionAcquire(Intake intake, LED led)
   {
     setName("IntakeActionAcquire");
@@ -35,13 +43,13 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),
         new WaitCommand(0.1),
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getRotaryPosition),
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getIntakePosition),
         new WaitCommand(0.1),
-        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake::getRotaryPosition),
+        new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake::getIntakePosition),
         new WaitCommand(0.1),
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getRotaryPosition)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition)
         // @formatter:on
     );
   }

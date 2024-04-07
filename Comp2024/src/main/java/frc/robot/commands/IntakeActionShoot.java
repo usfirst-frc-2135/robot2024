@@ -12,10 +12,18 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
 /**
- *
+ * Intake ActionShoot command
  */
 public class IntakeActionShoot extends SequentialCommandGroup
 {
+  /**
+   * Group command to use the intake to push note to shooter
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param led
+   *          led subsystem
+   */
   public IntakeActionShoot(Intake intake, LED led)
   {
     setName("IntakeActionShoot");
@@ -29,13 +37,13 @@ public class IntakeActionShoot extends SequentialCommandGroup
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
-        new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake::getRotaryPosition),
+        new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getRotaryPosition)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition)
  
         // @formatter:on
     );

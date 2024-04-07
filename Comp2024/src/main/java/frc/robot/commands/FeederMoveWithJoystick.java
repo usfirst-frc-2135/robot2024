@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Feeder;
 
 /**
- *
+ * Feeder MoveWithJoystick command
  */
 public class FeederMoveWithJoystick extends Command
 {
@@ -16,6 +16,14 @@ public class FeederMoveWithJoystick extends Command
   private final Feeder   m_feeder;
   private XboxController m_gamePad;
 
+  /**
+   * Command the feeder manually using a joystick axis
+   * 
+   * @param feeder
+   *          feeder subsystem
+   * @param gamePad
+   *          gamepad to select the joystick from
+   */
   public FeederMoveWithJoystick(Feeder feeder, XboxController gamePad)
   {
     m_feeder = feeder;

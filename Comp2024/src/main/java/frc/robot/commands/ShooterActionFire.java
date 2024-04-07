@@ -12,10 +12,20 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
 
 /**
- *
+ * Shooter ActionFire command
  */
 public class ShooterActionFire extends SequentialCommandGroup
 {
+  /**
+   * Group command to fire a note
+   * 
+   * @param shooter
+   *          shooter subsystem
+   * @param intake
+   *          intake subsystem
+   * @param led
+   *          led subsystem
+   */
   public ShooterActionFire(Shooter shooter, Intake intake, LED led)
   {
     setName("ShooterActionFire");
@@ -29,7 +39,7 @@ public class ShooterActionFire extends SequentialCommandGroup
         new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
 
         new LogCommand(getName(), "Wait for desired speed"),
-        new WaitUntilCommand(shooter::isAtDesiredSpeed),
+        new WaitUntilCommand(shooter::isAtTargetSpeed),
 
         new LogCommand(getName(), "Feed note from intake"),
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),

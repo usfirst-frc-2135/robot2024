@@ -20,6 +20,18 @@ public class IntakeRun extends Command
   private final boolean    m_holdPosition;
   private DoubleSupplier   m_getPosition = null;
 
+  /**
+   * Control intake rotary and roller motors
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param mode
+   *          roller mode desired
+   * @param getPosition
+   *          rotary position desired
+   * @param hold
+   *          if true hold the current position
+   */
   public IntakeRun(Intake intake, RollerMode mode, DoubleSupplier getPosition, boolean hold)
   {
     m_intake = intake;
@@ -30,6 +42,16 @@ public class IntakeRun extends Command
     IntakeRunCommon( );
   }
 
+  /**
+   * Control intake rotary and roller motors
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param mode
+   *          roller mode desired
+   * @param getPosition
+   *          rotary position desired
+   */
   public IntakeRun(Intake intake, RollerMode mode, DoubleSupplier getPosition)
   {
     m_intake = intake;
@@ -50,7 +72,7 @@ public class IntakeRun extends Command
   @Override
   public void initialize( )
   {
-    m_intake.setRollerSpeed(m_mode);
+    m_intake.setRollerMode(m_mode);
     m_intake.moveToPositionInit(m_getPosition.getAsDouble( ), m_holdPosition);
   }
 

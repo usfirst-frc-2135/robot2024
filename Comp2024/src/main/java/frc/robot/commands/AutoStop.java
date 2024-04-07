@@ -9,12 +9,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 /**
- *
+ * AutoStop command
  */
 public class AutoStop extends Command
 {
   private final CommandSwerveDrivetrain m_drivetrain;
 
+  /**
+   * Command the swerve drivetrain subsystem to stop
+   * 
+   * @param drivetrain
+   */
   public AutoStop(CommandSwerveDrivetrain drivetrain)
   {
     m_drivetrain = drivetrain;

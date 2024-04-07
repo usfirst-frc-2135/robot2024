@@ -1,22 +1,27 @@
-
+//
 // Pigeon IMU initialization utilities
-
-package frc.robot.lib.util;
+//
+package frc.robot.lib.phoenix;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.Constants.SWConsts;
 
+/****************************************************************************
+ * 
+ * Pigeon2 IMU class
+ */
 public class PigeonIMU
 {
+  private static final boolean kGyroInvert       = false; // Always ensure Gyro is CCW+ CW-
+
   // Pigeon 2 object
-  private Pigeon2    m_gyro;
+  private Pigeon2              m_gyro;
 
   // Offset adjustments to each axis to hide gyro hardware offsets
-  private Rotation2d m_yawAdjustment   = new Rotation2d( );
-  private Rotation2d m_pitchAdjustment = new Rotation2d( );
-  private Rotation2d m_rollAdjustment  = new Rotation2d( );
+  private Rotation2d           m_yawAdjustment   = new Rotation2d( );
+  private Rotation2d           m_pitchAdjustment = new Rotation2d( );
+  private Rotation2d           m_rollAdjustment  = new Rotation2d( );
 
   /**
    * Construct the pigeon2 IMU using the CAN ID and CAN bus.
@@ -76,7 +81,7 @@ public class PigeonIMU
   {
     Rotation2d rot2d = getUnadjustedYaw( ).rotateBy(m_yawAdjustment.unaryMinus( ));
 
-    return (SWConsts.gyroInvert) ? rot2d.unaryMinus( ) : rot2d;
+    return (kGyroInvert) ? rot2d.unaryMinus( ) : rot2d;
   }
 
   /**

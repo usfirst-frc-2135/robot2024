@@ -8,13 +8,21 @@ import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.subsystems.Shooter;
 
 /**
- *
+ * Shooter Run command
  */
 public class ShooterRun extends Command
 {
   private final Shooter     m_shooter;
   private final ShooterMode m_mode;
 
+  /**
+   * Control shooter motor based on requested mode
+   * 
+   * @param shooter
+   *          shooter subsystem
+   * @param mode
+   *          requested mode
+   */
   public ShooterRun(Shooter shooter, ShooterMode mode)
   {
     m_shooter = shooter;

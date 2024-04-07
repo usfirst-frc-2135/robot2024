@@ -27,9 +27,10 @@ import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.Ports;
 
-//
-// LED subsystem class
-//
+/****************************************************************************
+ * 
+ * LED subsystem class
+ */
 public class LED extends SubsystemBase
 {
   private class rgbColor
@@ -73,8 +74,10 @@ public class LED extends SubsystemBase
   private rgbColor                            m_previousRgb         = kRgbOff;
   private Animation                           m_previousAnimation   = null;
 
-  // Constructor
-
+  /****************************************************************************
+   * 
+   * Constructor
+   */
   public LED( )
   {
     setName("LED");
@@ -82,6 +85,38 @@ public class LED extends SubsystemBase
 
     m_candle.configBrightnessScalar(kBrightness);
     m_candle.clearAnimation(kSlot);
+
+    initSmartDashboard( );
+    initialize( );
+  }
+
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec)
+   */
+  @Override
+  public void periodic( )
+  {
+    // This method will be called once per scheduler run
+  }
+
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec) during simulation
+   */
+  @Override
+  public void simulationPeriodic( )
+  {
+    // This method will be called once per scheduler run during simulation
+  }
+
+  /****************************************************************************
+   * 
+   * Initialize dashboard widgets
+   */
+  private void initSmartDashboard( )
+  {
+    // Initialize dashboard widgets
 
     // Add options for colors in SmartDashboard
     m_ledChooser.setDefaultOption("OFF", LEDColor.OFF);
@@ -107,33 +142,43 @@ public class LED extends SubsystemBase
 
     SmartDashboard.putData("LED_Color", m_ledChooser);
     SmartDashboard.putData("LED_Animation", m_ledAnimationChooser);
-
-    initialize( );
   }
 
-  @Override
-  public void periodic( )
-  {
-    // This method will be called once per scheduler run
-  }
+  // Put methods for controlling this subsystem here. Call these from Commands.
 
-  @Override
-  public void simulationPeriodic( )
-  {
-    // This method will be called once per scheduler run during simulation
-  }
-
+  /****************************************************************************
+   * 
+   * Initialize subsystem during mode changes
+   */
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setLEDs(LEDColor.OFF, LEDAnimation.CLEARALL);
   }
 
+  /****************************************************************************
+   * 
+   * Write out hardware faults and reset sticky faults
+   */
   public void faultDump( )
   {
     DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+    m_candle.clearStickyFaults( );
   }
 
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Set LEDs based on the color and animation requested
+   * 
+   * @param color
+   *          requested color
+   * @param animation
+   *          requested animation
+   */
   public void setLEDs(LEDColor color, LEDAnimation animation)
   {
     if (color == LEDColor.DASHBOARD)

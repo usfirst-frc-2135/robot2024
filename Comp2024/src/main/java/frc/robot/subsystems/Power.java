@@ -7,14 +7,19 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-//
-// Power subsystem class
-//
+/****************************************************************************
+ * 
+ * Power subsystem class
+ */
 public class Power extends SubsystemBase
 {
   // Member objects
   private final PowerDistribution m_powerDistribution = new PowerDistribution( );;
 
+  /****************************************************************************
+   * 
+   * Constructor
+   */
   public Power( )
   {
     setName("Power");
@@ -25,12 +30,20 @@ public class Power extends SubsystemBase
     initialize( );
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec)
+   */
   @Override
   public void periodic( )
   {
     // This method will be called once per scheduler run
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec) during simulation
+   */
   @Override
   public void simulationPeriodic( )
   {
@@ -39,12 +52,20 @@ public class Power extends SubsystemBase
 
   // Put methods for controlling this subsystem here. Call these from Commands.
 
+  /****************************************************************************
+   * 
+   * Initialize subsystem during mode changes
+   */
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     DataLogManager.log(String.format("%s: Init Voltage is %.1f", getSubsystem( ), m_powerDistribution.getVoltage( )));
   }
 
+  /****************************************************************************
+   * 
+   * Write out hardware faults and reset sticky faults
+   */
   public void faultDump( )
   {
     DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));

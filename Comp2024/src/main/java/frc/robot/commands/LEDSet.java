@@ -9,7 +9,7 @@ import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.subsystems.LED;
 
 /**
- *
+ * LED set command
  */
 public class LEDSet extends Command
 {
@@ -17,6 +17,16 @@ public class LEDSet extends Command
   private final LED          m_led;
   private final LEDAnimation m_animation;
 
+  /**
+   * Change LED color and animation command
+   * 
+   * @param led
+   *          led subsystem
+   * @param color
+   *          requested color
+   * @param animation
+   *          requested animation
+   */
   public LEDSet(LED led, LEDColor color, LEDAnimation animation)
   {
     m_led = led;

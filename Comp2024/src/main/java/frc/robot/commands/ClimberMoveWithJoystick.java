@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 
 /**
- *
+ * Climber MoveWithJoystick command
  */
 public class ClimberMoveWithJoystick extends Command
 {
@@ -16,6 +16,14 @@ public class ClimberMoveWithJoystick extends Command
 
   private XboxController m_gamePad;
 
+  /**
+   * Command the climber manually using a joystick axis
+   * 
+   * @param climber
+   *          climber subsystem
+   * @param gamePad
+   *          gamepad to select the joystick from
+   */
   public ClimberMoveWithJoystick(Climber climber, XboxController gamePad)
   {
     m_climber = climber;

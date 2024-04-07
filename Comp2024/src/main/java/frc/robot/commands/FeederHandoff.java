@@ -11,10 +11,18 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 
 /**
- *
+ * Feeder Handoff command
  */
 public class FeederHandoff extends SequentialCommandGroup
 {
+  /**
+   * Group command to handoff from intake to feeder
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param feeder
+   *          feeder subsystem
+   */
   public FeederHandoff(Intake intake, Feeder feeder)
   {
     setName("FeederHandoff");
@@ -24,19 +32,19 @@ public class FeederHandoff extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Align Feeder and Intake"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.HANDOFF, feeder::getRotaryHandoff),
+        new FeederRun(feeder, FDConsts.FDRollerMode.HANDOFF, feeder::getFeederHandoff),
 
         new WaitCommand(0.1),
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeHandoff),
 
         new LogCommand(getName(), "Transfer Note"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.HOLD, feeder::getRotaryPosition),
-        new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake::getRotaryPosition),
+        new FeederRun(feeder, FDConsts.FDRollerMode.HOLD, feeder::getFeederPosition),
+        new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake::getIntakePosition),
         
         new WaitCommand(0.1),
 
         new LogCommand(getName(), "Stop rollers"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getRotaryPosition),
+        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getFeederPosition),
 
         new WaitCommand(0.2),
 

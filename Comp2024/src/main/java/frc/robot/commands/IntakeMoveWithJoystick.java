@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 /**
- *
+ * Intake MoveWithJoystick command
  */
 public class IntakeMoveWithJoystick extends Command
 {
@@ -16,6 +16,14 @@ public class IntakeMoveWithJoystick extends Command
   private final Intake   m_intake;
   private XboxController m_gamePad;
 
+  /**
+   * Command the intake manually using a joystick axis
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param gamePad
+   *          gamepad to select the joystick from
+   */
   public IntakeMoveWithJoystick(Intake intake, XboxController gamePad)
   {
     m_intake = intake;

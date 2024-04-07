@@ -1,5 +1,5 @@
 //
-// Intake Subystem - takes in Notes and delivers them to the Shooter
+// Intake Subystem - takes in Notes and delivers them to the other subsystems
 //
 package frc.robot.subsystems;
 
@@ -39,14 +39,15 @@ import frc.robot.Constants.INConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
-import frc.robot.lib.util.CTREConfigs5;
-import frc.robot.lib.util.CTREConfigs6;
-import frc.robot.lib.util.PhoenixUtil5;
-import frc.robot.lib.util.PhoenixUtil6;
+import frc.robot.lib.phoenix.CTREConfigs5;
+import frc.robot.lib.phoenix.CTREConfigs6;
+import frc.robot.lib.phoenix.PhoenixUtil5;
+import frc.robot.lib.phoenix.PhoenixUtil6;
 
-//
-// Intake subsystem class
-//
+/****************************************************************************
+ * 
+ * Intake subsystem class
+ */
 public class Intake extends SubsystemBase
 {
   // Constants
@@ -70,11 +71,11 @@ public class Intake extends SubsystemBase
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
   private static final TalonFX      m_rotaryMotor         = new TalonFX(Ports.kCANID_IntakeRotary);
-  private static final CANcoder     m_CANCoder            = new CANcoder(Ports.kCANID_IntakeCANCoder);
+  private static final CANcoder     m_CANcoder            = new CANcoder(Ports.kCANID_IntakeCANcoder);
   private static final DigitalInput m_noteInIntake        = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
   private final TalonFXSimState     m_rotarySim           = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState    m_CANCoderSim         = m_CANCoder.getSimState( );
+  private final CANcoderSimState    m_CANcoderSim         = m_CANcoder.getSimState( );
   private final SingleJointedArmSim m_armSim              = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
       SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
@@ -91,7 +92,7 @@ public class Intake extends SubsystemBase
 
   // Rotary variables
   private boolean                   m_inRotaryValid;      // Health indicator for motor 
-  private boolean                   m_inCCValid;          // Health indicator for CANCoder 
+  private boolean                   m_inCCValid;          // Health indicator for CANcoder 
   private boolean                   m_debug               = true;
   private double                    m_currentDegrees      = 0.0; // Current angle in degrees
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees
@@ -113,10 +114,12 @@ public class Intake extends SubsystemBase
   private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_ccPosition          = m_CANCoder.getAbsolutePosition( );
+  private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
 
-  // Constructor
-
+  /****************************************************************************
+   * 
+   * Constructor
+   */
   public Intake( )
   {
     setName("Intake");
@@ -132,17 +135,17 @@ public class Intake extends SubsystemBase
     m_inRotaryValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Intake Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
     m_inCCValid =
-        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
+        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
 
-    Double ccRotations = getCANCoderRotations( );
+    Double ccRotations = getCANcoderRotations( );
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
-    DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
+    DataLogManager.log(String.format("%s: CANcoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_inRotaryValid)
       m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
-    m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
+    m_CANcoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
@@ -158,6 +161,10 @@ public class Intake extends SubsystemBase
     initialize( );
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec)
+   */
   @Override
   public void periodic( )
   {
@@ -168,7 +175,7 @@ public class Intake extends SubsystemBase
 
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
-    SmartDashboard.putNumber("IN_ccDegrees", Units.rotationsToDegrees(getCANCoderRotations( )));
+    SmartDashboard.putNumber("IN_ccDegrees", Units.rotationsToDegrees(getCANcoderRotations( )));
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("IN_rotaryDegrees", m_currentDegrees); // reference is rotary encoder
@@ -182,6 +189,10 @@ public class Intake extends SubsystemBase
     }
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec) during simulation
+   */
   @Override
   public void simulationPeriodic( )
   {
@@ -189,7 +200,7 @@ public class Intake extends SubsystemBase
 
     // Set input motor voltage from the motor setting
     m_rotarySim.setSupplyVoltage(RobotController.getInputVoltage( ));
-    m_CANCoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_CANcoderSim.setSupplyVoltage(RobotController.getInputVoltage( ));
     m_armSim.setInputVoltage(m_rotarySim.getMotorVoltage( ));
 
     // update for 20 msec loop
@@ -199,8 +210,8 @@ public class Intake extends SubsystemBase
     m_rotarySim.setRawRotorPosition(Conversions.radiansToInputRotations(m_armSim.getAngleRads( ), kRotaryGearRatio));
     m_rotarySim.setRotorVelocity(Conversions.radiansToInputRotations(m_armSim.getVelocityRadPerSec( ), kRotaryGearRatio));
 
-    m_CANCoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
-    m_CANCoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
+    m_CANcoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
+    m_CANcoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
@@ -208,49 +219,114 @@ public class Intake extends SubsystemBase
     m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
   }
 
-  // Initialize dashboard widgets
-
+  /****************************************************************************
+   * 
+   * Initialize dashboard widgets
+   */
   private void initSmartDashboard( )
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_INValidRoller", m_inRollerValid);
     SmartDashboard.putBoolean("HL_INValidNRotary", m_inRotaryValid);
-    SmartDashboard.putBoolean("HL_INValidCANCoder", m_inCCValid);
+    SmartDashboard.putBoolean("HL_INValidCANcoder", m_inCCValid);
 
     SmartDashboard.putData("INRotaryMech", m_rotaryMech);
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
 
+  /****************************************************************************
+   * 
+   * Initialize subsystem during mode changes
+   */
   public void initialize( )
   {
-    setRollerSpeed(RollerMode.STOP);
+    setRollerMode(RollerMode.STOP);
     setRotaryStopped( );
 
     m_targetDegrees = m_currentDegrees;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Degrees: %.1f", getSubsystem( ), m_targetDegrees));
   }
 
+  /****************************************************************************
+   * 
+   * Write out hardware faults and reset sticky faults
+   */
   public void faultDump( )
   {
     DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+    DataLogManager.log(String.format("%s: faultDump %x", getSubsystem( ), m_rotaryMotor.getFaultField( ).getValue( )));
+    m_rollerMotor.clearStickyFaults( );
+    m_rotaryMotor.clearStickyFaults( );
   }
 
-  private double getRotaryRotations( )
-  {
-    return (m_inRotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
-  }
-
-  private double getCANCoderRotations( )
-  {
-    double ccRotations = (m_inCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
-    ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
-    return ccRotations;
-  }
-
+  ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
-  public void setRollerSpeed(RollerMode mode)
+  /****************************************************************************
+   * 
+   * Return current intake position
+   * 
+   * @return current intake rotary angle
+   */
+  public double getIntakePosition( )
+  {
+    return m_currentDegrees;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake angle for retracted state
+   * 
+   * @return retracted state angle
+   */
+  public double getIntakeRetracted( )
+  {
+    return INConsts.kRotaryAngleRetracted;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake angle for handoff state
+   * 
+   * @return handoff state angle
+   */
+  public double getIntakeHandoff( )
+  {
+    return INConsts.kRotaryAngleHandoff;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake angle for deployed state
+   * 
+   * @return deployed state angle
+   */
+  public double getIntakeDeployed( )
+  {
+    return INConsts.kRotaryAngleDeployed;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake note sensor state
+   * 
+   * @return true if note detected in intake
+   */
+  public boolean isNoteDetected( )
+  {
+    return m_noteDetected.calculate(m_noteInIntake.get( ));
+  }
+
+  /****************************************************************************
+   * 
+   * Set roller speed based on requested mode
+   * 
+   * @param mode
+   *          requested speed
+   */
+  public void setRollerMode(RollerMode mode)
   {
     double output = 0.0;
 
@@ -285,44 +361,15 @@ public class Intake extends SubsystemBase
     }
   }
 
-  public double getRotaryPosition( )
-  {
-    return m_currentDegrees;
-  }
-
-  public double getIntakeRetracted( )
-  {
-    return INConsts.kRotaryAngleRetracted;
-  }
-
-  public double getIntakeHandoff( )
-  {
-    return INConsts.kRotaryAngleHandoff;
-  }
-
-  public double getIntakeDeployed( )
-  {
-    return INConsts.kRotaryAngleDeployed;
-  }
-
-  public boolean isNoteDetected( )
-  {
-    return m_noteDetected.calculate(m_noteInIntake.get( ));
-  }
-
-  public void setRotaryStopped( )
-  {
-    DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
-    m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
-  }
-
-  private boolean isMoveValid(double degrees)
-  {
-    return (degrees >= INConsts.kRotaryAngleMin) && (degrees <= INConsts.kRotaryAngleMax);
-  }
-
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
+  /****************************************************************************
+   * 
+   * Move motors proportional to a joystick axis value
+   * 
+   * @param axisValue
+   *          proportional input
+   */
   public void moveRotaryWithJoystick(double axisValue)
   {
     boolean rangeLimited = false;
@@ -343,7 +390,7 @@ public class Intake extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getRotaryPosition( ),
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getIntakePosition( ),
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
@@ -354,12 +401,21 @@ public class Intake extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
+  /****************************************************************************
+   * 
+   * Initialize a Motion Magic movement
+   * 
+   * @param newAngle
+   *          rotation to move
+   * @param holdPosition
+   *          hold previous position if true
+   */
   public void moveToPositionInit(double newAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
     if (holdPosition)
-      newAngle = getRotaryPosition( );
+      newAngle = getIntakePosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))
@@ -388,12 +444,22 @@ public class Intake extends SubsystemBase
     }
   }
 
+  /****************************************************************************
+   * 
+   * Continuously update Motion Magic setpoint
+   */
   public void moveToPositionExecute( )
   {
     m_rotaryMotor
         .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 
+  /****************************************************************************
+   * 
+   * Detect Motion Magic finished state
+   * 
+   * @return true when movement has completed
+   */
   public boolean moveToPositionIsFinished( )
   {
     boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
@@ -411,9 +477,62 @@ public class Intake extends SubsystemBase
     return m_moveIsFinished;
   }
 
+  /****************************************************************************
+   * 
+   * Wrap up a Motion Magic movement
+   */
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
+  }
+
+  ///////////////////////// PRIVATE HELPERS ///////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Set intake rotary motor to stopped
+   */
+  private void setRotaryStopped( )
+  {
+    DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
+    m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
+  }
+
+  /****************************************************************************
+   * 
+   * Get intake rotary rotations
+   * 
+   * @return intake rotary rotations
+   */
+  private double getRotaryRotations( )
+  {
+    return (m_inRotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
+  }
+
+  /****************************************************************************
+   * 
+   * Get intake CANcoder rotations
+   * 
+   * @return intake rotary CANcoder rotations
+   */
+  private double getCANcoderRotations( )
+  {
+    double ccRotations = (m_inCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
+    ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
+    return ccRotations;
+  }
+
+  /****************************************************************************
+   * 
+   * Validate requested intake move
+   * 
+   * @param degrees
+   *          angle requested
+   * @return true if move is within range
+   */
+  private boolean isMoveValid(double degrees)
+  {
+    return (degrees >= INConsts.kRotaryAngleMin) && (degrees <= INConsts.kRotaryAngleMax);
   }
 
 }

@@ -20,6 +20,18 @@ public class FeederRun extends Command
   private final boolean      m_holdPosition;
   private DoubleSupplier     m_getPosition = null;
 
+  /**
+   * Control feeder rotary and roller motors
+   * 
+   * @param feeder
+   *          feeder subsystem
+   * @param mode
+   *          roller mode desired
+   * @param getPosition
+   *          rotary position desired
+   * @param hold
+   *          if true hold the current position
+   */
   public FeederRun(Feeder feeder, FDRollerMode mode, DoubleSupplier getPosition, boolean hold)
   {
     m_feeder = feeder;
@@ -30,6 +42,16 @@ public class FeederRun extends Command
     FeederRunCommon( );
   }
 
+  /**
+   * Control feeder rotary and roller motors
+   * 
+   * @param feeder
+   *          feeder subsystem
+   * @param mode
+   *          roller mode desired
+   * @param getPosition
+   *          rotary position desired
+   */
   public FeederRun(Feeder feeder, FDRollerMode mode, DoubleSupplier getPosition)
   {
     m_feeder = feeder;
@@ -50,7 +72,7 @@ public class FeederRun extends Command
   @Override
   public void initialize( )
   {
-    m_feeder.setRollerSpeed(m_mode);
+    m_feeder.setRollerMode(m_mode);
     m_feeder.moveToPositionInit(m_getPosition.getAsDouble( ), m_holdPosition);
   }
 

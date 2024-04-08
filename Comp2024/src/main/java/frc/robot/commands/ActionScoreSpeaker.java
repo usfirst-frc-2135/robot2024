@@ -4,7 +4,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.INConsts;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.subsystems.Intake;
@@ -12,12 +14,12 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
 
 /**
- * Shooter ActionFire command
+ * Command to shoot into the speaker
  */
-public class ShooterActionFire extends SequentialCommandGroup
+public class ActionScoreSpeaker extends SequentialCommandGroup
 {
   /**
-   * Group command to fire a note
+   * Group command to fire a note to speaker
    * 
    * @param shooter
    *          shooter subsystem
@@ -26,24 +28,33 @@ public class ShooterActionFire extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public ShooterActionFire(Shooter shooter, Intake intake, LED led)
+  public ActionScoreSpeaker(Shooter shooter, Intake intake, LED led)
   {
-    setName("ShooterActionFire");
+    setName("ActionScoreSpeaker");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
-        new LogCommand(getName(), "Start shooter and retract intake"),
-        // new ShooterRun(shooter, ShooterMode.SCORE),  // Already running
+        new LogCommand(getName(), "Start shooter, stop rollers and retract intake"),
         new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
+        // new ShooterRun(shooter, ShooterMode.SCORE),  // Already running
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),
 
         new LogCommand(getName(), "Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtTargetSpeed),
 
         new LogCommand(getName(), "Feed note from intake"),
         new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
-        new IntakeActionShoot(intake, led),
+
+        new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
+        new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake::getIntakePosition),
+
+        new LogCommand(getName(), "Wait for note to release"),
+        new WaitCommand(0.5),
+
+        new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition),
 
         new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL)
         // new ShooterRun(shooter, ShooterMode.STOP), // Don't turn off

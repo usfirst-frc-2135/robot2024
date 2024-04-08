@@ -13,9 +13,9 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
 /**
- * Intake ActionAcquire command
+ * Command to acquire a note from floor
  */
-public class IntakeActionAcquire extends SequentialCommandGroup
+public class ActionAcquireNote extends SequentialCommandGroup
 {
   /**
    * Group command to use the intake to acquire a note from the floor
@@ -25,9 +25,9 @@ public class IntakeActionAcquire extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public IntakeActionAcquire(Intake intake, LED led)
+  public ActionAcquireNote(Intake intake, LED led)
   {
-    setName("IntakeActionAcquire");
+    setName("ActionAcquireNote");
 
     addCommands(
         // Add Commands here:
@@ -40,8 +40,7 @@ public class IntakeActionAcquire extends SequentialCommandGroup
         new LogCommand(getName(), "Wait for note"),
         new WaitUntilCommand(intake::isNoteDetected),
   
-        
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),  // TODO: Does this do anything?
         new WaitCommand(0.1),
         new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getIntakePosition),
         new WaitCommand(0.1),

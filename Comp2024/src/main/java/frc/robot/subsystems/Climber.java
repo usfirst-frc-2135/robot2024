@@ -439,7 +439,7 @@ public class Climber extends SubsystemBase
    */
   private void setVoltage(double volts)
   {
-    DataLogManager.log(String.format("%s: now %1f volts", getSubsystem( ), volts));
+    DataLogManager.log(String.format("%s: now %.1f volts", getSubsystem( ), volts));
     if (m_climberValid)
     {
       m_climberL.setControl(m_requestVolts.withOutput(volts));

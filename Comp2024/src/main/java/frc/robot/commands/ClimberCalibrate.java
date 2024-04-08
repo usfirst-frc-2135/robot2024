@@ -38,7 +38,6 @@ public class ClimberCalibrate extends Command
     DataLogManager.log(String.format("%s: Start up", getName( )));
     m_calibrateTimer.restart( );
     m_climber.climberCalibrateInit( );
-    DataLogManager.log(String.format("%s: Start FPGATime %.3f", getName( ), Timer.getFPGATimestamp( )));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,8 +49,7 @@ public class ClimberCalibrate extends Command
   @Override
   public void end(boolean interrupted)
   {
-    DataLogManager
-        .log(String.format("%s: End FPGATime %.3f (%.3f)", getName( ), Timer.getFPGATimestamp( ), m_calibrateTimer.get( )));
+    DataLogManager.log(String.format("%s: End time %.3f", getName( ), m_calibrateTimer.get( )));
     m_calibrateTimer.stop( );
     m_climber.climberCalibrateEnd( );
   }

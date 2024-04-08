@@ -12,39 +12,39 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
 /**
- * Intake ActionShoot command
+ * Command to expel a note to the floor
  */
-public class IntakeActionShoot extends SequentialCommandGroup
+public class ActionExpelNote extends SequentialCommandGroup
 {
   /**
-   * Group command to use the intake to push note to shooter
+   * Group command to use the intake to expel a note to the floor
    * 
    * @param intake
    *          intake subsystem
    * @param led
    *          led subsystem
    */
-  public IntakeActionShoot(Intake intake, LED led)
+  public ActionExpelNote(Intake intake, LED led)
   {
-    setName("IntakeActionShoot");
+    setName("ActionExpelNote");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
-        new LogCommand(getName(), "Hold rollers & Retract intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.HOLD, intake::getIntakeRetracted),
+        new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeDeployed),
 
-        new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
-        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
-        new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake::getIntakePosition),
+        new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),        
+        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition)
- 
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition),
+        new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL)
+
         // @formatter:on
     );
   }

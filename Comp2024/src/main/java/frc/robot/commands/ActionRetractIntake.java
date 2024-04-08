@@ -12,9 +12,9 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
 /**
- * Intake ActionRetract command
+ * Command to retract the intake
  */
-public class IntakeActionRetract extends SequentialCommandGroup
+public class ActionRetractIntake extends SequentialCommandGroup
 {
   /**
    * Group command to move the intake to retracted position
@@ -24,9 +24,9 @@ public class IntakeActionRetract extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public IntakeActionRetract(Intake intake, LED led)
+  public ActionRetractIntake(Intake intake, LED led)
   {
-    setName("IntakeActionRetract");
+    setName("ActionRetractIntake");
 
     addCommands(
         // Add Commands here:

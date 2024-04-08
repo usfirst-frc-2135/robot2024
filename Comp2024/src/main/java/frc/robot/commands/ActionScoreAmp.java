@@ -9,9 +9,9 @@ import frc.robot.Constants.FDConsts;
 import frc.robot.subsystems.Feeder;
 
 /**
- * Feeder AmpScore command
+ * Command to score a note into amp
  */
-public class FeederAmpScore extends SequentialCommandGroup
+public class ActionScoreAmp extends SequentialCommandGroup
 {
   /**
    * Group command to use the feeder to score a note in the amp
@@ -19,9 +19,9 @@ public class FeederAmpScore extends SequentialCommandGroup
    * @param feeder
    *          feeder subsystem
    */
-  public FeederAmpScore(Feeder feeder)
+  public ActionScoreAmp(Feeder feeder)
   {
-    setName("FeederHandoff");
+    setName("ActionScoreAmp");
 
     addCommands(
         // Add Commands here:

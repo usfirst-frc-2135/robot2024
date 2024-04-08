@@ -11,9 +11,9 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 
 /**
- * Feeder Handoff command
+ * Command to handoff from intake to feeder
  */
-public class FeederHandoff extends SequentialCommandGroup
+public class ActionHandoff extends SequentialCommandGroup
 {
   /**
    * Group command to handoff from intake to feeder
@@ -23,9 +23,9 @@ public class FeederHandoff extends SequentialCommandGroup
    * @param feeder
    *          feeder subsystem
    */
-  public FeederHandoff(Intake intake, Feeder feeder)
+  public ActionHandoff(Intake intake, Feeder feeder)
   {
-    setName("FeederHandoff");
+    setName("ActionHandoff");
 
     addCommands(
         // Add Commands here:
@@ -34,7 +34,7 @@ public class FeederHandoff extends SequentialCommandGroup
         new LogCommand(getName(), "Align Feeder and Intake"),
         new FeederRun(feeder, FDConsts.FDRollerMode.HANDOFF, feeder::getFeederHandoff),
 
-        new WaitCommand(0.1),
+        new WaitCommand(0.1), // TODO: Does this do anything?
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeHandoff),
 
         new LogCommand(getName(), "Transfer Note"),

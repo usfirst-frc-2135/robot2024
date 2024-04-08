@@ -194,7 +194,7 @@ public class Shooter extends SubsystemBase
    */
   public void setShooterMode(ShooterMode mode)
   {
-    DataLogManager.log(getSubsystem( ) + ": set shooter mode " + mode);
+    DataLogManager.log(String.format("%s: set shooter mode is %s", getSubsystem( ), mode));
 
     // Select the shooter RPM for the requested mode - NEVER NEGATIVE when running!
     switch (mode)
@@ -218,7 +218,7 @@ public class Shooter extends SubsystemBase
       else
         m_shooterLower.setControl(m_requestVolts);
     }
-    DataLogManager.log(String.format("%s: target rpm is %.1f rps %1f", getSubsystem( ), m_targetRPM, rotPerSecond));
+    DataLogManager.log(String.format("%s: target rpm is %.1f rps %.1f", getSubsystem( ), m_targetRPM, rotPerSecond));
   }
 
   /****************************************************************************

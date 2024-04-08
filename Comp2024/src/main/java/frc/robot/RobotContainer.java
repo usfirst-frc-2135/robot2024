@@ -38,25 +38,25 @@ import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.Constants.VIConsts;
-import frc.robot.commands.AutoStop;
+import frc.robot.commands.ActionAcquireNote;
+import frc.robot.commands.ActionExpelNote;
+import frc.robot.commands.ActionHandoff;
+import frc.robot.commands.ActionPrepareToClimb;
+import frc.robot.commands.ActionRetractIntake;
+import frc.robot.commands.ActionScoreAmp;
+import frc.robot.commands.ActionScoreSpeaker;
 import frc.robot.commands.ClimberCalibrate;
 import frc.robot.commands.ClimberMoveToPosition;
 import frc.robot.commands.ClimberMoveWithJoystick;
 import frc.robot.commands.Dummy;
-import frc.robot.commands.FeederAmpScore;
-import frc.robot.commands.FeederHandoff;
 import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
-import frc.robot.commands.IntakeActionAcquire;
-import frc.robot.commands.IntakeActionExpel;
-import frc.robot.commands.IntakeActionRetract;
-import frc.robot.commands.IntakeActionShoot;
 import frc.robot.commands.IntakeMoveWithJoystick;
 import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.LogCommand;
-import frc.robot.commands.ShooterActionFire;
 import frc.robot.commands.ShooterRun;
+import frc.robot.commands.SwerveStop;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -185,10 +185,13 @@ public class RobotContainer
     SmartDashboard.putNumber("SW_SetPoseRot", 0.0);
     SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromDashboard( )).ignoringDisable(true));
 
-    SmartDashboard.putData("InActionAcquire", new IntakeActionAcquire(m_intake, m_led));
-    SmartDashboard.putData("InActionRetract", new IntakeActionRetract(m_intake, m_led));
-    SmartDashboard.putData("InActionExpel", new IntakeActionExpel(m_intake, m_led));
-    SmartDashboard.putData("InActionShoot", new IntakeActionShoot(m_intake, m_led));
+    SmartDashboard.putData("ActionAcquireNote", new ActionAcquireNote(m_intake, m_led));
+    SmartDashboard.putData("ActionExpelNote", new ActionExpelNote(m_intake, m_led));
+    SmartDashboard.putData("ActionHandoff", new ActionHandoff(m_intake, m_feeder));
+    SmartDashboard.putData("ActionPrepareToClimb", new ActionPrepareToClimb(m_climber, m_feeder));
+    SmartDashboard.putData("ActionRetractIntake", new ActionRetractIntake(m_intake, m_led));
+    SmartDashboard.putData("ActionScoreAmp", new ActionScoreAmp(m_feeder));
+    SmartDashboard.putData("ActionScoreSpeaker", new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
     SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake::getIntakePosition));
     SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake::getIntakePosition));
@@ -202,9 +205,6 @@ public class RobotContainer
 
     SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
     SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
-
-    SmartDashboard.putData("FdAmpScore", new FeederAmpScore(m_feeder));
-    SmartDashboard.putData("FdHandoff", new FeederHandoff(m_intake, m_feeder));
 
     SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getFeederPosition));
     SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getFeederPosition));
@@ -246,8 +246,8 @@ public class RobotContainer
     // Driver - Bumpers, start, back
     //
     m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
-    m_driverPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
-    m_driverPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
+    m_driverPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
+    m_driverPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
 
@@ -269,7 +269,7 @@ public class RobotContainer
     //
     m_driverPad.leftTrigger(Constants.kTriggerThreshold)
         .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose)); // drive to speaker
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
     m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
     m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
@@ -283,23 +283,21 @@ public class RobotContainer
     m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
     m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
     m_operatorPad.x( ).onTrue(new Dummy("oper X"));
-    m_operatorPad.y( ).onTrue(new IntakeActionExpel(m_intake, m_led));
+    m_operatorPad.y( ).onTrue(new ActionExpelNote(m_intake, m_led));
 
     //
     // Operator - Bumpers, start, back
     //
-    m_operatorPad.leftBumper( ).onTrue(new FeederHandoff(m_intake, m_feeder));
-    m_operatorPad.rightBumper( ).onTrue(new IntakeActionAcquire(m_intake, m_led));
-    m_operatorPad.rightBumper( ).onFalse(new IntakeActionRetract(m_intake, m_led));
+    m_operatorPad.leftBumper( ).onTrue(new ActionHandoff(m_intake, m_feeder));
+    m_operatorPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
+    m_operatorPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
 
     //
     // Operator - POV buttons
     //
-    m_operatorPad.pov(0).onTrue(new ParallelCommandGroup( //
-        new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getFeederAmp),
-        new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull)));
+    m_operatorPad.pov(0).onTrue(new ActionPrepareToClimb(m_climber, m_feeder));
     m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
     m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
     m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
@@ -309,8 +307,8 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     //
-    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new FeederAmpScore(m_feeder));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ShooterActionFire(m_shooter, m_intake, m_led));
+    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreAmp(m_feeder));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
     m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
@@ -435,11 +433,11 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-        m_autoCommand = new AutoStop(m_drivetrain);
+        m_autoCommand = new SwerveStop(m_drivetrain);
         break;
 
       case AUTOPRELOADONLY :
-        m_autoCommand = new ShooterActionFire(m_shooter, m_intake, m_led);
+        m_autoCommand = new ActionScoreSpeaker(m_shooter, m_intake, m_led);
         break;
 
       case AUTOLEAVE :
@@ -453,7 +451,7 @@ public class RobotContainer
             m_drivetrain.getAutoCommand(pathName),
 
             new LogCommand(mode.toString(), "Score preloaded note"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Leave zone"),
             m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
@@ -467,7 +465,7 @@ public class RobotContainer
             m_drivetrain.getAutoCommand(pathName), 
 
             new LogCommand(mode.toString(), "Score preloaded note"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Deploy intake before moving"),
             new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
@@ -477,14 +475,14 @@ public class RobotContainer
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
                 m_drivetrain.getAutoCommand("DriveS" + positionValue),
-                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
             
             new LogCommand(mode.toString(), "Drive to scoring position"),
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),
 
             new LogCommand(mode.toString(), "Score note"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
             
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
             new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition),
@@ -501,7 +499,7 @@ public class RobotContainer
             m_drivetrain.getAutoCommand(pathName),
 
             new LogCommand(mode.toString(), "Score preloaded note"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Deploy intake before moving"),
             new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
@@ -511,38 +509,38 @@ public class RobotContainer
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup( 
                 m_drivetrain.getAutoCommand("DriveS" + positionValue),
-                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
 
             new LogCommand(mode.toString(), "Drive to scoring position"),
             m_drivetrain.getAutoCommand("ScoreS" + positionValue),
 
             new LogCommand(mode.toString(), "Score note 2"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
                 m_drivetrain.getAutoCommand("DriveS" + altpos1),
-                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
 
             new LogCommand(mode.toString(), "Drive to scoring position"),
             m_drivetrain.getAutoCommand("ScoreS" + altpos1),
 
             new LogCommand(mode.toString(), "Score note 3"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
                 m_drivetrain.getAutoCommand("DriveS" + altpos2),
-                new IntakeActionAcquire(m_intake, m_led).withTimeout(1.5)
+                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ), 
             
             new LogCommand(mode.toString(), "Drive to scoring position"),
             m_drivetrain.getAutoCommand("ScoreS" + altpos2),
 
             new LogCommand(mode.toString(), "Score note 4"),
-            new ShooterActionFire(m_shooter, m_intake, m_led),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
             new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition)
@@ -553,7 +551,7 @@ public class RobotContainer
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
             m_drivetrain.getAutoCommand("DriveP0"),
-            new ShooterActionFire(m_shooter, m_intake, m_led), 
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
             m_drivetrain.getAutoCommand("LeaveS1")
         // @formatter:on
         );
@@ -562,7 +560,7 @@ public class RobotContainer
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
             new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
-            new ShooterActionFire(m_shooter, m_intake, m_led), 
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
             m_drivetrain.getAutoCommand("LeaveS3")
         // @formatter:on
         );

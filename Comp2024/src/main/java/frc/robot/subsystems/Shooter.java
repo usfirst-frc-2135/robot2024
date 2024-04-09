@@ -172,11 +172,10 @@ public class Shooter extends SubsystemBase
    * 
    * Write out hardware faults and reset sticky faults
    */
-  public void faultDump( )
+  public void printFaults( )
   {
-    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
-    DataLogManager.log(String.format("%s: faultDump lower %x", getSubsystem( ), m_shooterLower.getFaultField( ).getValue( )));
-    DataLogManager.log(String.format("%s: faultDump upper %x", getSubsystem( ), m_shooterUpper.getFaultField( ).getValue( )));
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_shooterLower, "ShooterLower");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_shooterUpper, "ShooterUpper");
     m_shooterLower.clearStickyFaults( );
     m_shooterUpper.clearStickyFaults( );
   }

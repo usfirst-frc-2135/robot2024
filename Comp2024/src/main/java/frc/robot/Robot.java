@@ -100,7 +100,7 @@ public class Robot extends TimedRobot
       if (!m_faultsCleared)
       {
         m_faultsCleared = true;
-        m_robotContainer.faultDump( );
+        m_robotContainer.printFaults( );
       }
     }
     else

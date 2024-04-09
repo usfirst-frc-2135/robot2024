@@ -668,15 +668,15 @@ public class RobotContainer
    * 
    * Called when user button is pressed - place subsystem fault dumps here
    */
-  public void faultDump( )
+  public void printFaults( )
   {
-    m_led.faultDump( );
-    m_power.faultDump( );
+    m_led.printFaults( );
+    m_power.printFaults( );
 
-    m_intake.faultDump( );
-    m_shooter.faultDump( );
-    m_feeder.faultDump( );
-    m_climber.faultDump( );
+    m_intake.printFaults( );
+    m_shooter.printFaults( );
+    m_feeder.printFaults( );
+    m_climber.printFaults( );
   }
 
   /****************************************************************************

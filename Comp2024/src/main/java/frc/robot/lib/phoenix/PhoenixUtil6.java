@@ -227,4 +227,89 @@ public class PhoenixUtil6
 
     return pigeon2Valid;
   }
+
+  /****************************************************************************
+   * 
+   * Print fault flags for a talonFX
+   * 
+   * @param talonFX
+   *          reference to a talonFX motor controller
+   * @param name
+   *          descriptive name of the talonFX
+   */
+  public void talonFXPrintFaults(TalonFX talonFX, String name)
+  {
+    DataLogManager.log(String.format("%s: ------------------ DUMP FAULTS ------------------", name));
+    DataLogManager.log(String.format("  FaultField ......................... 0x%08x 0x%08x", talonFX.getFaultField( ).getValue( ),
+        talonFX.getStickyFaultField( ).getValue( )));
+    DataLogManager.log(String.format("  Hardware ........................... %5s %5s", talonFX.getFault_Hardware( ).getValue( ),
+        talonFX.getStickyFault_Hardware( ).getValue( )));
+    DataLogManager.log(String.format("  ProcTemp ........................... %5s %5s", talonFX.getFault_ProcTemp( ).getValue( ),
+        talonFX.getStickyFault_ProcTemp( ).getValue( )));
+    DataLogManager.log(String.format("  DeviceTemp ......................... %5s %5s", talonFX.getFault_DeviceTemp( ).getValue( ),
+        talonFX.getStickyFault_DeviceTemp( ).getValue( )));
+    DataLogManager.log(String.format("  Undervoltage ....................... %5s %5s",
+        talonFX.getFault_Undervoltage( ).getValue( ), talonFX.getStickyFault_Undervoltage( ).getValue( )));
+    DataLogManager.log(String.format("  BootDuringEnable ................... %5s %5s",
+        talonFX.getFault_BootDuringEnable( ).getValue( ), talonFX.getStickyFault_BootDuringEnable( ).getValue( )));
+    DataLogManager.log(String.format("  UnlicensedFeatureInUse ............. %5s %5s",
+        talonFX.getFault_UnlicensedFeatureInUse( ).getValue( ), talonFX.getStickyFault_UnlicensedFeatureInUse( ).getValue( )));
+    DataLogManager.log(String.format("  BridgeBrownout ..................... %5s %5s",
+        talonFX.getFault_BridgeBrownout( ).getValue( ), talonFX.getStickyFault_BridgeBrownout( ).getValue( )));
+    DataLogManager.log(String.format("  RemoteSensorReset .................. %5s %5s",
+        talonFX.getFault_RemoteSensorReset( ).getValue( ), talonFX.getStickyFault_RemoteSensorReset( ).getValue( )));
+    DataLogManager.log(String.format("  MissingDifferentialFX .............. %5s %5s",
+        talonFX.getFault_MissingDifferentialFX( ).getValue( ), talonFX.getStickyFault_MissingDifferentialFX( ).getValue( )));
+    DataLogManager.log(String.format("  RemoteSensorPosOverflow ............ %5s %5s",
+        talonFX.getFault_RemoteSensorPosOverflow( ).getValue( ), talonFX.getStickyFault_RemoteSensorPosOverflow( )));
+    DataLogManager.log(String.format("  OverSupplyV ........................ %5s %5s",
+        talonFX.getFault_OverSupplyV( ).getValue( ), talonFX.getStickyFault_OverSupplyV( ).getValue( )));
+    DataLogManager.log(String.format("  UnstableSupplyV .................... %5s %5s",
+        talonFX.getFault_UnstableSupplyV( ).getValue( ), talonFX.getStickyFault_UnstableSupplyV( ).getValue( )));
+    DataLogManager.log(String.format("  ReverseHardLimit ................... %5s %5s",
+        talonFX.getFault_ReverseHardLimit( ).getValue( ), talonFX.getStickyFault_ReverseHardLimit( ).getValue( )));
+    DataLogManager.log(String.format("  ForwardHardLimit ................... %5s %5s",
+        talonFX.getFault_ForwardHardLimit( ).getValue( ), talonFX.getStickyFault_ForwardHardLimit( ).getValue( )));
+    DataLogManager.log(String.format("  ReverseSoftLimit ................... %5s %5s",
+        talonFX.getFault_ReverseSoftLimit( ).getValue( ), talonFX.getStickyFault_ReverseSoftLimit( ).getValue( )));
+    DataLogManager.log(String.format("  ForwardSoftLimit ................... %5s %5s",
+        talonFX.getFault_ForwardSoftLimit( ).getValue( ), talonFX.getStickyFault_ForwardSoftLimit( ).getValue( )));
+    DataLogManager.log(String.format("  RemoteSensorDataInvalid ............ %5s %5s",
+        talonFX.getFault_RemoteSensorDataInvalid( ).getValue( ), talonFX.getStickyFault_RemoteSensorDataInvalid( )));
+    DataLogManager.log(String.format("  FusedSensorOutOfSync ............... %5s %5s",
+        talonFX.getFault_FusedSensorOutOfSync( ).getValue( ), talonFX.getStickyFault_FusedSensorOutOfSync( ).getValue( )));
+    DataLogManager.log(String.format("  StatorCurrLimit .................... %5s %5s",
+        talonFX.getFault_StatorCurrLimit( ).getValue( ), talonFX.getStickyFault_StatorCurrLimit( ).getValue( )));
+    DataLogManager.log(String.format("  SupplyCurrLimit .................... %5s %5s",
+        talonFX.getFault_SupplyCurrLimit( ).getValue( ), talonFX.getStickyFault_SupplyCurrLimit( ).getValue( )));
+    DataLogManager.log(String.format("  UsingFusedCANcoderWhileUnlicensed .. %5s %5s",
+        talonFX.getFault_UsingFusedCANcoderWhileUnlicensed( ).getValue( ),
+        talonFX.getStickyFault_UsingFusedCANcoderWhileUnlicensed( ).getValue( )));
+  }
+
+  /****************************************************************************
+   * 
+   * Print fault flags for a CANcoder
+   * 
+   * @param cancoder
+   *          reference to a CANcoder
+   * @param name
+   *          descriptive name of the CANcoder
+   */
+  public void cancoderPrintFaults(CANcoder cancoder, String name)
+  {
+    DataLogManager.log(String.format("%s: ------------------ DUMP FAULTS ------------------", name));
+    DataLogManager.log(String.format("  FaultField ......................... 0x%08x 0x%08x",
+        cancoder.getFaultField( ).getValue( ), cancoder.getStickyFaultField( ).getValue( )));
+    DataLogManager.log(String.format("  Hardware ........................... %5s %5s", cancoder.getFault_Hardware( ).getValue( ),
+        cancoder.getStickyFault_Hardware( ).getValue( )));
+    DataLogManager.log(String.format("  Undervoltage ....................... %5s %5s",
+        cancoder.getFault_Undervoltage( ).getValue( ), cancoder.getStickyFault_Undervoltage( ).getValue( )));
+    DataLogManager.log(String.format("  BootDuringEnable ................... %5s %5s",
+        cancoder.getFault_BootDuringEnable( ).getValue( ), cancoder.getStickyFault_BootDuringEnable( ).getValue( )));
+    DataLogManager.log(String.format("  UnlicensedFeatureInUse ............. %5s %5s",
+        cancoder.getFault_UnlicensedFeatureInUse( ).getValue( ), cancoder.getStickyFault_UnlicensedFeatureInUse( ).getValue( )));
+    DataLogManager.log(String.format("  BadMagnet .......................... %5s %5s", cancoder.getFault_BadMagnet( ).getValue( ),
+        cancoder.getStickyFault_BadMagnet( ).getValue( )));
+  }
 }

@@ -248,12 +248,15 @@ public class Feeder extends SubsystemBase
    * 
    * Write out hardware faults and reset sticky faults
    */
-  public void faultDump( )
+  public void printFaults( )
   {
-    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
-    DataLogManager.log(String.format("%s: faultDump %x", getSubsystem( ), m_rotaryMotor.getFaultField( ).getValue( )));
+    PhoenixUtil5.getInstance( ).talonSRXPrintFaults(m_rollerMotor, "FeederRoller");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rotaryMotor, "FeederRotary");
+    PhoenixUtil6.getInstance( ).cancoderPrintFaults(m_CANcoder, "FeederCANcoder");
+
     m_rollerMotor.clearStickyFaults( );
     m_rotaryMotor.clearStickyFaults( );
+    m_CANcoder.clearStickyFaults( );
   }
 
   ////////////////////////////////////////////////////////////////////////////

@@ -224,11 +224,10 @@ public class Climber extends SubsystemBase
    * 
    * Write out hardware faults and reset sticky faults
    */
-  public void faultDump( )
+  public void printFaults( )
   {
-    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
-    DataLogManager.log(String.format("%s: faultDump left  %x", getSubsystem( ), m_climberL.getFaultField( ).getValue( )));
-    DataLogManager.log(String.format("%s: faultDump right %x", getSubsystem( ), m_climberR.getFaultField( ).getValue( )));
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_climberL, "ClimeberLeft");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_climberR, "ClimeberLeft");
     m_climberL.clearStickyFaults( );
     m_climberR.clearStickyFaults( );
   }

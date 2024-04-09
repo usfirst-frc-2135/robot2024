@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.Ports;
+import frc.robot.lib.phoenix.PhoenixUtil5;
 
 /****************************************************************************
  * 
@@ -160,9 +161,9 @@ public class LED extends SubsystemBase
    * 
    * Write out hardware faults and reset sticky faults
    */
-  public void faultDump( )
+  public void printFaults( )
   {
-    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+    PhoenixUtil5.getInstance( ).candlePrintFaults(m_candle, "candle");
     m_candle.clearStickyFaults( );
   }
 

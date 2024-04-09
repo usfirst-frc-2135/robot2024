@@ -252,12 +252,15 @@ public class Intake extends SubsystemBase
    * 
    * Write out hardware faults and reset sticky faults
    */
-  public void faultDump( )
+  public void printFaults( )
   {
-    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
-    DataLogManager.log(String.format("%s: faultDump %x", getSubsystem( ), m_rotaryMotor.getFaultField( ).getValue( )));
+    PhoenixUtil5.getInstance( ).talonSRXPrintFaults(m_rollerMotor, "IntakeRoller");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rotaryMotor, "IntakeRotary");
+    PhoenixUtil6.getInstance( ).cancoderPrintFaults(m_CANcoder, "IntakeCANcoder");
+
     m_rollerMotor.clearStickyFaults( );
     m_rotaryMotor.clearStickyFaults( );
+    m_CANcoder.clearStickyFaults( );
   }
 
   ////////////////////////////////////////////////////////////////////////////

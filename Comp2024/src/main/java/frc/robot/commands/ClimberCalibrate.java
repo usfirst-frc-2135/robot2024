@@ -13,7 +13,7 @@ import frc.robot.subsystems.Climber;
  */
 public class ClimberCalibrate extends Command
 {
-  private static final double kTimeout         = 1.0;
+  private static final double kTimeout         = 1.0; // TODO: Tune me!
 
   private Climber             m_climber;
   private Timer               m_calibrateTimer = new Timer( );

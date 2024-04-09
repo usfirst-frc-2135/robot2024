@@ -6,7 +6,6 @@ package frc.robot.lib.phoenix;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdleFaults;
-import com.ctre.phoenix.led.CANdleStickyFaults;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;

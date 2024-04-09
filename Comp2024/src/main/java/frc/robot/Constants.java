@@ -112,13 +112,13 @@ public class Constants
       OUTBOARD // Intake Rotary moving out of the robot
     }
 
-    // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -97.5; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = -49.9; // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 99.4;  // TODO: Tune me!
+    // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
+    public static final double kRotaryAngleRetracted = -97.5;
+    public static final double kRotaryAngleHandoff   = -49.9;
+    public static final double kRotaryAngleDeployed  = 99.4;
 
-    public static final double kRotaryAngleMin       = -99.0; // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 101.4; // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -99.0;
+    public static final double kRotaryAngleMax       = 101.4;
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -144,13 +144,13 @@ public class Constants
       OUTBOARD // Intake Rotary moving out of the feeder
     }
 
-    // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleAmp     = -33.0;    // TODO: Tune me!
-    public static final double kRotaryAngleClimb   = 60.0;     // TODO: Tune me!
-    public static final double kRotaryAngleHandoff = 88.75;    // TODO: Tune me!
+    // Rotary angles - Motion Magic move parameters - TODO: tune these angles!
+    public static final double kRotaryAngleAmp     = -33.0;
+    public static final double kRotaryAngleClimb   = 60.0;
+    public static final double kRotaryAngleHandoff = 88.75;
 
-    public static final double kRotaryAngleMin     = -61.89;   // TODO: Tune me!
-    public static final double kRotaryAngleMax     = 90.0;     // TODO: Tune me!
+    public static final double kRotaryAngleMin     = -61.89;
+    public static final double kRotaryAngleMax     = 90.0;
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -228,11 +228,11 @@ public class Constants
     /////////////////////////////////////////////////////////////////////////////
     public static final class PathFindConsts                                    // TODO: set back to original speeds
     {
-      public static final double kMaxVelocityMps                         = 1.0; // TODO: Slowed from 3.0 for testing
-      public static final double kMaxAccelerationMpsSq                   = 1.0; // TODO: Slowed from 3.0 for testing
+      public static final double kMaxVelocityMps                         = 1.0; // Slowed from 3.0 for testing
+      public static final double kMaxAccelerationMpsSq                   = 1.0; // Slowed from 3.0 for testing
 
-      public static final double kMaxAngularSpeedRadiansPerSecond        = 1.0 * Math.PI; // TODO: Slowed from 2.0 * Math.PI for testing
-      public static final double kMaxAngularSpeedRadiansPerSecondSquared = 1.0 * Math.PI; // TODO: Slowed from 1.5 * Math.PI for testing
+      public static final double kMaxAngularSpeedRadiansPerSecond        = 1.0 * Math.PI; // Slowed from 2.0 * Math.PI for testing
+      public static final double kMaxAngularSpeedRadiansPerSecondSquared = 1.0 * Math.PI; // Slowed from 1.5 * Math.PI for testing
     }
 
     //Path constraints

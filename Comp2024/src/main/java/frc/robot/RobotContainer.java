@@ -341,7 +341,7 @@ public class RobotContainer
               .withName("CommandSwerveDrivetrain"));
     }
 
-    // if (Utils.isSimulation()) {
+    // if (Utils.isSimulation()) {  // TODO: needed? maybe fixes config check for simulation where CANcode initializes to 90 degrees?
     //   m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     // }
 

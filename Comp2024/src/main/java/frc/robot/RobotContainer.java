@@ -115,17 +115,17 @@ public class RobotContainer
 
   Command                                             m_autoCmd;
 
-  // Chooser for autonomous commands
+  // Chooser for autonomous commands - all starting from poses 1-3
   enum AutoChooser
   {
-    AUTOSTOP,                // AutoStop - do nothing
-    AUTOPRELOADONLY,         // Score preloaded game piece
-    AUTOLEAVE,               // Leave starting zone
-    AUTOPRELOADANDLEAVE,     // Score preload and leave starting zone
-    AUTOPRELOADSCOREANOTHER, // Score preload and score another
-    AUTOSCORE4,              // Score preload and 3 spike notes
-    AUTOP0LEAVE,             // Score preload and leave starting zone
-    AUTOP4LEAVE,             // Score preload and leave starting zone
+    AUTOSTOP,                // AutoStop - sit still, do nothing
+    AUTOLEAVE,               // Leave starting zone avoiding spikes
+    AUTOPRELOADONLY,         // Score preloaded game piece from starting position
+    AUTOPRELOADANDLEAVE,     // Score preload at waypoints P1-P3 and leave starting zone
+    AUTOPRELOADP0LEAVE,      // Score preload at waypoint P0 and leave starting zone
+    AUTOPRELOADP4LEAVE,      // Score preload at waypoint P4 and leave starting zone
+    AUTOPRELOADSCOREANOTHER, // Score preload at waypoints P1-P3 and score another from nearest spike
+    AUTOSCORE4,              // Score preload at waypoints P1-P3 and pike notes at S1-S3
     AUTOTESTPATH             // Run a selected test path
   }
 
@@ -366,13 +366,13 @@ public class RobotContainer
   {
     // Configure autonomous sendable chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-    m_autoChooser.addOption("1 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
-    m_autoChooser.addOption("2 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("2 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
     m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
-    m_autoChooser.addOption("4 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
-    m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
-    m_autoChooser.addOption("6 - AutoPreloadP0AndLeave", AutoChooser.AUTOP0LEAVE);
-    m_autoChooser.addOption("7 - AutoPreloadP4AndLeave", AutoChooser.AUTOP4LEAVE);
+    m_autoChooser.addOption("4 - AutoPreloadP0AndLeave", AutoChooser.AUTOPRELOADP0LEAVE);
+    m_autoChooser.addOption("5 - AutoPreloadP4AndLeave", AutoChooser.AUTOPRELOADP4LEAVE);
+    m_autoChooser.addOption("6 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
+    m_autoChooser.addOption("7 - AutoScore4", AutoChooser.AUTOSCORE4);
     m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
@@ -436,12 +436,12 @@ public class RobotContainer
         m_autoCommand = new SwerveStop(m_drivetrain);
         break;
 
-      case AUTOPRELOADONLY :
-        m_autoCommand = new ActionScoreSpeaker(m_shooter, m_intake, m_led);
-        break;
-
       case AUTOLEAVE :
         m_autoCommand = m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue);
+        break;
+
+      case AUTOPRELOADONLY :
+        m_autoCommand = new ActionScoreSpeaker(m_shooter, m_intake, m_led);
         break;
 
       case AUTOPRELOADANDLEAVE :
@@ -456,6 +456,26 @@ public class RobotContainer
             new LogCommand(mode.toString(), "Leave zone"),
             m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
         // @formatter:on
+        break;
+
+      case AUTOPRELOADP0LEAVE :
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            m_drivetrain.getAutoCommand("DriveP0"),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
+            m_drivetrain.getAutoCommand("LeaveS1")
+        // @formatter:on
+        );
+        break;
+
+      case AUTOPRELOADP4LEAVE :
+        m_autoCommand = new SequentialCommandGroup(
+        // @formatter:off
+            new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
+            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
+            m_drivetrain.getAutoCommand("LeaveS3")
+        // @formatter:on
+        );
         break;
 
       case AUTOPRELOADSCOREANOTHER :
@@ -544,24 +564,6 @@ public class RobotContainer
 
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
             new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition)
-        // @formatter:on
-        );
-        break;
-      case AUTOP0LEAVE :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            m_drivetrain.getAutoCommand("DriveP0"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
-            m_drivetrain.getAutoCommand("LeaveS1")
-        // @formatter:on
-        );
-        break;
-      case AUTOP4LEAVE :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
-            m_drivetrain.getAutoCommand("LeaveS3")
         // @formatter:on
         );
         break;

@@ -3,7 +3,8 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Feeder;
 
@@ -13,21 +14,21 @@ import frc.robot.subsystems.Feeder;
 public class FeederMoveWithJoystick extends Command
 {
 
-  private final Feeder   m_feeder;
-  private XboxController m_gamePad;
+  private final Feeder         m_feeder;
+  private final DoubleSupplier m_getAxis;
 
   /**
    * Command the feeder manually using a joystick axis
    * 
    * @param feeder
    *          feeder subsystem
-   * @param gamePad
-   *          gamepad to select the joystick from
+   * @param getAxis
+   *          double supplier that retrieves joystick axis
    */
-  public FeederMoveWithJoystick(Feeder feeder, XboxController gamePad)
+  public FeederMoveWithJoystick(Feeder feeder, DoubleSupplier getAxis)
   {
     m_feeder = feeder;
-    m_gamePad = gamePad;
+    m_getAxis = getAxis;
 
     setName("FeederMoveWithJoystick");
     addRequirements(m_feeder);
@@ -42,7 +43,7 @@ public class FeederMoveWithJoystick extends Command
   @Override
   public void execute( )
   {
-    m_feeder.moveRotaryWithJoystick(-m_gamePad.getLeftX( ));
+    m_feeder.moveRotaryWithJoystick(m_getAxis);
   }
 
   // Called once the command ends or is interrupted.

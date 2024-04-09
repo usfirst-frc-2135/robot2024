@@ -3,6 +3,8 @@
 //
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -238,11 +240,12 @@ public class Climber extends SubsystemBase
    * 
    * Move motors proportional to a joystick axis value
    * 
-   * @param axisValue
-   *          proportional input
+   * @param getAxis
+   *          double supplier that returns desired joystick axis
    */
-  public void moveWithJoystick(double axisValue)
+  public void moveWithJoystick(DoubleSupplier getAxis)
   {
+    double axisValue = getAxis.getAsDouble( );
     boolean rangeLimited = false;
     ClimberMode newMode = ClimberMode.STOP;
 

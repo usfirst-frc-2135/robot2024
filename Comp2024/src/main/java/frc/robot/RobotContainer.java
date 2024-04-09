@@ -291,7 +291,7 @@ public class RobotContainer
     m_operatorPad.leftBumper( ).onTrue(new ActionHandoff(m_intake, m_feeder));
     m_operatorPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
-    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));  // aka View
+    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, ( ) -> getClimberAxis( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
 
     //
@@ -310,8 +310,8 @@ public class RobotContainer
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreAmp(m_feeder));
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
-    m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
-    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
+    m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, ( ) -> getFeederAxis( )));
+    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, ( ) -> getIntakeAxis( )));
   }
 
   /****************************************************************************
@@ -648,6 +648,21 @@ public class RobotContainer
   public CommandXboxController getOperator( )
   {
     return m_operatorPad;
+  }
+
+  public double getIntakeAxis( )
+  {
+    return m_operatorPad.getRightX( );
+  }
+
+  public double getFeederAxis( )
+  {
+    return m_operatorPad.getLeftX( );
+  }
+
+  public double getClimberAxis( )
+  {
+    return -m_operatorPad.getRightY( );
   }
 
   /****************************************************************************

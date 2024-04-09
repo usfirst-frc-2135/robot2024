@@ -3,6 +3,8 @@
 //
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -370,11 +372,12 @@ public class Intake extends SubsystemBase
    * 
    * Move motors proportional to a joystick axis value
    * 
-   * @param axisValue
-   *          proportional input
+   * @param getAxis
+   *          double supplier that returns desired joystick axis
    */
-  public void moveRotaryWithJoystick(double axisValue)
+  public void moveRotaryWithJoystick(DoubleSupplier getAxis)
   {
+    double axisValue = getAxis.getAsDouble( );
     boolean rangeLimited = false;
     RotaryMode newMode = RotaryMode.INIT;
 

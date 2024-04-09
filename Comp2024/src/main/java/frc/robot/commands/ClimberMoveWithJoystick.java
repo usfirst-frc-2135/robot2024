@@ -3,7 +3,8 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 
@@ -12,22 +13,21 @@ import frc.robot.subsystems.Climber;
  */
 public class ClimberMoveWithJoystick extends Command
 {
-  private final Climber  m_climber;
-
-  private XboxController m_gamePad;
+  private final Climber        m_climber;
+  private final DoubleSupplier m_getAxis;
 
   /**
    * Command the climber manually using a joystick axis
    * 
    * @param climber
    *          climber subsystem
-   * @param gamePad
-   *          gamepad to select the joystick from
+   * @param getAxis
+   *          double supplier that retrieves joystick axis
    */
-  public ClimberMoveWithJoystick(Climber climber, XboxController gamePad)
+  public ClimberMoveWithJoystick(Climber climber, DoubleSupplier getAxis)
   {
     m_climber = climber;
-    m_gamePad = gamePad;
+    m_getAxis = getAxis;
 
     setName("ClimberMoveWithJoystick");
     addRequirements(m_climber);
@@ -42,7 +42,7 @@ public class ClimberMoveWithJoystick extends Command
   @Override
   public void execute( )
   {
-    m_climber.moveWithJoystick(-m_gamePad.getRightY( ));
+    m_climber.moveWithJoystick(m_getAxis);
   }
 
   // Called once the command ends or is interrupted.

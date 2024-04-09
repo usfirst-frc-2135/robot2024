@@ -3,7 +3,8 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
@@ -13,21 +14,21 @@ import frc.robot.subsystems.Intake;
 public class IntakeMoveWithJoystick extends Command
 {
 
-  private final Intake   m_intake;
-  private XboxController m_gamePad;
+  private final Intake         m_intake;
+  private final DoubleSupplier m_getAxis;
 
   /**
    * Command the intake manually using a joystick axis
    * 
    * @param intake
    *          intake subsystem
-   * @param gamePad
-   *          gamepad to select the joystick from
+   * @param getAxis
+   *          double supplier that retrieves joystick axis
    */
-  public IntakeMoveWithJoystick(Intake intake, XboxController gamePad)
+  public IntakeMoveWithJoystick(Intake intake, DoubleSupplier getAxis)
   {
     m_intake = intake;
-    m_gamePad = gamePad;
+    m_getAxis = getAxis;
 
     setName("IntakeMoveWithJoystick");
     addRequirements(m_intake);
@@ -42,7 +43,7 @@ public class IntakeMoveWithJoystick extends Command
   @Override
   public void execute( )
   {
-    m_intake.moveRotaryWithJoystick(-m_gamePad.getRightX( ));
+    m_intake.moveRotaryWithJoystick(m_getAxis);
   }
 
   // Called once the command ends or is interrupted.

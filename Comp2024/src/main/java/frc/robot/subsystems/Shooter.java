@@ -74,8 +74,9 @@ public class Shooter extends SubsystemBase
     setName("Shooter");
     setSubsystem("Shooter");
 
-    m_shooterValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Lower", CTREConfigs6.shooterFXConfig( ))
-        && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Upper", CTREConfigs6.shooterFXConfig( ));
+    m_shooterValid =
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Shooter Lower", CTREConfigs6.shooterFXConfig( ))
+            && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Shooter Upper", CTREConfigs6.shooterFXConfig( ));
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), (Robot.isComp( )) ? false : true));
 
     m_shooterLVelocity.setUpdateFrequency(50);
@@ -104,7 +105,7 @@ public class Shooter extends SubsystemBase
 
       if (m_isAtTargetSpeed != m_isAtTargetSpeedPrevious)
       {
-        DataLogManager.log(String.format("%s: at desired speed now: %.1f", getSubsystem( ), m_targetRPM));
+        DataLogManager.log(String.format("%s: At desired speed now: %.1f", getSubsystem( ), m_targetRPM));
         m_isAtTargetSpeedPrevious = m_isAtTargetSpeed;
       }
 
@@ -193,7 +194,7 @@ public class Shooter extends SubsystemBase
    */
   public void setShooterMode(ShooterMode mode)
   {
-    DataLogManager.log(String.format("%s: set shooter mode is %s", getSubsystem( ), mode));
+    DataLogManager.log(String.format("%s: Set shooter mode to %s", getSubsystem( ), mode));
 
     // Select the shooter RPM for the requested mode - NEVER NEGATIVE when running!
     switch (mode)
@@ -217,7 +218,7 @@ public class Shooter extends SubsystemBase
       else
         m_shooterLower.setControl(m_requestVolts);
     }
-    DataLogManager.log(String.format("%s: target rpm is %.1f rps %.1f", getSubsystem( ), m_targetRPM, rotPerSecond));
+    DataLogManager.log(String.format("%s: Target rpm is %.1f rps %.1f", getSubsystem( ), m_targetRPM, rotPerSecond));
   }
 
   /****************************************************************************

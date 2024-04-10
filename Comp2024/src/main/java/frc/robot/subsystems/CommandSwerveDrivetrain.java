@@ -254,7 +254,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command drivePathtoPose(CommandSwerveDrivetrain drivetrain, Pose2d pose)
   {
-    DataLogManager.log(String.format("drivePathToPose: given alliance %s target pose %s", DriverStation.getAlliance( ), pose));
+    DataLogManager.log(String.format("drivePathToPose: Alliance %s target pose %s", DriverStation.getAlliance( ), pose));
 
     return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kPathFindConstraints, 0.0);
   }

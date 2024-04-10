@@ -71,13 +71,13 @@ public class Power extends SubsystemBase
   public void printFaults( )
   {
     DataLogManager.log(String.format("%s: ------------------ DUMP FAULTS ------------------", getSubsystem( )));
-    DataLogManager.log(String.format("  Temperature ...... %.1f", m_powerDistribution.getTemperature( )));
+    DataLogManager.log(String.format("  Temperature ...... %.1f C", m_powerDistribution.getTemperature( )));
     DataLogManager.log(String.format("  Input Voltage .... %.1f volts", m_powerDistribution.getVoltage( )));
-    for (int i = 0; i <= 15; i++)
+    for (int i = 0; i < m_powerDistribution.getNumChannels( ); i++)
     {
       DataLogManager.log(String.format("  Channel %2d ....... %.1f amps", i, m_powerDistribution.getCurrent(i)));
     }
-    DataLogManager.log(String.format("  Total Current .... %.1f", m_powerDistribution.getTotalCurrent( )));
+    DataLogManager.log(String.format("  Total Current .... %.1f Amps", m_powerDistribution.getTotalCurrent( )));
     DataLogManager.log(String.format("  Total Power ...... %.1f watts", m_powerDistribution.getTotalPower( )));
     DataLogManager.log(String.format("  Total Energy ..... %.1f joules", m_powerDistribution.getTotalEnergy( )));
 

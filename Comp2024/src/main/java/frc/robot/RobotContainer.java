@@ -353,7 +353,7 @@ public class RobotContainer
     m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
 
     //Default command - manual mode
-    // m_intake.setDefaultCommand(new IntakeMoveWithJoysticks(m_intake, m_operatorPad.getHID( )));
+    // m_intake.setDefaultCommand(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
     // m_feeder.setDefaultCommand(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
     // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
   }
@@ -404,7 +404,7 @@ public class RobotContainer
     switch (startPosition)
     {
       default :
-        DataLogManager.log(String.format("RobotContainer: invalid position %s", startPosition));
+        DataLogManager.log(String.format("RobotContainer: Invalid auto start position %s", startPosition));
 
       case POSE1 :
         positionValue = 1;
@@ -426,7 +426,7 @@ public class RobotContainer
     }
 
     pathName = "DriveP" + positionValue;
-    DataLogManager.log(String.format("getAutonomousCommand: %s", pathName));
+    DataLogManager.log(String.format("getAutonomousCommand: Initial path %s", pathName));
 
     // The selected command will be run in autonomous
     switch (mode)
@@ -579,7 +579,7 @@ public class RobotContainer
 
       // List<Pose2d> poses = path.getPathPoses( );
       // for (int i = 0; i < poses.size( ); i++)
-      //   DataLogManager.log(String.format("pose: %s", poses.get(i)));
+      //   DataLogManager.log(String.format("Auto path pose: %s", poses.get(i)));
 
       Pose2d initialPose =
           new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
@@ -588,7 +588,8 @@ public class RobotContainer
         m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: mode is %s %s %s", mode, startPosition, m_autoCommand.getName( )));
+    DataLogManager
+        .log(String.format("getAutonomousCommand: Auto mode is %s %s %s", mode, startPosition, m_autoCommand.getName( )));
 
     return m_autoCommand;
   }

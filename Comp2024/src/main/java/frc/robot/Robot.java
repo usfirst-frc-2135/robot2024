@@ -222,7 +222,7 @@ public class Robot extends TimedRobot
       isComp = false;
       robotName = "PRACTICE/BETA (B)";
     }
-    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+    DataLogManager.log(String.format("robotContainer: Detected the %s robot (RoboRIO)!", robotName));
 
     return isComp;
   }

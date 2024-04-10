@@ -111,12 +111,12 @@ public class Climber extends SubsystemBase
     setSubsystem("Climber");
 
     // Initialize climber motors
-    m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberFXConfig( ))
-        && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberFXConfig( ));
+    m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "Climber Left", CTREConfigs6.climberFXConfig( ))
+        && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "Climber Right", CTREConfigs6.climberFXConfig( ));
     m_climberR.setInverted(false);
 
     setClimberPosition(m_currentInches);
-    DataLogManager.log(String.format("%s: CANcoder initial inches %.1f", getSubsystem( ), m_currentInches));
+    DataLogManager.log(String.format("%s: Initial position %.1f inches", getSubsystem( ), m_currentInches));
 
     // Simulation object initialization
     m_climberSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -229,7 +229,7 @@ public class Climber extends SubsystemBase
   public void printFaults( )
   {
     PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_climberL, "ClimeberLeft");
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_climberR, "ClimeberLeft");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_climberR, "ClimeberRight");
     m_climberL.clearStickyFaults( );
     m_climberR.clearStickyFaults( );
   }
@@ -264,8 +264,8 @@ public class Climber extends SubsystemBase
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(String.format("%s: move %s %.1f in %s", getSubsystem( ), m_mode, getCurrentInchesLeft( ),
-          ((rangeLimited) ? " - RANGE LIMITED" : "")));
+      DataLogManager.log(String.format("%s: Manual move mode %s now %.1f inches %s", getSubsystem( ), m_mode,
+          getCurrentInchesLeft( ), ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
     m_targetInches = m_currentInches;
@@ -291,7 +291,8 @@ public class Climber extends SubsystemBase
 
     if (!m_calibrated)
     {
-      DataLogManager.log(String.format("%s: Position move %.1f inches is NOT CALIBRATED!", getSubsystem( ), m_targetInches));
+      DataLogManager
+          .log(String.format("%s: Position move target %.1f inches is NOT CALIBRATED!", getSubsystem( ), m_targetInches));
       return;
     }
 
@@ -313,18 +314,18 @@ public class Climber extends SubsystemBase
 
         setMMPosition(m_targetInches);
 
-        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
+        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.3f -> %.3f rot)", getSubsystem( ),
             m_currentInches, m_targetInches, Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio),
             Conversions.inchesToWinchRotations(m_targetInches, kRolloutRatio)));
       }
       else
-        DataLogManager.log(String.format("%s: Position move %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_targetInches, CLConsts.kLengthMin, CLConsts.kLengthMax));
+        DataLogManager.log(String.format("%s: Position move target %.1f inches is OUT OF RANGE! [%.1f, %.1f rot]",
+            getSubsystem( ), m_targetInches, CLConsts.kLengthMin, CLConsts.kLengthMax));
     }
     else
     {
       m_moveIsFinished = true;
-      DataLogManager.log(String.format("%s: Position already achieved - %s", getSubsystem( ), m_targetInches));
+      DataLogManager.log(String.format("%s: Position already achieved - target %s inches", getSubsystem( ), m_targetInches));
     }
   }
 
@@ -358,7 +359,7 @@ public class Climber extends SubsystemBase
       if (hittingHardStop)
         DataLogManager.log(String.format("%s - HITTINGHARDSTOP: %s", getSubsystem( ), hittingHardStop));
       if (!m_moveIsFinished)
-        DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f %s",
+        DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f sec %s",
             getSubsystem( ), m_currentInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
       m_moveIsFinished = true;
@@ -441,7 +442,7 @@ public class Climber extends SubsystemBase
    */
   private void setVoltage(double volts)
   {
-    DataLogManager.log(String.format("%s: now %.1f volts", getSubsystem( ), volts));
+    DataLogManager.log(String.format("%s: Motor voltage at %.1f volts", getSubsystem( ), volts));
     if (m_climberValid)
     {
       m_climberL.setControl(m_requestVolts.withOutput(volts));

@@ -49,7 +49,7 @@ public class ClimberCalibrate extends Command
   @Override
   public void end(boolean interrupted)
   {
-    DataLogManager.log(String.format("%s: End time %.3f", getName( ), m_calibrateTimer.get( )));
+    DataLogManager.log(String.format("%s: End - elapsed %.3f sec", getName( ), m_calibrateTimer.get( )));
     m_calibrateTimer.stop( );
     m_climber.climberCalibrateEnd( );
   }

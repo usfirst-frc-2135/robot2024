@@ -255,11 +255,11 @@ public class LED extends SubsystemBase
 
     if (m_rgb == m_previousRgb && m_animation == m_previousAnimation)
     {
-      DataLogManager.log(String.format("%s: colors and animation already active - %s, %s", getName( ), color, animation));
+      DataLogManager.log(String.format("%s: Color and animation already active - %s, %s", getName( ), color, animation));
       return;
     }
 
-    DataLogManager.log(String.format("%s: color is now %s, %s", getSubsystem( ), color, animation));
+    DataLogManager.log(String.format("%s: Color is now %s, %s", getSubsystem( ), color, animation));
     if (m_animation != null)
     {
       m_candle.animate(m_animation, kSlot);

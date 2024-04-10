@@ -108,7 +108,7 @@ public class Vision extends SubsystemBase
       setPriorityId(7, "BLUE");
     }
     else
-      DataLogManager.log(String.format("%s: driver station alliance NOT SET!", getSubsystem( )));
+      DataLogManager.log(String.format("%s: Driver station alliance color NOT SET!", getSubsystem( )));
   }
 
   /****************************************************************************
@@ -132,7 +132,7 @@ public class Vision extends SubsystemBase
         m_stream = streamMode.PIPSECONDARY;
         LimelightHelpers.setStreamMode_PiPSecondary("limelight");
     }
-    DataLogManager.log(String.format("%s: setStreamMode_PiPxxx %s", getSubsystem( ), m_stream));
+    DataLogManager.log(String.format("%s: Set stream mode (setStreamMode_PiPxxx) %s", getSubsystem( ), m_stream));
   }
 
   /****************************************************************************
@@ -188,7 +188,7 @@ public class Vision extends SubsystemBase
    */
   private void setPriorityId(int id, String alliance)
   {
-    DataLogManager.log(String.format("%s: priority id %d (%s)", getSubsystem( ), id, alliance));
+    DataLogManager.log(String.format("%s: Set priority id %d (%s)", getSubsystem( ), id, alliance));
     LimelightHelpers.setPriorityTagID("limelight", id);
   }
 

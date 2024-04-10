@@ -226,7 +226,7 @@ public class Feeder extends SubsystemBase
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_FDValidRoller", m_fdRollerValid);
-    SmartDashboard.putBoolean("HL_FDValidNRotary", m_fdRotaryValid);
+    SmartDashboard.putBoolean("HL_FDValidRotary", m_fdRotaryValid);
     SmartDashboard.putBoolean("HL_FDValidCANcoder", m_fdCCValid);
     SmartDashboard.putData("FDRotaryMech", m_rotaryMech);
   }

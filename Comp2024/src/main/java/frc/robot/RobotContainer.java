@@ -120,7 +120,7 @@ public class RobotContainer
   {
     AUTOSTOP,                // AutoStop - sit still, do nothing
     AUTOLEAVE,               // Leave starting zone avoiding spikes
-    AUTOPRELOADONLY,         // Score preloaded game piece from starting position
+    AUTOPRELOADONLY,         // Score preloaded game piece from starting pose
     AUTOPRELOADANDLEAVE,     // Score preload at waypoints P1-P3 and leave starting zone
     AUTOPRELOADP0LEAVE,      // Score preload at waypoint P0 and leave starting zone
     AUTOPRELOADP4LEAVE,      // Score preload at waypoint P4 and leave starting zone
@@ -129,17 +129,17 @@ public class RobotContainer
     AUTOTESTPATH             // Run a selected test path
   }
 
-  // Chooser for autonomous starting position
-  enum StartPosition
+  // Chooser for autonomous starting pose
+  enum StartPose
   {
-    POSE1, // Starting position 1 - blue left, red right (driver perspective)
-    POSE2, // Starting position 2 - blue/red middle (driver perspective)
-    POSE3  // Starting position 3 - blue right, red left (driver perspective)
+    POSE1, // Starting pose 1 - blue left, red right (driver perspective)
+    POSE2, // Starting pose 2 - blue/red middle (driver perspective)
+    POSE3  // Starting pose 3 - blue right, red left (driver perspective)
   }
 
-  private SendableChooser<AutoChooser>   m_autoChooser  = new SendableChooser<>( );
-  private SendableChooser<StartPosition> m_startChooser = new SendableChooser<>( );
-  private SendableChooser<Integer>       m_odomChooser  = new SendableChooser<>( );
+  private SendableChooser<AutoChooser> m_autoChooser  = new SendableChooser<>( );
+  private SendableChooser<StartPose>   m_startChooser = new SendableChooser<>( );
+  private SendableChooser<Integer>     m_odomChooser  = new SendableChooser<>( );
 
   /****************************************************************************
    * 
@@ -376,11 +376,11 @@ public class RobotContainer
     m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
-    // Configure starting position sendable chooser
-    m_startChooser.setDefaultOption("POSE1", StartPosition.POSE1);
-    m_startChooser.addOption("POSE2", StartPosition.POSE2);
-    m_startChooser.addOption("POSE3", StartPosition.POSE3);
-    SmartDashboard.putData("StartPosition", m_startChooser);
+    // Configure starting pose sendable chooser
+    m_startChooser.setDefaultOption("POSE1", StartPose.POSE1);
+    m_startChooser.addOption("POSE2", StartPose.POSE2);
+    m_startChooser.addOption("POSE3", StartPose.POSE3);
+    SmartDashboard.putData("StartPose", m_startChooser);
   }
 
   /****************************************************************************
@@ -393,39 +393,39 @@ public class RobotContainer
   {
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
-    StartPosition startPosition = m_startChooser.getSelected( );
-    int positionValue = 0;
+    StartPose startPose = m_startChooser.getSelected( );
+    int poseValue = 0;
     int altpos1 = 0;
     int altpos2 = 0;
 
     if (m_autoCommand != null)
       m_autoCommand.cancel( );
 
-    switch (startPosition)
+    switch (startPose)
     {
       default :
-        DataLogManager.log(String.format("RobotContainer: Invalid auto start position %s", startPosition));
+        DataLogManager.log(String.format("RobotContainer: Invalid auto start pose %s", startPose));
 
       case POSE1 :
-        positionValue = 1;
+        poseValue = 1;
         altpos1 = 2;
         altpos2 = 3;
         break;
 
       case POSE2 :
-        positionValue = 2;
+        poseValue = 2;
         altpos1 = 3;
         altpos2 = 1;
         break;
 
       case POSE3 :
-        positionValue = 3;
+        poseValue = 3;
         altpos1 = 2;
         altpos2 = 1;
         break;
     }
 
-    pathName = "DriveP" + positionValue;
+    pathName = "DriveP" + poseValue;
     DataLogManager.log(String.format("getAutonomousCommand: Initial path %s", pathName));
 
     // The selected command will be run in autonomous
@@ -437,7 +437,7 @@ public class RobotContainer
         break;
 
       case AUTOLEAVE :
-        m_autoCommand = m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue);
+        m_autoCommand = m_drivetrain.getAutoCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue);
         break;
 
       case AUTOPRELOADONLY :
@@ -447,14 +447,14 @@ public class RobotContainer
       case AUTOPRELOADANDLEAVE :
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
-            new LogCommand(mode.toString(), "Drive to scoring position"),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
             m_drivetrain.getAutoCommand(pathName),
 
             new LogCommand(mode.toString(), "Score preloaded note"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Leave zone"),
-            m_drivetrain.getAutoCommand(positionValue == 2 ? "DriveS2" : "LeaveS" + positionValue));
+            m_drivetrain.getAutoCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue));
         // @formatter:on
         break;
 
@@ -481,7 +481,7 @@ public class RobotContainer
       case AUTOPRELOADSCOREANOTHER :
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
-            new LogCommand(mode.toString(), "Drive to scoring position"),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
             m_drivetrain.getAutoCommand(pathName), 
 
             new LogCommand(mode.toString(), "Score preloaded note"),
@@ -494,12 +494,12 @@ public class RobotContainer
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
-                m_drivetrain.getAutoCommand("DriveS" + positionValue),
+                m_drivetrain.getAutoCommand("DriveS" + poseValue),
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
             
-            new LogCommand(mode.toString(), "Drive to scoring position"),
-            m_drivetrain.getAutoCommand("ScoreS" + positionValue),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
+            m_drivetrain.getAutoCommand("ScoreS" + poseValue),
 
             new LogCommand(mode.toString(), "Score note"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
@@ -507,7 +507,7 @@ public class RobotContainer
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
             new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition),
 
-            m_drivetrain.getAutoCommand("LeaveS" + positionValue)
+            m_drivetrain.getAutoCommand("LeaveS" + poseValue)
         // @formatter:on
         );  //
         break;
@@ -515,7 +515,7 @@ public class RobotContainer
       case AUTOSCORE4 :
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
-            new LogCommand(mode.toString(), "Drive to scoring position"),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
             m_drivetrain.getAutoCommand(pathName),
 
             new LogCommand(mode.toString(), "Score preloaded note"),
@@ -528,12 +528,12 @@ public class RobotContainer
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup( 
-                m_drivetrain.getAutoCommand("DriveS" + positionValue),
+                m_drivetrain.getAutoCommand("DriveS" + poseValue),
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
 
-            new LogCommand(mode.toString(), "Drive to scoring position"),
-            m_drivetrain.getAutoCommand("ScoreS" + positionValue),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
+            m_drivetrain.getAutoCommand("ScoreS" + poseValue),
 
             new LogCommand(mode.toString(), "Score note 2"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
@@ -544,7 +544,7 @@ public class RobotContainer
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
 
-            new LogCommand(mode.toString(), "Drive to scoring position"),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
             m_drivetrain.getAutoCommand("ScoreS" + altpos1),
 
             new LogCommand(mode.toString(), "Score note 3"),
@@ -556,7 +556,7 @@ public class RobotContainer
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ), 
             
-            new LogCommand(mode.toString(), "Drive to scoring position"),
+            new LogCommand(mode.toString(), "Drive to scoring pose"),
             m_drivetrain.getAutoCommand("ScoreS" + altpos2),
 
             new LogCommand(mode.toString(), "Score note 4"),
@@ -588,8 +588,7 @@ public class RobotContainer
         m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
     }
 
-    DataLogManager
-        .log(String.format("getAutonomousCommand: Auto mode is %s %s %s", mode, startPosition, m_autoCommand.getName( )));
+    DataLogManager.log(String.format("getAutonomousCommand: Auto mode is %s %s %s", mode, startPose, m_autoCommand.getName( )));
 
     return m_autoCommand;
   }

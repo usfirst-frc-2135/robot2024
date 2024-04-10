@@ -229,7 +229,7 @@ public class Intake extends SubsystemBase
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_INValidRoller", m_inRollerValid);
-    SmartDashboard.putBoolean("HL_INValidNRotary", m_inRotaryValid);
+    SmartDashboard.putBoolean("HL_INValidRotary", m_inRotaryValid);
     SmartDashboard.putBoolean("HL_INValidCANcoder", m_inCCValid);
 
     SmartDashboard.putData("INRotaryMech", m_rotaryMech);

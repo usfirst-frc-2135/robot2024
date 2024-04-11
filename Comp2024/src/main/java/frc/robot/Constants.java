@@ -179,11 +179,11 @@ public class Constants
     }
 
     // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = 0.0;    // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 112.21; // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 114.0;  // TODO: Tune me!
+    public static final double kRotaryAngleRetracted = -97.5; // TODO: Tune me!
+    public static final double kRotaryAngleHandoff   = -49.9;  // TODO: Tune me!
+    public static final double kRotaryAngleDeployed  = 99.4;  // TODO: Tune me!
+    public static final double kRotaryAngleMin       = -99.0;  // TODO: Tune me!
+    public static final double kRotaryAngleMax       = 101.4;  // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -194,13 +194,11 @@ public class Constants
     // Global settings
 
     // Feeder intake parameters
-    public enum RollerMode
+    public enum FDRollerMode
     {
       STOP,    // Stop spinning
-      ACQUIRE, // Acquire a game piece
-      EXPEL,   // Expel a game piece
-      SCORE,   // put into shooter 
-      HANDOFF, // put into feeder 
+      SCORE,   // put into amp 
+      HANDOFF, // handoff into feeder 
       HOLD     // Maintain existing setting
     }
 
@@ -214,11 +212,11 @@ public class Constants
     }
 
     // Rotary angles - Motion Magic move parameters
-    public static final double kRotaryAngleRetracted = -84.92; // TODO: Tune me!
-    public static final double kRotaryAngleHandoff   = 0.0;    // TODO: Tune me!
-    public static final double kRotaryAngleDeployed  = 112.21; // TODO: Tune me!
-    public static final double kRotaryAngleMin       = -87.0;  // TODO: Tune me!
-    public static final double kRotaryAngleMax       = 114.0;  // TODO: Tune me!
+    public static final double kRotaryAngleAmp     = -33.0;    // TODO: Tune me!
+    public static final double kRotaryAngleClimb   = 60.0;     // TODO: Tune me!
+    public static final double kRotaryAngleHandoff = 88.75;    // TODO: Tune me!
+    public static final double kRotaryAngleMin     = -61.89;   // TODO: Tune me!
+    public static final double kRotaryAngleMax     = 90.0;     // TODO: Tune me!
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -262,7 +260,7 @@ public class Constants
 
     // Climber lengths - Motion Magic config parameters
     public static final double kLengthClimbed = 0.0;    // By definition - Climber fully climbed
-    public static final double kLengthFull    = 19.5;   // From Mech Design height needed to reach max chain
+    public static final double kLengthFull    = 18.0;   // From Mech Design height needed to reach max chain
     public static final double kLengthChain   = 8.0;    // From Mech Design height needed to reach hanging chain
     public static final double kLengthMin     = 0.0;    // Climber minimum allowable length
     public static final double kLengthMax     = 21.0;  // Climber maximum allowable length (2" beyond high length)
@@ -310,7 +308,7 @@ public class Constants
     ));
 
     //Poses for limelight paths
-    public static final Pose2d       kSpeakerPose   = new Pose2d(2.63, 4.03, Rotation2d.fromDegrees(0));
+    public static final Pose2d       kSpeakerPose   = new Pose2d(2.17, 4.49, Rotation2d.fromDegrees(-26));
     public static final Pose2d       kAmpPose       = new Pose2d(1.93, 7.31, Rotation2d.fromDegrees(-90));
     public static final Pose2d       kStageCenter   = new Pose2d(5.92, 4.13, Rotation2d.fromDegrees(0));
     public static final Pose2d       kStageLeft     = new Pose2d(4.3, 5.0, Rotation2d.fromDegrees(120));

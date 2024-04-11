@@ -3,8 +3,10 @@
 //
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.subsystems.Feeder;
 
 //
@@ -13,26 +15,27 @@ import frc.robot.subsystems.Feeder;
 public class FeederRun extends Command
 {
   // Member variables/objects
-  private final Feeder     m_feeder;
-  private final RollerMode m_mode;
-  private final boolean    m_holdAngle;
-  private double           m_newAngle = 0.0;
+  private final Feeder       m_feeder;
+  private final FDRollerMode m_mode;
+  private final boolean      m_holdPosition;
+  private DoubleSupplier     m_getPosition = null;
 
-  public FeederRun(Feeder feeder, RollerMode mode)
+  public FeederRun(Feeder feeder, FDRollerMode mode, DoubleSupplier getPosition, boolean hold)
   {
     m_feeder = feeder;
     m_mode = mode;
-    m_holdAngle = true;
+    m_holdPosition = hold;
+    m_getPosition = getPosition;
 
     FeederRunCommon( );
   }
 
-  public FeederRun(Feeder feeder, RollerMode mode, double newAngle)
+  public FeederRun(Feeder feeder, FDRollerMode mode, DoubleSupplier getPosition)
   {
     m_feeder = feeder;
     m_mode = mode;
-    m_holdAngle = false;
-    m_newAngle = newAngle;
+    m_holdPosition = false;
+    m_getPosition = getPosition;
 
     FeederRunCommon( );
   }
@@ -48,7 +51,7 @@ public class FeederRun extends Command
   public void initialize( )
   {
     m_feeder.setRollerSpeed(m_mode);
-    m_feeder.moveToPositionInit(m_newAngle, m_holdAngle);
+    m_feeder.moveToPositionInit(m_getPosition.getAsDouble( ), m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -69,7 +72,7 @@ public class FeederRun extends Command
   @Override
   public boolean isFinished( )
   {
-    return (m_holdAngle) ? false : m_feeder.moveToPositionIsFinished( ); // Command exits if not holding a position
+    return (m_holdPosition) ? false : m_feeder.moveToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

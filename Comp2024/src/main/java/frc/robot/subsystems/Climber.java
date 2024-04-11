@@ -43,13 +43,13 @@ public class Climber extends SubsystemBase
 {
   // Constants
   private final double              kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
-  private static final double       kGearRatio           = 8.57;   // Gear reduction
+  private static final double       kGearRatio           = 16.0;   // Gear reduction
   private static final double       kClimberLengthMeters = 1.0;
   private static final double       kCarriageMassKg      = 2.0;
   private static final double       kDrumDiameterInches  = 1.375;  // Drum diameter in inches
   private static final double       kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
   private static final double       kRolloutRatio        = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
-  private static final double       kCalibrateSpeedVolts = -1.4;   // Motor voltage during calibration
+  private static final double       kCalibrateSpeedVolts = -1.0;   // Motor voltage during calibration
   private static final double       kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
 
   private static final double       kToleranceInches     = 0.5;    // Climber PID tolerance in inches
@@ -89,6 +89,7 @@ public class Climber extends SubsystemBase
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
 
   private StatusSignal<Double>      m_motorPosition      = m_climberL.getRotorPosition( );
+  private StatusSignal<Double>      m_motorPositionR     = m_climberR.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity      = m_climberL.getRotorVelocity( );
   private StatusSignal<Double>      m_motorCLoopError    = m_climberL.getClosedLoopError( );
   private StatusSignal<Double>      m_motorSupplyCur     = m_climberL.getSupplyCurrent( );
@@ -103,7 +104,7 @@ public class Climber extends SubsystemBase
 
     m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberL, "ClimberL", CTREConfigs6.climberFXConfig( ))
         && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_climberR, "ClimberR", CTREConfigs6.climberFXConfig( ));
-    m_climberR.setInverted(true);
+    m_climberR.setInverted(false);
 
     m_climberL.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
     m_climberR.setPosition(Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
@@ -137,6 +138,7 @@ public class Climber extends SubsystemBase
       setClimberToZero( );
 
     SmartDashboard.putNumber("CL_curInches", m_currentInches);
+    SmartDashboard.putNumber("CL_curInchesR", getCurrentInchesR( ));
     SmartDashboard.putNumber("CL_targetInches", m_targetInches);
     SmartDashboard.putNumber("CL_curRotations", Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
     SmartDashboard.putNumber("CL_totalFF", m_totalArbFeedForward);
@@ -210,6 +212,11 @@ public class Climber extends SubsystemBase
   private double getCurrentInches( )
   {
     return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), kRolloutRatio);
+  }
+
+  private double getCurrentInchesR( )
+  {
+    return Conversions.rotationsToWinchInches(m_motorPositionR.refresh( ).getValue( ), kRolloutRatio);
   }
 
   private boolean isMoveValid(double inches)

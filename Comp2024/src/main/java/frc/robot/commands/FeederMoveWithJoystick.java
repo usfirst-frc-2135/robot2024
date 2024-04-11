@@ -34,7 +34,7 @@ public class FeederMoveWithJoystick extends Command
   @Override
   public void execute( )
   {
-    m_feeder.moveRotaryWithJoystick(-m_gamePad.getRightY( ));
+    m_feeder.moveRotaryWithJoystick(-m_gamePad.getLeftX( ));
   }
 
   // Called once the command ends or is interrupted.

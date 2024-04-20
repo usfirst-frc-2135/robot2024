@@ -4,7 +4,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
@@ -25,12 +24,12 @@ public class IntakeActionRetract extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off      
-        new PrintCommand(getName() + ": Stop rollers & Retract intake rotary"),
+        new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
         new ConditionalCommand(
           new LEDSet(led, LEDColor.BLUE, LEDAnimation.CLEARALL), 
           new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL), 
           intake::isNoteDetected),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, INConsts.kRotaryAngleRetracted)
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted)
         
         //@formatter:on
     );

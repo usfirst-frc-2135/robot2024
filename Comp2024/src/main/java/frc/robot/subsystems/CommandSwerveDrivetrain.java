@@ -146,7 +146,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public void resetOdometry(Pose2d pose)
   {
-    m_odometry.resetPosition(pose.getRotation( ), m_modulePositions, pose);
+    m_odometry.resetPosition(m_pigeon2.getRotation2d( ), m_modulePositions, pose);
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)

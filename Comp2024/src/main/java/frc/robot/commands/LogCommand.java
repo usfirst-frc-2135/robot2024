@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
  */
 public class LogCommand extends InstantCommand
 {
+  private String m_prefix;
+  private String m_msg;
+
   /**
    * Creates a new a LogCommand.
    *
@@ -22,7 +25,14 @@ public class LogCommand extends InstantCommand
    */
   public LogCommand(String prefix, String msg)
   {
-    DataLogManager.log(String.format("%s: %s", prefix, msg));
+    m_prefix = prefix;
+    m_msg = msg;
+  }
+
+  @Override
+  public void initialize( )
+  {
+    DataLogManager.log(String.format("%s: %s", m_prefix, m_msg));
   }
 
   @Override

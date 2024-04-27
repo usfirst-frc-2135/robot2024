@@ -3,6 +3,7 @@
 //
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -59,6 +60,7 @@ public class Shooter extends SubsystemBase
 
   // Declare module variables
   private boolean               m_shooterValid;
+  private boolean               m_debug                   = true;
   private boolean               m_isAtTargetSpeed         = false; // Indicates flywheel RPM is close to target
   private boolean               m_isAtTargetSpeedPrevious = false;
 
@@ -80,8 +82,7 @@ public class Shooter extends SubsystemBase
     m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), (Robot.isComp( )) ? false : true));
 
     m_shooterLVelocity.setUpdateFrequency(50);
-    m_shooterLSupplyCur.setUpdateFrequency(10);
-    m_shooterLStatorCur.setUpdateFrequency(10);
+    BaseStatusSignal.setUpdateFrequencyForAll(20, m_shooterLSupplyCur, m_shooterLStatorCur);
 
     initSmartDashboard( );
     initialize( );
@@ -109,8 +110,12 @@ public class Shooter extends SubsystemBase
         m_isAtTargetSpeedPrevious = m_isAtTargetSpeed;
       }
 
-      SmartDashboard.putNumber("SH_supCur", m_shooterLSupplyCur.refresh( ).getValue( ));
-      SmartDashboard.putNumber("SH_current", m_shooterLStatorCur.refresh( ).getValue( ));
+      if (m_debug)
+      {
+        BaseStatusSignal.refreshAll(m_shooterLSupplyCur, m_shooterLStatorCur);
+        SmartDashboard.putNumber("SH_supCur", m_shooterLSupplyCur.getValue( ));
+        SmartDashboard.putNumber("SH_current", m_shooterLStatorCur.getValue( ));
+      }
     }
 
     SmartDashboard.putNumber("SH_targetRPM", m_targetRPM);

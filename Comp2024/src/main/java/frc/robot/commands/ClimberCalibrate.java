@@ -3,8 +3,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 
@@ -13,10 +11,7 @@ import frc.robot.subsystems.Climber;
  */
 public class ClimberCalibrate extends Command
 {
-  private static final double kTimeout         = 1.0; // TODO: Tune me!
-
-  private Climber             m_climber;
-  private Timer               m_calibrateTimer = new Timer( );
+  private Climber m_climber;
 
   /**
    * Command the climber subsystem to do a calibration
@@ -35,8 +30,6 @@ public class ClimberCalibrate extends Command
   @Override
   public void initialize( )
   {
-    DataLogManager.log(String.format("%s: Start up", getName( )));
-    m_calibrateTimer.restart( );
     m_climber.climberCalibrateInit( );
   }
 
@@ -49,8 +42,6 @@ public class ClimberCalibrate extends Command
   @Override
   public void end(boolean interrupted)
   {
-    DataLogManager.log(String.format("%s: End - elapsed %.3f sec", getName( ), m_calibrateTimer.get( )));
-    m_calibrateTimer.stop( );
     m_climber.climberCalibrateEnd( );
   }
 
@@ -58,7 +49,7 @@ public class ClimberCalibrate extends Command
   @Override
   public boolean isFinished( )
   {
-    return (m_calibrateTimer.hasElapsed(kTimeout) || m_climber.climberCalibrateIsFinished( ));
+    return m_climber.climberCalibrateIsFinished( );
   }
 
   @Override

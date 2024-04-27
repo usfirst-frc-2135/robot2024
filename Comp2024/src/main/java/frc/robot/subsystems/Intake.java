@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -112,7 +113,6 @@ public class Intake extends SubsystemBase
 
   // Status signals
   private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
-  private StatusSignal<Double>      m_rotaryVelocity      = m_rotaryMotor.getRotorVelocity( );
   private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
@@ -151,12 +151,7 @@ public class Intake extends SubsystemBase
 
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
-    {
-      m_rotaryVelocity.setUpdateFrequency(10);
-      m_rotaryCLoopError.setUpdateFrequency(10);
-      m_rotarySupplyCur.setUpdateFrequency(10);
-      m_rotaryStatorCur.setUpdateFrequency(10);
-    }
+      BaseStatusSignal.setUpdateFrequencyForAll(20, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
     m_ccPosition.setUpdateFrequency(10);
 
     initSmartDashboard( );
@@ -180,14 +175,13 @@ public class Intake extends SubsystemBase
     SmartDashboard.putNumber("IN_ccDegrees", Units.rotationsToDegrees(getCANcoderRotations( )));
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
-    SmartDashboard.putNumber("IN_rotaryDegrees", m_currentDegrees); // reference is rotary encoder
     SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
     if (m_debug && m_inRotaryValid)
     {
-      SmartDashboard.putNumber("IN_rotaryRps", m_rotaryVelocity.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.refresh( ).getValue( ));
-      SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.refresh( ).getValue( ));
+      BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
+      SmartDashboard.putNumber("IN_curError", m_rotaryCLoopError.getValue( ));
+      SmartDashboard.putNumber("IN_rotSupCur", m_rotarySupplyCur.getValue( ));
+      SmartDashboard.putNumber("IN_rotStatCur", m_rotaryStatorCur.getValue( ));
     }
   }
 

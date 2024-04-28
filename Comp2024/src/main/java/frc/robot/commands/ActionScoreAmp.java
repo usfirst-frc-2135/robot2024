@@ -28,14 +28,14 @@ public class ActionScoreAmp extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Align Feeder to Amp"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getFeederAmp),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederAmp),
 
         new LogCommand(getName(), "Score Note to Amp"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.SCORE, feeder::getFeederPosition),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.SCORE, feeder::getFeederPosition),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getFeederHandoff)
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederHandoff)
         // @formatter:on
     );
   }

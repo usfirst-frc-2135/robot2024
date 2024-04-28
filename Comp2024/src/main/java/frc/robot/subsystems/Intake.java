@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -264,49 +265,9 @@ public class Intake extends SubsystemBase
     m_CANcoder.clearStickyFaults( );
   }
 
-  /****************************************************************************
-   * 
-   * Set roller speed based on requested mode
-   * 
-   * @param mode
-   *          requested speed
-   */
-  public void setRollerMode(RollerMode mode)
-  {
-    double output = 0.0;
-
-    if (mode == RollerMode.HOLD)
-    {
-      DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_rollerMotor.get( )));
-    }
-    else
-    {
-      switch (mode)
-      {
-        default :
-          DataLogManager.log(String.format("%s: Roller mode is invalid: %s", getSubsystem( ), mode));
-        case STOP :
-          output = 0.0;
-          break;
-        case ACQUIRE :
-          output = kRollerSpeedAcquire;
-          break;
-        case EXPEL :
-          output = kRollerSpeedExpel;
-          break;
-        case SHOOT :
-          output = kRollerSpeedToShooter;
-          break;
-        case HANDOFF :
-          output = kRollerSpeedToFeeder;
-
-      }
-      DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));
-      m_rollerMotor.set(output);
-    }
-  }
-
-  ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// MANUAL MOVEMENT //////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
@@ -345,19 +306,24 @@ public class Intake extends SubsystemBase
     m_rotaryMotor.setControl(m_requestVolts.withOutput(axisValue * kRotaryManualVolts));
   }
 
-  ///////////////////////// MOTION MAGIC ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// MOTION MAGIC /////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
-   * Initialize a Motion Magic movement
+   * Initialize a Motion Magic movement and control rollers
    * 
+   * @param mode
+   *          roller mode to apply
    * @param newAngle
    *          rotation to move
    * @param holdPosition
    *          hold previous position if true
    */
-  public void moveToPositionInit(double newAngle, boolean holdPosition)
+  public void moveToPositionInit(RollerMode mode, double newAngle, boolean holdPosition)
   {
+    setRollerMode(mode);
     m_safetyTimer.restart( );
 
     if (holdPosition)
@@ -380,8 +346,8 @@ public class Intake extends SubsystemBase
                 m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio), targetRotations));
       }
       else
-        DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]", getSubsystem( ),
-            m_targetDegrees, INConsts.kRotaryAngleMin, INConsts.kRotaryAngleMax));
+        DataLogManager.log(String.format("%s: Position move target %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]",
+            getSubsystem( ), m_targetDegrees, INConsts.kRotaryAngleMin, INConsts.kRotaryAngleMax));
     }
     else
     {
@@ -406,15 +372,18 @@ public class Intake extends SubsystemBase
    * 
    * @return true when movement has completed
    */
-  public boolean moveToPositionIsFinished( )
+  public boolean moveToPositionIsFinished(boolean hold)
   {
     boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
     double error = m_targetDegrees - m_currentDegrees;
 
+    if (hold)
+      return false;
+
     if (m_withinTolerance.calculate(Math.abs(error) < kToleranceDegrees) || timedOut)
     {
       if (!m_moveIsFinished)
-        DataLogManager.log(String.format("%s: Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f %s",
+        DataLogManager.log(String.format("%s: Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f sec %s",
             getSubsystem( ), m_currentDegrees, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
       m_moveIsFinished = true;
@@ -435,6 +404,48 @@ public class Intake extends SubsystemBase
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// PRIVATE HELPERS //////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Set roller speed based on requested mode
+   * 
+   * @param mode
+   *          requested speed
+   */
+  private void setRollerMode(RollerMode mode)
+  {
+    double output = 0.0;
+
+    if (mode == RollerMode.HOLD)
+    {
+      DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_rollerMotor.get( )));
+    }
+    else
+    {
+      switch (mode)
+      {
+        default :
+          DataLogManager.log(String.format("%s: Roller mode is invalid: %s", getSubsystem( ), mode));
+        case STOP :
+          output = 0.0;
+          break;
+        case ACQUIRE :
+          output = kRollerSpeedAcquire;
+          break;
+        case EXPEL :
+          output = kRollerSpeedExpel;
+          break;
+        case SHOOT :
+          output = kRollerSpeedToShooter;
+          break;
+        case HANDOFF :
+          output = kRollerSpeedToFeeder;
+
+      }
+      DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));
+      m_rollerMotor.set(output);
+    }
+  }
 
   /****************************************************************************
    * 
@@ -561,6 +572,59 @@ public class Intake extends SubsystemBase
         this                                  // Subsystem required
     )                                         //
         .withName("IntakeMoveWithJoystick");
+  }
+
+  /****************************************************************************
+   * 
+   * Create motion magic base command
+   * 
+   * @param mode
+   *          roller mode to apply
+   * @param position
+   *          double supplier that provides the target distance
+   * @param hold
+   *          boolen to indicate whether the command ever finishes
+   * @return continuous command that runs climber motors
+   */
+  private Command getMMPositionCommand(RollerMode mode, DoubleSupplier position, boolean hold)
+  {
+    return new FunctionalCommand(                                 // Command with all phases declared
+        ( ) -> moveToPositionInit(mode, position.getAsDouble( ), hold), // Init method
+        ( ) -> moveToPositionExecute( ),                          // Execute method
+        interrupted -> moveToPositionEnd( ),                      // End method
+        ( ) -> moveToPositionIsFinished(hold),                    // IsFinished method
+        this                                                      // Subsytem required
+    );
+  }
+
+  /****************************************************************************
+   * 
+   * Create motion magic move to position command
+   * 
+   * @param mode
+   *          roller mode to apply
+   * @param position
+   *          double supplier that provides the target distance value
+   * @return continuous command that runs climber motors
+   */
+  public Command getMoveToPositionCommand(RollerMode mode, DoubleSupplier position)
+  {
+    return getMMPositionCommand(mode, position, false).withName("IntakeMMMoveToPosition");
+  }
+
+  /****************************************************************************
+   * 
+   * Create motion magic hold position command
+   * 
+   * @param mode
+   *          roller mode to apply
+   * @param position
+   *          double supplier that provides the target distance value
+   * @return continuous command that runs climber motors
+   */
+  public Command getHoldPositionCommand(RollerMode mode, DoubleSupplier position)
+  {
+    return getMMPositionCommand(mode, position, true).withName("IntakeMMHoldPosition");
   }
 
 }

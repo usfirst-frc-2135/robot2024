@@ -36,7 +36,7 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
         // @formatter:off
         new LogCommand(getName(), "Start shooter, stop rollers and retract intake"),
         // new ShooterRun(shooter, ShooterMode.SCORE),  // Already running
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
 
         new LogCommand(getName(), "Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtTargetSpeed),
@@ -44,13 +44,13 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
         new LogCommand(getName(), "Feed note from intake"),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
-        new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.SHOOT, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition)
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition)
 
         // new ShooterRun(shooter, ShooterMode.STOP), // Don't turn off
 

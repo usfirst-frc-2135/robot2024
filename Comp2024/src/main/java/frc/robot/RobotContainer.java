@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.FDConsts;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
@@ -43,8 +42,6 @@ import frc.robot.commands.ActionPrepareToClimb;
 import frc.robot.commands.ActionRetractIntake;
 import frc.robot.commands.ActionScoreAmp;
 import frc.robot.commands.ActionScoreSpeaker;
-import frc.robot.commands.FeederRun;
-import frc.robot.commands.IntakeRun;
 import frc.robot.commands.LogCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -184,27 +181,27 @@ public class RobotContainer
     SmartDashboard.putData("ActionScoreAmp", new ActionScoreAmp(m_feeder));
     SmartDashboard.putData("ActionScoreSpeaker", new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
-    SmartDashboard.putData("InRollStop", new IntakeRun(m_intake, RollerMode.STOP, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollAcquire", new IntakeRun(m_intake, RollerMode.ACQUIRE, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollExpel", new IntakeRun(m_intake, RollerMode.EXPEL, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollShoot", new IntakeRun(m_intake, RollerMode.SHOOT, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollHold", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollStop", m_intake.getMoveToPositionCommand(RollerMode.STOP, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollAcquire", m_intake.getMoveToPositionCommand(RollerMode.ACQUIRE, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollExpel", m_intake.getMoveToPositionCommand(RollerMode.EXPEL, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollShoot", m_intake.getMoveToPositionCommand(RollerMode.SHOOT, m_intake::getIntakePosition));
+    SmartDashboard.putData("InRollHold", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakePosition));
 
-    SmartDashboard.putData("InRotDeploy", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeDeployed));
-    SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeRetracted));
-    SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeHandoff));
+    SmartDashboard.putData("InRotDeploy", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakeDeployed));
+    SmartDashboard.putData("InRotRetract", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakeRetracted));
+    SmartDashboard.putData("InRotHandoff", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakeHandoff));
 
     SmartDashboard.putData("ShRunScore", m_shooter.getShooterScoreCommand( ));
     SmartDashboard.putData("ShRunStop", m_shooter.getShooterStopCommand( ));
 
-    SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getFeederPosition));
-    SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getFeederPosition));
-    SmartDashboard.putData("FdRollHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HANDOFF, m_feeder::getFeederPosition));
-    SmartDashboard.putData("FdRollHold", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollStop", m_feeder.getMoveToPositionCommand(FDRollerMode.STOP, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollScore", m_feeder.getMoveToPositionCommand(FDRollerMode.SCORE, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollHandoff", m_feeder.getMoveToPositionCommand(FDRollerMode.HANDOFF, m_feeder::getFeederPosition));
+    SmartDashboard.putData("FdRollHold", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederPosition));
 
-    SmartDashboard.putData("FdRotAmp", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederAmp));
-    SmartDashboard.putData("FdRotClimb", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederClimb));
-    SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederHandoff));
+    SmartDashboard.putData("FdRotAmp", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederAmp));
+    SmartDashboard.putData("FdRotClimb", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederClimb));
+    SmartDashboard.putData("FdRotHandoff", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederHandoff));
 
     SmartDashboard.putData("ClRunExtended", m_climber.getMoveToPositionCommand(m_climber::getClimberFullyExtended));
     SmartDashboard.putData("ClRunChain", m_climber.getMoveToPositionCommand(m_climber::getClimberChainLevel));
@@ -341,8 +338,8 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
-    m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakePosition, true));
-    m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD, m_feeder::getFeederPosition, true));
+    m_intake.setDefaultCommand(m_intake.getHoldPositionCommand(RollerMode.HOLD, m_intake::getIntakePosition));
+    m_feeder.setDefaultCommand(m_feeder.getHoldPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederPosition));
     m_climber.setDefaultCommand(m_climber.getHoldPositionCommand(m_climber::getClimberPosition));
 
     //Default command - manual mode
@@ -481,7 +478,7 @@ public class RobotContainer
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Deploy intake before moving"),
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
+            m_intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
 
             new WaitCommand(0.5), // TODO - do we need this? The intake command will run to completion first
 
@@ -498,7 +495,7 @@ public class RobotContainer
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
             
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition),
+            m_intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, m_intake::getIntakePosition),
 
             m_drivetrain.getAutoCommand("LeaveS" + poseValue)
         // @formatter:on
@@ -515,7 +512,7 @@ public class RobotContainer
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Deploy intake before moving"),
-            new IntakeRun(m_intake, INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
+            m_intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
 
             new WaitCommand(0.5),  // TODO - do we need this? The intake command will run to completion first
 
@@ -556,7 +553,7 @@ public class RobotContainer
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            new IntakeRun(m_intake, INConsts.RollerMode.STOP, m_intake::getIntakePosition)
+            m_intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, m_intake::getIntakePosition)
         // @formatter:on
         );
         break;

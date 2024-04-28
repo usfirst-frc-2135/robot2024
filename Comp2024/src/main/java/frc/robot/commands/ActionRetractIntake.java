@@ -37,8 +37,8 @@ public class ActionRetractIntake extends SequentialCommandGroup
           led.getLEDCommand(LEDColor.BLUE, LEDAnimation.CLEARALL),
           led.getLEDCommand(LEDColor.OFF, LEDAnimation.CLEARALL),
           intake::isNoteDetected),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted)
-        
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+
         //@formatter:on
     );
 

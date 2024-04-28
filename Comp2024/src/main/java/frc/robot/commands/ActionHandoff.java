@@ -32,24 +32,22 @@ public class ActionHandoff extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Align Feeder and Intake"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.HANDOFF, feeder::getFeederHandoff),
-
-        new WaitCommand(0.1), // TODO: Does this do anything?
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeHandoff),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HANDOFF, feeder::getFeederHandoff),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeHandoff),
 
         new LogCommand(getName(), "Transfer Note"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.HOLD, feeder::getFeederPosition),
-        new IntakeRun(intake, INConsts.RollerMode.HANDOFF, intake::getIntakePosition),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HOLD, feeder::getFeederPosition),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.HANDOFF, intake::getIntakePosition),
         
         new WaitCommand(0.1),
 
         new LogCommand(getName(), "Stop rollers"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getFeederPosition),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederPosition),
 
         new WaitCommand(0.2),
 
         new LogCommand(getName(), "Ensure Intake releases Note"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
 
         // @formatter:on
     );

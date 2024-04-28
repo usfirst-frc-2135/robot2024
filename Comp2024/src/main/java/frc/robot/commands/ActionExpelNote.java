@@ -33,16 +33,16 @@ public class ActionExpelNote extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeDeployed),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),        
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.EXPEL, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition),
         led.getLEDCommand(LEDColor.OFF, LEDAnimation.CLEARALL)
 
         // @formatter:on

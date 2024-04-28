@@ -140,7 +140,7 @@ public class Climber extends SubsystemBase
       BaseStatusSignal.setUpdateFrequencyForAll(20, m_rightCLoopError, m_rightSupplyCur, m_rightStatorCur);
     }
 
-    initSmartDashboard( );
+    initDashboard( );
     initialize( );
   }
 
@@ -209,7 +209,7 @@ public class Climber extends SubsystemBase
    * 
    * Initialize dashboard widgets
    */
-  private void initSmartDashboard( )
+  private void initDashboard( )
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_CLValid", m_climberValid);

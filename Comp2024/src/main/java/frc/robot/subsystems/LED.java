@@ -89,7 +89,7 @@ public class LED extends SubsystemBase
     m_candle.configBrightnessScalar(kBrightness);
     m_candle.clearAnimation(kSlot);
 
-    initSmartDashboard( );
+    initDashboard( );
     initialize( );
   }
 
@@ -117,7 +117,7 @@ public class LED extends SubsystemBase
    * 
    * Initialize dashboard widgets
    */
-  private void initSmartDashboard( )
+  private void initDashboard( )
   {
     // Initialize dashboard widgets
 

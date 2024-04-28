@@ -87,7 +87,7 @@ public class Shooter extends SubsystemBase
     m_shooterLVelocity.setUpdateFrequency(50);
     BaseStatusSignal.setUpdateFrequencyForAll(20, m_shooterLSupplyCur, m_shooterLStatorCur);
 
-    initSmartDashboard( );
+    initDashboard( );
     initialize( );
   }
 
@@ -158,7 +158,7 @@ public class Shooter extends SubsystemBase
    * 
    * Initialize dashboard widgets
    */
-  private void initSmartDashboard( )
+  private void initDashboard( )
   {
     SmartDashboard.putBoolean("HL_SHValid", m_shooterValid);
 

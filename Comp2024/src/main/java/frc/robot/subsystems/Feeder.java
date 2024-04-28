@@ -154,7 +154,7 @@ public class Feeder extends SubsystemBase
       BaseStatusSignal.setUpdateFrequencyForAll(20, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
     m_ccPosition.setUpdateFrequency(10);
 
-    initSmartDashboard( );
+    initDashboard( );
     initialize( );
   }
 
@@ -222,7 +222,7 @@ public class Feeder extends SubsystemBase
    * 
    * Initialize dashboard widgets
    */
-  private void initSmartDashboard( )
+  private void initDashboard( )
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_FDValidRoller", m_fdRollerValid);

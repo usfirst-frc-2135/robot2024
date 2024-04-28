@@ -34,6 +34,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FDConsts;
@@ -89,6 +91,8 @@ public class Feeder extends SubsystemBase
 
   // Roller variables
   private boolean                   m_fdRollerValid;      // Health indicator for motor 
+  private Debouncer                 m_noteDebouncer     = new Debouncer(0.030, DebounceType.kBoth);
+  private boolean                   m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
   private boolean                   m_fdRotaryValid;      // Health indicator for motor 
@@ -104,7 +108,6 @@ public class Feeder extends SubsystemBase
   // Motion Magic config parameters
   private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
-  private Debouncer                 m_noteDetected      = new Debouncer(0.030, DebounceType.kBoth);
   private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
   private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
 
@@ -167,13 +170,15 @@ public class Feeder extends SubsystemBase
     double rollerCurrent = (m_fdRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
     SmartDashboard.putNumber("FD_rollerCur", rollerCurrent);
 
+    m_noteDetected = m_noteDebouncer.calculate(m_noteInFeeder.get( ));
+
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
     SmartDashboard.putNumber("FD_ccDegrees", Units.rotationsToDegrees(getCANcoderRotations( )));
     SmartDashboard.putNumber("FD_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("FD_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("FD_rotaryDegrees", m_currentDegrees); // reference is rotary encoder
-    SmartDashboard.putBoolean("FD_noteInFeeder", m_noteInFeeder.get( ));
+    SmartDashboard.putBoolean("FD_noteDetected", m_noteDetected);
     if (m_debug && m_fdRotaryValid)
     {
       BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
@@ -256,65 +261,6 @@ public class Feeder extends SubsystemBase
     m_CANcoder.clearStickyFaults( );
   }
 
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-
-  /****************************************************************************
-   * 
-   * Return current feeder position
-   * 
-   * @return current feeder rotary angle
-   */
-  public double getFeederPosition( )
-  {
-    return m_currentDegrees;
-  }
-
-  /****************************************************************************
-   * 
-   * Return feeder angle for amp scoring state
-   * 
-   * @return amp scoring state angle
-   */
-  public double getFeederAmp( )
-  {
-    return FDConsts.kRotaryAngleAmp;
-  }
-
-  /****************************************************************************
-   * 
-   * Return feeder angle for climb state
-   * 
-   * @return climb state angle
-   */
-  public double getFeederClimb( )
-  {
-    return FDConsts.kRotaryAngleClimb;
-  }
-
-  /****************************************************************************
-   * 
-   * Return feeder angle for handoff state
-   * 
-   * @return handoff state angle
-   */
-  public double getFeederHandoff( )
-  {
-    return FDConsts.kRotaryAngleHandoff;
-  }
-
-  /****************************************************************************
-   * 
-   * Return feeder note sensor state
-   * 
-   * @return true if note detected in feeder
-   */
-  public boolean isNoteDetected( )
-  {
-    return m_noteDetected.calculate(m_noteInFeeder.get( ));
-  }
-
   /****************************************************************************
    * 
    * Set roller speed based on requested mode
@@ -360,7 +306,7 @@ public class Feeder extends SubsystemBase
    * @param getAxis
    *          double supplier that returns desired joystick axis
    */
-  public void moveRotaryWithJoystick(DoubleSupplier getAxis)
+  private void moveRotaryWithJoystick(DoubleSupplier getAxis)
   {
     double axisValue = getAxis.getAsDouble( );
     boolean rangeLimited = false;
@@ -477,7 +423,9 @@ public class Feeder extends SubsystemBase
     m_safetyTimer.stop( );
   }
 
-  ///////////////////////// PRIVATE HELPERS ///////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PRIVATE HELPERS //////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
@@ -525,6 +473,86 @@ public class Feeder extends SubsystemBase
   private boolean isMoveValid(double degrees)
   {
     return (degrees >= FDConsts.kRotaryAngleMin) && (degrees <= FDConsts.kRotaryAngleMax);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Return current feeder position
+   * 
+   * @return current feeder rotary angle
+   */
+  public double getFeederPosition( )
+  {
+    return m_currentDegrees;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder angle for amp scoring state
+   * 
+   * @return amp scoring state angle
+   */
+  public double getFeederAmp( )
+  {
+    return FDConsts.kRotaryAngleAmp;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder angle for climb state
+   * 
+   * @return climb state angle
+   */
+  public double getFeederClimb( )
+  {
+    return FDConsts.kRotaryAngleClimb;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder angle for handoff state
+   * 
+   * @return handoff state angle
+   */
+  public double getFeederHandoff( )
+  {
+    return FDConsts.kRotaryAngleHandoff;
+  }
+
+  /****************************************************************************
+   * 
+   * Return feeder note sensor state
+   * 
+   * @return true if note detected in feeder
+   */
+  public boolean isNoteDetected( )
+  {
+    return m_noteDetected;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// COMMAND FACTORIES ////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Create joystick manual move command
+   * 
+   * @param axis
+   *          double supplier that provides the joystick axis value
+   * @return continuous command that runs rotary motor
+   */
+  public Command getJoystickCommand(DoubleSupplier axis)
+  {
+    return new RunCommand(                    // Command that runs continuously
+        ( ) -> moveRotaryWithJoystick(axis),  // Lambda method to call
+        this                                  // Subsystem required
+    )                                         //
+        .withName("FeederMoveWithJoystick");
   }
 
 }

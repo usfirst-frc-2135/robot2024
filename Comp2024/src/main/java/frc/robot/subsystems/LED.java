@@ -22,6 +22,8 @@ import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
@@ -168,7 +170,7 @@ public class LED extends SubsystemBase
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ///////////////////////// PRIVATE HELPERS //////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
@@ -180,7 +182,7 @@ public class LED extends SubsystemBase
    * @param animation
    *          requested animation
    */
-  public void setLEDs(LEDColor color, LEDAnimation animation)
+  private void setLEDs(LEDColor color, LEDAnimation animation)
   {
     if (color == LEDColor.DASHBOARD)
       color = m_ledChooser.getSelected( );
@@ -273,4 +275,29 @@ public class LED extends SubsystemBase
     m_previousRgb = m_rgb;
     m_previousAnimation = m_animation;
   }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// COMMAND FACTORIES ////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Create LED set command
+   * 
+   * @param color
+   *          LED color to display
+   * @param animation
+   *          LED animation pattern to use
+   * @return instant command that changes LEDs
+   */
+  public Command getLEDCommand(LEDColor color, LEDAnimation animation)
+  {
+    return new InstantCommand(            // Command that runs exactly once
+        ( ) -> setLEDs(color, animation), // Method to call
+        this                              // Subsystem requirement
+    )                                     //
+        .withName("LEDSet")          //
+        .ignoringDisable(true);
+  }
+
 }

@@ -34,6 +34,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.INConsts;
@@ -92,6 +94,8 @@ public class Intake extends SubsystemBase
 
   // Roller variables
   private boolean                   m_inRollerValid;      // Health indicator for motor 
+  private Debouncer                 m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
+  private boolean                   m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
   private boolean                   m_inRotaryValid;      // Health indicator for motor 
@@ -107,7 +111,6 @@ public class Intake extends SubsystemBase
   // Motion Magic config parameters
   private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
   private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
-  private Debouncer                 m_noteDetected        = new Debouncer(0.030, DebounceType.kBoth);
   private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
   private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
 
@@ -170,12 +173,14 @@ public class Intake extends SubsystemBase
     double rollerCurrent = (m_inRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
     SmartDashboard.putNumber("IN_rollerCur", rollerCurrent);
 
+    m_noteDetected = m_noteDebouncer.calculate(m_noteInIntake.get( ));
+
     // CANcoder is the primary (remote) sensor for Motion Magic
     m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
     SmartDashboard.putNumber("IN_ccDegrees", Units.rotationsToDegrees(getCANcoderRotations( )));
     SmartDashboard.putNumber("IN_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("IN_targetDegrees", m_targetDegrees);
-    SmartDashboard.putBoolean("IN_noteInIntake", m_noteInIntake.get( ));
+    SmartDashboard.putBoolean("IN_noteDetected", m_noteDetected);
     if (m_debug && m_inRotaryValid)
     {
       BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
@@ -259,65 +264,6 @@ public class Intake extends SubsystemBase
     m_CANcoder.clearStickyFaults( );
   }
 
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-
-  /****************************************************************************
-   * 
-   * Return current intake position
-   * 
-   * @return current intake rotary angle
-   */
-  public double getIntakePosition( )
-  {
-    return m_currentDegrees;
-  }
-
-  /****************************************************************************
-   * 
-   * Return intake angle for retracted state
-   * 
-   * @return retracted state angle
-   */
-  public double getIntakeRetracted( )
-  {
-    return INConsts.kRotaryAngleRetracted;
-  }
-
-  /****************************************************************************
-   * 
-   * Return intake angle for handoff state
-   * 
-   * @return handoff state angle
-   */
-  public double getIntakeHandoff( )
-  {
-    return INConsts.kRotaryAngleHandoff;
-  }
-
-  /****************************************************************************
-   * 
-   * Return intake angle for deployed state
-   * 
-   * @return deployed state angle
-   */
-  public double getIntakeDeployed( )
-  {
-    return INConsts.kRotaryAngleDeployed;
-  }
-
-  /****************************************************************************
-   * 
-   * Return intake note sensor state
-   * 
-   * @return true if note detected in intake
-   */
-  public boolean isNoteDetected( )
-  {
-    return m_noteDetected.calculate(m_noteInIntake.get( ));
-  }
-
   /****************************************************************************
    * 
    * Set roller speed based on requested mode
@@ -369,7 +315,7 @@ public class Intake extends SubsystemBase
    * @param getAxis
    *          double supplier that returns desired joystick axis
    */
-  public void moveRotaryWithJoystick(DoubleSupplier getAxis)
+  private void moveRotaryWithJoystick(DoubleSupplier getAxis)
   {
     double axisValue = getAxis.getAsDouble( );
     boolean rangeLimited = false;
@@ -486,7 +432,9 @@ public class Intake extends SubsystemBase
     m_safetyTimer.stop( );
   }
 
-  ///////////////////////// PRIVATE HELPERS ///////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PRIVATE HELPERS //////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
@@ -533,6 +481,86 @@ public class Intake extends SubsystemBase
   private boolean isMoveValid(double degrees)
   {
     return (degrees >= INConsts.kRotaryAngleMin) && (degrees <= INConsts.kRotaryAngleMax);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Return current intake position
+   * 
+   * @return current intake rotary angle
+   */
+  public double getIntakePosition( )
+  {
+    return m_currentDegrees;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake angle for retracted state
+   * 
+   * @return retracted state angle
+   */
+  public double getIntakeRetracted( )
+  {
+    return INConsts.kRotaryAngleRetracted;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake angle for handoff state
+   * 
+   * @return handoff state angle
+   */
+  public double getIntakeHandoff( )
+  {
+    return INConsts.kRotaryAngleHandoff;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake angle for deployed state
+   * 
+   * @return deployed state angle
+   */
+  public double getIntakeDeployed( )
+  {
+    return INConsts.kRotaryAngleDeployed;
+  }
+
+  /****************************************************************************
+   * 
+   * Return intake note sensor state
+   * 
+   * @return true if note detected in intake
+   */
+  public boolean isNoteDetected( )
+  {
+    return m_noteDetected;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// COMMAND FACTORIES ////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Create joystick manual move command
+   * 
+   * @param axis
+   *          double supplier that provides the joystick axis value
+   * @return continuous command that runs rotary motor
+   */
+  public Command getJoystickCommand(DoubleSupplier axis)
+  {
+    return new RunCommand(                    // Command that runs continuously
+        ( ) -> moveRotaryWithJoystick(axis),  // Lambda method to call
+        this                                  // Subsystem required
+    )                                         //
+        .withName("IntakeMoveWithJoystick");
   }
 
 }

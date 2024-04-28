@@ -30,6 +30,9 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
@@ -243,7 +246,9 @@ public class Climber extends SubsystemBase
     m_rightMotor.clearStickyFaults( );
   }
 
+  ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
@@ -252,7 +257,7 @@ public class Climber extends SubsystemBase
    * @param getAxis
    *          double supplier that returns desired joystick axis
    */
-  public void moveWithJoystick(DoubleSupplier getAxis)
+  private void moveWithJoystick(DoubleSupplier getAxis)
   {
     double axisValue = getAxis.getAsDouble( );
     boolean rangeLimited = false;
@@ -282,7 +287,9 @@ public class Climber extends SubsystemBase
     setVoltage(axisValue * kManualSpeedVolts, axisValue * kManualSpeedVolts);
   }
 
+  ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// MOTION MAGIC //////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
@@ -293,7 +300,7 @@ public class Climber extends SubsystemBase
    * @param holdPosition
    *          hold previous position if true
    */
-  public void moveToPositionInit(double newLength, boolean holdPosition)
+  private void moveToPositionInit(double newLength, boolean holdPosition)
   {
     m_safetyTimer.restart( );
     m_hardStopCounter = 0;
@@ -342,7 +349,7 @@ public class Climber extends SubsystemBase
    * 
    * Continuously update Motion Magic setpoint
    */
-  public void moveToPositionExecute( )
+  private void moveToPositionExecute( )
   {
     if (m_calibrated)
       setMMPosition(m_targetInches);
@@ -354,7 +361,7 @@ public class Climber extends SubsystemBase
    * 
    * @return true when movement has completed
    */
-  public boolean moveToPositionIsFinished( )
+  private boolean moveToPositionIsFinished(boolean hold)
   {
     boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
     double error = m_targetInches - m_currentInches;
@@ -362,6 +369,8 @@ public class Climber extends SubsystemBase
 
     if (!m_calibrated)
       return true;
+    if (hold)
+      return false;
 
     if (m_withinTolerance.calculate(Math.abs(error) < kToleranceInches) || timedOut || hittingHardStop)
     {
@@ -381,24 +390,27 @@ public class Climber extends SubsystemBase
    * 
    * Wrap up a Motion Magic movement
    */
-  public void moveToPositionEnd( )
+  private void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
   }
 
+  ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CALIBRATION ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
    * Initialize calibration movement
    */
-  public void climberCalibrateInit( )
+  private void calibrateInit( )
   {
     DataLogManager.log(String.format("%s: Start up", getName( )));
     m_calibrated = false;
     m_calibrateTimer.restart( );
     m_leftStalled.calculate(false);
     m_rightStalled.calculate(false);
+    setVoltage(kCalibrateSpeedVolts, kCalibrateSpeedVolts);
   }
 
   /****************************************************************************
@@ -406,11 +418,11 @@ public class Climber extends SubsystemBase
    * Move climber down during calibration
    * 
    */
-  public void climberCalibrateExecute( )
+  private void calibrateExecute( )
   {
-    double leftVolts = (m_leftStalled.calculate(m_leftSupplyCur.getValue( ) > kCalibrateStallAmps)) ? kCalibrateSpeedVolts : 0.0;
+    double leftVolts = (m_leftStalled.calculate(m_leftSupplyCur.getValue( ) > kCalibrateStallAmps)) ? 0.0 : kCalibrateSpeedVolts;
     double rightVolts =
-        (m_rightStalled.calculate(m_rightSupplyCur.getValue( ) > kCalibrateStallAmps)) ? kCalibrateSpeedVolts : 0.0;
+        (m_rightStalled.calculate(m_rightSupplyCur.getValue( ) > kCalibrateStallAmps)) ? 0.0 : kCalibrateSpeedVolts;
 
     setVoltage(leftVolts, rightVolts);
   }
@@ -421,17 +433,19 @@ public class Climber extends SubsystemBase
    * 
    * @return true when command has completed
    */
-  public boolean climberCalibrateIsFinished( )
+  private boolean calibrateIsFinished( )
   {
-    return (m_calibrateTimer.hasElapsed(kCalibrationTimeout) || (Math.abs(m_leftMotor.getMotorVoltage( ).getValue( )) < 0.1
-        && (Math.abs(m_rightMotor.getMotorVoltage( ).getValue( )) < 0.1)));
+    return (m_calibrateTimer.hasElapsed(kCalibrationTimeout));
+    // TODO: end when current limit is reached
+    // return (m_calibrateTimer.hasElapsed(kCalibrationTimeout) || (Math.abs(m_leftMotor.getMotorVoltage( ).getValue( )) < 0.1
+    // && (Math.abs(m_rightMotor.getMotorVoltage( ).getValue( )) < 0.1)));
   }
 
   /****************************************************************************
    * 
    * Wrap up calibration sequence
    */
-  public void climberCalibrateEnd( )
+  private void calibrateEnd( )
   {
     DataLogManager.log(String.format("%s: End - elapsed %.3f sec", getName( ), m_calibrateTimer.get( )));
     m_calibrateTimer.stop( );
@@ -442,7 +456,9 @@ public class Climber extends SubsystemBase
     SmartDashboard.putBoolean("CL_calibrated", m_calibrated);
   }
 
+  ////////////////////////////////////////////////////////////////////////////
   ///////////////////////// PRIVATE HELPERS ///////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
    * 
@@ -510,4 +526,137 @@ public class Climber extends SubsystemBase
     return (inches >= CLConsts.kLengthMin) && (inches <= CLConsts.kLengthMax);
   }
 
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Return current cliimber position
+   * 
+   * @return current climber position in inches
+   */
+  public double getClimberPosition( )
+  {
+    return m_currentInches;
+  }
+
+  /****************************************************************************
+   * 
+   * Return climber length for climbed state
+   * 
+   * @return climbed state length
+   */
+  public double getClimberClimbed( )
+  {
+    return CLConsts.kLengthClimbed;
+  }
+
+  /****************************************************************************
+   * 
+   * Return climber length for fully extended state
+   * 
+   * @return fully extended state length
+   */
+  public double getClimberFullyExtended( )
+  {
+    return CLConsts.kLengthFull;
+  }
+
+  /****************************************************************************
+   * 
+   * Return climber length for chain state
+   * 
+   * @return chain height state length
+   */
+  public double getClimberChainLevel( )
+  {
+    return CLConsts.kLengthChain;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// COMMAND FACTORIES ////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Create calibration command
+   * 
+   * @return continuous command that runs climber motors
+   */
+  public Command getCalibrateCommand( )
+  {
+    return new FunctionalCommand(       // Command with all phases declared
+        ( ) -> calibrateInit( ),        // Init method
+        ( ) -> calibrateExecute( ),     // Execute method
+        interrupted -> calibrateEnd( ), // End method
+        ( ) -> calibrateIsFinished( ),  // IsFinished method
+        this                            // Subsytem required
+    )                                   //
+        .withName("ClimberCalibrate");
+  }
+
+  /****************************************************************************
+   * 
+   * Create joystick manual move command
+   * 
+   * @param axis
+   *          double supplier that provides the joystick axis value
+   * @return continuous command that runs climber motors
+   */
+  public Command getJoystickCommand(DoubleSupplier axis)
+  {
+    return new RunCommand(              // Command that runs continuously
+        ( ) -> moveWithJoystick(axis),  // Lambda method to call
+        this                            // Subsystem required
+    )                                   //
+        .withName("ClimberMoveWithJoystick");
+  }
+
+  /****************************************************************************
+   * 
+   * Create motion magic base command
+   * 
+   * @param position
+   *          double supplier that provides the target distance
+   * @param hold
+   *          boolen to indicate whether the command ever finishes
+   * @return continuous command that runs climber motors
+   */
+  private Command getMMPositionCommand(DoubleSupplier position, boolean hold)
+  {
+    return new FunctionalCommand(                                 // Command with all phases declared
+        ( ) -> moveToPositionInit(position.getAsDouble( ), hold), // Init method
+        ( ) -> moveToPositionExecute( ),                          // Execute method
+        interrupted -> moveToPositionEnd( ),                      // End method
+        ( ) -> moveToPositionIsFinished(hold),                    // IsFinished method
+        this                                                      // Subsytem required
+    );
+  }
+
+  /****************************************************************************
+   * 
+   * Create motion magic move to position command
+   * 
+   * @param position
+   *          double supplier that provides the target distance value
+   * @return continuous command that runs climber motors
+   */
+  public Command getMoveToPositionCommand(DoubleSupplier position)
+  {
+    return getMMPositionCommand(position, false).withName("ClimberMMMoveToPosition");
+  }
+
+  /****************************************************************************
+   * 
+   * Create motion magic hold position command
+   * 
+   * @param position
+   *          double supplier that provides the target distance value
+   * @return continuous command that runs climber motors
+   */
+  public Command getHoldPositionCommand(DoubleSupplier position)
+  {
+    return getMMPositionCommand(position, true).withName("ClimberMMHoldPosition");
+  }
 }

@@ -34,7 +34,7 @@ public class ActionAcquireNote extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Start rollers & Deploy intake rotary"),
-        new LEDSet(led, LEDColor.YELLOW, LEDAnimation.CLEARALL),
+        led.getLEDCommand(LEDColor.YELLOW, LEDAnimation.CLEARALL),
         new IntakeRun(intake, INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Wait for note"),

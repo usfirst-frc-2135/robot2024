@@ -7,8 +7,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.LEDConsts.LEDAnimation;
-import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
@@ -37,7 +35,6 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Start shooter, stop rollers and retract intake"),
-        new LEDSet(led, LEDColor.RED, LEDAnimation.CLEARALL),
         // new ShooterRun(shooter, ShooterMode.SCORE),  // Already running
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeRetracted),
 
@@ -45,7 +42,6 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
         new WaitUntilCommand(shooter::isAtTargetSpeed),
 
         new LogCommand(getName(), "Feed note from intake"),
-        new LEDSet(led, LEDColor.GREEN, LEDAnimation.CLEARALL),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
         new IntakeRun(intake, INConsts.RollerMode.SHOOT, intake::getIntakePosition),
@@ -54,9 +50,8 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition),
+        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition)
 
-        new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL)
         // new ShooterRun(shooter, ShooterMode.STOP), // Don't turn off
 
         // @formatter:on

@@ -25,6 +25,7 @@ public class Vision extends SubsystemBase
     PIPMAIN(1),     //
     PIPSECONDARY(2);
 
+    @SuppressWarnings("unused")
     public final int value;
 
     private streamMode(int value)

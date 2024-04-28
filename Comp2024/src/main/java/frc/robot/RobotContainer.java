@@ -29,14 +29,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.CLConsts;
 import frc.robot.Constants.FDConsts;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
-import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.Constants.VIConsts;
 import frc.robot.commands.ActionAcquireNote;
 import frc.robot.commands.ActionExpelNote;
@@ -45,18 +43,9 @@ import frc.robot.commands.ActionPrepareToClimb;
 import frc.robot.commands.ActionRetractIntake;
 import frc.robot.commands.ActionScoreAmp;
 import frc.robot.commands.ActionScoreSpeaker;
-import frc.robot.commands.ClimberCalibrate;
-import frc.robot.commands.ClimberMoveToPosition;
-import frc.robot.commands.ClimberMoveWithJoystick;
-import frc.robot.commands.Dummy;
-import frc.robot.commands.FeederMoveWithJoystick;
 import frc.robot.commands.FeederRun;
-import frc.robot.commands.IntakeMoveWithJoystick;
 import frc.robot.commands.IntakeRun;
-import frc.robot.commands.LEDSet;
 import frc.robot.commands.LogCommand;
-import frc.robot.commands.ShooterRun;
-import frc.robot.commands.SwerveStop;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -96,8 +85,10 @@ public class RobotContainer
   private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )  //
       .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                 //
       .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);                // Field centric drive facing a direction
+  @SuppressWarnings("unused")
   private final SwerveRequest.PointWheelsAt           point          = new SwerveRequest.PointWheelsAt( );
   private final SwerveRequest.RobotCentric            aim            = new SwerveRequest.RobotCentric( );
+  private final SwerveRequest.Idle                    idle           = new SwerveRequest.Idle( );
 
   private final Telemetry                             logger         = new Telemetry(MaxSpeed);
 
@@ -178,7 +169,7 @@ public class RobotContainer
 
     SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( )));
 
-    SmartDashboard.putData("LEDRun", new LEDSet(m_led, LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
+    SmartDashboard.putData("LEDRun", m_led.getLEDCommand(LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
 
     SmartDashboard.putNumber("SW_SetPoseX", 0.0);
     SmartDashboard.putNumber("SW_SetPoseY", 0.0);
@@ -203,8 +194,8 @@ public class RobotContainer
     SmartDashboard.putData("InRotRetract", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeRetracted));
     SmartDashboard.putData("InRotHandoff", new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakeHandoff));
 
-    SmartDashboard.putData("ShRunScore", new ShooterRun(m_shooter, ShooterMode.SCORE));
-    SmartDashboard.putData("ShRunStop", new ShooterRun(m_shooter, ShooterMode.STOP));
+    SmartDashboard.putData("ShRunScore", m_shooter.getShooterScoreCommand( ));
+    SmartDashboard.putData("ShRunStop", m_shooter.getShooterStopCommand( ));
 
     SmartDashboard.putData("FdRollStop", new FeederRun(m_feeder, FDConsts.FDRollerMode.STOP, m_feeder::getFeederPosition));
     SmartDashboard.putData("FdRollScore", new FeederRun(m_feeder, FDConsts.FDRollerMode.SCORE, m_feeder::getFeederPosition));
@@ -215,10 +206,10 @@ public class RobotContainer
     SmartDashboard.putData("FdRotClimb", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederClimb));
     SmartDashboard.putData("FdRotHandoff", new FeederRun(m_feeder, FDConsts.FDRollerMode.HOLD, m_feeder::getFeederHandoff));
 
-    SmartDashboard.putData("ClRunExtended", new ClimberMoveToPosition(m_climber, CLConsts.kLengthFull));
-    SmartDashboard.putData("ClRunChain", new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
-    SmartDashboard.putData("ClRunClimbed", new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
-    SmartDashboard.putData("CLCalibrate", new ClimberCalibrate(m_climber));
+    SmartDashboard.putData("ClRunExtended", m_climber.getMoveToPositionCommand(m_climber::getClimberFullyExtended));
+    SmartDashboard.putData("ClRunChain", m_climber.getMoveToPositionCommand(m_climber::getClimberChainLevel));
+    SmartDashboard.putData("ClRunClimbed", m_climber.getMoveToPositionCommand(m_climber::getClimberClimbed));
+    SmartDashboard.putData("CLCalibrate", m_climber.getCalibrateCommand( ));
   }
 
   /****************************************************************************
@@ -238,9 +229,9 @@ public class RobotContainer
         .withVelocityX(-m_vision.limelight_range_proportional(MaxSpeed))            //
         .withVelocityY(0)                                                 //
         .withRotationalRate(m_vision.limelight_aim_proportional(MaxAngularRate))));
-    m_driverPad.b( ).onTrue(new Dummy("driver b")); // drive to stage right
-    m_driverPad.x( ).onTrue(new Dummy("driver x")); // drive to stage left
-    m_driverPad.y( ).onTrue(new Dummy("driver y")); // drive to stage center
+    m_driverPad.b( ).onTrue(new LogCommand("driverPad", "B")); // drive to stage right
+    m_driverPad.x( ).onTrue(new LogCommand("driverPad", "X")); // drive to stage left
+    m_driverPad.y( ).onTrue(new LogCommand("driverPad", "Y")); // drive to stage center
 
     //
     // Driver - Bumpers, start, back
@@ -271,8 +262,8 @@ public class RobotContainer
         .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose)); // drive to speaker
     m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
-    m_driverPad.leftStick( ).onTrue(new Dummy("driver left stick"));
-    m_driverPad.rightStick( ).onTrue(new Dummy("driver right stick"));
+    m_driverPad.leftStick( ).onTrue(new LogCommand("driverPad", "left stick"));
+    m_driverPad.rightStick( ).onTrue(new LogCommand("driverPad", "right stick"));
 
     ///////////////////////////////////////////////////////
     //
@@ -280,9 +271,9 @@ public class RobotContainer
     //
     // Operator - A, B, X, Y
     //
-    m_operatorPad.a( ).onTrue(new ShooterRun(m_shooter, ShooterMode.SCORE));
-    m_operatorPad.b( ).onTrue(new ShooterRun(m_shooter, ShooterMode.STOP));
-    m_operatorPad.x( ).onTrue(new Dummy("oper X"));
+    m_operatorPad.a( ).onTrue(m_shooter.getShooterScoreCommand( ));
+    m_operatorPad.b( ).onTrue(m_shooter.getShooterStopCommand( ));
+    m_operatorPad.x( ).onTrue(new LogCommand("operPad", "X"));
     m_operatorPad.y( ).onTrue(new ActionExpelNote(m_intake, m_led));
 
     //
@@ -291,16 +282,16 @@ public class RobotContainer
     m_operatorPad.leftBumper( ).onTrue(new ActionHandoff(m_intake, m_feeder));
     m_operatorPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
-    m_operatorPad.back( ).toggleOnTrue(new ClimberMoveWithJoystick(m_climber, ( ) -> getClimberAxis( )));  // aka View
+    m_operatorPad.back( ).toggleOnTrue(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
 
     //
     // Operator - POV buttons
     //
     m_operatorPad.pov(0).onTrue(new ActionPrepareToClimb(m_climber, m_feeder));
-    m_operatorPad.pov(90).onTrue(new Dummy("POV button 90"));
-    m_operatorPad.pov(180).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthClimbed));
-    m_operatorPad.pov(270).onTrue(new ClimberMoveToPosition(m_climber, CLConsts.kLengthChain));
+    m_operatorPad.pov(90).onTrue(new LogCommand("operPad", "POV 90"));
+    m_operatorPad.pov(180).onTrue(m_climber.getMoveToPositionCommand(m_climber::getClimberClimbed));
+    m_operatorPad.pov(270).onTrue(m_climber.getMoveToPositionCommand(m_climber::getClimberChainLevel));
 
     //
     // Operator Left/Right Trigger
@@ -310,8 +301,8 @@ public class RobotContainer
     m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreAmp(m_feeder));
     m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
-    m_operatorPad.leftStick( ).toggleOnTrue(new FeederMoveWithJoystick(m_feeder, ( ) -> getFeederAxis( )));
-    m_operatorPad.rightStick( ).toggleOnTrue(new IntakeMoveWithJoystick(m_intake, ( ) -> getIntakeAxis( )));
+    m_operatorPad.leftStick( ).toggleOnTrue(m_feeder.getJoystickCommand(( ) -> getFeederAxis( )));
+    m_operatorPad.rightStick( ).toggleOnTrue(m_intake.getJoystickCommand(( ) -> getIntakeAxis( )));
   }
 
   /****************************************************************************
@@ -327,7 +318,8 @@ public class RobotContainer
               .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                      // Drive forward with negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                      // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate)          // Drive counterclockwise with negative X (left)
-          ).ignoringDisable(true)                                  //
+          )                                                                            //
+              .ignoringDisable(true)                               //
               .withName("CommandSwerveDrivetrain"));
     }
     else // When using simulation on MacOS X, XBox controllers need to be re-mapped due to an Apple bug
@@ -337,7 +329,8 @@ public class RobotContainer
               .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                       // Drive forward with negative Y (forward)
               .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                       // Drive left with negative X (left)
               .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate)  // Drive counterclockwise with negative X (left)
-          ).ignoringDisable(true)                                   //
+          )                                                                             //
+              .ignoringDisable(true)                                //
               .withName("CommandSwerveDrivetrain"));
     }
 
@@ -350,12 +343,12 @@ public class RobotContainer
     // Default command - Motion Magic hold
     m_intake.setDefaultCommand(new IntakeRun(m_intake, RollerMode.HOLD, m_intake::getIntakePosition, true));
     m_feeder.setDefaultCommand(new FeederRun(m_feeder, FDRollerMode.HOLD, m_feeder::getFeederPosition, true));
-    m_climber.setDefaultCommand(new ClimberMoveToPosition(m_climber));
+    m_climber.setDefaultCommand(m_climber.getHoldPositionCommand(m_climber::getClimberPosition));
 
     //Default command - manual mode
-    // m_intake.setDefaultCommand(new IntakeMoveWithJoystick(m_intake, m_operatorPad.getHID( )));
-    // m_feeder.setDefaultCommand(new FeederMoveWithJoystick(m_feeder, m_operatorPad.getHID( )));
-    // m_climber.setDefaultCommand(new ClimberMoveWithJoystick(m_climber, m_operatorPad.getHID( )));
+    // m_intake.setDefaultCommand(m_intake.getJoystickCommand(( ) -> getIntakeAxis( )));
+    // m_feeder.setDefaultCommand(m_feeder.getJoystickCommand(( ) -> getFeederAxis( )));
+    // m_climber.setDefaultCommand(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));
   }
 
   /****************************************************************************
@@ -433,7 +426,7 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-        m_autoCommand = new SwerveStop(m_drivetrain);
+        m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
         break;
 
       case AUTOLEAVE :
@@ -702,6 +695,7 @@ public class RobotContainer
    */
   public void teleopInit( )
   {
-    CommandScheduler.getInstance( ).schedule(new ClimberCalibrate(m_climber));
+    CommandScheduler.getInstance( ).schedule(m_climber.getCalibrateCommand( ));
   }
+
 }

@@ -20,8 +20,11 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
+import frc.robot.Constants.SHConsts;
 import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
@@ -187,7 +190,7 @@ public class Shooter extends SubsystemBase
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ///////////////////////// PRIVATE HELPERS //////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
@@ -197,7 +200,7 @@ public class Shooter extends SubsystemBase
    * @param mode
    *          requested speed
    */
-  public void setShooterMode(ShooterMode mode)
+  private void setShooterMode(ShooterMode mode)
   {
     DataLogManager.log(String.format("%s: Set shooter mode to %s", getSubsystem( ), mode));
 
@@ -226,6 +229,10 @@ public class Shooter extends SubsystemBase
     DataLogManager.log(String.format("%s: Target rpm is %.1f rps %.1f", getSubsystem( ), m_targetRPM, rotPerSecond));
   }
 
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
   /****************************************************************************
    * 
    * Return shooter speed check against target RPM
@@ -236,4 +243,47 @@ public class Shooter extends SubsystemBase
   {
     return m_isAtTargetSpeed;
   }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////// COMMAND FACTORIES ////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Create shooter command based on passed mode
+   * 
+   * @param mode
+   *          shooter mode that detemines speed
+   * @return instant command that changes shooter motors
+   */
+  private Command getShooterCommand(ShooterMode mode)
+  {
+    return new InstantCommand(        // Command that runs exactly once
+        ( ) -> setShooterMode(mode),  // Method to call
+        this                          // Subsystem requirement
+    );
+  }
+
+  /****************************************************************************
+   * 
+   * Create shooter mode command for scoring
+   * 
+   * @return instant command that runs shooter motors for scoring
+   */
+  public Command getShooterScoreCommand( )
+  {
+    return getShooterCommand(SHConsts.ShooterMode.SCORE).withName("ShooterScore");
+  }
+
+  /****************************************************************************
+   * 
+   * Create shooter mode command to stop motors
+   * 
+   * @return instant command that stops shooter motors
+   */
+  public Command getShooterStopCommand( )
+  {
+    return getShooterCommand(SHConsts.ShooterMode.STOP).withName("ShooterStop");
+  }
+
 }

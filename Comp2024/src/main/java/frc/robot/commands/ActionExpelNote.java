@@ -43,7 +43,7 @@ public class ActionExpelNote extends SequentialCommandGroup
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
         new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakePosition),
-        new LEDSet(led, LEDColor.OFF, LEDAnimation.CLEARALL)
+        led.getLEDCommand(LEDColor.OFF, LEDAnimation.CLEARALL)
 
         // @formatter:on
     );

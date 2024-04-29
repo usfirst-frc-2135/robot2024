@@ -15,6 +15,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -95,6 +96,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private final DoubleArrayPublisher                 fieldPub                        =
       table.getDoubleArrayTopic("llPose").publish( );
   private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
+
+  private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
+      1.0,       // kMaxVelocityMps                               (slowed from 3.0 for testing)    
+      1.0, // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  
+      1.0 * Math.PI,            // kMaxAngularSpeedRadiansPerSecond              (slowed from 2.0 * Math.PI for testing)  
+      1.0 * Math.PI             // kMaxAngularSpeedRadiansPerSecondSquared       (slowed from 1.5 * Math.PIfor testing)  
+  );
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
       SwerveModuleConstants... modules)
@@ -258,6 +266,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   {
     DataLogManager.log(String.format("drivePathToPose: Alliance %s target pose %s", DriverStation.getAlliance( ), pose));
 
-    return AutoBuilder.pathfindToPoseFlipped(pose, VIConsts.kPathFindConstraints, 0.0);
+    return AutoBuilder.pathfindToPoseFlipped(pose, kPathFindConstraints, 0.0);
   }
 }

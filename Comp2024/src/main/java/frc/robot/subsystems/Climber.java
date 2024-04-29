@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CLConsts;
-import frc.robot.Constants.CLConsts.ClimberMode;
 import frc.robot.Constants.Ports;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
@@ -49,20 +48,29 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Climber extends SubsystemBase
 {
   // Constants
-  private static final double       kLigament2dOffset     = 0.0;    // Offset from mechanism root for climber ligament
-  private static final double       kGearRatio            = 16.0;   // Gear reduction
-  private static final double       kClimberLengthMeters  = 0.5;
-  private static final double       kCarriageMassKg       = 2.0;
-  private static final double       kDrumDiameterInches   = 1.375;  // Drum diameter in inches
-  private static final double       kDrumRadiusMeters     = Units.inchesToMeters(kDrumDiameterInches) / 2;
-  private static final double       kRolloutRatio         = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
-  private static final double       kCalibrateSpeedVolts  = -1.0;   // Motor voltage during calibration
-  private static final double       kCalibrateStallAmps   = 4.0;    // Motor amps during calibration stall
-  private static final double       kManualSpeedVolts     = 3.0;    // Motor voltage during manual operation (joystick)
+  private static final double kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
+  private static final double kGearRatio           = 16.0;   // Gear reduction
+  private static final double kClimberLengthMeters = 0.5;
+  private static final double kCarriageMassKg      = 2.0;
+  private static final double kDrumDiameterInches  = 1.375;  // Drum diameter in inches
+  private static final double kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
+  private static final double kRolloutRatio        = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
+  private static final double kCalibrateSpeedVolts = -1.0;   // Motor voltage during calibration
+  private static final double kCalibrateStallAmps  = 4.0;    // Motor amps during calibration stall
+  private static final double kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
 
-  private static final double       kToleranceInches      = 0.5;    // Climber PID tolerance in inches
-  private static final double       kMMSafetyTimeout      = 2.0;    // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
-  private static final double       kCalibrationTimeout   = 2.0;    // Max calibration time
+  private static final double kToleranceInches     = 0.5;    // Climber PID tolerance in inches
+  private static final double kMMSafetyTimeout     = 2.0;    // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double kCalibrationTimeout  = 2.0;    // Max calibration time
+
+  // Climber manual move parameters
+  private enum ClimberMode
+  {
+    INIT,   // Initialize climber
+    UP,     // Climber move upward
+    STOP,   // Climber stop
+    DOWN    // Climber move downward
+  }
 
   // Device and simulation objects
   private final TalonFX             m_leftMotor           = new TalonFX(Ports.kCANID_ClimberL);

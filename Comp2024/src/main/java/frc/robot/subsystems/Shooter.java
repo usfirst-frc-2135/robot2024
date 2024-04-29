@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
-import frc.robot.Constants.SHConsts;
-import frc.robot.Constants.SHConsts.ShooterMode;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
@@ -42,6 +40,13 @@ public class Shooter extends SubsystemBase
 
   private static final double   kFlywheelScoreRPM         = 3000.0;    // RPM to score
   private static final double   kToleranceRPM             = 100.0;     // Tolerance band around target RPM
+
+  private enum ShooterMode
+  {
+    REVERSE,    // Shooter runs in reverse direction to handle jams
+    STOP,       // Shooter is stopped
+    SCORE,      // Shooter ramped to an initial speed before shooting
+  }
 
   // Devices and simulation objects
   private final TalonFX         m_shooterLower            = new TalonFX(Ports.kCANID_ShooterLower);
@@ -272,7 +277,7 @@ public class Shooter extends SubsystemBase
    */
   public Command getShooterScoreCommand( )
   {
-    return getShooterCommand(SHConsts.ShooterMode.SCORE).withName("ShooterScore");
+    return getShooterCommand(ShooterMode.SCORE).withName("ShooterScore");
   }
 
   /****************************************************************************
@@ -283,7 +288,7 @@ public class Shooter extends SubsystemBase
    */
   public Command getShooterStopCommand( )
   {
-    return getShooterCommand(SHConsts.ShooterMode.STOP).withName("ShooterStop");
+    return getShooterCommand(ShooterMode.STOP).withName("ShooterStop");
   }
 
 }

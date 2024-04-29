@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FDConsts;
 import frc.robot.Constants.FDConsts.FDRollerMode;
-import frc.robot.Constants.FDConsts.RotaryMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
@@ -68,6 +67,15 @@ public class Feeder extends SubsystemBase
   private static final double       kRotaryLengthMeters = 0.5;
   private static final double       kRotaryWeightKg     = 4.0;
   private static final double       kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
+
+  // Rotary manual move parameters
+  private enum RotaryMode
+  {
+    INIT,    // Initialize intake
+    INBOARD, // Intake Rotary moving into the feeder
+    STOPPED, // Intake Rotary stop and hold position
+    OUTBOARD // Intake Rotary moving out of the feeder
+  }
 
   // Rotary constants
   private static final double       kToleranceDegrees   = 4.0;      // PID tolerance in degrees
@@ -281,9 +289,9 @@ public class Feeder extends SubsystemBase
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if ((axisValue < 0.0) && (m_currentDegrees > FDConsts.kRotaryAngleMin))
-      newMode = FDConsts.RotaryMode.INBOARD;
+      newMode = RotaryMode.INBOARD;
     else if ((axisValue > 0.0) && (m_currentDegrees < FDConsts.kRotaryAngleMax))
-      newMode = FDConsts.RotaryMode.OUTBOARD;
+      newMode = RotaryMode.OUTBOARD;
     else
     {
       rangeLimited = true;

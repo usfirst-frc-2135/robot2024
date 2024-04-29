@@ -36,10 +36,10 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Shooter extends SubsystemBase
 {
   // Constants
-  private static final double   kFlywheelGearRatio        = (18.0 / 18.0);
+  private static final double kFlywheelGearRatio = (18.0 / 18.0);
 
-  private static final double   kFlywheelScoreRPM         = 3000.0;    // RPM to score
-  private static final double   kToleranceRPM             = 100.0;     // Tolerance band around target RPM
+  private static final double kFlywheelScoreRPM  = 3000.0;    // RPM to score
+  private static final double kToleranceRPM      = 100.0;     // Tolerance band around target RPM
 
   private enum ShooterMode
   {
@@ -108,7 +108,7 @@ public class Shooter extends SubsystemBase
     // Calculate flywheel RPM and display on dashboard
     if (m_shooterValid)
     {
-      m_flywheelRPM = m_flywheelFilter.calculate((m_shooterLower.getVelocity( ).refresh( ).getValue( ) * 60.0));
+      m_flywheelRPM = m_flywheelFilter.calculate((m_shooterLVelocity.getValue( ) * 60.0));
 
       m_isAtTargetSpeed = (m_flywheelRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_flywheelRPM, kToleranceRPM);
 

@@ -161,7 +161,7 @@ public class Feeder extends SubsystemBase
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
       BaseStatusSignal.setUpdateFrequencyForAll(20, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
-    m_ccPosition.setUpdateFrequency(10);
+    m_ccPosition.setUpdateFrequency(50);
 
     initDashboard( );
     initialize( );

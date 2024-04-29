@@ -7,10 +7,13 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
@@ -36,6 +39,12 @@ import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.LEDConsts.LEDAnimation;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts;
+import frc.robot.autos.AutoLeave;
+import frc.robot.autos.AutoPreloadLeave;
+import frc.robot.autos.AutoPreloadScore;
+import frc.robot.autos.AutoPreloadSteal;
+import frc.robot.autos.AutoScore4;
+import frc.robot.autos.AutoTest;
 import frc.robot.commands.ActionAcquireNote;
 import frc.robot.commands.ActionExpelNote;
 import frc.robot.commands.ActionHandoff;
@@ -124,9 +133,9 @@ public class RobotContainer
     AUTOLEAVE,        // Leave starting zone avoiding spikes
     AUTOPRELOADLEAVE, // Score preload at waypoints P0, P2, and P4 and leave starting zone
     AUTOPRELOADSCORE, // Score preload at waypoints P1-P3 and score another from nearest spike
-    AUTOSCORE4,       // Score preload at waypoints P1-P3 and spike notes at S1-S3
     AUTOPRELOADSTEAL, // Score preload at waypoints P1-P3 and steal centerline notes
-    AUTOTESTPATH      // Run a selected test path
+    AUTOSCORE4,       // Score preload at waypoints P1-P3 and spike notes at S1-S3
+    AUTOTEST          // Run a selected test auto
   }
 
   // Chooser for autonomous starting pose
@@ -138,8 +147,39 @@ public class RobotContainer
   }
 
   private SendableChooser<AutoChooser> m_autoChooser  = new SendableChooser<>( );
+  private SendableChooser<AutoChooser2> m_autoChooser2 = new SendableChooser<>( );
   private SendableChooser<StartPose>   m_startChooser = new SendableChooser<>( );
   private SendableChooser<Integer>     m_odomChooser  = new SendableChooser<>( );
+
+  private final HashMap<String, String> autoMap        = new HashMap<>(Map.ofEntries( //
+      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1-Stop"),
+      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2-Stop"),
+      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3-Stop"),
+
+      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1-Leave1"),
+      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2-Leave2"),
+      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3-Leave3"),
+
+      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1-P0"),
+      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2-P2"),
+      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3-P4"),
+
+      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1-P1_P1-S2_S1-P1"),
+      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2"),
+      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P2"),
+
+      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1-P0_P0-C1_C1-C2_C2-C3_C3-C4"),
+      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2-P2_P2-C1_C1-C2_C2-C3_C3-C4"),
+      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3-P4_C5-C4_C4-C3_C3-C2_C2-C1"),
+
+      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1-P1_P1-S1_S1-P1_P1-S2_S2-P2_P2-S3_S3-P3"),
+      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2_P2-S1_S1-P1_P1-S3_S3-P3"),
+      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P3_P3-S2_S2-P2_P2-S1_S1-P1"),
+
+      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE1.toString( ), "Pos1-test1"),
+      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE2.toString( ), "Pos2-test2"),
+      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE3.toString( ), "Pos3-test3") //
+  ));
 
   /****************************************************************************
    * 
@@ -378,6 +418,16 @@ public class RobotContainer
     m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
     SmartDashboard.putData("AutoMode", m_autoChooser);
 
+    // Configure autonomous sendable chooser
+    m_autoChooser2.setDefaultOption("0 - AutoStop", AutoChooser2.AUTOSTOP);
+    m_autoChooser2.addOption("1 - AutoLeave", AutoChooser2.AUTOLEAVE);
+    m_autoChooser2.addOption("2 - AutoPreloadLeave", AutoChooser2.AUTOPRELOADLEAVE);
+    m_autoChooser2.addOption("3 - AutoPreloadScore", AutoChooser2.AUTOPRELOADSCORE);
+    m_autoChooser2.addOption("4 - AutoPreloadSteal", AutoChooser2.AUTOPRELOADSTEAL);
+    m_autoChooser2.addOption("5 - AutoScore4", AutoChooser2.AUTOSCORE4);
+    m_autoChooser2.addOption("6 - AutoTestPath", AutoChooser2.AUTOTEST);
+    SmartDashboard.putData("AutoMode2", m_autoChooser2);
+
     // Configure starting pose sendable chooser
     m_startChooser.setDefaultOption("POSE1", StartPose.POSE1);
     m_startChooser.addOption("POSE2", StartPose.POSE2);
@@ -614,42 +664,59 @@ public class RobotContainer
       m_autoCommand = null;
     }
 
-    HashMap<String, String> autoMap = new HashMap<>( );
-    autoMap.put(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1-Stop");
-    autoMap.put(AutoChooser2.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2-Stop");
-    autoMap.put(AutoChooser2.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3-Stop");
-
-    autoMap.put(AutoChooser2.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1-Leave1");
-    autoMap.put(AutoChooser2.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2-Leave2");
-    autoMap.put(AutoChooser2.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3-Leave3");
-
-    autoMap.put(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1-P0");
-    autoMap.put(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2-P2");
-    autoMap.put(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3-P4");
-
-    autoMap.put(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1-P1_P1-S2_S1-P1");
-    autoMap.put(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2");
-    autoMap.put(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P2");
-
-    autoMap.put(AutoChooser2.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1-P1_P1-S1_S1-P1_P1-S2_S2-P2_P2-S3_S3-P3");
-    autoMap.put(AutoChooser2.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2_P2-S1_S1-P1_P1-S3_S3-P3");
-    autoMap.put(AutoChooser2.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P3_P3-S2_S2-P2_P2-S1_S1-P1");
-
-    autoMap.put(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1-P0_P0-C1_C1-C2_C2-C3_C3-C4");
-    autoMap.put(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2-P2_P2-C1_C1-C2_C2-C3_C3-C4");
-    autoMap.put(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3-P4_C5-C4_C4-C3_C3-C2_C2-C1");
-
-    autoMap.put(AutoChooser2.AUTOTESTPATH + StartPose.POSE1.toString( ), "Pos1-test1");
-    autoMap.put(AutoChooser2.AUTOTESTPATH + StartPose.POSE2.toString( ), "Pos2-test2");
-    autoMap.put(AutoChooser2.AUTOTESTPATH + StartPose.POSE3.toString( ), "Pos3-test3");
-
     String autoName = autoMap.get(autoKey);
-    if (autoName == null)
-      m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
 
     DataLogManager.log(String.format("================================================================="));
     DataLogManager.log(String.format("getAutoCommand: autoKey: %s  autoName: %s", autoKey, autoName));
     DataLogManager.log(String.format("================================================================="));
+
+    if (autoName == null)
+      return m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
+
+    List<PathPlannerPath> ppPathList = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+    PathPlannerPath ppPath = ppPathList.get(0);
+
+    DataLogManager.log(String.format("================================================================="));
+    DataLogManager.log(String.format("getAutoCommand: ppPath %s", ppPath.toString( )));
+    DataLogManager.log(String.format("================================================================="));
+
+    // if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red))) // TODO: Is this needed? PP Auto should handle this
+    //   ppPath = ppPath.flipPath( );
+
+    Pose2d initialPose =
+        new PathPlannerTrajectory(ppPath, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
+
+    if (initialPose != null)
+      m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
+
+    switch (mode)
+    {
+      default :
+      case AUTOSTOP :
+      m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
+        break;
+      case AUTOLEAVE :
+        m_autoCommand = new AutoLeave(ppPathList, m_drivetrain, m_led);
+        break;
+      case AUTOPRELOADLEAVE :
+        m_autoCommand = new AutoPreloadLeave(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        break;
+      case AUTOPRELOADSCORE :
+        m_autoCommand = new AutoPreloadScore(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        break;
+      case AUTOPRELOADSTEAL :
+        m_autoCommand = new AutoPreloadSteal(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        break;
+      case AUTOSCORE4 :
+        m_autoCommand = new AutoScore4(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        break;
+      case AUTOTEST :
+        m_autoCommand = new AutoTest(ppPathList, m_drivetrain, m_led);
+        break;
+    }
+
+    DataLogManager.log(String.format("getAutonomousCommand: Auto mode is %s%s startPose %s %s", mode, startPose, startPose,
+        m_autoCommand.getName( )));
 
     return m_autoCommand;
   }
@@ -763,7 +830,7 @@ public class RobotContainer
    */
   public void teleopInit( )
   {
-    getAutonomousCommand_2( );
+    // getAutonomousCommand_2( );
 
     CommandScheduler.getInstance( ).schedule(m_climber.getCalibrateCommand( ));
   }

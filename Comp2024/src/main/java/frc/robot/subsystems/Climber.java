@@ -89,7 +89,8 @@ public class Climber extends SubsystemBase
   private Timer                     m_calibrateTimer      = new Timer( );
   private Debouncer                 m_leftStalled         = new Debouncer(0.100, DebounceType.kRising);
   private Debouncer                 m_rightStalled        = new Debouncer(0.100, DebounceType.kRising);
-  private boolean                   m_calibrated          = false;
+  private boolean                   m_leftCalibrated      = false;
+  private boolean                   m_rightCalibrated     = false;
 
   // Manual mode config parameters
   private VoltageOut                m_requestVolts        = new VoltageOut(0);
@@ -159,6 +160,8 @@ public class Climber extends SubsystemBase
     if (m_currentInches < 0)
       setClimberPosition(0.0);
 
+    SmartDashboard.putBoolean("CL_calibrated", (m_leftCalibrated && m_rightCalibrated));
+
     SmartDashboard.putNumber("CL_curInches", m_currentInches);
     SmartDashboard.putNumber("CL_curInchesR", m_currentInchesR);
     SmartDashboard.putNumber("CL_targetInches", m_targetInches);
@@ -226,8 +229,8 @@ public class Climber extends SubsystemBase
   public void initialize( )
   {
     setVoltage(0.0, 0.0);
-    m_calibrated = false;
-    SmartDashboard.putBoolean("CL_calibrated", m_calibrated);
+    m_leftCalibrated = false;
+    m_rightCalibrated = false;
 
     m_currentInches = 0.0; // Allow calibration routine to run for up to this length
     m_targetInches = m_currentInches;
@@ -305,10 +308,9 @@ public class Climber extends SubsystemBase
     m_safetyTimer.restart( );
     m_hardStopCounter = 0;
 
-    if (!m_calibrated)
+    if (!(m_leftCalibrated && m_rightCalibrated))
     {
-      DataLogManager
-          .log(String.format("%s: Position move target %.1f inches is NOT CALIBRATED!", getSubsystem( ), m_targetInches));
+      DataLogManager.log(String.format("%s: Position move target %.1f in - NOT CALIBRATED!", getSubsystem( ), m_targetInches));
       return;
     }
 
@@ -351,8 +353,7 @@ public class Climber extends SubsystemBase
    */
   private void moveToPositionExecute( )
   {
-    if (m_calibrated)
-      setMMPosition(m_targetInches);
+    setMMPosition(m_targetInches);
   }
 
   /****************************************************************************
@@ -367,8 +368,6 @@ public class Climber extends SubsystemBase
     double error = m_targetInches - m_currentInches;
     boolean hittingHardStop = (m_targetInches <= 0.0) && (m_currentInches <= 1.0) && (m_hardStopCounter++ >= 10);
 
-    if (!m_calibrated)
-      return true;
     if (hold)
       return false;
 
@@ -405,8 +404,9 @@ public class Climber extends SubsystemBase
    */
   private void calibrateInit( )
   {
-    DataLogManager.log(String.format("%s: Start up", getName( )));
-    m_calibrated = false;
+    DataLogManager.log(String.format("%s: Start up (%.1fV, %.1fV)", getName( ), kCalibrateSpeedVolts, kCalibrateSpeedVolts));
+    m_leftCalibrated = false;
+    m_rightCalibrated = false;
     m_calibrateTimer.restart( );
     m_leftStalled.calculate(false);
     m_rightStalled.calculate(false);
@@ -420,11 +420,10 @@ public class Climber extends SubsystemBase
    */
   private void calibrateExecute( )
   {
-    double leftVolts = (m_leftStalled.calculate(m_leftSupplyCur.getValue( ) > kCalibrateStallAmps)) ? 0.0 : kCalibrateSpeedVolts;
-    double rightVolts =
-        (m_rightStalled.calculate(m_rightSupplyCur.getValue( ) > kCalibrateStallAmps)) ? 0.0 : kCalibrateSpeedVolts;
+    m_leftCalibrated = m_leftStalled.calculate(m_leftSupplyCur.getValue( ) > kCalibrateStallAmps);
+    m_rightCalibrated = m_rightStalled.calculate(m_rightSupplyCur.getValue( ) > kCalibrateStallAmps);
 
-    setVoltage(leftVolts, rightVolts);
+    setVoltage((m_leftCalibrated) ? 0.0 : kCalibrateSpeedVolts, (m_rightCalibrated) ? 0.0 : kCalibrateSpeedVolts);
   }
 
   /****************************************************************************
@@ -435,10 +434,7 @@ public class Climber extends SubsystemBase
    */
   private boolean calibrateIsFinished( )
   {
-    return (m_calibrateTimer.hasElapsed(kCalibrationTimeout));
-    // TODO: end when current limit is reached
-    // return (m_calibrateTimer.hasElapsed(kCalibrationTimeout) || (Math.abs(m_leftMotor.getMotorVoltage( ).getValue( )) < 0.1
-    // && (Math.abs(m_rightMotor.getMotorVoltage( ).getValue( )) < 0.1)));
+    return (m_leftCalibrated && m_rightCalibrated) || m_calibrateTimer.hasElapsed(kCalibrationTimeout);
   }
 
   /****************************************************************************
@@ -452,8 +448,8 @@ public class Climber extends SubsystemBase
     setClimberPosition(0.0);
     setVoltage(0.0, 0.0);
     m_targetInches = m_currentInches;
-    m_calibrated = true;
-    SmartDashboard.putBoolean("CL_calibrated", m_calibrated);
+    m_leftCalibrated = true;
+    m_rightCalibrated = true;
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -486,7 +482,6 @@ public class Climber extends SubsystemBase
    */
   private void setVoltage(double leftVolts, double rightVolts)
   {
-    DataLogManager.log(String.format("%s: Motor voltage at %.1f volts", getSubsystem( ), leftVolts, rightVolts));
     if (m_climberValid)
     {
       m_leftMotor.setControl(m_requestVolts.withOutput(leftVolts));

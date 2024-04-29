@@ -6,6 +6,7 @@
 
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -115,6 +116,17 @@ public class RobotContainer
     AUTOPRELOADSCOREANOTHER, // Score preload at waypoints P1-P3 and score another from nearest spike
     AUTOSCORE4,              // Score preload at waypoints P1-P3 and pike notes at S1-S3
     AUTOTESTPATH             // Run a selected test path
+  }
+
+  enum AutoChooser2
+  {
+    AUTOSTOP,         // AutoStop - sit still, do nothing
+    AUTOLEAVE,        // Leave starting zone avoiding spikes
+    AUTOPRELOADLEAVE, // Score preload at waypoints P0, P2, and P4 and leave starting zone
+    AUTOPRELOADSCORE, // Score preload at waypoints P1-P3 and score another from nearest spike
+    AUTOSCORE4,       // Score preload at waypoints P1-P3 and spike notes at S1-S3
+    AUTOPRELOADSTEAL, // Score preload at waypoints P1-P3 and steal centerline notes
+    AUTOTESTPATH      // Run a selected test path
   }
 
   // Chooser for autonomous starting pose
@@ -585,6 +597,65 @@ public class RobotContainer
 
   /****************************************************************************
    * 
+   * Use this to pass the autonomous command to the main Robot class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand_2( )
+  {
+    AutoChooser mode = m_autoChooser.getSelected( );
+    StartPose startPose = m_startChooser.getSelected( );
+    String autoKey = mode.toString( ) + startPose.toString( );
+
+    if (m_autoCommand != null)
+    {
+      if (m_autoCommand.isScheduled( ))
+        m_autoCommand.cancel( );
+      m_autoCommand = null;
+    }
+
+    HashMap<String, String> autoMap = new HashMap<>( );
+    autoMap.put(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1-Stop");
+    autoMap.put(AutoChooser2.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2-Stop");
+    autoMap.put(AutoChooser2.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3-Stop");
+
+    autoMap.put(AutoChooser2.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1-Leave1");
+    autoMap.put(AutoChooser2.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2-Leave2");
+    autoMap.put(AutoChooser2.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3-Leave3");
+
+    autoMap.put(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1-P0");
+    autoMap.put(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2-P2");
+    autoMap.put(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3-P4");
+
+    autoMap.put(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1-P1_P1-S2_S1-P1");
+    autoMap.put(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2");
+    autoMap.put(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P2");
+
+    autoMap.put(AutoChooser2.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1-P1_P1-S1_S1-P1_P1-S2_S2-P2_P2-S3_S3-P3");
+    autoMap.put(AutoChooser2.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2_P2-S1_S1-P1_P1-S3_S3-P3");
+    autoMap.put(AutoChooser2.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P3_P3-S2_S2-P2_P2-S1_S1-P1");
+
+    autoMap.put(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1-P0_P0-C1_C1-C2_C2-C3_C3-C4");
+    autoMap.put(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2-P2_P2-C1_C1-C2_C2-C3_C3-C4");
+    autoMap.put(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3-P4_C5-C4_C4-C3_C3-C2_C2-C1");
+
+    autoMap.put(AutoChooser2.AUTOTESTPATH + StartPose.POSE1.toString( ), "Pos1-test1");
+    autoMap.put(AutoChooser2.AUTOTESTPATH + StartPose.POSE2.toString( ), "Pos2-test2");
+    autoMap.put(AutoChooser2.AUTOTESTPATH + StartPose.POSE3.toString( ), "Pos3-test3");
+
+    String autoName = autoMap.get(autoKey);
+    if (autoName == null)
+      m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
+
+    DataLogManager.log(String.format("================================================================="));
+    DataLogManager.log(String.format("getAutoCommand: autoKey: %s  autoName: %s", autoKey, autoName));
+    DataLogManager.log(String.format("================================================================="));
+
+    return m_autoCommand;
+  }
+
+  /****************************************************************************
+   * 
    * Set up odometry chooser
    */
   private void initOdometryChooser( )
@@ -692,6 +763,8 @@ public class RobotContainer
    */
   public void teleopInit( )
   {
+    getAutonomousCommand_2( );
+
     CommandScheduler.getInstance( ).schedule(m_climber.getCalibrateCommand( ));
   }
 

@@ -4,8 +4,6 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
-import com.pathplanner.lib.path.PathConstraints;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -103,15 +101,6 @@ public class Constants
       HOLD     // Maintain existing setting
     }
 
-    // Rotary manual move parameters
-    public enum RotaryMode
-    {
-      INIT,    // Initialize intake
-      INBOARD, // Intake Rotary moving into the robot
-      STOPPED, // Intake Rotary stop and hold position
-      OUTBOARD // Intake Rotary moving out of the robot
-    }
-
     // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
     public static final double kRotaryAngleRetracted = -97.5;
     public static final double kRotaryAngleHandoff   = -49.9;
@@ -135,15 +124,6 @@ public class Constants
       HOLD     // Maintain existing setting
     }
 
-    // Rotary manual move parameters
-    public enum RotaryMode
-    {
-      INIT,    // Initialize intake
-      INBOARD, // Intake Rotary moving into the feeder
-      STOPPED, // Intake Rotary stop and hold position
-      OUTBOARD // Intake Rotary moving out of the feeder
-    }
-
     // Rotary angles - Motion Magic move parameters - TODO: tune these angles!
     public static final double kRotaryAngleAmp     = -33.0;
     public static final double kRotaryAngleClimb   = 60.0;
@@ -158,13 +138,6 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class SHConsts
   {
-    // Manual config parameters
-    public enum ShooterMode
-    {
-      REVERSE,    // Shooter runs in reverse direction to handle jams
-      STOP,       // Shooter is stopped
-      SCORE,      // Shooter ramped to an initial speed before shooting
-    }
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -172,15 +145,6 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class CLConsts
   {
-    // Climber manual move parameters
-    public enum ClimberMode
-    {
-      INIT,   // Initialize climber
-      UP,     // Climber move upward
-      STOP,   // Climber stop
-      DOWN    // Climber move downward
-    }
-
     // Climber lengths - Motion Magic config parameters
     public static final double kLengthClimbed = 0.0;    // By definition - Climber fully climbed
     public static final double kLengthFull    = 18.0;   // From Mech Design height needed to reach max chain
@@ -222,26 +186,6 @@ public class Constants
     public static final Pose2d       kStageCenter   = new Pose2d(5.92, 4.13, Rotation2d.fromDegrees(0));
     public static final Pose2d       kStageLeft     = new Pose2d(4.3, 5.0, Rotation2d.fromDegrees(120));
     public static final Pose2d       kStageRight    = new Pose2d(4.3, 3.2, Rotation2d.fromDegrees(-120));
-
-    /////////////////////////////////////////////////////////////////////////////
-    // Path on the fly trajectory constraints
-    /////////////////////////////////////////////////////////////////////////////
-    public static final class PathFindConsts                                    // TODO: set back to original speeds
-    {
-      public static final double kMaxVelocityMps                         = 1.0; // Slowed from 3.0 for testing
-      public static final double kMaxAccelerationMpsSq                   = 1.0; // Slowed from 3.0 for testing
-
-      public static final double kMaxAngularSpeedRadiansPerSecond        = 1.0 * Math.PI; // Slowed from 2.0 * Math.PI for testing
-      public static final double kMaxAngularSpeedRadiansPerSecondSquared = 1.0 * Math.PI; // Slowed from 1.5 * Math.PI for testing
-    }
-
-    //Path constraints
-    public static final PathConstraints kPathFindConstraints = new PathConstraints( //
-        PathFindConsts.kMaxVelocityMps,                         //
-        PathFindConsts.kMaxAccelerationMpsSq,                   //
-        PathFindConsts.kMaxAngularSpeedRadiansPerSecond,        //
-        PathFindConsts.kMaxAngularSpeedRadiansPerSecondSquared  //
-    );
   }
 
   /////////////////////////////////////////////////////////////////////////////

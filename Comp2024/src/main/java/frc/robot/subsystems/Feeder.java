@@ -3,6 +3,7 @@
 //
 package frc.robot.subsystems;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -21,17 +22,21 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,75 +62,102 @@ public class Feeder extends SubsystemBase
 {
 
   // Constants
-  private static final boolean      kFeederMotorInvert  = true;     // Motor direction for positive input
+  private static final String  kFeederTab          = "Feeder";
+  private static final boolean kRollerMotorInvert  = true;     // Motor direction for positive input
 
-  private static final double       kRollerSpeedScore   = -0.5;
-  private static final double       kRollerSpeedHandoff = -0.37;
+  private static final double  kRollerSpeedScore   = -0.5;
+  private static final double  kRollerSpeedHandoff = -0.37;
 
-  private static final double       kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
-  private static final double       kRotaryGearRatio    = 27.0;
-  private static final double       kRotaryLengthMeters = 0.5;
-  private static final double       kRotaryWeightKg     = 4.0;
-  private static final double       kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
+  private static final double  kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
+  private static final double  kRotaryGearRatio    = 27.0;
+  private static final double  kRotaryLengthMeters = 0.5;
+  private static final double  kRotaryWeightKg     = 4.0;
+  private static final double  kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
 
   // Rotary manual move parameters
   private enum RotaryMode
   {
-    INIT,    // Initialize intake
-    INBOARD, // Intake Rotary moving into the feeder
-    STOPPED, // Intake Rotary stop and hold position
-    OUTBOARD // Intake Rotary moving out of the feeder
+    INIT,    // Initialize feeder
+    INBOARD, // Feeder Rotary moving into the feeder
+    STOPPED, // Feeder Rotary stop and hold position
+    OUTBOARD // Feeder Rotary moving out of the feeder
   }
 
   // Rotary constants
-  private static final double       kToleranceDegrees   = 4.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout    = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
+  private static final double       kMMSafetyTimeout      = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Device and simulation objects
-  private final WPI_TalonSRX        m_rollerMotor       = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
-  private final TalonFX             m_rotaryMotor       = new TalonFX(Ports.kCANID_FeederRotary);
-  private final CANcoder            m_CANcoder          = new CANcoder(Ports.kCANID_FeederCANcoder);
-  private final DigitalInput        m_noteInFeeder      = new DigitalInput(Ports.kDIO1_NoteInFeeder);
+  private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
+  private static final TalonFX      m_rotaryMotor         = new TalonFX(Ports.kCANID_FeederRotary);
+  private static final CANcoder     m_CANcoder            = new CANcoder(Ports.kCANID_FeederCANcoder);
+  private static final DigitalInput m_noteInFeeder        = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
-  private final TalonFXSimState     m_rotarySim         = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState    m_CANcoderSim       = m_CANcoder.getSimState( );
-  private final SingleJointedArmSim m_armSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
+  private final TalonFXSimState     m_rotarySim           = m_rotaryMotor.getSimState( );
+  private final CANcoderSimState    m_CANcoderSim         = m_CANcoder.getSimState( );
+  private final SingleJointedArmSim m_armSim              = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
       SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_rotaryMech        = new Mechanism2d(1.0, 1.0);
-  private final MechanismRoot2d     m_mechRoot          = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
-  private final MechanismLigament2d m_mechLigament      =
+  private final Mechanism2d         m_rotaryMech          = new Mechanism2d(1.0, 1.0);
+  private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
+  private final MechanismLigament2d m_mechLigament        =
       m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kBlue)));
 
   // Roller variables
-  private boolean                   m_fdRollerValid;      // Health indicator for motor 
-  private Debouncer                 m_noteDebouncer     = new Debouncer(0.030, DebounceType.kBoth);
+  private boolean                   m_rollerValid;      // Health indicator for motor 
+  private Debouncer                 m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
   private boolean                   m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
-  private boolean                   m_fdRotaryValid;      // Health indicator for motor 
-  private boolean                   m_fdCCValid;          // Health indicator for CANcoder 
-  private boolean                   m_debug             = true;
-  private double                    m_currentDegrees    = 0.0; // Current angle in degrees
-  private double                    m_targetDegrees     = 0.0; // Target angle in degrees
+  private boolean                   m_rotaryValid;      // Health indicator for motor 
+  private boolean                   m_canCoderValid;    // Health indicator for CANcoder 
+  private boolean                   m_debug               = true;
+  private double                    m_currentDegrees      = 0.0; // Current angle in degrees
+  private double                    m_targetDegrees       = 0.0; // Target angle in degrees
+  private double                    m_ccDegrees           = 0.0; // CANcoder angle in degrees
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts      = new VoltageOut(0);
-  private RotaryMode                m_rotaryMode        = RotaryMode.INIT;     // Manual movement mode with joysticks
+  private VoltageOut                m_requestVolts        = new VoltageOut(0);
+  private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts    = new MotionMagicVoltage(0).withSlot(0);
-  private Debouncer                 m_withinTolerance   = new Debouncer(0.060, DebounceType.kRising);
-  private Timer                     m_safetyTimer       = new Timer( ); // Safety timer for movements
+  private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
+  private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
+  private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
   private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
 
   // Status signals
-  private StatusSignal<Double>      m_rotaryPosition    = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
-  private StatusSignal<Double>      m_rotaryCLoopError  = m_rotaryMotor.getClosedLoopError( );
-  private StatusSignal<Double>      m_rotarySupplyCur   = m_rotaryMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rotaryStatorCur   = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_ccPosition        = m_CANcoder.getAbsolutePosition( );
+  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
+  private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
+  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
+  private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
+
+  // Shuffleboard objects
+  ShuffleboardTab                   m_feederTab           = Shuffleboard.getTab(kFeederTab);
+  ShuffleboardLayout                m_rollerList          =
+      m_feederTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
+  GenericEntry                      m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
+  GenericEntry                      m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
+  GenericEntry                      m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
+  GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
+
+  ShuffleboardLayout                m_rotaryList          =
+      m_feederTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+  GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
+  GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
+  GenericEntry                      m_rotCurErrorEntry    = m_rotaryList.add("rotCurError", 0.0).getEntry( );
+  GenericEntry                      m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
+  GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
+
+  ShuffleboardLayout                m_statusList          =
+      m_feederTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
+  GenericEntry                      m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
+  GenericEntry                      m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
+  GenericEntry                      m_currentDegreesEntry = m_statusList.add("currentDegrees", 0.0).getEntry( );
+  GenericEntry                      m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
+  GenericEntry                      m_noteInFeederEntry   = m_statusList.add("noteInFeeder", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -137,21 +169,24 @@ public class Feeder extends SubsystemBase
     setSubsystem("Feeder");
 
     // Roller motor init
-    m_fdRollerValid =
+    m_rollerValid =
         PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Feeder Roller", CTREConfigs5.feederRollerConfig( ));
-    m_rollerMotor.setInverted(kFeederMotorInvert);
+    m_rollerMotor.setInverted(kRollerMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
+    m_rollValidEntry.setBoolean(m_rollerValid);
 
     // Rotary motor and CANcoder init
-    m_fdRotaryValid =
+    m_rotaryValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Feeder Rotary", CTREConfigs6.feederRotaryFXConfig( ));
-    m_fdCCValid =
+    m_canCoderValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
+    m_rotValidEntry.setBoolean(m_rotaryValid);
+    m_ccValidEntry.setBoolean(m_canCoderValid);
 
     Double ccRotations = getCANcoderRotations( );
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANcoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
-    if (m_fdRotaryValid)
+    if (m_rotaryValid)
       m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
 
     // Simulation object initialization
@@ -176,24 +211,25 @@ public class Feeder extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    double rollerCurrent = (m_fdRollerValid) ? m_rollerMotor.getStatorCurrent( ) : 0.0;
-    SmartDashboard.putNumber("FD_rollerCur", rollerCurrent);
-
+    m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
+    m_ccDegrees = Units.rotationsToDegrees(getCANcoderRotations( ));
     m_noteDetected = m_noteDebouncer.calculate(m_noteInFeeder.get( ));
 
-    // CANcoder is the primary (remote) sensor for Motion Magic
-    m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
-    SmartDashboard.putNumber("FD_ccDegrees", Units.rotationsToDegrees(getCANcoderRotations( )));
-    SmartDashboard.putNumber("FD_curDegrees", m_currentDegrees);
-    SmartDashboard.putNumber("FD_targetDegrees", m_targetDegrees);
-    SmartDashboard.putBoolean("FD_noteDetected", m_noteDetected);
-    if (m_debug && m_fdRotaryValid)
-    {
-      BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
-      SmartDashboard.putNumber("FD_curError", m_rotaryCLoopError.getValue( ));
-      SmartDashboard.putNumber("FD_rotSupCur", m_rotarySupplyCur.getValue( ));
-      SmartDashboard.putNumber("FD_rotStatCur", m_rotaryStatorCur.getValue( ));
-    }
+    // Update dashboard
+    m_rollSpeedEntry.setDouble(m_rollerMotor.get( ));
+    m_rollSupCurEntry.setDouble(m_rollerMotor.getSupplyCurrent( ));
+    m_rollStatCurEntry.setDouble(m_rollerMotor.getStatorCurrent( ));
+
+    m_currentDegreesEntry.setDouble(m_currentDegrees);
+    m_ccDegreesEntry.setDouble(m_ccDegrees);
+    m_rotDegreesEntry.setDouble(m_currentDegrees);
+    m_noteInFeederEntry.setBoolean(m_noteDetected);
+    m_targetDegreesEntry.setDouble(m_targetDegrees);
+
+    BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
+    m_rotCurErrorEntry.setDouble(m_rotaryCLoopError.getValue( ));
+    m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
+    m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
   }
 
   /****************************************************************************
@@ -233,10 +269,19 @@ public class Feeder extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_FDValidRoller", m_fdRollerValid);
-    SmartDashboard.putBoolean("HL_FDValidRotary", m_fdRotaryValid);
-    SmartDashboard.putBoolean("HL_FDValidCANcoder", m_fdCCValid);
-    SmartDashboard.putData("FDRotaryMech", m_rotaryMech);
+    m_feederTab.add("FDRotaryMech", m_rotaryMech).withPosition(0, 3);
+
+    // Shuffleboard layout
+    ShuffleboardLayout cmdList = m_feederTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+        .withProperties(Map.of("Label position", "HIDDEN"));
+    cmdList.add("FdRollStop", getMoveToPositionCommand(FDRollerMode.STOP, this::getFeederPosition));
+    cmdList.add("FdRollScore", getMoveToPositionCommand(FDRollerMode.SCORE, this::getFeederPosition));
+    cmdList.add("FdRollHandoff", getMoveToPositionCommand(FDRollerMode.HANDOFF, this::getFeederPosition));
+    cmdList.add("FdRollHold", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederPosition));
+
+    cmdList.add("FdRotAmp", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederAmp));
+    cmdList.add("FdRotClimb", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederClimb));
+    cmdList.add("FdRotHandoff", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederHandoff));
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -464,7 +509,7 @@ public class Feeder extends SubsystemBase
    */
   private double getRotaryRotations( )
   {
-    return (m_fdRotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
+    return (m_rotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
   }
 
   /****************************************************************************
@@ -475,7 +520,7 @@ public class Feeder extends SubsystemBase
    */
   private double getCANcoderRotations( )
   {
-    double ccRotations = (m_fdCCValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
+    double ccRotations = (m_canCoderValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
     ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
     return ccRotations;
   }
@@ -608,7 +653,7 @@ public class Feeder extends SubsystemBase
    */
   public Command getMoveToPositionCommand(FDRollerMode mode, DoubleSupplier position)
   {
-    return getMMPositionCommand(mode, position, false).withName("IntakeMMMoveToPosition");
+    return getMMPositionCommand(mode, position, false).withName("FeederMMMoveToPosition");
   }
 
   /****************************************************************************
@@ -623,7 +668,7 @@ public class Feeder extends SubsystemBase
    */
   public Command getHoldPositionCommand(FDRollerMode mode, DoubleSupplier position)
   {
-    return getMMPositionCommand(mode, position, true).withName("IntakeMMHoldPosition");
+    return getMMPositionCommand(mode, position, true).withName("FeederMMHoldPosition");
   }
 
 }

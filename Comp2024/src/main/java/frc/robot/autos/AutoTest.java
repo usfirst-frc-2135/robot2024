@@ -8,12 +8,9 @@ import java.util.List;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.ActionScoreSpeaker;
 import frc.robot.commands.LogCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
-import frc.robot.subsystems.Shooter;
 
 /**
  * Command to acquire a note from floor

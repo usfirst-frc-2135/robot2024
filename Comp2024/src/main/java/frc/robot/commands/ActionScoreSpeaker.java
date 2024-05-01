@@ -39,7 +39,7 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
 
         new LogCommand(getName(), "Wait for desired speed"),
-        new WaitUntilCommand(shooter::isAtTargetSpeed),
+        new WaitUntilCommand(shooter::isAtTargetRPM),
 
         new LogCommand(getName(), "Feed note from intake"),
 

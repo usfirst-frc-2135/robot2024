@@ -3,6 +3,8 @@
 //
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
@@ -14,12 +16,16 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,6 +42,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Shooter extends SubsystemBase
 {
   // Constants
+  private static final String kShooterTab        = "Shooter";
   private static final double kFlywheelGearRatio = (18.0 / 18.0);
 
   private static final double kFlywheelScoreRPM  = 3000.0;    // RPM to score
@@ -49,31 +56,58 @@ public class Shooter extends SubsystemBase
   }
 
   // Devices and simulation objects
-  private final TalonFX         m_shooterLower            = new TalonFX(Ports.kCANID_ShooterLower);
-  private final TalonFX         m_shooterUpper            = new TalonFX(Ports.kCANID_ShooterUpper);
+  private final TalonFX         m_lowerMotor            = new TalonFX(Ports.kCANID_ShooterLower);
+  private final TalonFX         m_upperMotor            = new TalonFX(Ports.kCANID_ShooterUpper);
 
-  private final TalonFXSimState m_shooterLowerSim         = new TalonFXSimState(m_shooterLower);
-  private final TalonFXSimState m_shooterUpperSim         = new TalonFXSimState(m_shooterUpper);
-  private final FlywheelSim     m_flywheelLowerSim        = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
-  private final FlywheelSim     m_flywheelUpperSim        = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
-
-  private VelocityVoltage       m_requestVelocity         = new VelocityVoltage(0.0);
-  private VoltageOut            m_requestVolts            = new VoltageOut(0.0);
-  private LinearFilter          m_flywheelFilter          = LinearFilter.singlePoleIIR(0.060, 0.020);
-
-  // Status signals
-  private StatusSignal<Double>  m_shooterLVelocity        = m_shooterLower.getRotorVelocity( );
-  private StatusSignal<Double>  m_shooterLSupplyCur       = m_shooterLower.getSupplyCurrent( );
-  private StatusSignal<Double>  m_shooterLStatorCur       = m_shooterLower.getStatorCurrent( );
+  private final TalonFXSimState m_lowerMotorSim         = new TalonFXSimState(m_lowerMotor);
+  private final TalonFXSimState m_upperMotorSim         = new TalonFXSimState(m_upperMotor);
+  private final FlywheelSim     m_lowerFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
+  private final FlywheelSim     m_upperFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
 
   // Declare module variables
   private boolean               m_shooterValid;
-  private boolean               m_debug                   = true;
-  private boolean               m_isAtTargetSpeed         = false; // Indicates flywheel RPM is close to target
-  private boolean               m_isAtTargetSpeedPrevious = false;
+  private boolean               m_debug                 = true;
+  private boolean               m_isAttargetRPM         = false; // Indicates flywheel RPM is close to target
+  private boolean               m_isAttargetRPMPrevious = false;
 
-  private double                m_targetRPM;             // Requested flywheel RPM
-  private double                m_flywheelRPM;           // Current flywheel RPM
+  private double                m_targetRPM;            // Requested target flywheel RPM
+  private double                m_lowerRPM;             // Current lower RPM
+  private double                m_upperRPM;             // Current upper RPM
+
+  private VelocityVoltage       m_requestVelocity       = new VelocityVoltage(0.0);
+  private VoltageOut            m_requestVolts          = new VoltageOut(0.0);
+  private LinearFilter          m_lowerFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
+  private LinearFilter          m_upperFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
+
+  // Status signals
+  private StatusSignal<Double>  m_lowerVelocity         = m_lowerMotor.getRotorVelocity( );
+  private StatusSignal<Double>  m_lowerSupplyCur        = m_lowerMotor.getSupplyCurrent( );
+  private StatusSignal<Double>  m_lowerStatorCur        = m_lowerMotor.getStatorCurrent( );
+  private StatusSignal<Double>  m_upperVelocity         = m_upperMotor.getRotorVelocity( );
+  private StatusSignal<Double>  m_upperSupplyCur        = m_upperMotor.getSupplyCurrent( );
+  private StatusSignal<Double>  m_upperStatorCur        = m_upperMotor.getStatorCurrent( );
+
+  // Shuffleboard objects
+  ShuffleboardTab               m_shooterTab            = Shuffleboard.getTab(kShooterTab);
+  ShuffleboardLayout            m_lowerList             =
+      m_shooterTab.getLayout("Lower", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
+  GenericEntry                  m_lowerValidEntry       = m_lowerList.add("lowerValid", false).getEntry( );
+  GenericEntry                  m_lowerSpeedEntry       = m_lowerList.add("lowerSpeed", 0.0).getEntry( );
+  GenericEntry                  m_lowerSupCurEntry      = m_lowerList.add("lowerSupCur", 0.0).getEntry( );
+  GenericEntry                  m_lowerStatCurEntry     = m_lowerList.add("lowerStatCur", 0.0).getEntry( );
+
+  ShuffleboardLayout            m_upperList             =
+      m_shooterTab.getLayout("Upper", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
+  GenericEntry                  m_upperValidEntry       = m_upperList.add("upperValid", false).getEntry( );
+  GenericEntry                  m_upperSpeedEntry       = m_upperList.add("upperSpeed", 0.0).getEntry( );
+  GenericEntry                  m_upperSupCurEntry      = m_upperList.add("upperSupCur", 0.0).getEntry( );
+  GenericEntry                  m_upperStatCurEntry     = m_upperList.add("upperStatCur", 0.0).getEntry( );
+
+  ShuffleboardLayout            m_statusList            =
+      m_shooterTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
+  GenericEntry                  m_atDesiredRPMEntry     = m_statusList.add("atDesiredRPM", false).getEntry( );
+  GenericEntry                  m_targetRPMEntry        = m_statusList.add("targetRPM", 0.0).getEntry( );
+  GenericEntry                  m_flywheelRPMEntry      = m_statusList.add("flywheelRPM", 0.0).getEntry( );
 
   /****************************************************************************
    * 
@@ -84,13 +118,19 @@ public class Shooter extends SubsystemBase
     setName("Shooter");
     setSubsystem("Shooter");
 
-    m_shooterValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterLower, "Shooter Lower", CTREConfigs6.shooterFXConfig( ))
-            && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_shooterUpper, "Shooter Upper", CTREConfigs6.shooterFXConfig( ));
-    m_shooterUpper.setControl(new Follower(m_shooterLower.getDeviceID( ), (Robot.isComp( )) ? false : true));
+    boolean lowerValid =
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, "Shooter Lower", CTREConfigs6.shooterFXConfig( ));
+    boolean upperValid =
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_upperMotor, "Shooter Upper", CTREConfigs6.shooterFXConfig( ));
+    m_lowerValidEntry.setBoolean(lowerValid);
+    m_upperValidEntry.setBoolean(upperValid);
+    m_shooterValid = lowerValid && upperValid;
 
-    m_shooterLVelocity.setUpdateFrequency(50);
-    BaseStatusSignal.setUpdateFrequencyForAll(20, m_shooterLSupplyCur, m_shooterLStatorCur);
+    m_upperMotor.setControl(new Follower(m_lowerMotor.getDeviceID( ), (Robot.isComp( )) ? false : true));
+
+    m_lowerVelocity.setUpdateFrequency(50);
+    m_upperVelocity.setUpdateFrequency(50);
+    BaseStatusSignal.setUpdateFrequencyForAll(20, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
 
     initDashboard( );
     initialize( );
@@ -108,27 +148,30 @@ public class Shooter extends SubsystemBase
     // Calculate flywheel RPM and display on dashboard
     if (m_shooterValid)
     {
-      m_flywheelRPM = m_flywheelFilter.calculate((m_shooterLVelocity.getValue( ) * 60.0));
+      m_lowerRPM = m_lowerFlywheelFilter.calculate((m_lowerVelocity.refresh( ).getValue( ) * 60.0));
+      m_upperRPM = m_upperFlywheelFilter.calculate((m_upperVelocity.refresh( ).getValue( ) * 60.0));
+      m_lowerSpeedEntry.setDouble(m_lowerRPM);
+      m_upperSpeedEntry.setDouble(m_upperRPM);
 
-      m_isAtTargetSpeed = (m_flywheelRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_flywheelRPM, kToleranceRPM);
+      m_isAttargetRPM = (m_lowerRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_lowerRPM, kToleranceRPM);
+      m_atDesiredRPMEntry.setBoolean(m_isAttargetRPM);
 
-      if (m_isAtTargetSpeed != m_isAtTargetSpeedPrevious)
+      if (m_isAttargetRPM != m_isAttargetRPMPrevious)
       {
         DataLogManager.log(String.format("%s: At desired speed now: %.1f", getSubsystem( ), m_targetRPM));
-        m_isAtTargetSpeedPrevious = m_isAtTargetSpeed;
+        m_isAttargetRPMPrevious = m_isAttargetRPM;
       }
 
       if (m_debug)
       {
-        BaseStatusSignal.refreshAll(m_shooterLSupplyCur, m_shooterLStatorCur);
-        SmartDashboard.putNumber("SH_supCur", m_shooterLSupplyCur.getValue( ));
-        SmartDashboard.putNumber("SH_current", m_shooterLStatorCur.getValue( ));
+        m_lowerSupCurEntry.setDouble(m_lowerSupplyCur.getValue( ));
+        m_lowerStatCurEntry.setDouble(m_lowerStatorCur.getValue( ));
+        m_upperSupCurEntry.setDouble(m_upperSupplyCur.getValue( ));
+        m_upperStatCurEntry.setDouble(m_upperStatorCur.getValue( ));
       }
     }
 
-    SmartDashboard.putNumber("SH_targetRPM", m_targetRPM);
-    SmartDashboard.putNumber("SH_flywheelRPM", m_flywheelRPM);
-    SmartDashboard.putBoolean("SH_atDesiredSpeed", m_isAtTargetSpeed);
+    m_targetRPMEntry.setDouble(m_targetRPM);
   }
 
   /****************************************************************************
@@ -141,22 +184,22 @@ public class Shooter extends SubsystemBase
     // This method will be called once per scheduler run during simulation
 
     // Set input flywheel voltage from the motor setting
-    m_shooterLowerSim.setSupplyVoltage(RobotController.getInputVoltage( ));
-    m_shooterUpperSim.setSupplyVoltage(RobotController.getInputVoltage( ));
-    m_flywheelLowerSim.setInput(m_shooterLowerSim.getMotorVoltage( ));
-    m_flywheelUpperSim.setInput(m_shooterUpperSim.getMotorVoltage( ));
+    m_lowerMotorSim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_upperMotorSim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_lowerFlywheelSim.setInput(m_lowerMotorSim.getMotorVoltage( ));
+    m_upperFlywheelSim.setInput(m_upperMotorSim.getMotorVoltage( ));
 
     // update for 20 msec loop
-    m_flywheelLowerSim.update(0.020);
-    m_flywheelUpperSim.update(0.020);
+    m_lowerFlywheelSim.update(0.020);
+    m_upperFlywheelSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_shooterLowerSim.setRotorVelocity(m_flywheelLowerSim.getAngularVelocityRPM( ) / 60.0);
-    m_shooterUpperSim.setRotorVelocity(m_flywheelUpperSim.getAngularVelocityRPM( ) / 60.0);
+    m_lowerMotorSim.setRotorVelocity(m_lowerFlywheelSim.getAngularVelocityRPM( ) / 60.0);
+    m_upperMotorSim.setRotorVelocity(m_upperFlywheelSim.getAngularVelocityRPM( ) / 60.0);
 
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelLowerSim.getCurrentDrawAmps( )));
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelUpperSim.getCurrentDrawAmps( )));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_lowerFlywheelSim.getCurrentDrawAmps( )));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_upperFlywheelSim.getCurrentDrawAmps( )));
   }
 
   /****************************************************************************
@@ -165,9 +208,12 @@ public class Shooter extends SubsystemBase
    */
   private void initDashboard( )
   {
-    SmartDashboard.putBoolean("HL_SHValid", m_shooterValid);
+    m_flywheelRPMEntry.setDouble(kFlywheelScoreRPM);
 
-    SmartDashboard.putNumber("SH_scoreRPM", kFlywheelScoreRPM);
+    ShuffleboardLayout cmdList = m_shooterTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
+        .withProperties(Map.of("Label position", "HIDDEN"));
+    cmdList.add("ShRunScore", getShooterScoreCommand( ));
+    cmdList.add("ShRunStop", getShooterStopCommand( ));
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -188,10 +234,10 @@ public class Shooter extends SubsystemBase
    */
   public void printFaults( )
   {
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_shooterLower, "ShooterLower");
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_shooterUpper, "ShooterUpper");
-    m_shooterLower.clearStickyFaults( );
-    m_shooterUpper.clearStickyFaults( );
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_lowerMotor, "ShooterLower");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_upperMotor, "ShooterUpper");
+    m_lowerMotor.clearStickyFaults( );
+    m_upperMotor.clearStickyFaults( );
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -218,7 +264,7 @@ public class Shooter extends SubsystemBase
         m_targetRPM = 0.0;
         break;
       case SCORE :
-        m_targetRPM = SmartDashboard.getNumber("SH_scoreRPM", m_targetRPM);
+        m_targetRPM = m_flywheelRPMEntry.getDouble(0.0);
         break;
     }
 
@@ -226,10 +272,10 @@ public class Shooter extends SubsystemBase
     if (m_shooterValid)
     {
       if (m_targetRPM > 100.0)
-        m_shooterLower
+        m_lowerMotor
             .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
       else
-        m_shooterLower.setControl(m_requestVolts);
+        m_lowerMotor.setControl(m_requestVolts);
     }
     DataLogManager.log(String.format("%s: Target rpm is %.1f rps %.1f", getSubsystem( ), m_targetRPM, rotPerSecond));
   }
@@ -244,9 +290,9 @@ public class Shooter extends SubsystemBase
    * 
    * @return true if shooter is at target RPM
    */
-  public boolean isAtTargetSpeed( )
+  public boolean isAtTargetRPM( )
   {
-    return m_isAtTargetSpeed;
+    return m_isAttargetRPM;
   }
 
   ////////////////////////////////////////////////////////////////////////////

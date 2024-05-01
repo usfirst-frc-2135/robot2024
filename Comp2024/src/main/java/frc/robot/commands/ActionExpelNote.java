@@ -6,8 +6,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.LEDConsts.LEDAnimation;
-import frc.robot.Constants.LEDConsts.LEDColor;
+import frc.robot.Constants.LEDConsts.ANIMATION;
+import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
@@ -43,7 +43,7 @@ public class ActionExpelNote extends SequentialCommandGroup
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition),
-        led.getLEDCommand(LEDColor.OFF, LEDAnimation.CLEARALL)
+        led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
 
         // @formatter:on
     );

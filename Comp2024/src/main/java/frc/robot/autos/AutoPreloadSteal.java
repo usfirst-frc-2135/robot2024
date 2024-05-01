@@ -53,7 +53,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         new ActionScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to centerline"),
-        drivetrain.getPathCommand(ppAuto.get(1).toString()) // TODO: need to complete this sequence
+        drivetrain.getPathCommand(ppAuto.get(1).toString()) // TODO: need to complete this sequence to centerline
         // @formatter:on
     );
   }

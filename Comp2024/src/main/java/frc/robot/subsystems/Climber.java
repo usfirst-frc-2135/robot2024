@@ -3,6 +3,7 @@
 //
 package frc.robot.subsystems;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -18,16 +19,20 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,6 +53,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Climber extends SubsystemBase
 {
   // Constants
+  private static final String kClimberTab          = "Climber";
   private static final double kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
   private static final double kGearRatio           = 16.0;   // Gear reduction
   private static final double kClimberLengthMeters = 0.5;
@@ -73,53 +79,77 @@ public class Climber extends SubsystemBase
   }
 
   // Device and simulation objects
-  private final TalonFX             m_leftMotor           = new TalonFX(Ports.kCANID_ClimberL);
-  private final TalonFX             m_rightMotor          = new TalonFX(Ports.kCANID_ClimberR);
+  private final TalonFX             m_leftMotor          = new TalonFX(Ports.kCANID_ClimberL);
+  private final TalonFX             m_rightMotor         = new TalonFX(Ports.kCANID_ClimberR);
 
-  private final TalonFXSimState     m_climberSim          = m_leftMotor.getSimState( );
-  private final ElevatorSim         m_elevSim             = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, kCarriageMassKg,
+  private final TalonFXSimState     m_climberSim         = m_leftMotor.getSimState( );
+  private final ElevatorSim         m_elevSim            = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, kCarriageMassKg,
       kDrumRadiusMeters, -CLConsts.kLengthMax, CLConsts.kLengthMax, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_climberMech         = new Mechanism2d(1.0, 1.0);
-  private final MechanismRoot2d     m_mechRoot            = m_climberMech.getRoot("Linear", 0.5, 0.5);
-  private final MechanismLigament2d m_mechLigament        = m_mechRoot
+  private final Mechanism2d         m_climberMech        = new Mechanism2d(1.0, 1.0);
+  private final MechanismRoot2d     m_mechRoot           = m_climberMech.getRoot("Linear", 0.5, 0.5);
+  private final MechanismLigament2d m_mechLigament       = m_mechRoot
       .append(new MechanismLigament2d("climber", kClimberLengthMeters, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
-  private boolean                   m_climberValid;                // Health indicator for Falcon 
-  private boolean                   m_debug               = true;
-  private double                    m_currentInches       = 0.0;    // Current length in inches on left (default) side
-  private double                    m_currentInchesR      = 0.0;    // Current length in inches on right side
-  private double                    m_targetInches        = 0.0;    // Target length in inches
+  private boolean                   m_debug              = true;
+  private boolean                   m_climberValid;              // Health indicator for Falcon 
+  private double                    m_leftCurInches      = 0.0;    // Current length in inches on left (default) side
+  private double                    m_rightCurInches     = 0.0;    // Current length in inches on right side
+  private double                    m_targetInches       = 0.0;    // Target length in inches
 
   // Calibration variables
-  private Timer                     m_calibrateTimer      = new Timer( );
-  private Debouncer                 m_leftStalled         = new Debouncer(0.100, DebounceType.kRising);
-  private Debouncer                 m_rightStalled        = new Debouncer(0.100, DebounceType.kRising);
-  private boolean                   m_leftCalibrated      = false;
-  private boolean                   m_rightCalibrated     = false;
+  private Timer                     m_calibrateTimer     = new Timer( );
+  private Debouncer                 m_leftStalled        = new Debouncer(0.100, DebounceType.kRising);
+  private Debouncer                 m_rightStalled       = new Debouncer(0.100, DebounceType.kRising);
+  private boolean                   m_leftCalibrated     = false;
+  private boolean                   m_rightCalibrated    = false;
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts        = new VoltageOut(0);
-  private ClimberMode               m_mode                = ClimberMode.INIT;  // Manual movement mode with joysticks
-  private int                       m_hardStopCounter     = 0;
+  private VoltageOut                m_requestVolts       = new VoltageOut(0);
+  private ClimberMode               m_mode               = ClimberMode.INIT;  // Manual movement mode with joysticks
+  private int                       m_hardStopCounter    = 0;
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
-  private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
-  private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
+  private MotionMagicVoltage        m_requestMMVolts     = new MotionMagicVoltage(0).withSlot(0);
+  private Debouncer                 m_withinTolerance    = new Debouncer(0.060, DebounceType.kRising);
+  private Timer                     m_safetyTimer        = new Timer( ); // Safety timer for movements
   private double                    m_totalArbFeedForward;  // Arbitrary feedforward added to counteract gravity
   private boolean                   m_moveIsFinished;       // Movement has completed (within tolerance)
 
-  private StatusSignal<Double>      m_leftPosition        = m_leftMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_leftMotorCLoopError = m_leftMotor.getClosedLoopError( );
-  private StatusSignal<Double>      m_leftSupplyCur       = m_leftMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_leftStatorCur       = m_leftMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_rightPosition       = m_rightMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_rightCLoopError     = m_rightMotor.getClosedLoopError( );
-  private StatusSignal<Double>      m_rightSupplyCur      = m_rightMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rightStatorCur      = m_rightMotor.getStatorCurrent( );
+  private StatusSignal<Double>      m_leftPosition       = m_leftMotor.getRotorPosition( );
+  private StatusSignal<Double>      m_leftCLoopError     = m_leftMotor.getClosedLoopError( );
+  private StatusSignal<Double>      m_leftSupplyCur      = m_leftMotor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_leftStatorCur      = m_leftMotor.getStatorCurrent( );
+  private StatusSignal<Double>      m_rightPosition      = m_rightMotor.getRotorPosition( );
+  private StatusSignal<Double>      m_rightCLoopError    = m_rightMotor.getClosedLoopError( );
+  private StatusSignal<Double>      m_rightSupplyCur     = m_rightMotor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_rightStatorCur     = m_rightMotor.getStatorCurrent( );
+
+  // Shuffleboard objects
+  ShuffleboardTab                   m_climberTab         = Shuffleboard.getTab(kClimberTab);
+  ShuffleboardLayout                m_leftList           =
+      m_climberTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 4);
+  GenericEntry                      m_leftValidEntry     = m_leftList.add("leftValid", false).getEntry( );
+  GenericEntry                      m_leftInchesEntry    = m_leftList.add("leftInches", 0.0).getEntry( );
+  GenericEntry                      m_leftCurErrorEntry  = m_leftList.add("leftCurError", 0.0).getEntry( );
+  GenericEntry                      m_leftSupCurEntry    = m_leftList.add("leftSupCur", 0.0).getEntry( );
+  GenericEntry                      m_leftStatCurEntry   = m_leftList.add("leftStatCur", 0.0).getEntry( );
+
+  ShuffleboardLayout                m_rightList          =
+      m_climberTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+  GenericEntry                      m_rightValidEntry    = m_rightList.add("righttValid", false).getEntry( );
+  GenericEntry                      m_rightInchesEntry   = m_rightList.add("rightInches", 0.0).getEntry( );
+  GenericEntry                      m_rightCurErrorEntry = m_rightList.add("rightCurError", 0.0).getEntry( );
+  GenericEntry                      m_rightSupCurEntry   = m_rightList.add("rightSupCur", 0.0).getEntry( );
+  GenericEntry                      m_rightStatCurEntry  = m_rightList.add("rightStatCur", 0.0).getEntry( );
+
+  ShuffleboardLayout                m_statusList         =
+      m_climberTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
+  GenericEntry                      m_calibratedEntry    = m_statusList.add("calibrated", false).getEntry( );
+  GenericEntry                      m_currentInchesEntry = m_statusList.add("currentInches", 0.0).getEntry( );
+  GenericEntry                      m_targetInchesEntry  = m_statusList.add("targetInches", 0.0).getEntry( );
 
   /****************************************************************************
    * 
@@ -131,12 +161,18 @@ public class Climber extends SubsystemBase
     setSubsystem("Climber");
 
     // Initialize climber motors
-    m_climberValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_leftMotor, "Climber Left", CTREConfigs6.climberFXConfig( ))
-        && PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rightMotor, "Climber Right", CTREConfigs6.climberFXConfig( ));
+    boolean leftValid =
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_leftMotor, "Climber Left", CTREConfigs6.climberFXConfig( ));
+    boolean rightValid =
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rightMotor, "Climber Right", CTREConfigs6.climberFXConfig( ));
+    m_climberValid = leftValid && rightValid;
+    m_leftValidEntry.setBoolean(leftValid);
+    m_rightValidEntry.setBoolean(rightValid);
+
     m_rightMotor.setInverted(false);
 
-    setClimberPosition(m_currentInches);
-    DataLogManager.log(String.format("%s: Initial position %.1f inches", getSubsystem( ), m_currentInches));
+    setClimberPosition(m_leftCurInches);
+    DataLogManager.log(String.format("%s: Initial position %.1f inches", getSubsystem( ), m_leftCurInches));
 
     // Simulation object initialization
     m_climberSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -145,7 +181,7 @@ public class Climber extends SubsystemBase
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_leftPosition, m_rightPosition);
     if (m_debug)
     {
-      BaseStatusSignal.setUpdateFrequencyForAll(20, m_leftMotorCLoopError, m_leftSupplyCur, m_leftStatorCur);
+      BaseStatusSignal.setUpdateFrequencyForAll(20, m_leftCLoopError, m_leftSupplyCur, m_leftStatorCur);
       BaseStatusSignal.setUpdateFrequencyForAll(20, m_rightCLoopError, m_rightSupplyCur, m_rightStatorCur);
     }
 
@@ -163,28 +199,26 @@ public class Climber extends SubsystemBase
     // This method will be called once per scheduler run
 
     BaseStatusSignal.refreshAll(m_leftPosition, m_rightPosition);
-    m_currentInches = Conversions.rotationsToWinchInches(m_leftPosition.getValue( ), kRolloutRatio);
-    m_currentInchesR = Conversions.rotationsToWinchInches(m_rightPosition.getValue( ), kRolloutRatio);
-    if (m_currentInches < 0)
+    m_leftCurInches = Conversions.rotationsToWinchInches(m_leftPosition.getValue( ), kRolloutRatio);
+    m_rightCurInches = Conversions.rotationsToWinchInches(m_rightPosition.getValue( ), kRolloutRatio);
+    if (m_leftCurInches < 0)
       setClimberPosition(0.0);
 
-    SmartDashboard.putBoolean("CL_calibrated", (m_leftCalibrated && m_rightCalibrated));
-
-    SmartDashboard.putNumber("CL_curInches", m_currentInches);
-    SmartDashboard.putNumber("CL_curInchesR", m_currentInchesR);
-    SmartDashboard.putNumber("CL_targetInches", m_targetInches);
-    SmartDashboard.putNumber("CL_curRotations", Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio));
-    SmartDashboard.putNumber("CL_totalFF", m_totalArbFeedForward);
+    // Update dashboard
+    m_calibratedEntry.setBoolean((m_leftCalibrated && m_rightCalibrated));
+    m_leftInchesEntry.setDouble(m_leftCurInches);
+    m_rightInchesEntry.setDouble(m_rightCurInches);
+    m_targetInchesEntry.setDouble(m_targetInches);
     if (m_debug)
     {
-      BaseStatusSignal.refreshAll(m_leftMotorCLoopError, m_leftSupplyCur, m_leftStatorCur);
-      BaseStatusSignal.refreshAll(m_rightCLoopError, m_rightSupplyCur, m_rightStatorCur);
-      SmartDashboard.putNumber("CL_curErrorL", m_leftMotorCLoopError.getValue( ));
-      SmartDashboard.putNumber("CL_supplyCurL", m_leftSupplyCur.getValue( ));
-      SmartDashboard.putNumber("CL_statorCurL", m_leftStatorCur.getValue( ));
-      SmartDashboard.putNumber("CL_curErrorR", m_rightCLoopError.getValue( ));
-      SmartDashboard.putNumber("CL_supplyCurR", m_rightSupplyCur.getValue( ));
-      SmartDashboard.putNumber("CL_statorCurR", m_rightStatorCur.getValue( ));
+      BaseStatusSignal.refreshAll(m_leftCLoopError, m_leftSupplyCur, m_leftStatorCur, m_rightCLoopError, m_rightSupplyCur,
+          m_rightStatorCur);
+      m_leftCurErrorEntry.setDouble(m_leftCLoopError.getValue( ));
+      m_leftSupCurEntry.setDouble(m_leftSupplyCur.getValue( ));
+      m_leftStatCurEntry.setDouble(m_leftStatorCur.getValue( ));
+      m_rightCurErrorEntry.setDouble(m_rightCLoopError.getValue( ));
+      m_rightSupCurEntry.setDouble(m_rightSupplyCur.getValue( ));
+      m_rightStatCurEntry.setDouble(m_rightStatorCur.getValue( ));
     }
   }
 
@@ -213,7 +247,7 @@ public class Climber extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setLength(0.1 + Units.inchesToMeters(m_currentInches));
+    m_mechLigament.setLength(0.1 + Units.inchesToMeters(m_leftCurInches));
   }
 
   /****************************************************************************
@@ -223,9 +257,14 @@ public class Climber extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    SmartDashboard.putBoolean("HL_CLValid", m_climberValid);
+    m_climberTab.add("ClimberMech", m_climberMech).withPosition(0, 3);
 
-    SmartDashboard.putData("ClimberMech", m_climberMech);
+    ShuffleboardLayout cmdList = m_climberTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+        .withProperties(Map.of("Label position", "HIDDEN"));
+    cmdList.add("ClRunExtended", getMoveToPositionCommand(this::getClimberFullyExtended));
+    cmdList.add("ClRunChain", getMoveToPositionCommand(this::getClimberChainLevel));
+    cmdList.add("ClRunClimbed", getMoveToPositionCommand(this::getClimberClimbed));
+    cmdList.add("ClCalibrate", getCalibrateCommand( ));
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -240,8 +279,8 @@ public class Climber extends SubsystemBase
     m_leftCalibrated = false;
     m_rightCalibrated = false;
 
-    m_currentInches = 0.0; // Allow calibration routine to run for up to this length
-    m_targetInches = m_currentInches;
+    m_leftCurInches = 0.0; // Allow calibration routine to run for up to this length
+    m_targetInches = m_leftCurInches;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
 
@@ -276,9 +315,9 @@ public class Climber extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_currentInches > CLConsts.kLengthMin))
+    if ((axisValue < 0.0) && (m_leftCurInches > CLConsts.kLengthMin))
       newMode = ClimberMode.DOWN;
-    else if ((axisValue > 0.0) && (m_currentInches < CLConsts.kLengthMax))
+    else if ((axisValue > 0.0) && (m_leftCurInches < CLConsts.kLengthMax))
       newMode = ClimberMode.UP;
     else
     {
@@ -289,11 +328,11 @@ public class Climber extends SubsystemBase
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(String.format("%s: Manual move mode %s now %.1f inches %s", getSubsystem( ), m_mode, m_currentInches,
+      DataLogManager.log(String.format("%s: Manual move mode %s now %.1f inches %s", getSubsystem( ), m_mode, m_leftCurInches,
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
-    m_targetInches = m_currentInches;
+    m_targetInches = m_leftCurInches;
 
     setVoltage(axisValue * kManualSpeedVolts, axisValue * kManualSpeedVolts);
   }
@@ -323,13 +362,13 @@ public class Climber extends SubsystemBase
     }
 
     if (holdPosition)
-      newLength = m_currentInches;
+      newLength = m_leftCurInches;
 
     if (newLength < 0.25)
       newLength = 0.25;
 
     // Decide if a new position request
-    if (holdPosition || newLength != m_targetInches || !MathUtil.isNear(newLength, m_currentInches, kToleranceInches))
+    if (holdPosition || newLength != m_targetInches || !MathUtil.isNear(newLength, m_leftCurInches, kToleranceInches))
     {
       // Validate the position request
       if (isMoveValid(newLength))
@@ -341,7 +380,7 @@ public class Climber extends SubsystemBase
         setMMPosition(m_targetInches);
 
         DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.3f -> %.3f rot)", getSubsystem( ),
-            m_currentInches, m_targetInches, Conversions.inchesToWinchRotations(m_currentInches, kRolloutRatio),
+            m_leftCurInches, m_targetInches, Conversions.inchesToWinchRotations(m_leftCurInches, kRolloutRatio),
             Conversions.inchesToWinchRotations(m_targetInches, kRolloutRatio)));
       }
       else
@@ -373,8 +412,8 @@ public class Climber extends SubsystemBase
   private boolean moveToPositionIsFinished(boolean hold)
   {
     boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
-    double error = m_targetInches - m_currentInches;
-    boolean hittingHardStop = (m_targetInches <= 0.0) && (m_currentInches <= 1.0) && (m_hardStopCounter++ >= 10);
+    double error = m_targetInches - m_leftCurInches;
+    boolean hittingHardStop = (m_targetInches <= 0.0) && (m_leftCurInches <= 1.0) && (m_hardStopCounter++ >= 10);
 
     if (hold)
       return false;
@@ -385,7 +424,7 @@ public class Climber extends SubsystemBase
         DataLogManager.log(String.format("%s - HITTINGHARDSTOP: %s", getSubsystem( ), hittingHardStop));
       if (!m_moveIsFinished)
         DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f sec %s",
-            getSubsystem( ), m_currentInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
+            getSubsystem( ), m_leftCurInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
       m_moveIsFinished = true;
     }
@@ -455,7 +494,7 @@ public class Climber extends SubsystemBase
     m_calibrateTimer.stop( );
     setClimberPosition(0.0);
     setVoltage(0.0, 0.0);
-    m_targetInches = m_currentInches;
+    m_targetInches = m_leftCurInches;
     m_leftCalibrated = true;
     m_rightCalibrated = true;
   }
@@ -473,7 +512,7 @@ public class Climber extends SubsystemBase
    */
   private void setClimberPosition(double inches)
   {
-    m_currentInches = inches;
+    m_leftCurInches = inches;
     if (m_climberValid)
     {
       m_leftMotor.setPosition(Conversions.inchesToWinchRotations(inches, kRolloutRatio));
@@ -541,7 +580,7 @@ public class Climber extends SubsystemBase
    */
   public double getClimberPosition( )
   {
-    return m_currentInches;
+    return m_leftCurInches;
   }
 
   /****************************************************************************

@@ -24,9 +24,11 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -35,8 +37,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VIConsts;
@@ -52,6 +59,7 @@ import frc.robot.lib.LimelightHelpers.PoseEstimate;
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
   private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
+  private static final String                        kSwerveTab                      = "Swerve";
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
   private double                                     m_lastSimTime;
@@ -103,6 +111,22 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       1.0 * Math.PI,            // kMaxAngularSpeedRadiansPerSecond              (slowed from 2.0 * Math.PI for testing)  
       1.0 * Math.PI             // kMaxAngularSpeedRadiansPerSecondSquared       (slowed from 1.5 * Math.PIfor testing)  
   );
+
+  // Shuffleboard objects
+  ShuffleboardTab                                    swerveTab                       = Shuffleboard.getTab(kSwerveTab);
+  ShuffleboardLayout                                 poseList                        =
+      swerveTab.getLayout("Pose", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3);
+
+  GenericEntry                                       poseXEntry                      =
+      poseList.add("X", 0.0).withPosition(0, 0).getEntry( );
+  GenericEntry                                       poseYEntry                      =
+      poseList.add("Y", 0.0).withPosition(0, 1).getEntry( );
+  GenericEntry                                       poseRotEntry                    =
+      poseList.add("rotation", 0.0).withPosition(0, 2).getEntry( );
+  ComplexWidget                                      setPose                         =
+      poseList.add("SetPose", new InstantCommand(( ) -> setOdometryFromDashboard( )).ignoringDisable(true)).withPosition(0, 3);
+  GenericEntry                                       shooterDistanceEntry            =
+      swerveTab.add("shooterDistance", 0.0).withPosition(6, 3).withSize(2, 1).getEntry( );
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
       SwerveModuleConstants... modules)
@@ -167,6 +191,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   public Command getAutoCommand(String autoName)
   {
     return new PathPlannerAuto(autoName).withName("swervePPAuto");
+  }
+
+  public Command getAutoPathFromList(String autoName, int num)
+  {
+    PathPlannerPath path = PathPlannerAuto.getPathGroupFromAutoFile(autoName).get(num);
+
+    return AutoBuilder.followPath(path).withName(path.toString( ));
   }
 
   public Command getPathCommand(String pathName)
@@ -242,7 +273,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     double speakerTagDistance = this.getState( ).Pose.getTranslation( ).getDistance(m_allianceSpeakerATPose.getTranslation( ));
-    SmartDashboard.putNumber("SW_shootDistance", Units.metersToInches(speakerTagDistance));
+    shooterDistanceEntry.setDouble(Units.metersToInches(speakerTagDistance));
 
     if (m_useLimelight && Robot.isReal( ))
     {
@@ -268,4 +299,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     return AutoBuilder.pathfindToPoseFlipped(pose, kPathFindConstraints, 0.0);
   }
+
+  private void setOdometryFromDashboard( )
+  {
+    resetOdometry(        //
+        new Pose2d(       //
+            new Translation2d(poseXEntry.getDouble(0.0), poseYEntry.getDouble(0.0)), //
+            new Rotation2d(poseRotEntry.getDouble(0.0))) //
+    );
+  }
+
 }

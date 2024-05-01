@@ -19,13 +19,14 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,8 +37,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
-import frc.robot.Constants.LEDConsts.LEDAnimation;
-import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts;
 import frc.robot.autos.AutoLeave;
 import frc.robot.autos.AutoPreloadLeave;
@@ -74,10 +73,13 @@ import frc.robot.subsystems.Vision;
 public class RobotContainer
 {
   private final boolean                               m_macOSXSim    = false;
+  private static final String                         kAutoTab       = "Autonomous";
 
   // Joysticks
   private static final CommandXboxController          m_driverPad    = new CommandXboxController(Constants.kDriverPadPort);
   private static final CommandXboxController          m_operatorPad  = new CommandXboxController(Constants.kOperatorPadPort);
+
+  private static final String                         kCommandTab    = "Command";
 
   private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // Maximum top speed
   private double                                      MaxAngularRate = 3.0 * Math.PI;                     // 1.5 rotations per second max angular velocity
@@ -146,10 +148,9 @@ public class RobotContainer
     POSE3  // Starting pose 3 - blue right, red left (driver perspective)
   }
 
-  private SendableChooser<AutoChooser> m_autoChooser  = new SendableChooser<>( );
+  private SendableChooser<AutoChooser>  m_autoChooser  = new SendableChooser<>( );
   private SendableChooser<AutoChooser2> m_autoChooser2 = new SendableChooser<>( );
-  private SendableChooser<StartPose>   m_startChooser = new SendableChooser<>( );
-  private SendableChooser<Integer>     m_odomChooser  = new SendableChooser<>( );
+  private SendableChooser<StartPose>    m_startChooser = new SendableChooser<>( );
 
   private final HashMap<String, String> autoMap        = new HashMap<>(Map.ofEntries( //
       Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1-Stop"),
@@ -181,6 +182,14 @@ public class RobotContainer
       Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE3.toString( ), "Pos3-test3") //
   ));
 
+  // Shuffleboard objects
+  ShuffleboardTab                       autoTab        = Shuffleboard.getTab(kAutoTab);
+  ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(6, 0).withSize(2, 1);
+  ComplexWidget                         modeEntry2     =
+      autoTab.add("AutoMode2", m_autoChooser2).withPosition(6, 3).withSize(2, 1);
+  ComplexWidget                         startEntry     =
+      autoTab.add("StartPosition", m_startChooser).withPosition(6, 1).withSize(2, 1);
+
   /****************************************************************************
    * 
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -189,76 +198,65 @@ public class RobotContainer
   {
     m_drivetrain.getDaqThread( ).setThreadPriority(99);   // Start swerve telemetry thread
 
-    addSmartDashboardWidgets( );                    // Add dashboard widgets for commands
+    addDashboardWidgets( );      // Add dashboard widgets for commands
 
-    configureButtonBindings( );                     // Configure game controller buttons
+    configureButtonBindings( );       // Configure game controller buttons
 
-    initDefaultCommands( );                         // Initialize subsystem default commands
-
-    initAutonomousChooser( );                       // Build autonomous chooser and put on dashboard
-
-    initOdometryChooser( );                         // Build odometry chooser and put on dashboard
+    initDefaultCommands( );           // Initialize subsystem default commands
   }
 
   /****************************************************************************
    * 
    * Create general dashboard widgets for commands and subsystems
    */
-  private void addSmartDashboardWidgets( )
+  private void addDashboardWidgets( )
   {
-    // For future work to set up Shuffleboard layout from code
-    // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
-    // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
+    // Set up Shuffleboard layout from code
 
-    // SmartDashboard Buttons
-    SmartDashboard.putData(m_intake);
-    SmartDashboard.putData(m_shooter);
-    SmartDashboard.putData(m_feeder);
-    SmartDashboard.putData(m_climber);
+    // Configure autonomous sendable chooser
+    m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
+    m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
+    m_autoChooser.addOption("2 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
+    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
+    m_autoChooser.addOption("4 - AutoPreloadP0AndLeave", AutoChooser.AUTOPRELOADP0LEAVE);
+    m_autoChooser.addOption("5 - AutoPreloadP4AndLeave", AutoChooser.AUTOPRELOADP4LEAVE);
+    m_autoChooser.addOption("6 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
+    m_autoChooser.addOption("7 - AutoScore4", AutoChooser.AUTOSCORE4);
+    m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
 
-    SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( )));
+    // Configure autonomous sendable chooser
+    m_autoChooser2.setDefaultOption("0 - AutoStop", AutoChooser2.AUTOSTOP);
+    m_autoChooser2.addOption("1 - AutoLeave", AutoChooser2.AUTOLEAVE);
+    m_autoChooser2.addOption("2 - AutoPreloadLeave", AutoChooser2.AUTOPRELOADLEAVE);
+    m_autoChooser2.addOption("3 - AutoPreloadScore", AutoChooser2.AUTOPRELOADSCORE);
+    m_autoChooser2.addOption("4 - AutoPreloadSteal", AutoChooser2.AUTOPRELOADSTEAL);
+    m_autoChooser2.addOption("5 - AutoScore4", AutoChooser2.AUTOSCORE4);
+    m_autoChooser2.addOption("6 - AutoTestPath", AutoChooser2.AUTOTEST);
 
-    SmartDashboard.putData("LEDRun", m_led.getLEDCommand(LEDColor.DASHBOARD, LEDAnimation.DASHBOARD));
+    // Configure starting pose sendable chooser
+    m_startChooser.setDefaultOption("POSE1", StartPose.POSE1);
+    m_startChooser.addOption("POSE2", StartPose.POSE2);
+    m_startChooser.addOption("POSE3", StartPose.POSE3);
 
-    SmartDashboard.putNumber("SW_SetPoseX", 0.0);
-    SmartDashboard.putNumber("SW_SetPoseY", 0.0);
-    SmartDashboard.putNumber("SW_SetPoseRot", 0.0);
-    SmartDashboard.putData("SwSetOdometry", new InstantCommand(( ) -> setOdometryFromDashboard( )).ignoringDisable(true));
+    autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 2);
 
-    SmartDashboard.putData("ActionAcquireNote", new ActionAcquireNote(m_intake, m_led));
-    SmartDashboard.putData("ActionExpelNote", new ActionExpelNote(m_intake, m_led));
-    SmartDashboard.putData("ActionHandoff", new ActionHandoff(m_intake, m_feeder));
-    SmartDashboard.putData("ActionPrepareToClimb", new ActionPrepareToClimb(m_climber, m_feeder));
-    SmartDashboard.putData("ActionRetractIntake", new ActionRetractIntake(m_intake, m_led));
-    SmartDashboard.putData("ActionScoreAmp", new ActionScoreAmp(m_feeder));
-    SmartDashboard.putData("ActionScoreSpeaker", new ActionScoreSpeaker(m_shooter, m_intake, m_led));
+    // Command tab
+    ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
+    cmdTab.add("ActionAcquireNote", new ActionAcquireNote(m_intake, m_led)).withPosition(0, 0);
+    cmdTab.add("ActionExpelNote", new ActionExpelNote(m_intake, m_led)).withPosition(0, 1);
+    cmdTab.add("ActionHandoff", new ActionHandoff(m_intake, m_feeder)).withPosition(0, 2);
+    cmdTab.add("ActionRetractIntake", new ActionRetractIntake(m_intake, m_led)).withPosition(0, 3);
 
-    SmartDashboard.putData("InRollStop", m_intake.getMoveToPositionCommand(RollerMode.STOP, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollAcquire", m_intake.getMoveToPositionCommand(RollerMode.ACQUIRE, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollExpel", m_intake.getMoveToPositionCommand(RollerMode.EXPEL, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollShoot", m_intake.getMoveToPositionCommand(RollerMode.SHOOT, m_intake::getIntakePosition));
-    SmartDashboard.putData("InRollHold", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakePosition));
+    cmdTab.add("ActionPrepareToClimb", new ActionPrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
+    cmdTab.add("ActionScoreAmp", new ActionScoreAmp(m_feeder)).withPosition(2, 2);
+    cmdTab.add("ActionScoreSpeaker", new ActionScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 3);
 
-    SmartDashboard.putData("InRotDeploy", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakeDeployed));
-    SmartDashboard.putData("InRotRetract", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakeRetracted));
-    SmartDashboard.putData("InRotHandoff", m_intake.getMoveToPositionCommand(RollerMode.HOLD, m_intake::getIntakeHandoff));
+    cmdTab.add(m_intake).withPosition(4, 0);
+    cmdTab.add(m_shooter).withPosition(4, 1);
+    cmdTab.add(m_feeder).withPosition(4, 2);
+    cmdTab.add(m_climber).withPosition(4, 3);
 
-    SmartDashboard.putData("ShRunScore", m_shooter.getShooterScoreCommand( ));
-    SmartDashboard.putData("ShRunStop", m_shooter.getShooterStopCommand( ));
-
-    SmartDashboard.putData("FdRollStop", m_feeder.getMoveToPositionCommand(FDRollerMode.STOP, m_feeder::getFeederPosition));
-    SmartDashboard.putData("FdRollScore", m_feeder.getMoveToPositionCommand(FDRollerMode.SCORE, m_feeder::getFeederPosition));
-    SmartDashboard.putData("FdRollHandoff", m_feeder.getMoveToPositionCommand(FDRollerMode.HANDOFF, m_feeder::getFeederPosition));
-    SmartDashboard.putData("FdRollHold", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederPosition));
-
-    SmartDashboard.putData("FdRotAmp", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederAmp));
-    SmartDashboard.putData("FdRotClimb", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederClimb));
-    SmartDashboard.putData("FdRotHandoff", m_feeder.getMoveToPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederHandoff));
-
-    SmartDashboard.putData("ClRunExtended", m_climber.getMoveToPositionCommand(m_climber::getClimberFullyExtended));
-    SmartDashboard.putData("ClRunChain", m_climber.getMoveToPositionCommand(m_climber::getClimberChainLevel));
-    SmartDashboard.putData("ClRunClimbed", m_climber.getMoveToPositionCommand(m_climber::getClimberClimbed));
-    SmartDashboard.putData("CLCalibrate", m_climber.getCalibrateCommand( ));
+    cmdTab.add(CommandScheduler.getInstance( )).withPosition(6, 0);
   }
 
   /****************************************************************************
@@ -398,41 +396,6 @@ public class RobotContainer
     // m_intake.setDefaultCommand(m_intake.getJoystickCommand(( ) -> getIntakeAxis( )));
     // m_feeder.setDefaultCommand(m_feeder.getJoystickCommand(( ) -> getFeederAxis( )));
     // m_climber.setDefaultCommand(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));
-  }
-
-  /****************************************************************************
-   * 
-   * Set up autonomous chooser
-   */
-  private void initAutonomousChooser( )
-  {
-    // Configure autonomous sendable chooser
-    m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-    m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
-    m_autoChooser.addOption("2 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
-    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
-    m_autoChooser.addOption("4 - AutoPreloadP0AndLeave", AutoChooser.AUTOPRELOADP0LEAVE);
-    m_autoChooser.addOption("5 - AutoPreloadP4AndLeave", AutoChooser.AUTOPRELOADP4LEAVE);
-    m_autoChooser.addOption("6 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
-    m_autoChooser.addOption("7 - AutoScore4", AutoChooser.AUTOSCORE4);
-    m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
-    SmartDashboard.putData("AutoMode", m_autoChooser);
-
-    // Configure autonomous sendable chooser
-    m_autoChooser2.setDefaultOption("0 - AutoStop", AutoChooser2.AUTOSTOP);
-    m_autoChooser2.addOption("1 - AutoLeave", AutoChooser2.AUTOLEAVE);
-    m_autoChooser2.addOption("2 - AutoPreloadLeave", AutoChooser2.AUTOPRELOADLEAVE);
-    m_autoChooser2.addOption("3 - AutoPreloadScore", AutoChooser2.AUTOPRELOADSCORE);
-    m_autoChooser2.addOption("4 - AutoPreloadSteal", AutoChooser2.AUTOPRELOADSTEAL);
-    m_autoChooser2.addOption("5 - AutoScore4", AutoChooser2.AUTOSCORE4);
-    m_autoChooser2.addOption("6 - AutoTestPath", AutoChooser2.AUTOTEST);
-    SmartDashboard.putData("AutoMode2", m_autoChooser2);
-
-    // Configure starting pose sendable chooser
-    m_startChooser.setDefaultOption("POSE1", StartPose.POSE1);
-    m_startChooser.addOption("POSE2", StartPose.POSE2);
-    m_startChooser.addOption("POSE3", StartPose.POSE3);
-    SmartDashboard.putData("StartPose", m_startChooser);
   }
 
   /****************************************************************************
@@ -653,7 +616,7 @@ public class RobotContainer
    */
   public Command getAutonomousCommand_2( )
   {
-    AutoChooser mode = m_autoChooser.getSelected( );
+    AutoChooser2 mode = m_autoChooser2.getSelected( );
     StartPose startPose = m_startChooser.getSelected( );
     String autoKey = mode.toString( ) + startPose.toString( );
 
@@ -693,7 +656,7 @@ public class RobotContainer
     {
       default :
       case AUTOSTOP :
-      m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
+        m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
         break;
       case AUTOLEAVE :
         m_autoCommand = new AutoLeave(ppPathList, m_drivetrain, m_led);
@@ -719,49 +682,6 @@ public class RobotContainer
         m_autoCommand.getName( )));
 
     return m_autoCommand;
-  }
-
-  /****************************************************************************
-   * 
-   * Set up odometry chooser
-   */
-  private void initOdometryChooser( )
-  {
-    // Autonomous Chooser
-    m_odomChooser.setDefaultOption("ID1-AprilTag", 1);
-    m_odomChooser.addOption("ID2-AprilTag", 2);
-    m_odomChooser.addOption("ID3-AprilTag", 3);
-    m_odomChooser.addOption("ID4-AprilTag", 4);
-    m_odomChooser.addOption("ID5-AprilTag", 5);
-    m_odomChooser.addOption("ID6-AprilTag", 6);
-    m_odomChooser.addOption("ID7-AprilTag", 7);
-    m_odomChooser.addOption("ID8-AprilTag", 8);
-    m_odomChooser.addOption("ID9-AprilTag", 9);
-    m_odomChooser.addOption("ID10-AprilTag", 10);
-    m_odomChooser.addOption("ID11-AprilTag", 11);
-    m_odomChooser.addOption("ID12-AprilTag", 12);
-    m_odomChooser.addOption("ID13-AprilTag", 13);
-    m_odomChooser.addOption("ID14-AprilTag", 14);
-    m_odomChooser.addOption("ID15-AprilTag", 15);
-    m_odomChooser.addOption("ID16-AprilTag", 16);
-
-    // Configure odometry sendable chooser
-    SmartDashboard.putData("AprilTagPose", m_odomChooser);
-    SmartDashboard.putData("ResetPose", new InstantCommand(( ) -> setAprilTagOdometry( )).ignoringDisable(true));
-  }
-
-  private void setAprilTagOdometry( )
-  {
-    m_drivetrain.resetOdometry(Constants.VIConsts.kAprilTagPoses.get(m_odomChooser.getSelected( )));
-  }
-
-  private void setOdometryFromDashboard( )
-  {
-    m_drivetrain.resetOdometry(new Pose2d(new Translation2d(            // 
-        SmartDashboard.getNumber("SW_SetPoseX", 0.0),  //
-        SmartDashboard.getNumber("SW_SetPoseY", 0.0)), //
-        Rotation2d.fromDegrees(SmartDashboard.getNumber("SW_SetPoseRot", 0.0)) //
-    ));
   }
 
   /****************************************************************************

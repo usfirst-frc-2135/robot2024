@@ -193,7 +193,7 @@ public class Constants
   /////////////////////////////////////////////////////////////////////////////
   public static final class LEDConsts
   {
-    public enum LEDColor
+    public enum COLOR
     {
       OFF,      // CANdle off
       WHITE,    // CANdle white
@@ -206,7 +206,7 @@ public class Constants
       DASHBOARD // CANdle color taken from dashboard
     }
 
-    public enum LEDAnimation
+    public enum ANIMATION
     {
       COLORFLOW,    // Single color flow through string
       FIRE,         // Fire pattern from one end of string

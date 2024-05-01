@@ -6,8 +6,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.LEDConsts.LEDAnimation;
-import frc.robot.Constants.LEDConsts.LEDColor;
+import frc.robot.Constants.LEDConsts.ANIMATION;
+import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
@@ -34,8 +34,8 @@ public class ActionRetractIntake extends SequentialCommandGroup
         // @formatter:off      
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
         new ConditionalCommand(
-          led.getLEDCommand(LEDColor.BLUE, LEDAnimation.CLEARALL),
-          led.getLEDCommand(LEDColor.OFF, LEDAnimation.CLEARALL),
+          led.getLEDCommand(COLOR.BLUE, ANIMATION.CLEARALL),
+          led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL),
           intake::isNoteDetected),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
 

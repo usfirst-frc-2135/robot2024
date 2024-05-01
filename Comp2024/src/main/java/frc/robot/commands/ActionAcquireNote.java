@@ -6,8 +6,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.INConsts;
-import frc.robot.Constants.LEDConsts.LEDAnimation;
-import frc.robot.Constants.LEDConsts.LEDColor;
+import frc.robot.Constants.LEDConsts.ANIMATION;
+import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
@@ -33,7 +33,7 @@ public class ActionAcquireNote extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Start rollers & Deploy intake rotary"),
-        led.getLEDCommand(LEDColor.YELLOW, LEDAnimation.CLEARALL),
+        led.getLEDCommand(COLOR.YELLOW, ANIMATION.CLEARALL),
         intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Wait for note"),

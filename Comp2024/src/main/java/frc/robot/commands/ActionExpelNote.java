@@ -6,34 +6,45 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.INConsts;
+import frc.robot.Constants.LEDConsts.ANIMATION;
+import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
 /**
- *
+ * Command to expel a note to the floor
  */
-public class IntakeActionExpel extends SequentialCommandGroup
+public class ActionExpelNote extends SequentialCommandGroup
 {
-  public IntakeActionExpel(Intake intake, LED led)
+  /**
+   * Group command to use the intake to expel a note to the floor
+   * 
+   * @param intake
+   *          intake subsystem
+   * @param led
+   *          led subsystem
+   */
+  public ActionExpelNote(Intake intake, LED led)
   {
-    setName("IntakeActionExpel");
+    setName("ActionExpelNote");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
         new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getIntakeDeployed),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),        
-        new IntakeRun(intake, INConsts.RollerMode.EXPEL, intake::getRotaryPosition),
+        intake.getMoveToPositionCommand(INConsts.RollerMode.EXPEL, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        new IntakeRun(intake, INConsts.RollerMode.STOP, intake::getRotaryPosition)
- 
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition),
+        led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
+
         // @formatter:on
     );
   }

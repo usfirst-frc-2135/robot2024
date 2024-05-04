@@ -3,12 +3,13 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -25,9 +26,9 @@ public class Robot extends TimedRobot
   private Command              m_autonomousCommand;
   private boolean              m_faultsCleared  = false;
 
-  /**
-   * This function is run when the robot is first started up and should be used for any initialization
-   * code.
+  /****************************************************************************
+   * 
+   * This function runs when the Robot class is first started and used for initialization.
    */
   @Override
   public void robotInit( )
@@ -35,10 +36,12 @@ public class Robot extends TimedRobot
     // Starts recording to data log
     DataLogManager.start( );
 
+    // Log when commands initialize, interrupt, and end states
     CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(String.format("%s: Init", cmd.getName( ))));
     CommandScheduler.getInstance( ).onCommandInterrupt(cmd -> DataLogManager.log(String.format("%s: Interrupt", cmd.getName( ))));
     CommandScheduler.getInstance( ).onCommandFinish(cmd -> DataLogManager.log(String.format("%s: End", cmd.getName( ))));
 
+    // Forward packets from RoboRIO USB connections to ethernet
     PortForwarder.add(5800, "limelight.local", 5800);
     PortForwarder.add(5801, "limelight.local", 5801);
     PortForwarder.add(5802, "limelight.local", 5802);
@@ -46,28 +49,32 @@ public class Robot extends TimedRobot
     PortForwarder.add(5804, "limelight.local", 5804);
     PortForwarder.add(5805, "limelight.local", 5805);
 
-    SmartDashboard.putData(CommandScheduler.getInstance( ));
+    // Put command scheduler on dashbaord for debugging
+
+    FollowPathCommand.warmupCommand( ).schedule( ); // Recommended by PathPlanner docs
   }
 
-  /**
-   * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
+  /****************************************************************************
+   * 
+   * This function is called every 20 msec robot loop, no matter the mode. Use this for items like
+   * diagnostics that you want to run during Disabled, Autonomous, Teleoperated and Test.
    *
-   * <p>
    * This runs after the mode specific periodic functions, but before LiveWindow and SmartDashboard
    * integrated updating.
    */
   @Override
   public void robotPeriodic( )
   {
-    // Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled commands,
+    // Runs the Command Scheduler. This is responsible for polling buttons, adding newly-scheduled commands,
     // running already-scheduled commands, removing finished or interrupted commands, and running 
     // subsystem periodic() methods. This must be called from the robot's periodic block in order
     // for anything in the Command-based framework to work.
+    //
     CommandScheduler.getInstance( ).run( );
   }
 
-  /**
+  /****************************************************************************
+   * 
    * This function is called once each time the robot enters Disabled mode.
    */
   @Override
@@ -80,7 +87,7 @@ public class Robot extends TimedRobot
   }
 
   /**
-   * This function is called periodically while disabled.
+   * This function is called periodically while in Disabled mode.
    */
   @Override
   public void disabledPeriodic( )
@@ -91,16 +98,16 @@ public class Robot extends TimedRobot
       if (!m_faultsCleared)
       {
         m_faultsCleared = true;
-        m_robotContainer.faultDump( );
+        m_robotContainer.printFaults( );
       }
     }
     else
       m_faultsCleared = false;
   }
 
-  /**
-   * This function is called once each time the robot enters Disabled mode.
-   * This autonomous runs the autonomous command selected by your {@link RobotContainer} class.
+  /****************************************************************************
+   * 
+   * This function is called once each time the robot enters Autonomous mode.
    */
   @Override
   public void autonomousInit( )
@@ -110,7 +117,7 @@ public class Robot extends TimedRobot
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
 
-    // schedule the autonomous command (example)
+    // schedule the autonomous command selected by the RobotContainer class
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.schedule( );
@@ -118,13 +125,14 @@ public class Robot extends TimedRobot
   }
 
   /**
-   * This function is called periodically during autonomous.
+   * This function is called periodically during Autonomous mode.
    */
   @Override
   public void autonomousPeriodic( )
   {}
 
-  /**
+  /****************************************************************************
+   * 
    * This function is called once each time the robot enters Teleop mode.
    */
   @Override
@@ -133,24 +141,25 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
-    // This makes sure that the autonomous stops running when teleop starts running. 
-
+    // Make sure that the autonomous command stops running when Teleop starts running
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel( );
     }
 
+    // Handle any commands that need to be scheduled when entering Teleop mode
     m_robotContainer.teleopInit( );
   }
 
   /**
-   * This function is called periodically during operator control.
+   * This function is called periodically during Teleop mode (operator control).
    */
   @Override
   public void teleopPeriodic( )
   {}
 
-  /**
+  /****************************************************************************
+   * 
    * This function is called once each time the robot enters Simulation mode.
    */
   @Override
@@ -158,12 +167,16 @@ public class Robot extends TimedRobot
   {}
 
   /**
-   * This function is called periodically during simulation.
+   * This function is called periodically during Simulation mode.
    */
   @Override
   public void simulationPeriodic( )
   {}
 
+  /****************************************************************************
+   * 
+   * This function is called once each time the robot enters Test mode.
+   */
   @Override
   public void testInit( )
   {
@@ -172,13 +185,14 @@ public class Robot extends TimedRobot
   }
 
   /**
-   * This function is called periodically during test mode.
+   * This function is called periodically during Test mode.
    */
   @Override
   public void testPeriodic( )
   {}
 
-  /**
+  /****************************************************************************
+   * 
    * Our robot detection process between competition and beta (practice) robots
    */
   public static boolean isComp( )
@@ -206,7 +220,7 @@ public class Robot extends TimedRobot
       isComp = false;
       robotName = "PRACTICE/BETA (B)";
     }
-    DataLogManager.log(String.format("robotContainer: Detected the %s robot!", robotName));
+    DataLogManager.log(String.format("robotContainer: Detected the %s robot (RoboRIO)!", robotName));
 
     return isComp;
   }

@@ -1,7 +1,7 @@
 
 // Phoenix 6 configurations
 
-package frc.robot.lib.util;
+package frc.robot.lib.phoenix;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,10 +17,12 @@ import frc.robot.Robot;
 public final class CTREConfigs6
 {
 
-  // Swerve module configs built into subsystem
+  // Swerve module configs are built into swerve subsystem
 
-  // Intake
-
+  /****************************************************************************
+   * 
+   * Intake rotary motor - Falcon 500
+   */
   public static TalonFXConfiguration intakeRotaryFXConfig( )
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
@@ -39,12 +41,12 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
-    // inRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANCoder;
+    // inRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANcoder;
     // inRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     // inRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
     // inRotaryConfig.Feedback.RotorToSensorRatio = 27.41;
 
-    // Hardware limit switches
+    // Hardware limit switches - NONE
     // inRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
@@ -58,9 +60,7 @@ public final class CTREConfigs6
     inRotaryConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Open Loop settings
-    inRotaryConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0; // Seconds to ramp
-    // inRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod      // Seconds to ramp
-    inRotaryConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;   // Seconds to ramp
+    // inRotaryConfig.OpenLoopRamps.*                             // Seconds to ramp
 
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
@@ -78,6 +78,10 @@ public final class CTREConfigs6
     return inRotaryConfig;
   }
 
+  /****************************************************************************
+   * 
+   * Intake rotary CANcoder
+   */
   public static CANcoderConfiguration intakeRotaryCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
@@ -92,8 +96,10 @@ public final class CTREConfigs6
     return config;
   }
 
-  // Shooter
-
+  /****************************************************************************
+   * 
+   * Shooter motors - Falcon 500 (2)
+   */
   public static TalonFXConfiguration shooterFXConfig( )
   {
     TalonFXConfiguration shooterConfig = new TalonFXConfiguration( );
@@ -120,9 +126,7 @@ public final class CTREConfigs6
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     // Open Loop settings
-    shooterConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.0;  // Seconds to ramp
-    // inRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod        // Seconds to ramp
-    shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.0;    // Seconds to ramp
+    // shooterConfig.OpenLoopRamps.*                                // Seconds to ramp
 
     // Slot settings
     shooterConfig.Slot0.kS = 0.0;                                   // Voltage or duty cylce to overcome static friction
@@ -136,8 +140,10 @@ public final class CTREConfigs6
     return shooterConfig;
   }
 
-  // Feeder
-
+  /****************************************************************************
+   * 
+   * Feeder rotary motor - Falcon 500
+   */
   public static TalonFXConfiguration feederRotaryFXConfig( )
   {
     TalonFXConfiguration fdRotaryConfig = new TalonFXConfiguration( );
@@ -156,12 +162,12 @@ public final class CTREConfigs6
     fdRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
-    // fdRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANCoder;
+    // fdRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANcoder;
     // fdRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     // fdRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
     // fdRotaryConfig.Feedback.RotorToSensorRatio = 27.41;
 
-    // Hardware limit switches
+    // Hardware limit switches - NONE
     // fdRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
@@ -175,9 +181,7 @@ public final class CTREConfigs6
     fdRotaryConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Open Loop settings
-    fdRotaryConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0; // Seconds to ramp
-    // fdRotaryConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod      // Seconds to ramp
-    fdRotaryConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;   // Seconds to ramp
+    // fdRotaryConfig.OpenLoopRamps.*                             // Seconds to ramp
 
     // Slot settings
     fdRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
@@ -195,6 +199,10 @@ public final class CTREConfigs6
     return fdRotaryConfig;
   }
 
+  /****************************************************************************
+   * 
+   * Feeder rotary CANcoder
+   */
   public static CANcoderConfiguration feederRotaryCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
@@ -209,8 +217,10 @@ public final class CTREConfigs6
     return config;
   }
 
-  // Climber
-
+  /****************************************************************************
+   * 
+   * Climber motors (2) - Falcon 500
+   */
   public static TalonFXConfiguration climberFXConfig( )
   {
     TalonFXConfiguration climberConfig = new TalonFXConfiguration( );
@@ -231,7 +241,7 @@ public final class CTREConfigs6
     // Feedback settings
     // climberConfig.Feedback.*
 
-    // Hardware limit switches
+    // Hardware limit switches - NONE
     // climberConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
@@ -245,9 +255,7 @@ public final class CTREConfigs6
     climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Open Loop settings
-    climberConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;  // Seconds to ramp
-    // exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod            // Seconds to ramp
-    climberConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;    // Seconds to ramp
+    // climberConfig.OpenLoopRamps.*                              // Seconds to ramp
 
     // Slot settings
     climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction

@@ -1,59 +1,74 @@
-
-// ROBOTBUILDER TYPE: Subsystem.
-
+//
+// Vision Subystem - handle limelight interface
+//
 package frc.robot.subsystems;
 
 import java.util.Optional;
 
-import edu.wpi.first.math.filter.MedianFilter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.VIConsts;
-import frc.robot.lib.util.LimelightHelpers;
+import frc.robot.lib.LimelightHelpers;
 
-/**
- *
+/****************************************************************************
+ * 
+ * Vision subsystem class
  */
 public class Vision extends SubsystemBase
 {
+  private static final String kVisionTab = "Vision";
+
   private enum streamMode
   {
-    STANDARD, PIPMAIN, PIPSECONDARY
+    STANDARD(0),    //
+    PIPMAIN(1),     //
+    PIPSECONDARY(2);
+
+    @SuppressWarnings("unused")
+    public final int value;
+
+    private streamMode(int value)
+    {
+      this.value = value;
+    }
   };
 
   // Constants
+  private static final double kAimingKp    = 0.01;
+  private static final double kDrivingKp   = 0.06;
 
   // Objects
-  private MedianFilter          m_tyfilter      = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
-  private MedianFilter          m_tvfilter      = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
+
+  // Shuffleboard objects
+  ShuffleboardTab             m_visionTab  = Shuffleboard.getTab(kVisionTab);
+  ShuffleboardLayout          m_targetList =
+      m_visionTab.getLayout("Target", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
+  GenericEntry                m_txEntry    = m_targetList.add("tx-horizontal", 0.0).getEntry( );
+  GenericEntry                m_tyEntry    = m_targetList.add("ty-vertical", 0.0).getEntry( );
+  GenericEntry                m_taEntry    = m_targetList.add("ta-area", 0.0).getEntry( );
+  GenericEntry                m_tsEntry    = m_targetList.add("ts-skew", 0.0).getEntry( );
+
+  ShuffleboardLayout          m_statusList =
+      m_visionTab.getLayout("Status", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
+  GenericEntry                m_tvEntry    = m_statusList.add("tv-valid", false).getEntry( );
+  GenericEntry                m_tlEntry    = m_statusList.add("tl-latency", 0.0).getEntry( );
+  GenericEntry                m_tidEntry   = m_statusList.add("tid-targetid", 0.0).getEntry( );
 
   // Declare module variables
-  private NetworkTable          m_table;            // Network table reference for getting LL values
-  private DoubleArraySubscriber m_botPoseSub;
+  private NetworkTable        m_table      = NetworkTableInstance.getDefault( ).getTable("limelight"); // Network table reference for LL values
 
-  private double                m_targetHorizAngle;      // LL Target horizontal Offset from Crosshair to Target (-27 to 27 deg)
-  private double                m_targetVertAngle;       // LL Target vertical Offset from Crosshair to Target (-20.5 to 20.5 deg)
-  private double                m_targetArea;            // LL Target Area (0% of image to 100% of image)
-  private double                m_targetSkew;            // LL Target Skew or rotation (-90 to 0 deg)
-  private boolean               m_targetValid;           // LL Target Valid or not
-  private double                m_targetLatency;         // LL pipeline’s latency contribution (ms) Add at least 11ms for image capture latency.
-  private int                   m_targetID;              // ID of the primary in-view AprilTag
-  private boolean               m_targetIDFixed = false; // Override periodic reading of limelight targetIDs for testing
-  private streamMode            m_stream        = streamMode.STANDARD;
+  private streamMode          m_stream     = streamMode.STANDARD;
 
-  /**
-   *
+  /****************************************************************************
+   * 
+   * Constructor
    */
   public Vision( )
   {
@@ -61,39 +76,31 @@ public class Vision extends SubsystemBase
     setSubsystem("Vision");
 
     // Get the Network table reference once for all methods
-    m_table = NetworkTableInstance.getDefault( ).getTable("limelight");
-
-    // Put all the needed widgets on the dashboard
-    SmartDashboard.putNumberArray("VI_RobotPose", new double[ ] { });
-
-    m_botPoseSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
 
     initialize( );
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec)
+   */
   @Override
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    m_targetHorizAngle = m_table.getEntry("tx").getDouble(0.0);
-    m_targetVertAngle = m_tyfilter.calculate(m_table.getEntry("ty").getDouble(0.0));
-    m_targetArea = m_table.getEntry("ta").getDouble(0.0);
-    m_targetSkew = m_table.getEntry("ts").getDouble(0.0);
-    m_targetValid = m_tvfilter.calculate(m_table.getEntry("tv").getDouble(0.0)) > 0.5;
-    if (!m_targetIDFixed)
-      m_targetID = (int) m_table.getEntry("tid").getDouble(0.0);
-    m_targetLatency = m_table.getEntry("tl").getDouble(0.0);
-
-    getLimelightRawPose( );
-
-    SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
-    SmartDashboard.putNumber("VI_vertAngle", m_targetVertAngle);
-    SmartDashboard.putNumber("VI_area", m_targetArea);
-    SmartDashboard.putNumber("VI_skew", m_targetSkew);
-    SmartDashboard.putBoolean("VI_valid", m_targetValid);
-    SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
+    m_tvEntry.setBoolean(m_table.getEntry("tv").getDouble(0.0) > 0.5);
+    m_txEntry.setDouble(m_table.getEntry("tx").getDouble(0.0));
+    m_tyEntry.setDouble(m_table.getEntry("ty").getDouble(0.0));
+    m_taEntry.setDouble(m_table.getEntry("ta").getDouble(0.0));
+    m_tsEntry.setDouble(m_table.getEntry("ts").getDouble(0.0));
+    m_tlEntry.setDouble(m_table.getEntry("tl").getDouble(0.0));
+    m_tidEntry.setDouble(m_table.getEntry("tid").getDouble(0.0));
   }
 
+  /****************************************************************************
+   * 
+   * Periodic actions that run every scheduler loop time (20 msec) during simulation
+   */
   @Override
   public void simulationPeriodic( )
   {
@@ -102,152 +109,17 @@ public class Vision extends SubsystemBase
 
   // Put methods for controlling this subsystem here. Call these from Commands.
 
+  /****************************************************************************
+   * 
+   * Initialize subsystem during mode changes
+   */
   public void initialize( )
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
 
-    setLEDMode(VIConsts.LED_OFF);
-    setCameraDisplay(VIConsts.PIP_SECONDARY);
+    LimelightHelpers.setLEDMode_ForceOff("limelight");
+    LimelightHelpers.setStreamMode_PiPSecondary("limelight");
 
-    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
-    {
-      setPriorityIdRed( );
-    }
-    else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
-    {
-      setPriorityIdBlue( );
-    }
-  }
-
-  public double getHorizOffsetDeg( )
-  {
-    return m_targetHorizAngle;
-  }
-
-  public double getVertOffsetDeg( )
-  {
-    return m_targetVertAngle;
-  }
-
-  public double getTargetArea( )
-  {
-    return m_targetArea;
-  }
-
-  public double getTargetSkew( )
-  {
-    return m_targetSkew;
-  }
-
-  public boolean getTargetValid( )
-  {
-    return m_targetValid;
-  }
-
-  public int getTargetID( )
-  {
-    return m_targetID;
-  }
-
-  // Used only for debugging to force a valid target ID
-
-  public void setFixedTargetID(int id)
-  {
-    m_targetIDFixed = true;
-    m_targetID = id;
-  }
-
-  public double getTargetLatency( )
-  {
-    return m_targetLatency;
-  }
-
-  // Return the limelight pose if the limelight thinks it is valid
-  public Pose2d getLimelightRawPose( )
-  {
-    double[ ] m_botPoseArray = m_botPoseSub.get( );
-
-    if (m_targetValid && (m_botPoseArray != null))
-    {
-      // Translate Pose3d sent by the limelight in an array into a Pose2d that we use
-      // Array [6] order: Translation (X, Y, Z), Rotation(Roll, Pitch, Yaw)
-      double yawDegrees = m_botPoseArray[5] + ((m_botPoseArray[5] < 0) ? 360 : 0);
-
-      Pose2d m_botLLPose =
-          new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(Units.degreesToRadians(yawDegrees)));
-
-      double[ ] robotPose = new double[ ]
-      {
-          m_botPoseArray[0], m_botPoseArray[1], m_botPoseArray[5]
-      };
-
-      SmartDashboard.putNumberArray("VI_RobotPose", robotPose);
-
-      return m_botLLPose;
-    }
-
-    return null;
-  }
-
-  // Return the limelight pose if it passes all sanity checks
-  public Pose2d getLimelightValidPose(Pose2d currentPose)
-  {
-    Pose2d llPose = getLimelightRawPose( );
-
-    // If sanity checks are valid, return the limelight pose
-    if ((llPose != null) && isLimelightPoseValid(llPose, currentPose))
-    {
-      return llPose;
-    }
-
-    return null;
-  }
-
-  // Make sanity checks on the limelight pose
-  //  - compare to see if within a specified distance of the current pose
-  public boolean isLimelightPoseValid(Pose2d llPose, Pose2d currentPose)
-  {
-    Transform2d deltaTransform = currentPose.minus(llPose);
-
-    return Math.hypot(deltaTransform.getX( ), deltaTransform.getY( )) < 1.0;
-  }
-
-  public void setLEDMode(int mode)
-  {
-    DataLogManager.log(String.format("%s: setLedMode %d", getSubsystem( ), mode));
-    m_table.getEntry("ledMode").setValue(mode);
-  }
-
-  private void setPriorityId(int id, String alliance)
-  {
-    DataLogManager.log(String.format("%s: priority id %d (%s)", getSubsystem( ), id, alliance));
-    m_table.getEntry("priorityid").setValue(id);
-  }
-
-  public void setPriorityIdRed( )
-  {
-    setPriorityId(4, "RED");
-  }
-
-  public void setPriorityIdBlue( )
-  {
-    setPriorityId(7, "BLUE");
-  }
-
-  public void setAmpId( )
-  {
-    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
-    {
-      setPriorityId(5, "RED");
-    }
-    else if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Blue)))
-    {
-      setPriorityId(6, "BLUE");
-    }
-  }
-
-  public void setSpeakerId( )
-  {
     if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
     {
       setPriorityId(4, "RED");
@@ -256,17 +128,16 @@ public class Vision extends SubsystemBase
     {
       setPriorityId(7, "BLUE");
     }
+    else
+      DataLogManager.log(String.format("%s: Driver station alliance color NOT SET!", getSubsystem( )));
   }
 
-  public void setCameraDisplay(int stream)
-  {
-    DataLogManager.log(String.format("%s: setCameraDisplay %d", getSubsystem( ), stream));
-    m_table.getEntry("stream").setValue(stream);
-  }
-
+  /****************************************************************************
+   * 
+   * rotateCameraStreamMode - rotate through different stream modes
+   */
   public void rotateCameraStreamMode( )
   {
-    DataLogManager.log(String.format("%s: setStreamMode_PiPSecondary", getSubsystem( )));
     switch (m_stream)
     {
       default :
@@ -282,5 +153,64 @@ public class Vision extends SubsystemBase
         m_stream = streamMode.PIPSECONDARY;
         LimelightHelpers.setStreamMode_PiPSecondary("limelight");
     }
+    DataLogManager.log(String.format("%s: Set stream mode (setStreamMode_PiPxxx) %s", getSubsystem( ), m_stream));
   }
+
+  /****************************************************************************
+   * 
+   * Limelight auto-aiming control for rotational velocity.
+   * 
+   * @param maxAngularRate
+   *          max angular rate to scale against
+   */
+  public double limelight_aim_proportional(double maxAngularRate)
+  {
+    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kAimingKp;
+
+    // convert to radians per second for our drive method
+    targetingAngularVelocity *= maxAngularRate;
+
+    // invert since tx is positive when the target is to the right of the crosshair
+    targetingAngularVelocity *= -1.0;
+
+    return targetingAngularVelocity;
+  }
+
+  /****************************************************************************
+   * 
+   * Limelight auto-ranging control for distance velocity.
+   * 
+   * @param maxSpeed
+   *          max speed to scale against
+   */
+  public double limelight_range_proportional(double maxSpeed)
+  {
+    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kDrivingKp;
+
+    // convert to meters per second
+    targetingForwardSpeed *= maxSpeed;
+
+    // invert since ty is positive when the target is above the crosshair
+    targetingForwardSpeed *= -1.0;
+
+    return targetingForwardSpeed;
+  }
+
+  ///////////////////////// PRIVATE HELPERS ///////////////////////////////
+
+  /****************************************************************************
+   * 
+   * Set priorityid and display alliance color
+   * 
+   * @param id
+   *          aprilTag ID to set as priority
+   * @param alliance
+   *          alliance color string selected
+   */
+  private void setPriorityId(int id, String alliance)
+  {
+    DataLogManager.log(String.format("%s: Set priority id %d (%s)", getSubsystem( ), id, alliance));
+    LimelightHelpers.setPriorityTagID("limelight", id);
+  }
+
 }

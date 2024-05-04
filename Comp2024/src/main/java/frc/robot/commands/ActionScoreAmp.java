@@ -9,27 +9,33 @@ import frc.robot.Constants.FDConsts;
 import frc.robot.subsystems.Feeder;
 
 /**
- *
+ * Command to score a note into amp
  */
-public class FeederAmpScore extends SequentialCommandGroup
+public class ActionScoreAmp extends SequentialCommandGroup
 {
-  public FeederAmpScore(Feeder feeder)
+  /**
+   * Group command to use the feeder to score a note in the amp
+   * 
+   * @param feeder
+   *          feeder subsystem
+   */
+  public ActionScoreAmp(Feeder feeder)
   {
-    setName("FeederHandoff");
+    setName("ActionScoreAmp");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
         new LogCommand(getName(), "Align Feeder to Amp"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getRotaryAmp),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederAmp),
 
         new LogCommand(getName(), "Score Note to Amp"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.SCORE, feeder::getRotaryPosition),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.SCORE, feeder::getFeederPosition),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers"),
-        new FeederRun(feeder, FDConsts.FDRollerMode.STOP, feeder::getRotaryHandoff)
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederHandoff)
         // @formatter:on
     );
   }

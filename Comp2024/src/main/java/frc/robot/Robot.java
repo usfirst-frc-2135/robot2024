@@ -115,7 +115,13 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("autonomousInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
 
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand_2( );
+    if (m_autonomousCommand != null)
+    {
+      m_autonomousCommand.cancel( );
+      m_autonomousCommand = null;
+    }
+
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
 
     // schedule the autonomous command selected by the RobotContainer class
     if (m_autonomousCommand != null)
@@ -145,6 +151,7 @@ public class Robot extends TimedRobot
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel( );
+      m_autonomousCommand = null;
     }
 
     // Handle any commands that need to be scheduled when entering Teleop mode

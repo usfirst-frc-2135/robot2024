@@ -58,7 +58,7 @@ import frc.robot.lib.LimelightHelpers.PoseEstimate;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
   private static final String                        kSwerveTab                      = "Swerve";
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
@@ -163,24 +163,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         (speeds) -> this.setControl(AutoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
         new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
             driveBaseRadius, new ReplanningConfig( )),                // Path following config
-        ( ) ->                                                        // Red vs. Blue alliance
-        {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-          var alliance = DriverStation.getAlliance( );
-          if (alliance.isPresent( ))
-          {
-            return alliance.get( ) == DriverStation.Alliance.Red;
-          }
-          return false;
-        },                                                            // Change this if the path needs to be flipped on red vs blue
+        ( ) -> DriverStation.getAlliance( ).orElse(Alliance.Blue) == Alliance.Red, // Assume the path needs to be flipped for Red vs Blue (normally case)
         this);                                                        // Subsystem for requirements
-  }
-
-  public void resetOdometry(Pose2d pose)
-  {
-    m_odometry.resetPosition(m_pigeon2.getRotation2d( ), m_modulePositions, pose);
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier)
@@ -188,7 +172,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return run(( ) -> this.setControl(requestSupplier.get( )));
   }
 
-  public Command getAutoCommand(String autoName)
+  public Command getAutoPathCommand(String autoName)
   {
     return new PathPlannerAuto(autoName).withName("swervePPAuto");
   }
@@ -292,10 +276,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   private void setOdometryFromDashboard( )
   {
-    resetOdometry(        //
-        new Pose2d(       //
+    seedFieldRelative(        //
+        new Pose2d(           //
             new Translation2d(poseXEntry.getDouble(0.0), poseYEntry.getDouble(0.0)), //
-            new Rotation2d(poseRotEntry.getDouble(0.0))) //
+            new Rotation2d(poseRotEntry.getDouble(0.0)))        //
     );
   }
 

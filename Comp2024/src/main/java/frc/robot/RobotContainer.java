@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -382,10 +383,6 @@ public class RobotContainer
               .withName("CommandSwerveDrivetrain"));
     }
 
-    // if (Utils.isSimulation()) {  // TODO: needed? maybe fixes config check for simulation where CANcode initializes to 90 degrees?
-    //   m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-    // }
-
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
@@ -453,7 +450,7 @@ public class RobotContainer
         break;
 
       case AUTOLEAVE :
-        m_autoCommand = m_drivetrain.getAutoCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue);
+        m_autoCommand = m_drivetrain.getAutoPathCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue);
         break;
 
       case AUTOPRELOADONLY :
@@ -464,22 +461,22 @@ public class RobotContainer
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand(pathName),
+            m_drivetrain.getAutoPathCommand(pathName),
 
             new LogCommand(mode.toString(), "Score preloaded note"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Leave zone"),
-            m_drivetrain.getAutoCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue));
+            m_drivetrain.getAutoPathCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue));
         // @formatter:on
         break;
 
       case AUTOPRELOADP0LEAVE :
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
-            m_drivetrain.getAutoCommand("DriveP0"),
+            m_drivetrain.getAutoPathCommand("DriveP0"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
-            m_drivetrain.getAutoCommand("LeaveS1")
+            m_drivetrain.getAutoPathCommand("LeaveS1")
         // @formatter:on
         );
         break;
@@ -487,9 +484,9 @@ public class RobotContainer
       case AUTOPRELOADP4LEAVE :
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
-            new WaitCommand(5), m_drivetrain.getAutoCommand("DriveP4"),
+            new WaitCommand(5), m_drivetrain.getAutoPathCommand("DriveP4"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
-            m_drivetrain.getAutoCommand("LeaveS3")
+            m_drivetrain.getAutoPathCommand("LeaveS3")
         // @formatter:on
         );
         break;
@@ -498,7 +495,7 @@ public class RobotContainer
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand(pathName), 
+            m_drivetrain.getAutoPathCommand(pathName), 
 
             new LogCommand(mode.toString(), "Score preloaded note"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
@@ -510,12 +507,12 @@ public class RobotContainer
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
-                m_drivetrain.getAutoCommand("DriveS" + poseValue),
+                m_drivetrain.getAutoPathCommand("DriveS" + poseValue),
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
             
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand("ScoreS" + poseValue),
+            m_drivetrain.getAutoPathCommand("ScoreS" + poseValue),
 
             new LogCommand(mode.toString(), "Score note"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
@@ -523,7 +520,7 @@ public class RobotContainer
             new LogCommand(mode.toString(), "Turn off intake rollers"), 
             m_intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, m_intake::getIntakePosition),
 
-            m_drivetrain.getAutoCommand("LeaveS" + poseValue)
+            m_drivetrain.getAutoPathCommand("LeaveS" + poseValue)
         // @formatter:on
         );  //
         break;
@@ -532,7 +529,7 @@ public class RobotContainer
         m_autoCommand = new SequentialCommandGroup(
         // @formatter:off
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand(pathName),
+            m_drivetrain.getAutoPathCommand(pathName),
 
             new LogCommand(mode.toString(), "Score preloaded note"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
@@ -544,36 +541,36 @@ public class RobotContainer
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup( 
-                m_drivetrain.getAutoCommand("DriveS" + poseValue),
+                m_drivetrain.getAutoPathCommand("DriveS" + poseValue),
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
 
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand("ScoreS" + poseValue),
+            m_drivetrain.getAutoPathCommand("ScoreS" + poseValue),
 
             new LogCommand(mode.toString(), "Score note 2"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
-                m_drivetrain.getAutoCommand("DriveS" + altpos1),
+                m_drivetrain.getAutoPathCommand("DriveS" + altpos1),
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ),
 
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand("ScoreS" + altpos1),
+            m_drivetrain.getAutoPathCommand("ScoreS" + altpos1),
 
             new LogCommand(mode.toString(), "Score note 3"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
 
             new LogCommand(mode.toString(), "Drive to spike while intaking"),
             new ParallelCommandGroup(
-                m_drivetrain.getAutoCommand("DriveS" + altpos2),
+                m_drivetrain.getAutoPathCommand("DriveS" + altpos2),
                 new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
             ), 
             
             new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoCommand("ScoreS" + altpos2),
+            m_drivetrain.getAutoPathCommand("ScoreS" + altpos2),
 
             new LogCommand(mode.toString(), "Score note 4"),
             new ActionScoreSpeaker(m_shooter, m_intake, m_led),
@@ -584,7 +581,7 @@ public class RobotContainer
         );
         break;
       case AUTOTESTPATH :
-        m_autoCommand = m_drivetrain.getAutoCommand("Test");
+        m_autoCommand = m_drivetrain.getAutoPathCommand("Test");
         break;
     }
 
@@ -601,7 +598,7 @@ public class RobotContainer
           new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
 
       if (initialPose != null)
-        m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
+        m_drivetrain.seedFieldRelative(initialPose);
     }
 
     DataLogManager
@@ -629,47 +626,49 @@ public class RobotContainer
       m_autoCommand = null;
     }
 
+    // Get auto value using created key
     String autoName = autoMap.get(autoKey);
 
-    DataLogManager.log(String.format("================================================================="));
-    DataLogManager.log(String.format("getAutoCommand: autoKey: %s  autoName: %s", autoKey, autoName));
-    DataLogManager.log(String.format("================================================================="));
+    DataLogManager.log(String.format("==========================================================================="));
+    DataLogManager.log(String.format("autoCommand: autoKey: %s  autoName: %s", autoKey, autoName));
+    DataLogManager.log(String.format("==========================================================================="));
 
+    // If auto not defined in hashmap, no path assigned so sit idle
     if (autoName == null)
+    {
+      DataLogManager.log(String.format("autoCommand: ERROR - no auto defined for this autoKey (%s)", autoKey));
       return m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
+    }
 
+    // Get list of paths within the auto
     List<PathPlannerPath> ppPathList = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
-    PathPlannerPath ppPath = ppPathList.get(0);
+    if (ppPathList.isEmpty( ))
+    {
+      DataLogManager.log(String.format("autoCommand: ERROR - auto path list is empty"));
+      return m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
+    }
 
-    DataLogManager.log(String.format("================================================================="));
-    DataLogManager.log(String.format("getAutoCommand: ppPath %s", ppPath.toString( )));
-    DataLogManager.log(String.format("================================================================="));
+    // If on red alliance, flip each path
+    PathPlannerPath initialPath = ppPathList.get(0);
+    if (DriverStation.getAlliance( ).orElse(Alliance.Blue) == Alliance.Red)
+      initialPath = initialPath.flipPath( );
 
-    DataLogManager.log(String.format("getAutoCommand: Auto path pose: raw"));
+    // { // Debug only: print states of first path
+    //   List<PathPlannerTrajectory.State> states = initialPath.getTrajectory(new ChassisSpeeds( ), new Rotation2d( )).getStates( );
+    //   for (int i = 0; i < states.size( ); i++)
+    //     DataLogManager.log(String.format("autoCommand: Auto path state: (%d) %s", i, states.get(i).getTargetHolonomicPose( )));
+    // }
 
-    List<PathPlannerTrajectory.State> states = ppPath.getTrajectory(new ChassisSpeeds( ), new Rotation2d( )).getStates( );
-    for (int i = 0; i < states.size( ); i++)
-      DataLogManager
-          .log(String.format("getAutoCommand: Auto path state: %s %s", states.get(i).positionMeters, states.get(i).heading));
-
-    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red))) // TODO: Is this needed? PP Auto should handle this
-      ppPath = ppPath.flipPath( );
-
-    DataLogManager.log(String.format("getAutoCommand: Auto path pose: after flip"));
-    states = ppPath.getTrajectory(new ChassisSpeeds( ), new Rotation2d( )).getStates( );
-    for (int i = 0; i < states.size( ); i++)
-      DataLogManager
-          .log(String.format("getAutoCommand: Auto path state: %s %s", states.get(i).positionMeters, states.get(i).heading));
-
-    Pose2d initialPose = ppPath.getPreviewStartingHolonomicPose( );
-
+    // Set field centric robot position to start of auto sequence
+    Pose2d initialPose = initialPath.getPreviewStartingHolonomicPose( );
     if (initialPose != null)
-      m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
+      m_drivetrain.seedFieldRelative(initialPose);
 
+    // Create the correct base command and pass the path list
     switch (mode)
     {
       default :
-      case AUTOPRELOADCLINE : // Until paths are implemented to score centerline
+      case AUTOPRELOADCLINE : // Until paths are implemented to score centerline, default to stop command
       case AUTOSTOP :
         m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
         break;
@@ -694,7 +693,7 @@ public class RobotContainer
     }
 
     DataLogManager
-        .log(String.format("getAutoCommand: Auto mode is %s startPose %s %s", autoKey, initialPose, m_autoCommand.getName( )));
+        .log(String.format("autoCommand: Auto mode is %s startPose %s %s", autoKey, initialPose, m_autoCommand.getName( )));
 
     return m_autoCommand;
   }
@@ -765,8 +764,6 @@ public class RobotContainer
    */
   public void teleopInit( )
   {
-    // getAutonomousCommand_2( );
-
     CommandScheduler.getInstance( ).schedule(m_climber.getCalibrateCommand( ));
   }
 

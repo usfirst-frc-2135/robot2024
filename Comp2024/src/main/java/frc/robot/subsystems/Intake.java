@@ -395,17 +395,17 @@ public class Intake extends SubsystemBase
         double targetRotations = Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio);
         m_rotaryMotor.setControl(m_requestMMVolts.withPosition(targetRotations));
         DataLogManager
-            .log(String.format("%s: Position move: %.1f -> %.1f degrees (%.3f -> %.3f rot)", getSubsystem( ), m_currentDegrees,
+            .log(String.format("%s: MM Position move: %.1f -> %.1f degrees (%.3f -> %.3f rot)", getSubsystem( ), m_currentDegrees,
                 m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio), targetRotations));
       }
       else
-        DataLogManager.log(String.format("%s: Position move target %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]",
+        DataLogManager.log(String.format("%s: MM Position move target %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]",
             getSubsystem( ), m_targetDegrees, INConsts.kRotaryAngleMin, INConsts.kRotaryAngleMax));
     }
     else
     {
       m_moveIsFinished = true;
-      DataLogManager.log(String.format("%s: Position already achieved -target %s degrees", getSubsystem( ), m_targetDegrees));
+      DataLogManager.log(String.format("%s: MM Position already achieved -target %s degrees", getSubsystem( ), m_targetDegrees));
     }
   }
 
@@ -436,7 +436,7 @@ public class Intake extends SubsystemBase
     if (m_withinTolerance.calculate(Math.abs(error) < kToleranceDegrees) || timedOut)
     {
       if (!m_moveIsFinished)
-        DataLogManager.log(String.format("%s: Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f sec %s",
+        DataLogManager.log(String.format("%s: MM Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f sec %s",
             getSubsystem( ), m_currentDegrees, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
       m_moveIsFinished = true;

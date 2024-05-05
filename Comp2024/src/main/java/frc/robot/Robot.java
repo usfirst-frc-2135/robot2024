@@ -51,7 +51,7 @@ public class Robot extends TimedRobot
 
     // Put command scheduler on dashbaord for debugging
 
-    FollowPathCommand.warmupCommand( ).schedule( ); // Recommended by PathPlanner docs
+    FollowPathCommand.warmupCommand( ).withName("PathPlannerWarmupCommand").schedule( ); // Recommended by PathPlanner docs
   }
 
   /****************************************************************************

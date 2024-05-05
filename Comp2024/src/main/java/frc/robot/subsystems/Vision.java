@@ -209,7 +209,7 @@ public class Vision extends SubsystemBase
    */
   private void setPriorityId(int id, String alliance)
   {
-    DataLogManager.log(String.format("%s: Set priority id %d (%s)", getSubsystem( ), id, alliance));
+    DataLogManager.log(String.format("%s: Set AprilTag priority id %d (%s)", getSubsystem( ), id, alliance));
     LimelightHelpers.setPriorityTagID("limelight", id);
   }
 

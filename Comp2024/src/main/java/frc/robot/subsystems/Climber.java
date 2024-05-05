@@ -357,7 +357,7 @@ public class Climber extends SubsystemBase
 
     if (!(m_leftCalibrated && m_rightCalibrated))
     {
-      DataLogManager.log(String.format("%s: Position move target %.1f in - NOT CALIBRATED!", getSubsystem( ), m_targetInches));
+      DataLogManager.log(String.format("%s: MM Position move target %.1f in - NOT CALIBRATED!", getSubsystem( ), m_targetInches));
       return;
     }
 
@@ -379,18 +379,18 @@ public class Climber extends SubsystemBase
 
         setMMPosition(m_targetInches);
 
-        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.3f -> %.3f rot)", getSubsystem( ),
+        DataLogManager.log(String.format("%s: MM Position move: %.1f -> %.1f inches (%.3f -> %.3f rot)", getSubsystem( ),
             m_leftCurInches, m_targetInches, Conversions.inchesToWinchRotations(m_leftCurInches, kRolloutRatio),
             Conversions.inchesToWinchRotations(m_targetInches, kRolloutRatio)));
       }
       else
-        DataLogManager.log(String.format("%s: Position move target %.1f inches is OUT OF RANGE! [%.1f, %.1f rot]",
+        DataLogManager.log(String.format("%s: MM Position move target %.1f inches is OUT OF RANGE! [%.1f, %.1f rot]",
             getSubsystem( ), m_targetInches, CLConsts.kLengthMin, CLConsts.kLengthMax));
     }
     else
     {
       m_moveIsFinished = true;
-      DataLogManager.log(String.format("%s: Position already achieved - target %s inches", getSubsystem( ), m_targetInches));
+      DataLogManager.log(String.format("%s: MM Position already achieved - target %s inches", getSubsystem( ), m_targetInches));
     }
   }
 
@@ -423,7 +423,7 @@ public class Climber extends SubsystemBase
       if (hittingHardStop)
         DataLogManager.log(String.format("%s - HITTINGHARDSTOP: %s", getSubsystem( ), hittingHardStop));
       if (!m_moveIsFinished)
-        DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f sec %s",
+        DataLogManager.log(String.format("%s: MM Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f sec %s",
             getSubsystem( ), m_leftCurInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
       m_moveIsFinished = true;

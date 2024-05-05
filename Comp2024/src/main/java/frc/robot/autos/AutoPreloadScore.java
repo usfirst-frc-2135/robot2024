@@ -32,7 +32,7 @@ public class AutoPreloadScore extends SequentialCommandGroup
    * 4 - Drive to a scoring position
    * 5 - Leave the starting zone
    * 
-   * @param ppAuto
+   * @param ppPaths
    *          swerve drivetrain subsystem
    * @param drivetrain
    *          swerve drivetrain subsystem
@@ -43,7 +43,7 @@ public class AutoPreloadScore extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoPreloadScore(List<PathPlannerPath> ppAuto, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
+  public AutoPreloadScore(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
       LED led)
   {
     setName("AutoPreloadScore");
@@ -53,7 +53,7 @@ public class AutoPreloadScore extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getAutoCommand(ppAuto.get(0).toString()), 
+        drivetrain.getPathCommand(ppPaths.get(0)), 
 
         new LogCommand(getName(), "Score preloaded note"),
         new ActionScoreSpeaker(shooter, intake, led),
@@ -65,12 +65,12 @@ public class AutoPreloadScore extends SequentialCommandGroup
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
-            drivetrain.getAutoCommand(ppAuto.get(1).toString()),
+            drivetrain.getPathCommand(ppPaths.get(1)),
             new ActionAcquireNote(intake, led).withTimeout(1.5)
         ),
         
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getAutoCommand(ppAuto.get(2).toString()),
+        drivetrain.getPathCommand(ppPaths.get(2)),
 
         new LogCommand(getName(), "Score note"),
         new ActionScoreSpeaker(shooter, intake, led),
@@ -78,7 +78,7 @@ public class AutoPreloadScore extends SequentialCommandGroup
         new LogCommand(getName(), "Turn off intake rollers"), 
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition),
 
-        drivetrain.getAutoCommand(ppAuto.get(3).toString())
+        drivetrain.getPathCommand(ppPaths.get(3))
         // @formatter:on
     );
   }

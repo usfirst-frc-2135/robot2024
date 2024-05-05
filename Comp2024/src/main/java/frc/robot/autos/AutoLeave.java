@@ -37,7 +37,7 @@ public class AutoLeave extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Leave zone"),
-        drivetrain.getPathCommandNew(ppAuto.get(0))
+        drivetrain.getPathCommand(ppAuto.get(0))
         // @formatter:on
     );
   }

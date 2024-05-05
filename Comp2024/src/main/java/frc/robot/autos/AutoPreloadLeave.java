@@ -26,7 +26,7 @@ public class AutoPreloadLeave extends SequentialCommandGroup
    * 2 - Shoot the preloaded note
    * 3 - Leave the starting zone while avoiding spike notes
    * 
-   * @param ppAuto
+   * @param ppPaths
    *          swerve drivetrain subsystem
    * @param drivetrain
    *          swerve drivetrain subsystem
@@ -37,7 +37,7 @@ public class AutoPreloadLeave extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoPreloadLeave(List<PathPlannerPath> ppAuto, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
+  public AutoPreloadLeave(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
       LED led)
   {
     setName("AutoPreloadLeave");
@@ -47,13 +47,13 @@ public class AutoPreloadLeave extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getPathCommand(ppAuto.get(0).toString()),
+        drivetrain.getPathCommand(ppPaths.get(0)),
 
         new LogCommand(getName(), "Score preloaded note"),
         new ActionScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Leave zone"),
-        drivetrain.getPathCommand(ppAuto.get(1).toString())
+        drivetrain.getPathCommand(ppPaths.get(1))
         // @formatter:on
     );
   }

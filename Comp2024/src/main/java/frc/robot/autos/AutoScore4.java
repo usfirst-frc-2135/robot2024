@@ -41,7 +41,7 @@ public class AutoScore4 extends SequentialCommandGroup
    * 5c - Drive to a scoring position
    * 5d - Shoot a the third spike note
    * 
-   * @param ppAuto
+   * @param ppPaths
    *          swerve drivetrain subsystem
    * @param drivetrain
    *          swerve drivetrain subsystem
@@ -52,7 +52,7 @@ public class AutoScore4 extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoScore4(List<PathPlannerPath> ppAuto, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, LED led)
+  public AutoScore4(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, LED led)
   {
     setName("AutoScore4");
 
@@ -61,7 +61,7 @@ public class AutoScore4 extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getAutoCommand(ppAuto.get(0).toString()),
+        drivetrain.getPathCommand(ppPaths.get(0)),
 
         new LogCommand(getName(), "Score preloaded note"),
         new ActionScoreSpeaker(shooter, intake, led),
@@ -73,36 +73,36 @@ public class AutoScore4 extends SequentialCommandGroup
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup( 
-            drivetrain.getAutoCommand(ppAuto.get(1).toString()),
+            drivetrain.getPathCommand(ppPaths.get(1)),
             new ActionAcquireNote(intake, led).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getAutoCommand(ppAuto.get(2).toString()),
+        drivetrain.getPathCommand(ppPaths.get(2)),
 
         new LogCommand(getName(), "Score note 2"),
         new ActionScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
-            drivetrain.getAutoCommand(ppAuto.get(3).toString()),
+            drivetrain.getPathCommand(ppPaths.get(3)),
             new ActionAcquireNote(intake, led).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getAutoCommand(ppAuto.get(4).toString()),
+        drivetrain.getPathCommand(ppPaths.get(4)),
 
         new LogCommand(getName(), "Score note 3"),
         new ActionScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
-            drivetrain.getAutoCommand(ppAuto.get(5).toString()),
+            drivetrain.getPathCommand(ppPaths.get(5)),
             new ActionAcquireNote(intake, led).withTimeout(1.5)
         ), 
         
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getAutoCommand(ppAuto.get(6).toString()),
+        drivetrain.getPathCommand(ppPaths.get(6)),
 
         new LogCommand(getName(), "Score note 4"),
         new ActionScoreSpeaker(shooter, intake, led),

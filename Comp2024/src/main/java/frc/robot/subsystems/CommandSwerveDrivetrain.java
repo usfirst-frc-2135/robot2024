@@ -58,7 +58,7 @@ import frc.robot.lib.LimelightHelpers.PoseEstimate;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
   private static final String                        kSwerveTab                      = "Swerve";
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
@@ -193,20 +193,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return new PathPlannerAuto(autoName).withName("swervePPAuto");
   }
 
-  public Command getAutoPathFromList(String autoName, int num)
+  public Command getPathCommand(PathPlannerPath ppPath)
   {
-    PathPlannerPath path = PathPlannerAuto.getPathGroupFromAutoFile(autoName).get(num);
-
-    return AutoBuilder.followPath(path).withName(path.toString( ));
-  }
-
-  public Command getPathCommand(String pathName)
-  {
-    // Load the path you want to follow using its name in the GUI
-    PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-
     // Create a path following command using AutoBuilder. This will also trigger event markers.
-    return AutoBuilder.followPath(path).withName("swervePPPath");
+    return AutoBuilder.followPath(ppPath).withName("swervePPPath");
   }
 
   /*

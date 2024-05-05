@@ -26,7 +26,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
    * 2 - Shoot the preloaded note
    * 3 - Drive to steal centerline notes
    * 
-   * @param ppAuto
+   * @param ppPaths
    *          swerve drivetrain subsystem
    * @param drivetrain
    *          swerve drivetrain subsystem
@@ -37,7 +37,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoPreloadSteal(List<PathPlannerPath> ppAuto, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
+  public AutoPreloadSteal(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
       LED led)
   {
     setName("AutoPreloadSteal");
@@ -47,13 +47,13 @@ public class AutoPreloadSteal extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getPathCommand(ppAuto.get(0).toString()),
+        drivetrain.getPathCommand(ppPaths.get(0)),
 
         new LogCommand(getName(), "Score preloaded note"),
         new ActionScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to centerline"),
-        drivetrain.getPathCommand(ppAuto.get(1).toString()) // TODO: need to complete this sequence to centerline
+        drivetrain.getPathCommand(ppPaths.get(1)) // TODO: need to complete this sequence to centerline
         // @formatter:on
     );
   }

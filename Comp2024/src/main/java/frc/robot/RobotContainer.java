@@ -137,6 +137,7 @@ public class RobotContainer
     AUTOPRELOADSCORE, // Score preload at waypoints P1-P3 and score another from nearest spike
     AUTOPRELOADSTEAL, // Score preload at waypoints P1-P3 and steal centerline notes
     AUTOSCORE4,       // Score preload at waypoints P1-P3 and spike notes at S1-S3
+    AUTOPRELOADCLINE, // Score preload at waypoints P0, P2, and P4 and score C1-C5 notes
     AUTOTEST          // Run a selected test auto
   }
 
@@ -603,7 +604,8 @@ public class RobotContainer
         m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: Auto mode is %s %s %s", mode, startPose, m_autoCommand.getName( )));
+    DataLogManager
+        .log(String.format("getAutonomousCommand: Auto mode is %s %s %s", mode, startPose.toString( ), m_autoCommand.getName( )));
 
     return m_autoCommand;
   }
@@ -643,11 +645,23 @@ public class RobotContainer
     DataLogManager.log(String.format("getAutoCommand: ppPath %s", ppPath.toString( )));
     DataLogManager.log(String.format("================================================================="));
 
-    // if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red))) // TODO: Is this needed? PP Auto should handle this
-    //   ppPath = ppPath.flipPath( );
+    DataLogManager.log(String.format("getAutoCommand: Auto path pose: raw"));
 
-    Pose2d initialPose =
-        new PathPlannerTrajectory(ppPath, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
+    List<PathPlannerTrajectory.State> states = ppPath.getTrajectory(new ChassisSpeeds( ), new Rotation2d( )).getStates( );
+    for (int i = 0; i < states.size( ); i++)
+      DataLogManager
+          .log(String.format("getAutoCommand: Auto path state: %s %s", states.get(i).positionMeters, states.get(i).heading));
+
+    if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red))) // TODO: Is this needed? PP Auto should handle this
+      ppPath = ppPath.flipPath( );
+
+    DataLogManager.log(String.format("getAutoCommand: Auto path pose: after flip"));
+    states = ppPath.getTrajectory(new ChassisSpeeds( ), new Rotation2d( )).getStates( );
+    for (int i = 0; i < states.size( ); i++)
+      DataLogManager
+          .log(String.format("getAutoCommand: Auto path state: %s %s", states.get(i).positionMeters, states.get(i).heading));
+
+    Pose2d initialPose = ppPath.getPreviewStartingHolonomicPose( );
 
     if (initialPose != null)
       m_drivetrain.resetOdometry(new Pose2d(initialPose.getTranslation( ), initialPose.getRotation( )));
@@ -655,6 +669,7 @@ public class RobotContainer
     switch (mode)
     {
       default :
+      case AUTOPRELOADCLINE : // Until paths are implemented to score centerline
       case AUTOSTOP :
         m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
         break;
@@ -678,8 +693,8 @@ public class RobotContainer
         break;
     }
 
-    DataLogManager.log(String.format("getAutonomousCommand: Auto mode is %s%s startPose %s %s", mode, startPose, startPose,
-        m_autoCommand.getName( )));
+    DataLogManager
+        .log(String.format("getAutoCommand: Auto mode is %s startPose %s %s", autoKey, initialPose, m_autoCommand.getName( )));
 
     return m_autoCommand;
   }

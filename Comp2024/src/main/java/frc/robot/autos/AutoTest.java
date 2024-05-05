@@ -21,7 +21,7 @@ public class AutoTest extends SequentialCommandGroup
    * Autonomous command to:
    * 1 - Run an auto with a test path
    * 
-   * @param ppAuto
+   * @param ppPaths
    *          swerve drivetrain subsystem
    * @param drivetrain
    *          swerve drivetrain subsystem
@@ -32,7 +32,7 @@ public class AutoTest extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoTest(List<PathPlannerPath> ppAuto, CommandSwerveDrivetrain drivetrain, LED led)
+  public AutoTest(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, LED led)
   {
     setName("AutoTest");
 
@@ -41,7 +41,7 @@ public class AutoTest extends SequentialCommandGroup
 
         // @formatter:off
         new LogCommand(getName(), "Drive a test path"),
-        drivetrain.getPathCommand(ppAuto.get(0).toString())
+        drivetrain.getPathCommand(ppPaths.get(0))
         // @formatter:on
     );
   }

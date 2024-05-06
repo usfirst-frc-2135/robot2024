@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -155,42 +156,43 @@ public class RobotContainer
   private SendableChooser<StartPose>    m_startChooser = new SendableChooser<>( );
 
   private final HashMap<String, String> autoMap        = new HashMap<>(Map.ofEntries( //
-      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1-Stop"),
-      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2-Stop"),
-      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3-Stop"),
+      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1_Stop"),
+      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2_Stop"),
+      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3_Stop"),
 
-      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1-Leave1"),
-      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2-Leave2"),
-      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3-Leave3"),
+      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1_L1"),
+      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2_L2"),
+      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3_L3"),
 
-      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1-P0"),
-      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2-P2"),
-      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3-P4"),
+      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1_P0_L0"),
+      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2_P2_L2"),
+      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3_P4_L4"),
 
-      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1-P1_P1-S2_S1-P1"),
-      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2"),
-      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P2"),
+      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1"),
+      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
+      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3_P3_S3_P2"),
 
-      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1-P0_P0-C1_C1-C2_C2-C3_C3-C4"),
-      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2-P2_P2-C1_C1-C2_C2-C3_C3-C4"),
-      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3-P4_C5-C4_C4-C3_C3-C2_C2-C1"),
+      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
+      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2_P2_C1_C2_C3_C4"),
+      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
 
-      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1-P1_P1-S1_S1-P1_P1-S2_S2-P2_P2-S3_S3-P3"),
-      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2-P2_P2-S2_S2-P2_P2-S1_S1-P1_P1-S3_S3-P3"),
-      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3-P3_P3-S3_S3-P3_P3-S2_S2-P2_P2-S1_S1-P1"),
+      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
+      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2_S1_P1_S3_P3"),
+      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
 
-      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE1.toString( ), "Pos1-test1"),
-      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE2.toString( ), "Pos2-test2"),
-      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE3.toString( ), "Pos3-test3") //
+      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE1.toString( ), "Pos1_test1"),
+      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE2.toString( ), "Pos2_test2"),
+      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE3.toString( ), "Pos3_test3") //
   ));
 
   // Shuffleboard objects
   ShuffleboardTab                       autoTab        = Shuffleboard.getTab(kAutoTab);
-  ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(6, 0).withSize(2, 1);
+  ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(4, 3).withSize(2, 1);
   ComplexWidget                         modeEntry2     =
-      autoTab.add("AutoMode2", m_autoChooser2).withPosition(6, 3).withSize(2, 1);
+      autoTab.add("AutoMode2", m_autoChooser2).withPosition(6, 0).withSize(2, 1);
   ComplexWidget                         startEntry     =
       autoTab.add("StartPosition", m_startChooser).withPosition(6, 1).withSize(2, 1);
+  SimpleWidget                          autoDelay      = autoTab.add("AutoDelay", 0.0).withPosition(6, 2).withSize(2, 1);
 
   /****************************************************************************
    * 
@@ -240,7 +242,7 @@ public class RobotContainer
     m_startChooser.addOption("POSE2", StartPose.POSE2);
     m_startChooser.addOption("POSE3", StartPose.POSE3);
 
-    autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 2);
+    autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 3);
 
     // Command tab
     ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
@@ -694,6 +696,13 @@ public class RobotContainer
 
     DataLogManager
         .log(String.format("autoCommand: Auto mode is %s startPose %s %s", autoKey, initialPose, m_autoCommand.getName( )));
+
+    double delay = autoDelay.getEntry( ).getDouble(0.0);
+    if (delay > 0.0)
+      m_autoCommand = new SequentialCommandGroup( //
+          new LogCommand("Autodelay", String.format("Delaying %.1f seconds ...", delay)), //
+          new WaitCommand(delay), //
+          m_autoCommand);
 
     return m_autoCommand;
   }

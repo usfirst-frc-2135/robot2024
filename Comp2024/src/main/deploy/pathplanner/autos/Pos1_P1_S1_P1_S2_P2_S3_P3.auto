@@ -28,6 +28,30 @@
           "data": {
             "pathName": "S1-P1"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P1-S2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S2-P2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P2-S3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S3-P3"
+          }
         }
       ]
     }

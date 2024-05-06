@@ -5,7 +5,7 @@
       "x": 1.36,
       "y": 5.55
     },
-    "rotation": 0.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -14,19 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos1_P1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "P1-S1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "S1-P1"
+            "pathName": "Pos2_L2"
           }
         }
       ]

@@ -9,7 +9,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.INConsts;
 import frc.robot.commands.ActionAcquireNote;
 import frc.robot.commands.ActionScoreSpeaker;
@@ -60,8 +59,6 @@ public class AutoPreloadScore extends SequentialCommandGroup
 
         new LogCommand(getName(), "Deploy intake before moving"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
-
-        new WaitCommand(0.5), // TODO - do we need this? The intake command will run to completion first
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(

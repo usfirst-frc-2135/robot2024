@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7264069523996056,
-      "y": 6.62
+      "x": 0.72,
+      "y": 6.67
     },
     "rotation": 60.0
   },
@@ -14,12 +14,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DriveP0"
+            "pathName": "Pos1_P0"
           }
         }
       ]
     }
   },
-  "folder": "Original",
+  "folder": null,
   "choreoAuto": false
 }

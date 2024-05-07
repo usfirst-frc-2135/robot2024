@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 0.72,
+      "y": 6.67
+    },
+    "rotation": 60.0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,12 +14,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ScoreS3"
+            "pathName": "Pos1_P0"
           }
         }
       ]
     }
   },
-  "folder": "Original",
+  "folder": null,
   "choreoAuto": false
 }

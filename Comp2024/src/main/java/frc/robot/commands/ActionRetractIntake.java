@@ -31,7 +31,8 @@ public class ActionRetractIntake extends SequentialCommandGroup
     addCommands(
         // Add Commands here:
 
-        // @formatter:off      
+        // @formatter:off
+        
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
         new ConditionalCommand(
           led.getLEDCommand(COLOR.BLUE, ANIMATION.CLEARALL),

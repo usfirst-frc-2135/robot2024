@@ -32,6 +32,7 @@ public class ActionAcquireNote extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+
         new LogCommand(getName(), "Start rollers & Deploy intake rotary"),
         led.getLEDCommand(COLOR.YELLOW, ANIMATION.CLEARALL),
         intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
@@ -41,6 +42,7 @@ public class ActionAcquireNote extends SequentialCommandGroup
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+        
         // @formatter:on
     );
   }

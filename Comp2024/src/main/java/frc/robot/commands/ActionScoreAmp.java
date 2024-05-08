@@ -27,6 +27,7 @@ public class ActionScoreAmp extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+
         new LogCommand(getName(), "Align Feeder to Amp"),
         feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederAmp),
 
@@ -36,6 +37,7 @@ public class ActionScoreAmp extends SequentialCommandGroup
 
         new LogCommand(getName(), "Stop rollers"),
         feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederHandoff)
+        
         // @formatter:on
     );
   }

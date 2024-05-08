@@ -34,6 +34,7 @@ public class ActionHandoff extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+
         new LogCommand(getName(), "Align Feeder and Intake"),
         feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HANDOFF, feeder::getFeederHandoff),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeHandoff),
@@ -52,7 +53,7 @@ public class ActionHandoff extends SequentialCommandGroup
         new LogCommand(getName(), "Ensure Intake releases Note"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
         led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
-
+        
         // @formatter:on
     );
   }

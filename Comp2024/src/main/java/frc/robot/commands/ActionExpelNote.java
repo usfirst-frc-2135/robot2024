@@ -32,6 +32,7 @@ public class ActionExpelNote extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+
         new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeDeployed),
 
@@ -44,7 +45,7 @@ public class ActionExpelNote extends SequentialCommandGroup
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition),
         led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
-
+        
         // @formatter:on
     );
   }

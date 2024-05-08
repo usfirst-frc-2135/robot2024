@@ -30,6 +30,7 @@ public class ActionPrepareToClimb extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+        
         new ParallelCommandGroup( 
           feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederAmp),
           climber.getMoveToPositionCommand(climber::getClimberFullyExtended)

@@ -34,6 +34,7 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+        
         new LogCommand(getName(), "Start shooter, stop rollers and retract intake"),
         // shooter.getShooterScoreCommand(), // Already running
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),

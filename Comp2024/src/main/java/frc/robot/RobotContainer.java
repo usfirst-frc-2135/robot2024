@@ -2,24 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// ROBOTBUILDER TYPE: RobotContainer.
-
 package frc.robot;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,12 +27,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.FDConsts.FDRollerMode;
-import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.VIConsts;
 import frc.robot.autos.AutoLeave;
@@ -74,64 +67,52 @@ import frc.robot.subsystems.Vision;
  */
 public class RobotContainer
 {
-  private final boolean                               m_macOSXSim    = false;
-  private static final String                         kAutoTab       = "Autonomous";
+  private final boolean                               m_macOSXSim     = false;        // Enables Mac OS X controller compatibility in simulation
+  private static final String                         kAutoTab        = "Autonomous"; // Shuffleboard tab name for autonomous mode
+  private static final String                         kCommandTab     = "Command";    // Shuffleboard tab name for commands
 
-  // Joysticks
-  private static final CommandXboxController          m_driverPad    = new CommandXboxController(Constants.kDriverPadPort);
-  private static final CommandXboxController          m_operatorPad  = new CommandXboxController(Constants.kOperatorPadPort);
+  // Gamepad controllers
+  private static final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
+  private static final CommandXboxController          m_operatorPad   = new CommandXboxController(Constants.kOperatorPadPort);
 
-  private static final String                         kCommandTab    = "Command";
-
-  private double                                      MaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // Maximum top speed
-  private double                                      MaxAngularRate = 3.0 * Math.PI;                     // 1.5 rotations per second max angular velocity
+  private static final double                         kMaxSpeed       = TunerConstants.kSpeedAt12VoltsMps; // Maximum top speed
+  private static final double                         kMaxAngularRate = 3.0 * Math.PI;                     // 1.5 rotations per second max angular velocity
   private Command                                     m_autoCommand;
 
   // Setting up bindings for necessary control of the swerve drive platform
-  private final SwerveRequest.FieldCentric            drive          = new SwerveRequest.FieldCentric( ) //
-      .withDeadband(MaxSpeed * Constants.kStickDeadband)                  //
-      .withRotationalDeadband(MaxAngularRate * Constants.kStickDeadband)  //
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);            // We want field-centric driving in open loop
-  private final SwerveRequest.SwerveDriveBrake        brake          = new SwerveRequest.SwerveDriveBrake( );
-  private final SwerveRequest.FieldCentricFacingAngle facing         = new SwerveRequest.FieldCentricFacingAngle( )  //
-      .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                 //
-      .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed);                // Field centric drive facing a direction
+  private final SwerveRequest.FieldCentric            drive           = new SwerveRequest.FieldCentric( ) //
+      .withDeadband(kMaxSpeed * Constants.kStickDeadband)                  //
+      .withRotationalDeadband(kMaxAngularRate * Constants.kStickDeadband)  //
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);             // We want field-centric driving in open loop
+  private final SwerveRequest.SwerveDriveBrake        brake           = new SwerveRequest.SwerveDriveBrake( );
+  private final SwerveRequest.FieldCentricFacingAngle facing          = new SwerveRequest.FieldCentricFacingAngle( )  //
+      .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)                 //
+      .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed);                // Field centric drive facing a direction
   @SuppressWarnings("unused")
-  private final SwerveRequest.PointWheelsAt           point          = new SwerveRequest.PointWheelsAt( );
-  private final SwerveRequest.RobotCentric            aim            = new SwerveRequest.RobotCentric( );
-  private final SwerveRequest.Idle                    idle           = new SwerveRequest.Idle( );
+  private final SwerveRequest.PointWheelsAt           point           = new SwerveRequest.PointWheelsAt( );
+  private final SwerveRequest.RobotCentric            aim             = new SwerveRequest.RobotCentric( );
+  private final SwerveRequest.Idle                    idle            = new SwerveRequest.Idle( );
 
-  private final Telemetry                             logger         = new Telemetry(MaxSpeed);
+  private final Telemetry                             logger          = new Telemetry(kMaxSpeed);
 
   // The robot's shared subsystems
-  private final LED                                   m_led          = new LED( );
-  private final Power                                 m_power        = new Power( );
-  private final Vision                                m_vision       = new Vision( );
+  private final LED                                   m_led           = new LED( );
+  private final Power                                 m_power         = new Power( );
+  private final Vision                                m_vision        = new Vision( );
 
   // These subsystems may use LED or vision and must be created afterward
-  private final CommandSwerveDrivetrain               m_drivetrain   = TunerConstants.DriveTrain;
-  private final Intake                                m_intake       = new Intake( );
-  private final Shooter                               m_shooter      = new Shooter( );
-  private final Feeder                                m_feeder       = new Feeder( );
-  private final Climber                               m_climber      = new Climber( );
+  private final CommandSwerveDrivetrain               m_drivetrain    = TunerConstants.DriveTrain;
+  private final Intake                                m_intake        = new Intake( );
+  private final Shooter                               m_shooter       = new Shooter( );
+  private final Feeder                                m_feeder        = new Feeder( );
+  private final Climber                               m_climber       = new Climber( );
 
   Command                                             m_autoCmd;
 
-  // Chooser for autonomous commands - all starting from poses 1-3
+  /**
+   * Chooser options for autonomous commands - all starting from poses 1-3
+   */
   enum AutoChooser
-  {
-    AUTOSTOP,                // AutoStop - sit still, do nothing
-    AUTOLEAVE,               // Leave starting zone avoiding spikes
-    AUTOPRELOADONLY,         // Score preloaded game piece from starting pose
-    AUTOPRELOADANDLEAVE,     // Score preload at waypoints P1-P3 and leave starting zone
-    AUTOPRELOADP0LEAVE,      // Score preload at waypoint P0 and leave starting zone
-    AUTOPRELOADP4LEAVE,      // Score preload at waypoint P4 and leave starting zone
-    AUTOPRELOADSCOREANOTHER, // Score preload at waypoints P1-P3 and score another from nearest spike
-    AUTOSCORE4,              // Score preload at waypoints P1-P3 and pike notes at S1-S3
-    AUTOTESTPATH             // Run a selected test path
-  }
-
-  enum AutoChooser2
   {
     AUTOSTOP,         // AutoStop - sit still, do nothing
     AUTOLEAVE,        // Leave starting zone avoiding spikes
@@ -143,7 +124,9 @@ public class RobotContainer
     AUTOTEST          // Run a selected test auto
   }
 
-  // Chooser for autonomous starting pose
+  /**
+   * Chooser options for autonomous starting pose to select pose 1-3
+   */
   enum StartPose
   {
     POSE1, // Starting pose 1 - blue left, red right (driver perspective)
@@ -151,45 +134,54 @@ public class RobotContainer
     POSE3  // Starting pose 3 - blue right, red left (driver perspective)
   }
 
+  /** Dashboard chooser for auto option selection */
   private SendableChooser<AutoChooser>  m_autoChooser  = new SendableChooser<>( );
-  private SendableChooser<AutoChooser2> m_autoChooser2 = new SendableChooser<>( );
+  /** Dashboard chooser for starting pose selection */
   private SendableChooser<StartPose>    m_startChooser = new SendableChooser<>( );
 
+  /**
+   * Hash map of autonomous option relations to auto filenames
+   * 
+   * @param key
+   *          the auto option and pose selected
+   * @param value
+   *          the auto filename associated with the key
+   */
   private final HashMap<String, String> autoMap        = new HashMap<>(Map.ofEntries( //
-      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1_Stop"),
-      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2_Stop"),
-      Map.entry(AutoChooser2.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3_Stop"),
+      Map.entry(AutoChooser.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1_Stop"),
+      Map.entry(AutoChooser.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2_Stop"),
+      Map.entry(AutoChooser.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3_Stop"),
 
-      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1_L1"),
-      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2_L2"),
-      Map.entry(AutoChooser2.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3_L3"),
+      Map.entry(AutoChooser.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1_L1"),
+      Map.entry(AutoChooser.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2_L2"),
+      Map.entry(AutoChooser.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3_L3"),
 
-      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1_P0_L0"),
-      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2_P2_L2"),
-      Map.entry(AutoChooser2.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3_P4_L4"),
+      Map.entry(AutoChooser.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1_P0_L0"),
+      Map.entry(AutoChooser.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2_P2_L2"),
+      Map.entry(AutoChooser.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3_P4_L4"),
 
-      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1"),
-      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
-      Map.entry(AutoChooser2.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3_P3_S3_P2"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3_P3_S3_P2"),
 
-      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
-      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2_P2_C1_C2_C3_C4"),
-      Map.entry(AutoChooser2.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2_P2_C1_C2_C3_C4"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
 
-      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
-      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2_S1_P1_S3_P3"),
-      Map.entry(AutoChooser2.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
+      Map.entry(AutoChooser.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
+      Map.entry(AutoChooser.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2_S1_P1_S3_P3"),
+      Map.entry(AutoChooser.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
 
-      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE1.toString( ), "Pos1_test1"),
-      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE2.toString( ), "Pos2_test2"),
-      Map.entry(AutoChooser2.AUTOTEST + StartPose.POSE3.toString( ), "Pos3_test3") //
+      Map.entry(AutoChooser.AUTOTEST + StartPose.POSE1.toString( ), "Pos1_test1"),
+      Map.entry(AutoChooser.AUTOTEST + StartPose.POSE2.toString( ), "Pos2_test2"),
+      Map.entry(AutoChooser.AUTOTEST + StartPose.POSE3.toString( ), "Pos3_test3") //
   ));
 
   // Shuffleboard objects
   ShuffleboardTab                       autoTab        = Shuffleboard.getTab(kAutoTab);
   ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(4, 3).withSize(2, 1);
   ComplexWidget                         modeEntry2     =
-      autoTab.add("AutoMode2", m_autoChooser2).withPosition(6, 0).withSize(2, 1);
+      autoTab.add("AutoMode2", m_autoChooser).withPosition(6, 0).withSize(2, 1);
   ComplexWidget                         startEntry     =
       autoTab.add("StartPosition", m_startChooser).withPosition(6, 1).withSize(2, 1);
   SimpleWidget                          autoDelay      = autoTab.add("AutoDelay", 0.0).withPosition(6, 2).withSize(2, 1);
@@ -220,22 +212,11 @@ public class RobotContainer
     // Configure autonomous sendable chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
     m_autoChooser.addOption("1 - AutoLeave", AutoChooser.AUTOLEAVE);
-    m_autoChooser.addOption("2 - AutoPreloadOnly", AutoChooser.AUTOPRELOADONLY);
-    m_autoChooser.addOption("3 - AutoPreloadAndLeave", AutoChooser.AUTOPRELOADANDLEAVE);
-    m_autoChooser.addOption("4 - AutoPreloadP0AndLeave", AutoChooser.AUTOPRELOADP0LEAVE);
-    m_autoChooser.addOption("5 - AutoPreloadP4AndLeave", AutoChooser.AUTOPRELOADP4LEAVE);
-    m_autoChooser.addOption("6 - AutoPreloadAndScoreAnother", AutoChooser.AUTOPRELOADSCOREANOTHER);
-    m_autoChooser.addOption("7 - AutoScore4", AutoChooser.AUTOSCORE4);
-    m_autoChooser.addOption("8 - AutoTestPath", AutoChooser.AUTOTESTPATH);
-
-    // Configure autonomous sendable chooser
-    m_autoChooser2.setDefaultOption("0 - AutoStop", AutoChooser2.AUTOSTOP);
-    m_autoChooser2.addOption("1 - AutoLeave", AutoChooser2.AUTOLEAVE);
-    m_autoChooser2.addOption("2 - AutoPreloadLeave", AutoChooser2.AUTOPRELOADLEAVE);
-    m_autoChooser2.addOption("3 - AutoPreloadScore", AutoChooser2.AUTOPRELOADSCORE);
-    m_autoChooser2.addOption("4 - AutoPreloadSteal", AutoChooser2.AUTOPRELOADSTEAL);
-    m_autoChooser2.addOption("5 - AutoScore4", AutoChooser2.AUTOSCORE4);
-    m_autoChooser2.addOption("6 - AutoTestPath", AutoChooser2.AUTOTEST);
+    m_autoChooser.addOption("2 - AutoPreloadLeave", AutoChooser.AUTOPRELOADLEAVE);
+    m_autoChooser.addOption("3 - AutoPreloadScore", AutoChooser.AUTOPRELOADSCORE);
+    m_autoChooser.addOption("4 - AutoPreloadSteal", AutoChooser.AUTOPRELOADSTEAL);
+    m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
+    m_autoChooser.addOption("6 - AutoTestPath", AutoChooser.AUTOTEST);
 
     // Configure starting pose sendable chooser
     m_startChooser.setDefaultOption("POSE1", StartPose.POSE1);
@@ -277,9 +258,9 @@ public class RobotContainer
     // Driver - A, B, X, Y
     //
     m_driverPad.a( ).whileTrue(m_drivetrain.applyRequest(( ) -> aim                 //
-        .withVelocityX(-m_vision.limelight_range_proportional(MaxSpeed))            //
+        .withVelocityX(-m_vision.limelight_range_proportional(kMaxSpeed))            //
         .withVelocityY(0)                                                 //
-        .withRotationalRate(m_vision.limelight_aim_proportional(MaxAngularRate))));
+        .withRotationalRate(m_vision.limelight_aim_proportional(kMaxAngularRate))));
     m_driverPad.b( ).onTrue(new LogCommand("driverPad", "B")); // drive to stage right
     m_driverPad.x( ).onTrue(new LogCommand("driverPad", "X")); // drive to stage left
     m_driverPad.y( ).onTrue(new LogCommand("driverPad", "Y")); // drive to stage center
@@ -310,7 +291,7 @@ public class RobotContainer
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     //
     m_driverPad.leftTrigger(Constants.kTriggerThreshold)
-        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose)); // drive to speaker
+        .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose));
     m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
 
     m_driverPad.leftStick( ).onTrue(new LogCommand("driverPad", "left stick"));
@@ -366,9 +347,9 @@ public class RobotContainer
     {
       m_drivetrain.setDefaultCommand(                                                  // Drivetrain will execute this command periodically
           m_drivetrain.applyRequest(( ) -> drive                                       //
-              .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                      // Drive forward with negative Y (forward)
-              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                      // Drive left with negative X (left)
-              .withRotationalRate(-m_driverPad.getRightX( ) * MaxAngularRate)          // Drive counterclockwise with negative X (left)
+              .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)                     // Drive forward with negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed)                     // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getRightX( ) * kMaxAngularRate)         // Drive counterclockwise with negative X (left)
           )                                                                            //
               .ignoringDisable(true)                               //
               .withName("CommandSwerveDrivetrain"));
@@ -377,9 +358,9 @@ public class RobotContainer
     {
       m_drivetrain.setDefaultCommand(                                                   // Drivetrain will execute this command periodically
           m_drivetrain.applyRequest(( ) -> drive                                        //
-              .withVelocityX(-m_driverPad.getLeftY( ) * MaxSpeed)                       // Drive forward with negative Y (forward)
-              .withVelocityY(-m_driverPad.getLeftX( ) * MaxSpeed)                       // Drive left with negative X (left)
-              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * MaxAngularRate)  // Drive counterclockwise with negative X (left)
+              .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)                      // Drive forward with negative Y (forward)
+              .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed)                      // Drive left with negative X (left)
+              .withRotationalRate(-m_driverPad.getLeftTriggerAxis( ) * kMaxAngularRate) // Drive counterclockwise with negative X (left)
           )                                                                             //
               .ignoringDisable(true)                                //
               .withName("CommandSwerveDrivetrain"));
@@ -406,220 +387,9 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
-    String pathName = null;
-    AutoChooser mode = m_autoChooser.getSelected( );
-    StartPose startPose = m_startChooser.getSelected( );
-    int poseValue = 0;
-    int altpos1 = 0;
-    int altpos2 = 0;
-
-    if (m_autoCommand != null)
-      m_autoCommand.cancel( );
-
-    switch (startPose)
-    {
-      default :
-        DataLogManager.log(String.format("RobotContainer: Invalid auto start pose %s", startPose));
-
-      case POSE1 :
-        poseValue = 1;
-        altpos1 = 2;
-        altpos2 = 3;
-        break;
-
-      case POSE2 :
-        poseValue = 2;
-        altpos1 = 3;
-        altpos2 = 1;
-        break;
-
-      case POSE3 :
-        poseValue = 3;
-        altpos1 = 2;
-        altpos2 = 1;
-        break;
-    }
-
-    pathName = "DriveP" + poseValue;
-    DataLogManager.log(String.format("getAutonomousCommand: Initial path %s", pathName));
-
-    // The selected command will be run in autonomous
-    switch (mode)
-    {
-      default :
-      case AUTOSTOP :
-        m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
-        break;
-
-      case AUTOLEAVE :
-        m_autoCommand = m_drivetrain.getAutoPathCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue);
-        break;
-
-      case AUTOPRELOADONLY :
-        m_autoCommand = new ActionScoreSpeaker(m_shooter, m_intake, m_led);
-        break;
-
-      case AUTOPRELOADANDLEAVE :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand(pathName),
-
-            new LogCommand(mode.toString(), "Score preloaded note"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-
-            new LogCommand(mode.toString(), "Leave zone"),
-            m_drivetrain.getAutoPathCommand(poseValue == 2 ? "DriveS2" : "LeaveS" + poseValue));
-        // @formatter:on
-        break;
-
-      case AUTOPRELOADP0LEAVE :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            m_drivetrain.getAutoPathCommand("DriveP0"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
-            m_drivetrain.getAutoPathCommand("LeaveS1")
-        // @formatter:on
-        );
-        break;
-
-      case AUTOPRELOADP4LEAVE :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            new WaitCommand(5), m_drivetrain.getAutoPathCommand("DriveP4"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led), 
-            m_drivetrain.getAutoPathCommand("LeaveS3")
-        // @formatter:on
-        );
-        break;
-
-      case AUTOPRELOADSCOREANOTHER :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand(pathName), 
-
-            new LogCommand(mode.toString(), "Score preloaded note"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-
-            new LogCommand(mode.toString(), "Deploy intake before moving"),
-            m_intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
-
-            new WaitCommand(0.5), // TODO - do we need this? The intake command will run to completion first
-
-            new LogCommand(mode.toString(), "Drive to spike while intaking"),
-            new ParallelCommandGroup(
-                m_drivetrain.getAutoPathCommand("DriveS" + poseValue),
-                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
-            ),
-            
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand("ScoreS" + poseValue),
-
-            new LogCommand(mode.toString(), "Score note"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-            
-            new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            m_intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, m_intake::getIntakePosition),
-
-            m_drivetrain.getAutoPathCommand("LeaveS" + poseValue)
-        // @formatter:on
-        );  //
-        break;
-
-      case AUTOSCORE4 :
-        m_autoCommand = new SequentialCommandGroup(
-        // @formatter:off
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand(pathName),
-
-            new LogCommand(mode.toString(), "Score preloaded note"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-
-            new LogCommand(mode.toString(), "Deploy intake before moving"),
-            m_intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, m_intake::getIntakeDeployed),
-
-            new WaitCommand(0.5),  // TODO - do we need this? The intake command will run to completion first
-
-            new LogCommand(mode.toString(), "Drive to spike while intaking"),
-            new ParallelCommandGroup( 
-                m_drivetrain.getAutoPathCommand("DriveS" + poseValue),
-                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
-            ),
-
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand("ScoreS" + poseValue),
-
-            new LogCommand(mode.toString(), "Score note 2"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-
-            new LogCommand(mode.toString(), "Drive to spike while intaking"),
-            new ParallelCommandGroup(
-                m_drivetrain.getAutoPathCommand("DriveS" + altpos1),
-                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
-            ),
-
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand("ScoreS" + altpos1),
-
-            new LogCommand(mode.toString(), "Score note 3"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-
-            new LogCommand(mode.toString(), "Drive to spike while intaking"),
-            new ParallelCommandGroup(
-                m_drivetrain.getAutoPathCommand("DriveS" + altpos2),
-                new ActionAcquireNote(m_intake, m_led).withTimeout(1.5)
-            ), 
-            
-            new LogCommand(mode.toString(), "Drive to scoring pose"),
-            m_drivetrain.getAutoPathCommand("ScoreS" + altpos2),
-
-            new LogCommand(mode.toString(), "Score note 4"),
-            new ActionScoreSpeaker(m_shooter, m_intake, m_led),
-
-            new LogCommand(mode.toString(), "Turn off intake rollers"), 
-            m_intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, m_intake::getIntakePosition)
-        // @formatter:on
-        );
-        break;
-      case AUTOTESTPATH :
-        m_autoCommand = m_drivetrain.getAutoPathCommand("Test");
-        break;
-    }
-
-    {
-      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-      if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
-        path = path.flipPath( );
-
-      // List<Pose2d> poses = path.getPathPoses( );
-      // for (int i = 0; i < poses.size( ); i++)
-      //   DataLogManager.log(String.format("Auto path pose: %s", poses.get(i)));
-
-      Pose2d initialPose =
-          new PathPlannerTrajectory(path, new ChassisSpeeds( ), new Rotation2d( )).getInitialTargetHolonomicPose( );
-
-      if (initialPose != null)
-        m_drivetrain.seedFieldRelative(initialPose);
-    }
-
-    DataLogManager
-        .log(String.format("getAutonomousCommand: Auto mode is %s %s %s", mode, startPose.toString( ), m_autoCommand.getName( )));
-
-    return m_autoCommand;
-  }
-
-  /****************************************************************************
-   * 
-   * Use this to pass the autonomous command to the main Robot class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand_2( )
-  {
-    AutoChooser2 mode = m_autoChooser2.getSelected( );
-    StartPose startPose = m_startChooser.getSelected( );
-    String autoKey = mode.toString( ) + startPose.toString( );
+    AutoChooser autoOption = m_autoChooser.getSelected( );
+    StartPose startOption = m_startChooser.getSelected( );
+    String autoKey = autoOption.toString( ) + startOption.toString( );
 
     if (m_autoCommand != null)
     {
@@ -630,15 +400,14 @@ public class RobotContainer
 
     // Get auto value using created key
     String autoName = autoMap.get(autoKey);
-
     DataLogManager.log(String.format("==========================================================================="));
-    DataLogManager.log(String.format("autoCommand: autoKey: %s  autoName: %s", autoKey, autoName));
+    DataLogManager.log(String.format("getAuto: autoKey: %s  autoName: %s", autoKey, autoName));
     DataLogManager.log(String.format("==========================================================================="));
 
     // If auto not defined in hashmap, no path assigned so sit idle
     if (autoName == null)
     {
-      DataLogManager.log(String.format("autoCommand: ERROR - no auto defined for this autoKey (%s)", autoKey));
+      DataLogManager.log(String.format("getAuto: ERROR - no auto defined for this autoKey (%s)", autoKey));
       return m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
     }
 
@@ -646,7 +415,7 @@ public class RobotContainer
     List<PathPlannerPath> ppPathList = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
     if (ppPathList.isEmpty( ))
     {
-      DataLogManager.log(String.format("autoCommand: ERROR - auto path list is empty"));
+      DataLogManager.log(String.format("getAuto: ERROR - auto path list is empty"));
       return m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
     }
 
@@ -662,12 +431,12 @@ public class RobotContainer
     // }
 
     // Set field centric robot position to start of auto sequence
-    Pose2d initialPose = initialPath.getPreviewStartingHolonomicPose( );
-    if (initialPose != null)
-      m_drivetrain.seedFieldRelative(initialPose);
+    Pose2d startPose = initialPath.getPreviewStartingHolonomicPose( );
+    if (startPose != null)
+      m_drivetrain.seedFieldRelative(startPose);
 
     // Create the correct base command and pass the path list
-    switch (mode)
+    switch (autoOption)
     {
       default :
       case AUTOPRELOADCLINE : // Until paths are implemented to score centerline, default to stop command
@@ -694,8 +463,7 @@ public class RobotContainer
         break;
     }
 
-    DataLogManager
-        .log(String.format("autoCommand: Auto mode is %s startPose %s %s", autoKey, initialPose, m_autoCommand.getName( )));
+    DataLogManager.log(String.format("getAuto: autoMode %s startOption %s (%s)", autoKey, startPose, m_autoCommand.getName( )));
 
     double delay = autoDelay.getEntry( ).getDouble(0.0);
     if (delay > 0.0)

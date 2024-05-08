@@ -74,7 +74,7 @@ public class Feeder extends SubsystemBase
   private static final double  kRotaryWeightKg     = 4.0;
   private static final double  kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
 
-  // Rotary manual move parameters
+  /** Rotary manual move parameters */
   private enum RotaryMode
   {
     INIT,    // Initialize feeder

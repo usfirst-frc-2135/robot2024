@@ -1,6 +1,4 @@
 
-// ROBOTBUILDER TYPE: SequentialCommandGroup.
-
 package frc.robot.autos;
 
 import java.util.List;

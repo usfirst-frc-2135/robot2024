@@ -1,6 +1,4 @@
 
-// ROBOTBUILDER TYPE: Robot.
-
 package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;

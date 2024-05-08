@@ -40,6 +40,7 @@ import frc.robot.lib.phoenix.PhoenixUtil5;
  */
 public class LED extends SubsystemBase
 {
+  /** RGB color structure */
   private class rgbColor
   {
     private int r;

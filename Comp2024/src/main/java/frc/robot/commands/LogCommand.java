@@ -1,6 +1,4 @@
 
-// ROBOTBUILDER TYPE: Command.
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -8,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * A command that logs a string when initialized.
- *
  */
 public class LogCommand extends InstantCommand
 {

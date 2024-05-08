@@ -25,6 +25,7 @@ public class Vision extends SubsystemBase
 {
   private static final String kVisionTab = "Vision";
 
+  /** Camera stream mode parameter */
   private enum streamMode
   {
     STANDARD(0),    //

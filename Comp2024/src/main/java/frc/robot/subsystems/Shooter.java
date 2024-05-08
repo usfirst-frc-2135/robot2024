@@ -48,6 +48,7 @@ public class Shooter extends SubsystemBase
   private static final double kFlywheelScoreRPM  = 3000.0;    // RPM to score
   private static final double kToleranceRPM      = 100.0;     // Tolerance band around target RPM
 
+  /** Shooter (speed) modes */
   private enum ShooterMode
   {
     REVERSE,    // Shooter runs in reverse direction to handle jams

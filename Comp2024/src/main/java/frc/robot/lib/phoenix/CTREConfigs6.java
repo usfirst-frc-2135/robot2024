@@ -14,6 +14,10 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.INConsts;
 import frc.robot.Robot;
 
+/****************************************************************************
+ * 
+ * CTRE configuration structure for v6 devices
+ */
 public final class CTREConfigs6
 {
 

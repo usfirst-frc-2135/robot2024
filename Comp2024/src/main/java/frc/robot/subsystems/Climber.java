@@ -76,7 +76,7 @@ public class Climber extends SubsystemBase
   public static final double  kLengthMin           = 0.0;    // Climber minimum allowable length
   public static final double  kLengthMax           = 21.0;   // Climber maximum allowable length (2" beyond high length)
 
-  // Climber manual move parameters
+  /** Climber manual move parameters */
   private enum ClimberMode
   {
     INIT,   // Initialize climber

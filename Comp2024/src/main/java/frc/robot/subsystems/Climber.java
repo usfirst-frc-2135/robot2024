@@ -69,6 +69,14 @@ public class Climber extends SubsystemBase
   private static final double kMMSafetyTimeout     = 2.0;    // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
   private static final double kCalibrationTimeout  = 2.0;    // Max calibration time
 
+  // Climber lengths - Motion Magic config parameters
+  public static final double  kLengthClimbed       = 0.0;    // By definition - Climber fully climbed
+  public static final double  kLengthFull          = 18.0;   // From Mech Design height needed to reach max chain
+  public static final double  kLengthChain         = 8.0;    // From Mech Design height needed to reach hanging chain
+
+  public static final double  kLengthMin           = 0.0;    // Climber minimum allowable length
+  public static final double  kLengthMax           = 21.0;   // Climber maximum allowable length (2" beyond high length)
+
   // Climber manual move parameters
   private enum ClimberMode
   {
@@ -84,7 +92,7 @@ public class Climber extends SubsystemBase
 
   private final TalonFXSimState     m_climberSim         = m_leftMotor.getSimState( );
   private final ElevatorSim         m_elevSim            = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, kCarriageMassKg,
-      kDrumRadiusMeters, -CLConsts.kLengthMax, CLConsts.kLengthMax, false, 0.0);
+      kDrumRadiusMeters, -kLengthMax, kLengthMax, false, 0.0);
 
   // Mechanism2d
   private final Mechanism2d         m_climberMech        = new Mechanism2d(1.0, 1.0);
@@ -315,9 +323,9 @@ public class Climber extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_leftCurInches > CLConsts.kLengthMin))
+    if ((axisValue < 0.0) && (m_leftCurInches > kLengthMin))
       newMode = ClimberMode.DOWN;
-    else if ((axisValue > 0.0) && (m_leftCurInches < CLConsts.kLengthMax))
+    else if ((axisValue > 0.0) && (m_leftCurInches < kLengthMax))
       newMode = ClimberMode.UP;
     else
     {
@@ -385,7 +393,7 @@ public class Climber extends SubsystemBase
       }
       else
         DataLogManager.log(String.format("%s: MM Position move target %.1f inches is OUT OF RANGE! [%.1f, %.1f rot]",
-            getSubsystem( ), m_targetInches, CLConsts.kLengthMin, CLConsts.kLengthMax));
+            getSubsystem( ), m_targetInches, kLengthMin, kLengthMax));
     }
     else
     {
@@ -565,7 +573,7 @@ public class Climber extends SubsystemBase
    */
   private boolean isMoveValid(double inches)
   {
-    return (inches >= CLConsts.kLengthMin) && (inches <= CLConsts.kLengthMax);
+    return (inches >= kLengthMin) && (inches <= kLengthMax);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -591,7 +599,7 @@ public class Climber extends SubsystemBase
    */
   public double getClimberClimbed( )
   {
-    return CLConsts.kLengthClimbed;
+    return kLengthClimbed;
   }
 
   /****************************************************************************
@@ -602,7 +610,7 @@ public class Climber extends SubsystemBase
    */
   public double getClimberFullyExtended( )
   {
-    return CLConsts.kLengthFull;
+    return kLengthFull;
   }
 
   /****************************************************************************
@@ -613,7 +621,7 @@ public class Climber extends SubsystemBase
    */
   public double getClimberChainLevel( )
   {
-    return CLConsts.kLengthChain;
+    return kLengthChain;
   }
 
   ////////////////////////////////////////////////////////////////////////////

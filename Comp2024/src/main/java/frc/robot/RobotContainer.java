@@ -248,7 +248,7 @@ public class RobotContainer
     ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
     cmdTab.add("ActionAcquireNote", new ActionAcquireNote(m_intake, m_led)).withPosition(0, 0);
     cmdTab.add("ActionExpelNote", new ActionExpelNote(m_intake, m_led)).withPosition(0, 1);
-    cmdTab.add("ActionHandoff", new ActionHandoff(m_intake, m_feeder)).withPosition(0, 2);
+    cmdTab.add("ActionHandoff", new ActionHandoff(m_intake, m_feeder, m_led)).withPosition(0, 2);
     cmdTab.add("ActionRetractIntake", new ActionRetractIntake(m_intake, m_led)).withPosition(0, 3);
 
     cmdTab.add("ActionPrepareToClimb", new ActionPrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
@@ -330,7 +330,7 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     //
-    m_operatorPad.leftBumper( ).onTrue(new ActionHandoff(m_intake, m_feeder));
+    m_operatorPad.leftBumper( ).onTrue(new ActionHandoff(m_intake, m_feeder, m_led));
     m_operatorPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
     m_operatorPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));  // aka View

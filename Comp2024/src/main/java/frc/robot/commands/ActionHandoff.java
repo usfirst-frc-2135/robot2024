@@ -7,8 +7,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.FDConsts;
 import frc.robot.Constants.INConsts;
+import frc.robot.Constants.LEDConsts.ANIMATION;
+import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 
 /**
  * Command to handoff from intake to feeder
@@ -23,7 +26,7 @@ public class ActionHandoff extends SequentialCommandGroup
    * @param feeder
    *          feeder subsystem
    */
-  public ActionHandoff(Intake intake, Feeder feeder)
+  public ActionHandoff(Intake intake, Feeder feeder, LED led)
   {
     setName("ActionHandoff");
 
@@ -47,7 +50,8 @@ public class ActionHandoff extends SequentialCommandGroup
         new WaitCommand(0.2),
 
         new LogCommand(getName(), "Ensure Intake releases Note"),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
+        led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
 
         // @formatter:on
     );

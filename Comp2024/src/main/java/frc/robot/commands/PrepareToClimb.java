@@ -10,7 +10,7 @@ import frc.robot.subsystems.Feeder;
 /**
  * Command to prepare for a climb
  */
-public class ActionPrepareToClimb extends SequentialCommandGroup
+public class PrepareToClimb extends SequentialCommandGroup
 {
   /**
    * Group command to prepare for a climb
@@ -20,9 +20,9 @@ public class ActionPrepareToClimb extends SequentialCommandGroup
    * @param feeder
    *          feeder subsystem
    */
-  public ActionPrepareToClimb(Climber climber, Feeder feeder)
+  public PrepareToClimb(Climber climber, Feeder feeder)
   {
-    setName("ActionPrepareToClimb");
+    setName("PrepareToClimb");
 
     addCommands(
         // Add Commands here:

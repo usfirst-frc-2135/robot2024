@@ -8,8 +8,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
-import frc.robot.commands.ActionAcquireNote;
-import frc.robot.commands.ActionScoreSpeaker;
+import frc.robot.commands.AcquireNote;
+import frc.robot.commands.ScoreSpeaker;
 import frc.robot.commands.LogCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Intake;
@@ -61,7 +61,7 @@ public class AutoScore4 extends SequentialCommandGroup
         drivetrain.getPathCommand(ppPaths.get(0)),
 
         new LogCommand(getName(), "Score preloaded note"),
-        new ActionScoreSpeaker(shooter, intake, led),
+        new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Deploy intake before moving"),
         intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
@@ -69,38 +69,38 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(1)),
-            new ActionAcquireNote(intake, led).withTimeout(1.5)
+            new AcquireNote(intake, led).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
         drivetrain.getPathCommand(ppPaths.get(2)),
 
         new LogCommand(getName(), "Score note 2"),
-        new ActionScoreSpeaker(shooter, intake, led),
+        new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(3)),
-            new ActionAcquireNote(intake, led).withTimeout(1.5)
+            new AcquireNote(intake, led).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
         drivetrain.getPathCommand(ppPaths.get(4)),
 
         new LogCommand(getName(), "Score note 3"),
-        new ActionScoreSpeaker(shooter, intake, led),
+        new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(5)),
-            new ActionAcquireNote(intake, led).withTimeout(1.5)
+            new AcquireNote(intake, led).withTimeout(1.5)
         ), 
         
         new LogCommand(getName(), "Drive to scoring pose"),
         drivetrain.getPathCommand(ppPaths.get(6)),
 
         new LogCommand(getName(), "Score note 4"),
-        new ActionScoreSpeaker(shooter, intake, led),
+        new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Turn off intake rollers"), 
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition)

@@ -9,7 +9,7 @@ import frc.robot.subsystems.Feeder;
 /**
  * Command to score a note into amp
  */
-public class ActionScoreAmp extends SequentialCommandGroup
+public class ScoreAmp extends SequentialCommandGroup
 {
   /**
    * Group command to use the feeder to score a note in the amp
@@ -17,9 +17,9 @@ public class ActionScoreAmp extends SequentialCommandGroup
    * @param feeder
    *          feeder subsystem
    */
-  public ActionScoreAmp(Feeder feeder)
+  public ScoreAmp(Feeder feeder)
   {
-    setName("ActionScoreAmp");
+    setName("ScoreAmp");
 
     addCommands(
         // Add Commands here:

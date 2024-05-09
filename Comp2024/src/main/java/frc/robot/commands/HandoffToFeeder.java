@@ -14,7 +14,7 @@ import frc.robot.subsystems.LED;
 /**
  * Command to handoff from intake to feeder
  */
-public class ActionHandoff extends SequentialCommandGroup
+public class HandoffToFeeder extends SequentialCommandGroup
 {
   /**
    * Group command to handoff from intake to feeder
@@ -24,9 +24,9 @@ public class ActionHandoff extends SequentialCommandGroup
    * @param feeder
    *          feeder subsystem
    */
-  public ActionHandoff(Intake intake, Feeder feeder, LED led)
+  public HandoffToFeeder(Intake intake, Feeder feeder, LED led)
   {
-    setName("ActionHandoff");
+    setName("HandoffToFeeder");
 
     addCommands(
         // Add Commands here:

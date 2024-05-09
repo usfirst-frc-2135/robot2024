@@ -6,7 +6,7 @@ import java.util.List;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.ActionScoreSpeaker;
+import frc.robot.commands.ScoreSpeaker;
 import frc.robot.commands.LogCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Intake;
@@ -48,7 +48,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         drivetrain.getPathCommand(ppPaths.get(0)),
 
         new LogCommand(getName(), "Score preloaded note"),
-        new ActionScoreSpeaker(shooter, intake, led),
+        new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to centerline"),
         drivetrain.getPathCommand(ppPaths.get(1)) // TODO: need to complete this sequence to centerline

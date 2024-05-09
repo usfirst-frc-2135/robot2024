@@ -12,7 +12,7 @@ import frc.robot.subsystems.LED;
 /**
  * Command to expel a note to the floor
  */
-public class ActionExpelNote extends SequentialCommandGroup
+public class ExpelNote extends SequentialCommandGroup
 {
   /**
    * Group command to use the intake to expel a note to the floor
@@ -22,9 +22,9 @@ public class ActionExpelNote extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public ActionExpelNote(Intake intake, LED led)
+  public ExpelNote(Intake intake, LED led)
   {
-    setName("ActionExpelNote");
+    setName("ExpelNote");
 
     addCommands(
         // Add Commands here:

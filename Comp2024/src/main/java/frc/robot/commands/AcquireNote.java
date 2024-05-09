@@ -12,7 +12,7 @@ import frc.robot.subsystems.LED;
 /**
  * Command to acquire a note from floor
  */
-public class ActionAcquireNote extends SequentialCommandGroup
+public class AcquireNote extends SequentialCommandGroup
 {
   /**
    * Group command to use the intake to acquire a note from the floor
@@ -22,9 +22,9 @@ public class ActionAcquireNote extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public ActionAcquireNote(Intake intake, LED led)
+  public AcquireNote(Intake intake, LED led)
   {
-    setName("ActionAcquireNote");
+    setName("AcquireNote");
 
     addCommands(
         // Add Commands here:

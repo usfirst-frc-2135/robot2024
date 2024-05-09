@@ -12,7 +12,7 @@ import frc.robot.subsystems.Shooter;
 /**
  * Command to shoot into the speaker
  */
-public class ActionScoreSpeaker extends SequentialCommandGroup
+public class ScoreSpeaker extends SequentialCommandGroup
 {
   /**
    * Group command to fire a note to speaker
@@ -24,9 +24,9 @@ public class ActionScoreSpeaker extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public ActionScoreSpeaker(Shooter shooter, Intake intake, LED led)
+  public ScoreSpeaker(Shooter shooter, Intake intake, LED led)
   {
-    setName("ActionScoreSpeaker");
+    setName("ScoreSpeaker");
 
     addCommands(
         // Add Commands here:

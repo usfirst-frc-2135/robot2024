@@ -39,13 +39,13 @@ import frc.robot.autos.AutoPreloadScore;
 import frc.robot.autos.AutoPreloadSteal;
 import frc.robot.autos.AutoScore4;
 import frc.robot.autos.AutoTest;
-import frc.robot.commands.ActionAcquireNote;
-import frc.robot.commands.ActionExpelNote;
-import frc.robot.commands.ActionHandoff;
-import frc.robot.commands.ActionPrepareToClimb;
-import frc.robot.commands.ActionRetractIntake;
-import frc.robot.commands.ActionScoreAmp;
-import frc.robot.commands.ActionScoreSpeaker;
+import frc.robot.commands.AcquireNote;
+import frc.robot.commands.ExpelNote;
+import frc.robot.commands.HandoffToFeeder;
+import frc.robot.commands.PrepareToClimb;
+import frc.robot.commands.RetractIntake;
+import frc.robot.commands.ScoreAmp;
+import frc.robot.commands.ScoreSpeaker;
 import frc.robot.commands.LogCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -227,14 +227,15 @@ public class RobotContainer
 
     // Command tab
     ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
-    cmdTab.add("ActionAcquireNote", new ActionAcquireNote(m_intake, m_led)).withPosition(0, 0);
-    cmdTab.add("ActionExpelNote", new ActionExpelNote(m_intake, m_led)).withPosition(0, 1);
-    cmdTab.add("ActionHandoff", new ActionHandoff(m_intake, m_feeder, m_led)).withPosition(0, 2);
-    cmdTab.add("ActionRetractIntake", new ActionRetractIntake(m_intake, m_led)).withPosition(0, 3);
+    cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led)).withPosition(0, 0);
+    cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led)).withPosition(0, 1);
+    cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led)).withPosition(0, 2);
+    cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led)).withPosition(0, 3);
 
-    cmdTab.add("ActionPrepareToClimb", new ActionPrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
-    cmdTab.add("ActionScoreAmp", new ActionScoreAmp(m_feeder)).withPosition(2, 2);
-    cmdTab.add("ActionScoreSpeaker", new ActionScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 3);
+    cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
+    cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 2);
+    cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 3);
+    cmdTab.add("RumblePulse", this.getRumbleCommand(true, true)).withPosition(2, 1);
 
     cmdTab.add(m_intake).withPosition(4, 0);
     cmdTab.add(m_shooter).withPosition(4, 1);
@@ -269,8 +270,8 @@ public class RobotContainer
     // Driver - Bumpers, start, back
     //
     m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
-    m_driverPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
-    m_driverPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
+    m_driverPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led));
+    m_driverPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
 
@@ -292,7 +293,7 @@ public class RobotContainer
     //
     m_driverPad.leftTrigger(Constants.kTriggerThreshold)
         .whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kSpeakerPose));
-    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
+    m_driverPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ScoreSpeaker(m_shooter, m_intake, m_led));
 
     m_driverPad.leftStick( ).onTrue(new LogCommand("driverPad", "left stick"));
     m_driverPad.rightStick( ).onTrue(new LogCommand("driverPad", "right stick"));
@@ -306,21 +307,21 @@ public class RobotContainer
     m_operatorPad.a( ).onTrue(m_shooter.getShooterScoreCommand( ));
     m_operatorPad.b( ).onTrue(m_shooter.getShooterStopCommand( ));
     m_operatorPad.x( ).onTrue(new LogCommand("operPad", "X"));
-    m_operatorPad.y( ).onTrue(new ActionExpelNote(m_intake, m_led));
+    m_operatorPad.y( ).onTrue(new ExpelNote(m_intake, m_led));
 
     //
     // Operator - Bumpers, start, back
     //
-    m_operatorPad.leftBumper( ).onTrue(new ActionHandoff(m_intake, m_feeder, m_led));
-    m_operatorPad.rightBumper( ).onTrue(new ActionAcquireNote(m_intake, m_led));
-    m_operatorPad.rightBumper( ).onFalse(new ActionRetractIntake(m_intake, m_led));
+    m_operatorPad.leftBumper( ).onTrue(new HandoffToFeeder(m_intake, m_feeder, m_led));
+    m_operatorPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led));
+    m_operatorPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led));
     m_operatorPad.back( ).toggleOnTrue(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
 
     //
     // Operator - POV buttons
     //
-    m_operatorPad.pov(0).onTrue(new ActionPrepareToClimb(m_climber, m_feeder));
+    m_operatorPad.pov(0).onTrue(new PrepareToClimb(m_climber, m_feeder));
     m_operatorPad.pov(90).onTrue(new LogCommand("operPad", "POV 90"));
     m_operatorPad.pov(180).onTrue(m_climber.getMoveToPositionCommand(m_climber::getClimberClimbed));
     m_operatorPad.pov(270).onTrue(m_climber.getMoveToPositionCommand(m_climber::getClimberChainLevel));
@@ -330,8 +331,8 @@ public class RobotContainer
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     //
-    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreAmp(m_feeder));
-    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ActionScoreSpeaker(m_shooter, m_intake, m_led));
+    m_operatorPad.leftTrigger(Constants.kTriggerThreshold).onTrue(new ScoreAmp(m_feeder));
+    m_operatorPad.rightTrigger(Constants.kTriggerThreshold).onTrue(new ScoreSpeaker(m_shooter, m_intake, m_led));
 
     m_operatorPad.leftStick( ).toggleOnTrue(m_feeder.getJoystickCommand(( ) -> getFeederAxis( )));
     m_operatorPad.rightStick( ).toggleOnTrue(m_intake.getJoystickCommand(( ) -> getIntakeAxis( )));

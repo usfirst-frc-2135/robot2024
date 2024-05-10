@@ -3,9 +3,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.LEDConsts.ANIMATION;
 import frc.robot.Constants.LEDConsts.COLOR;
+import frc.robot.subsystems.HID;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
@@ -22,7 +24,7 @@ public class AcquireNote extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AcquireNote(Intake intake, LED led)
+  public AcquireNote(Intake intake, LED led, HID hid)
   {
     setName("AcquireNote");
 
@@ -39,6 +41,7 @@ public class AcquireNote extends SequentialCommandGroup
         new WaitUntilCommand(intake::isNoteDetected),
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
+        hid.getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity),
         intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
         
         // @formatter:on

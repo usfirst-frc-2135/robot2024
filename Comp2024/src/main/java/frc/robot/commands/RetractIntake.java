@@ -3,9 +3,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.LEDConsts.ANIMATION;
 import frc.robot.Constants.LEDConsts.COLOR;
+import frc.robot.subsystems.HID;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 
@@ -22,7 +24,7 @@ public class RetractIntake extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public RetractIntake(Intake intake, LED led)
+  public RetractIntake(Intake intake, LED led, HID hid)
   {
     setName("RetractIntake");
 
@@ -36,7 +38,8 @@ public class RetractIntake extends SequentialCommandGroup
           led.getLEDCommand(COLOR.BLUE, ANIMATION.CLEARALL),
           led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL),
           intake::isNoteDetected),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
+        hid.getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity)
 
         //@formatter:on
     );

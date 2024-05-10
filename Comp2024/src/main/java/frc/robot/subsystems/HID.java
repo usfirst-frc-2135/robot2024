@@ -102,8 +102,8 @@ public class HID extends SubsystemBase
    */
   private void setHIDs(boolean driverPad, boolean operatorPad, double intensity)
   {
-    m_driver.setRumble(RumbleType.kBothRumble, intensity);
-    m_operator.setRumble(RumbleType.kBothRumble, intensity);
+    m_driver.setRumble(RumbleType.kBothRumble, (driverPad) ? intensity : 0.0);
+    m_operator.setRumble(RumbleType.kBothRumble, (operatorPad) ? intensity : 0.0);
   }
 
   ////////////////////////////////////////////////////////////////////////////

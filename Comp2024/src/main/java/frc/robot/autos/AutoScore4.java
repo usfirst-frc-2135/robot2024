@@ -9,9 +9,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
 import frc.robot.commands.AcquireNote;
-import frc.robot.commands.ScoreSpeaker;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.ScoreSpeaker;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.HID;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
@@ -49,7 +50,8 @@ public class AutoScore4 extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoScore4(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, LED led)
+  public AutoScore4(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter, LED led,
+      HID hid)
   {
     setName("AutoScore4");
 
@@ -69,7 +71,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(1)),
-            new AcquireNote(intake, led).withTimeout(1.5)
+            new AcquireNote(intake, led, hid).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
@@ -81,7 +83,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(3)),
-            new AcquireNote(intake, led).withTimeout(1.5)
+            new AcquireNote(intake, led, hid).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
@@ -93,7 +95,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(5)),
-            new AcquireNote(intake, led).withTimeout(1.5)
+            new AcquireNote(intake, led, hid).withTimeout(1.5)
         ), 
         
         new LogCommand(getName(), "Drive to scoring pose"),

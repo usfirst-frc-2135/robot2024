@@ -229,15 +229,17 @@ public class RobotContainer
 
     // Command tab
     ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
-    cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led)).withPosition(0, 0);
+    cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led, m_hid)).withPosition(0, 0);
     cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led)).withPosition(0, 1);
     cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led)).withPosition(0, 2);
-    cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led)).withPosition(0, 3);
+    cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid)).withPosition(0, 3);
 
     cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
     cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 2);
     cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 3);
-    cmdTab.add("HIDRumble", m_hid.getHIDRumbleCommand(true, true, 1.0).withTimeout(1.0)).withPosition(2, 1);
+    cmdTab.add("HIDRumble", m_hid
+        .getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity).withTimeout(1.0))
+        .withPosition(2, 1);
 
     cmdTab.add(m_intake).withPosition(4, 0);
     cmdTab.add(m_shooter).withPosition(4, 1);
@@ -272,8 +274,8 @@ public class RobotContainer
     // Driver - Bumpers, start, back
     //
     m_driverPad.leftBumper( ).whileTrue(m_drivetrain.drivePathtoPose(m_drivetrain, VIConsts.kAmpPose));  // drive to amp
-    m_driverPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led));
-    m_driverPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led));
+    m_driverPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led, m_hid));
+    m_driverPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led, m_hid));
     m_driverPad.back( ).whileTrue(m_drivetrain.applyRequest(( ) -> brake));                       // aka View
     m_driverPad.start( ).onTrue(m_drivetrain.runOnce(( ) -> m_drivetrain.seedFieldRelative( )));  // aka Menu
 
@@ -315,8 +317,8 @@ public class RobotContainer
     // Operator - Bumpers, start, back
     //
     m_operatorPad.leftBumper( ).onTrue(new HandoffToFeeder(m_intake, m_feeder, m_led));
-    m_operatorPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led));
-    m_operatorPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led));
+    m_operatorPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led, m_hid));
+    m_operatorPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led, m_hid));
     m_operatorPad.back( ).toggleOnTrue(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));  // aka View
     m_operatorPad.start( ).onTrue(new InstantCommand(m_vision::rotateCameraStreamMode).ignoringDisable(true)); // aka Menu
 
@@ -453,13 +455,13 @@ public class RobotContainer
         m_autoCommand = new AutoPreloadLeave(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
         break;
       case AUTOPRELOADSCORE :
-        m_autoCommand = new AutoPreloadScore(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        m_autoCommand = new AutoPreloadScore(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);
         break;
       case AUTOPRELOADSTEAL :
         m_autoCommand = new AutoPreloadSteal(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
         break;
       case AUTOSCORE4 :
-        m_autoCommand = new AutoScore4(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        m_autoCommand = new AutoScore4(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);
         break;
       case AUTOTEST :
         m_autoCommand = new AutoTest(ppPathList, m_drivetrain, m_led);

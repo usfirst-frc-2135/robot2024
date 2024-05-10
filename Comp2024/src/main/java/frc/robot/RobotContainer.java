@@ -42,15 +42,16 @@ import frc.robot.autos.AutoTest;
 import frc.robot.commands.AcquireNote;
 import frc.robot.commands.ExpelNote;
 import frc.robot.commands.HandoffToFeeder;
+import frc.robot.commands.LogCommand;
 import frc.robot.commands.PrepareToClimb;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ScoreAmp;
 import frc.robot.commands.ScoreSpeaker;
-import frc.robot.commands.LogCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.HID;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
@@ -96,6 +97,7 @@ public class RobotContainer
   private final Telemetry                             logger          = new Telemetry(kMaxSpeed);
 
   // The robot's shared subsystems
+  private final HID                                   m_hid           = new HID(m_driverPad.getHID( ), m_operatorPad.getHID( ));
   private final LED                                   m_led           = new LED( );
   private final Power                                 m_power         = new Power( );
   private final Vision                                m_vision        = new Vision( );
@@ -235,7 +237,7 @@ public class RobotContainer
     cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
     cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 2);
     cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 3);
-    cmdTab.add("RumblePulse", this.getRumbleCommand(true, true)).withPosition(2, 1);
+    cmdTab.add("HIDRumble", m_hid.getHIDRumbleCommand(true, true, 1.0).withTimeout(1.0)).withPosition(2, 1);
 
     cmdTab.add(m_intake).withPosition(4, 0);
     cmdTab.add(m_shooter).withPosition(4, 1);

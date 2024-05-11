@@ -24,6 +24,7 @@ import frc.robot.lib.LimelightHelpers;
 public class Vision extends SubsystemBase
 {
   private static final String kVisionTab = "Vision";
+  private static final String kLLName    = "limelight";
 
   /** Camera stream mode parameter */
   private enum streamMode
@@ -63,7 +64,7 @@ public class Vision extends SubsystemBase
   GenericEntry                m_tidEntry   = m_statusList.add("tid-targetid", 0.0).getEntry( );
 
   // Declare module variables
-  private NetworkTable        m_table      = NetworkTableInstance.getDefault( ).getTable("limelight"); // Network table reference for LL values
+  private NetworkTable        m_table      = NetworkTableInstance.getDefault( ).getTable(kLLName); // Network table reference for LL values
 
   private streamMode          m_stream     = streamMode.STANDARD;
 
@@ -118,8 +119,8 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
 
-    LimelightHelpers.setLEDMode_ForceOff("limelight");
-    LimelightHelpers.setStreamMode_PiPSecondary("limelight");
+    LimelightHelpers.setLEDMode_ForceOff(kLLName);
+    LimelightHelpers.setStreamMode_PiPSecondary(kLLName);
 
     if (DriverStation.getAlliance( ).equals(Optional.of(DriverStation.Alliance.Red)))
     {
@@ -130,7 +131,9 @@ public class Vision extends SubsystemBase
       setPriorityId(7, "BLUE");
     }
     else
+    {
       DataLogManager.log(String.format("%s: Driver station alliance color NOT SET!", getSubsystem( )));
+    }
   }
 
   /****************************************************************************
@@ -144,16 +147,17 @@ public class Vision extends SubsystemBase
       default :
       case PIPSECONDARY :
         m_stream = streamMode.PIPMAIN;
-        LimelightHelpers.setStreamMode_PiPMain("limelight");
+        LimelightHelpers.setStreamMode_PiPMain(kLLName);
         break;
       case PIPMAIN :
         m_stream = streamMode.STANDARD;
-        LimelightHelpers.setStreamMode_Standard("limelight");
+        LimelightHelpers.setStreamMode_Standard(kLLName);
         break;
       case STANDARD :
         m_stream = streamMode.PIPSECONDARY;
-        LimelightHelpers.setStreamMode_PiPSecondary("limelight");
+        LimelightHelpers.setStreamMode_PiPSecondary(kLLName);
     }
+
     DataLogManager.log(String.format("%s: Set stream mode (setStreamMode_PiPxxx) %s", getSubsystem( ), m_stream));
   }
 
@@ -166,7 +170,7 @@ public class Vision extends SubsystemBase
    */
   public double limelight_aim_proportional(double maxAngularRate)
   {
-    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kAimingKp;
+    double targetingAngularVelocity = LimelightHelpers.getTX(kLLName) * kAimingKp;
 
     // convert to radians per second for our drive method
     targetingAngularVelocity *= maxAngularRate;
@@ -186,7 +190,7 @@ public class Vision extends SubsystemBase
    */
   public double limelight_range_proportional(double maxSpeed)
   {
-    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kDrivingKp;
+    double targetingForwardSpeed = LimelightHelpers.getTY(kLLName) * kDrivingKp;
 
     // convert to meters per second
     targetingForwardSpeed *= maxSpeed;
@@ -211,7 +215,7 @@ public class Vision extends SubsystemBase
   private void setPriorityId(int id, String alliance)
   {
     DataLogManager.log(String.format("%s: Set AprilTag priority id %d (%s)", getSubsystem( ), id, alliance));
-    LimelightHelpers.setPriorityTagID("limelight", id);
+    LimelightHelpers.setPriorityTagID(kLLName, id);
   }
 
 }

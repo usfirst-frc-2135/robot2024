@@ -444,7 +444,7 @@ public class RobotContainer
     switch (autoOption)
     {
       default :
-      case AUTOPRELOADCLINE : // Until paths are implemented to score centerline, default to stop command
+      case AUTOPRELOADCLINE : // TODO: Until paths are implemented to score centerline, default to stop command
       case AUTOSTOP :
         m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
         break;
@@ -484,16 +484,6 @@ public class RobotContainer
    * 
    * Gamepad interfaces
    */
-  public CommandXboxController getDriver( )
-  {
-    return m_driverPad;
-  }
-
-  public CommandXboxController getOperator( )
-  {
-    return m_operatorPad;
-  }
-
   public double getIntakeAxis( )
   {
     return m_operatorPad.getRightX( );

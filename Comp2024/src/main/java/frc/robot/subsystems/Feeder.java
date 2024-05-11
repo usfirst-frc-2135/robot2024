@@ -44,7 +44,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.FDConsts;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
@@ -86,6 +85,14 @@ public class Feeder extends SubsystemBase
   // Rotary constants
   private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
   private static final double       kMMSafetyTimeout      = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+
+  // Rotary angles - Motion Magic move parameters - TODO: tune these angles!
+  public static final double        kRotaryAngleAmp       = -33.0;
+  public static final double        kRotaryAngleClimb     = 60.0;
+  public static final double        kRotaryAngleHandoff   = 88.75;
+
+  public static final double        kRotaryAngleMin       = -61.89;
+  public static final double        kRotaryAngleMax       = 90.0;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
@@ -176,8 +183,8 @@ public class Feeder extends SubsystemBase
     m_rollValidEntry.setBoolean(m_rollerValid);
 
     // Rotary motor and CANcoder init
-    m_rotaryValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Feeder Rotary", CTREConfigs6.feederRotaryFXConfig( ));
+    m_rotaryValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Feeder Rotary",
+        CTREConfigs6.feederRotaryFXConfig(Units.degreesToRotations(kRotaryAngleMin), Units.degreesToRotations(kRotaryAngleMax)));
     m_canCoderValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
     m_rotValidEntry.setBoolean(m_rotaryValid);
@@ -333,9 +340,9 @@ public class Feeder extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_currentDegrees > FDConsts.kRotaryAngleMin))
+    if ((axisValue < 0.0) && (m_currentDegrees > kRotaryAngleMin))
       newMode = RotaryMode.INBOARD;
-    else if ((axisValue > 0.0) && (m_currentDegrees < FDConsts.kRotaryAngleMax))
+    else if ((axisValue > 0.0) && (m_currentDegrees < kRotaryAngleMax))
       newMode = RotaryMode.OUTBOARD;
     else
     {
@@ -396,7 +403,7 @@ public class Feeder extends SubsystemBase
       }
       else
         DataLogManager.log(String.format("%s: MM Position move target %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]",
-            getSubsystem( ), m_targetDegrees, FDConsts.kRotaryAngleMin, FDConsts.kRotaryAngleMax));
+            getSubsystem( ), m_targetDegrees, kRotaryAngleMin, kRotaryAngleMax));
     }
     else
     {
@@ -535,7 +542,7 @@ public class Feeder extends SubsystemBase
    */
   private boolean isMoveValid(double degrees)
   {
-    return (degrees >= FDConsts.kRotaryAngleMin) && (degrees <= FDConsts.kRotaryAngleMax);
+    return (degrees >= kRotaryAngleMin) && (degrees <= kRotaryAngleMax);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -561,7 +568,7 @@ public class Feeder extends SubsystemBase
    */
   public double getFeederAmp( )
   {
-    return FDConsts.kRotaryAngleAmp;
+    return kRotaryAngleAmp;
   }
 
   /****************************************************************************
@@ -572,7 +579,7 @@ public class Feeder extends SubsystemBase
    */
   public double getFeederClimb( )
   {
-    return FDConsts.kRotaryAngleClimb;
+    return kRotaryAngleClimb;
   }
 
   /****************************************************************************
@@ -583,7 +590,7 @@ public class Feeder extends SubsystemBase
    */
   public double getFeederHandoff( )
   {
-    return FDConsts.kRotaryAngleHandoff;
+    return kRotaryAngleHandoff;
   }
 
   /****************************************************************************

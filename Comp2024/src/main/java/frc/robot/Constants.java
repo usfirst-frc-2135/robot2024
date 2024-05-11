@@ -104,14 +104,6 @@ public class Constants
       HANDOFF, // put into feeder 
       HOLD     // Maintain existing setting
     }
-
-    // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
-    public static final double kRotaryAngleRetracted = -97.5;
-    public static final double kRotaryAngleHandoff   = -49.9;
-    public static final double kRotaryAngleDeployed  = 99.4;
-
-    public static final double kRotaryAngleMin       = -99.0;
-    public static final double kRotaryAngleMax       = 101.4;
   }
 
   /****************************************************************************
@@ -127,14 +119,6 @@ public class Constants
       HANDOFF, // handoff into feeder 
       HOLD     // Maintain existing setting
     }
-
-    // Rotary angles - Motion Magic move parameters - TODO: tune these angles!
-    public static final double kRotaryAngleAmp     = -33.0;
-    public static final double kRotaryAngleClimb   = 60.0;
-    public static final double kRotaryAngleHandoff = 88.75;
-
-    public static final double kRotaryAngleMin     = -61.89;
-    public static final double kRotaryAngleMax     = 90.0;
   }
 
   /****************************************************************************

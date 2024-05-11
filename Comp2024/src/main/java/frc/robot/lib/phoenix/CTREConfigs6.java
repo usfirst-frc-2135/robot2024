@@ -27,7 +27,7 @@ public final class CTREConfigs6
    * 
    * Intake rotary motor - Falcon 500
    */
-  public static TalonFXConfiguration intakeRotaryFXConfig( )
+  public static TalonFXConfiguration intakeRotaryFXConfig(double min, double max)
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
 
@@ -74,9 +74,9 @@ public final class CTREConfigs6
     inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
-    inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMin);  // Rotations
+    inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = min;  // Rotations
     // inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMax);  // Rotations
+    inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = max;  // Rotations
     // inRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return inRotaryConfig;
@@ -148,7 +148,7 @@ public final class CTREConfigs6
    * 
    * Feeder rotary motor - Falcon 500
    */
-  public static TalonFXConfiguration feederRotaryFXConfig( )
+  public static TalonFXConfiguration feederRotaryFXConfig(double min, double max)
   {
     TalonFXConfiguration fdRotaryConfig = new TalonFXConfiguration( );
 
@@ -195,9 +195,9 @@ public final class CTREConfigs6
     fdRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
-    fdRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMin);  // Rotations
+    fdRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = min;  // Rotations
     // fdRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    fdRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(INConsts.kRotaryAngleMax);  // Rotations
+    fdRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = max;  // Rotations
     // fdRotaryConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return fdRotaryConfig;
@@ -225,7 +225,7 @@ public final class CTREConfigs6
    * 
    * Climber motors (2) - Falcon 500
    */
-  public static TalonFXConfiguration climberFXConfig( )
+  public static TalonFXConfiguration climberFXConfig(double min, double max)
   {
     TalonFXConfiguration climberConfig = new TalonFXConfiguration( );
 
@@ -269,9 +269,9 @@ public final class CTREConfigs6
     climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
-    // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToWinchRotations(0.0, 0.432);   // Rotations
+    // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = min;   // Rotations
     // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToWinchRotations(18.25, 0.432); // Rotations
+    // climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = max;   // Rotations
     // climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return climberConfig;

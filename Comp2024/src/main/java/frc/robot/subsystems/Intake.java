@@ -44,7 +44,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.RollerMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
@@ -87,6 +86,14 @@ public class Intake extends SubsystemBase
   // Rotary constants
   private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
   private static final double       kMMSafetyTimeout      = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+
+  // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
+  public static final double        kRotaryAngleRetracted = -97.5;
+  public static final double        kRotaryAngleHandoff   = -49.9;
+  public static final double        kRotaryAngleDeployed  = 99.4;
+
+  public static final double        kRotaryAngleMin       = -99.0;
+  public static final double        kRotaryAngleMax       = 101.4;
 
   // Device and simulation objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -179,8 +186,8 @@ public class Intake extends SubsystemBase
     m_rollValidEntry.setBoolean(m_rollerValid);
 
     // Rotary motor and CANcoder init
-    m_rotaryValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Intake Rotary", CTREConfigs6.intakeRotaryFXConfig( ));
+    m_rotaryValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Intake Rotary",
+        CTREConfigs6.intakeRotaryFXConfig(Units.degreesToRotations(kRotaryAngleMin), Units.degreesToRotations(kRotaryAngleMax)));
     m_canCoderValid =
         PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
     m_rotValidEntry.setBoolean(m_rotaryValid);
@@ -337,9 +344,9 @@ public class Intake extends SubsystemBase
 
     axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
-    if ((axisValue < 0.0) && (m_currentDegrees > INConsts.kRotaryAngleMin))
+    if ((axisValue < 0.0) && (m_currentDegrees > kRotaryAngleMin))
       newMode = RotaryMode.INBOARD;
-    else if ((axisValue > 0.0) && (m_currentDegrees < INConsts.kRotaryAngleMax))
+    else if ((axisValue > 0.0) && (m_currentDegrees < kRotaryAngleMax))
       newMode = RotaryMode.OUTBOARD;
     else
     {
@@ -400,7 +407,7 @@ public class Intake extends SubsystemBase
       }
       else
         DataLogManager.log(String.format("%s: MM Position move target %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]",
-            getSubsystem( ), m_targetDegrees, INConsts.kRotaryAngleMin, INConsts.kRotaryAngleMax));
+            getSubsystem( ), m_targetDegrees, kRotaryAngleMin, kRotaryAngleMax));
     }
     else
     {
@@ -544,7 +551,7 @@ public class Intake extends SubsystemBase
    */
   private boolean isMoveValid(double degrees)
   {
-    return (degrees >= INConsts.kRotaryAngleMin) && (degrees <= INConsts.kRotaryAngleMax);
+    return (degrees >= kRotaryAngleMin) && (degrees <= kRotaryAngleMax);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -570,7 +577,7 @@ public class Intake extends SubsystemBase
    */
   public double getIntakeRetracted( )
   {
-    return INConsts.kRotaryAngleRetracted;
+    return kRotaryAngleRetracted;
   }
 
   /****************************************************************************
@@ -581,7 +588,7 @@ public class Intake extends SubsystemBase
    */
   public double getIntakeHandoff( )
   {
-    return INConsts.kRotaryAngleHandoff;
+    return kRotaryAngleHandoff;
   }
 
   /****************************************************************************
@@ -592,7 +599,7 @@ public class Intake extends SubsystemBase
    */
   public double getIntakeDeployed( )
   {
-    return INConsts.kRotaryAngleDeployed;
+    return kRotaryAngleDeployed;
   }
 
   /****************************************************************************

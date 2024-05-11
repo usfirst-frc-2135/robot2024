@@ -105,13 +105,13 @@ public class Feeder extends SubsystemBase
       m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kBlue)));
 
   // Roller variables
-  private boolean                   m_rollerValid;      // Health indicator for motor 
+  private boolean                   m_rollerValid;        // Health indicator for motor 
   private Debouncer                 m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
   private boolean                   m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
-  private boolean                   m_rotaryValid;      // Health indicator for motor 
-  private boolean                   m_canCoderValid;    // Health indicator for CANcoder 
+  private boolean                   m_rotaryValid;        // Health indicator for motor 
+  private boolean                   m_canCoderValid;      // Health indicator for CANcoder 
   private boolean                   m_debug               = true;
   private double                    m_currentDegrees      = 0.0; // Current angle in degrees
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees

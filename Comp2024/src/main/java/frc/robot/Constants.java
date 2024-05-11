@@ -207,17 +207,17 @@ public class Constants
     /** LED animation to be used */
     public enum ANIMATION
     {
-      COLORFLOW,    // Single color flow through string
-      FIRE,         // Fire pattern from one end of string
-      LARSON,       // Ping-pong pattern bouncing between string ends
-      RAINBOW,      // Fading rainbow colors
-      RGBFADE,      // Fading red, then green, then blue
-      SINGLEFADE,   // Fading with a single color
-      STROBE,       // Strobe flashing with a single color
-      TWINKLE,      // Twinkles leds on
-      TWINKLEOFF,   // Twinkles leds off
-      CLEARALL,     // Clears animations
-      DASHBOARD     // Animation taken from the dashboard
+      COLORFLOW,  // Single color flow through string
+      FIRE,       // Fire pattern from one end of string
+      LARSON,     // Ping-pong pattern bouncing between string ends
+      RAINBOW,    // Fading rainbow colors
+      RGBFADE,    // Fading red, then green, then blue
+      SINGLEFADE, // Fading with a single color
+      STROBE,     // Strobe flashing with a single color
+      TWINKLE,    // Twinkles leds on
+      TWINKLEOFF, // Twinkles leds off
+      CLEARALL,   // Clears animations
+      DASHBOARD   // Animation taken from the dashboard
     }
   }
 

@@ -113,8 +113,8 @@ public class Intake extends SubsystemBase
   private boolean                   m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
-  private boolean                   m_rotaryValid;      // Health indicator for motor 
-  private boolean                   m_canCoderValid;          // Health indicator for CANcoder 
+  private boolean                   m_rotaryValid;        // Health indicator for motor 
+  private boolean                   m_canCoderValid;      // Health indicator for CANcoder 
   private boolean                   m_debug               = true;
   private double                    m_currentDegrees      = 0.0; // Current angle in degrees
   private double                    m_targetDegrees       = 0.0; // Target angle in degrees

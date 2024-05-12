@@ -37,7 +37,7 @@ import frc.robot.lib.phoenix.PhoenixUtil5;
 
 /****************************************************************************
  * 
- * LED subsystem class
+ * LED subsystem to control LED changes and provide command factory
  */
 public class LED extends SubsystemBase
 {

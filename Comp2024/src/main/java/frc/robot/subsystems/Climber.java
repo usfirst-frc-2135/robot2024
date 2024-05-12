@@ -160,7 +160,7 @@ public class Climber extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Constructor
+   * Climber subsystem to control the climber linear mechanisms and provide command factories
    */
   public Climber( )
   {

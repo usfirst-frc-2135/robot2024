@@ -36,7 +36,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 
 /****************************************************************************
  * 
- * Shooter subsystem class
+ * Shooter subsystem to control the shooter flywheel mechanisms and provide command factories
  */
 public class Shooter extends SubsystemBase
 {

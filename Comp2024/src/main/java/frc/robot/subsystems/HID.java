@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /****************************************************************************
  * 
- * HID subsystem class
+ * HID subsystem class to provide rumble command factory
  */
 public class HID extends SubsystemBase
 {

@@ -54,7 +54,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 
 /****************************************************************************
  * 
- * Feeder subsystem class
+ * Feeder subsystem to control the feeder roller and rotary mechanism and provide command factories
  */
 public class Feeder extends SubsystemBase
 {

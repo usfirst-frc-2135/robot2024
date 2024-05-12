@@ -54,7 +54,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 
 /****************************************************************************
  * 
- * Intake subsystem class
+ * Intake subsystem to control the intake roller and rotary mechanism and provide command factories
  */
 public class Intake extends SubsystemBase
 {

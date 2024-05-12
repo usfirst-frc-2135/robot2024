@@ -53,28 +53,27 @@ public class Climber extends SubsystemBase
 {
   // Constants
   private static final String kClimberTab          = "Climber";
-  private static final double kLigament2dOffset    = 0.0;    // Offset from mechanism root for climber ligament
-  private static final double kGearRatio           = 16.0;   // Gear reduction
-  private static final double kClimberLengthMeters = 0.5;
-  private static final double kCarriageMassKg      = 2.0;
-  private static final double kDrumDiameterInches  = 1.375;  // Drum diameter in inches
+  private static final double kGearRatio           = 16.0;    // Gear reduction
+  private static final double kClimberLengthMeters = 0.5;     // Simulation
+  private static final double kCarriageMassKg      = 2.0;     // Simulation
+  private static final double kDrumDiameterInches  = 1.375;   // Drum diameter in inches
   private static final double kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
   private static final double kRolloutRatio        = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
-  private static final double kCalibrateSpeedVolts = -1.0;   // Motor voltage during calibration
-  private static final double kCalibrateStallAmps  = 4.0;    // Motor amps during calibration stall
-  private static final double kManualSpeedVolts    = 3.0;    // Motor voltage during manual operation (joystick)
+  private static final double kCalibrateSpeedVolts = -1.0;    // Motor voltage during calibration
+  private static final double kCalibrateStallAmps  = 4.0;     // Motor amps during calibration stall
+  private static final double kManualSpeedVolts    = 3.0;     // Motor voltage during manual operation (joystick)
 
-  private static final double kToleranceInches     = 0.5;    // Climber PID tolerance in inches
-  private static final double kMMSafetyTimeout     = 2.0;    // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
-  private static final double kCalibrationTimeout  = 2.0;    // Max calibration time
+  private static final double kToleranceInches     = 0.5;     // Climber PID tolerance in inches
+  private static final double kMMMoveTimeout       = 2.0;     // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double kCalibrationTimeout  = 2.0;     // Max calibration time
 
   // Climber lengths - Motion Magic config parameters
-  public static final double  kLengthClimbed       = 0.0;    // By definition - Climber fully climbed
-  public static final double  kLengthFull          = 18.0;   // From Mech Design height needed to reach max chain
-  public static final double  kLengthChain         = 8.0;    // From Mech Design height needed to reach hanging chain
+  public static final double  kLengthClimbed       = 0.0;     // By definition - Climber fully climbed
+  public static final double  kLengthFull          = 18.0;    // From Mech Design height needed to reach max chain
+  public static final double  kLengthChain         = 8.0;     // From Mech Design height needed to reach hanging chain
 
-  public static final double  kLengthMin           = 0.0;    // Climber minimum allowable length
-  public static final double  kLengthMax           = 21.0;   // Climber maximum allowable length (2" beyond high length)
+  public static final double  kLengthMin           = 0.0;     // Climber minimum allowable length
+  public static final double  kLengthMax           = 21.0;    // Climber maximum allowable length (2" beyond high length)
 
   /** Climber manual move parameters */
   private enum ClimberMode
@@ -85,10 +84,11 @@ public class Climber extends SubsystemBase
     DOWN    // Climber move downward
   }
 
-  // Device and simulation objects
+  // Device objects
   private final TalonFX             m_leftMotor          = new TalonFX(Ports.kCANID_ClimberL);
   private final TalonFX             m_rightMotor         = new TalonFX(Ports.kCANID_ClimberR);
 
+  // Simulation objects
   private final TalonFXSimState     m_climberSim         = m_leftMotor.getSimState( );
   private final ElevatorSim         m_elevSim            = new ElevatorSim(DCMotor.getFalcon500(1), kGearRatio, kCarriageMassKg,
       kDrumRadiusMeters, -kLengthMax, kLengthMax, false, 0.0);
@@ -96,8 +96,8 @@ public class Climber extends SubsystemBase
   // Mechanism2d
   private final Mechanism2d         m_climberMech        = new Mechanism2d(1.0, 1.0);
   private final MechanismRoot2d     m_mechRoot           = m_climberMech.getRoot("Linear", 0.5, 0.5);
-  private final MechanismLigament2d m_mechLigament       = m_mechRoot
-      .append(new MechanismLigament2d("climber", kClimberLengthMeters, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
+  private final MechanismLigament2d m_mechLigament       =
+      m_mechRoot.append(new MechanismLigament2d("climber", kClimberLengthMeters, 0.0, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_debug              = true;
@@ -119,11 +119,11 @@ public class Climber extends SubsystemBase
   private int                       m_hardStopCounter    = 0;
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts     = new MotionMagicVoltage(0).withSlot(0);
-  private Debouncer                 m_withinTolerance    = new Debouncer(0.060, DebounceType.kRising);
-  private Timer                     m_safetyTimer        = new Timer( ); // Safety timer for movements
+  private MotionMagicVoltage        m_mmRequestVolts     = new MotionMagicVoltage(0).withSlot(0);
+  private Debouncer                 m_mmWithinTolerance  = new Debouncer(0.060, DebounceType.kRising);
+  private Timer                     m_mmMoveTimer        = new Timer( ); // Safety timer for movements
   private double                    m_totalArbFeedForward;  // Arbitrary feedforward added to counteract gravity
-  private boolean                   m_moveIsFinished;       // Movement has completed (within tolerance)
+  private boolean                   m_mmMoveIsFinished;     // Movement has completed (within tolerance)
 
   private StatusSignal<Double>      m_leftPosition       = m_leftMotor.getRotorPosition( );
   private StatusSignal<Double>      m_leftCLoopError     = m_leftMotor.getClosedLoopError( );
@@ -359,7 +359,7 @@ public class Climber extends SubsystemBase
    */
   private void moveToPositionInit(double newLength, boolean holdPosition)
   {
-    m_safetyTimer.restart( );
+    m_mmMoveTimer.restart( );
     m_hardStopCounter = 0;
 
     if (!(m_leftCalibrated && m_rightCalibrated))
@@ -381,8 +381,8 @@ public class Climber extends SubsystemBase
       if (isMoveValid(newLength))
       {
         m_targetInches = newLength;
-        m_moveIsFinished = false;
-        m_withinTolerance.calculate(false); // Reset the debounce filter
+        m_mmMoveIsFinished = false;
+        m_mmWithinTolerance.calculate(false); // Reset the debounce filter
 
         setMMPosition(m_targetInches);
 
@@ -396,7 +396,7 @@ public class Climber extends SubsystemBase
     }
     else
     {
-      m_moveIsFinished = true;
+      m_mmMoveIsFinished = true;
       DataLogManager.log(String.format("%s: MM Position already achieved - target %s inches", getSubsystem( ), m_targetInches));
     }
   }
@@ -418,25 +418,25 @@ public class Climber extends SubsystemBase
    */
   private boolean moveToPositionIsFinished(boolean hold)
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
+    boolean timedOut = m_mmMoveTimer.hasElapsed(kMMMoveTimeout);
     double error = m_targetInches - m_leftCurInches;
     boolean hittingHardStop = (m_targetInches <= 0.0) && (m_leftCurInches <= 1.0) && (m_hardStopCounter++ >= 10);
 
     if (hold)
       return false;
 
-    if (m_withinTolerance.calculate(Math.abs(error) < kToleranceInches) || timedOut || hittingHardStop)
+    if (m_mmWithinTolerance.calculate(Math.abs(error) < kToleranceInches) || timedOut || hittingHardStop)
     {
       if (hittingHardStop)
         DataLogManager.log(String.format("%s - HITTINGHARDSTOP: %s", getSubsystem( ), hittingHardStop));
-      if (!m_moveIsFinished)
+      if (!m_mmMoveIsFinished)
         DataLogManager.log(String.format("%s: MM Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f sec %s",
-            getSubsystem( ), m_leftCurInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
+            getSubsystem( ), m_leftCurInches, error, m_mmMoveTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
-      m_moveIsFinished = true;
+      m_mmMoveIsFinished = true;
     }
 
-    return m_moveIsFinished;
+    return m_mmMoveIsFinished;
   }
 
   /****************************************************************************
@@ -445,7 +445,7 @@ public class Climber extends SubsystemBase
    */
   private void moveToPositionEnd( )
   {
-    m_safetyTimer.stop( );
+    m_mmMoveTimer.stop( );
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -555,9 +555,9 @@ public class Climber extends SubsystemBase
     if (m_climberValid)
     {
       // y = mx + b, where 0 degrees is 0.0 climber and 90 degrees is 1/4 winch turn (the climber constant)
-      m_leftMotor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
+      m_leftMotor.setControl(m_mmRequestVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
           .withFeedForward(m_totalArbFeedForward));
-      m_rightMotor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
+      m_rightMotor.setControl(m_mmRequestVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, kRolloutRatio))
           .withFeedForward(m_totalArbFeedForward));
     }
   }

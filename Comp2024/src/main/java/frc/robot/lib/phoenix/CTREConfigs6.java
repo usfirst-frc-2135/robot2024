@@ -10,8 +10,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.INConsts;
 import frc.robot.Robot;
 
 /****************************************************************************

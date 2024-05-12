@@ -46,7 +46,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.Ports;
-import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs5;
 import frc.robot.lib.phoenix.CTREConfigs6;
@@ -62,16 +61,15 @@ public class Feeder extends SubsystemBase
 
   // Constants
   private static final String  kFeederTab          = "Feeder";
-  private static final boolean kRollerMotorInvert  = true;     // Motor direction for positive input
+  private static final boolean kRollerMotorInvert  = true;      // Motor direction for positive input
 
   private static final double  kRollerSpeedScore   = -0.5;
   private static final double  kRollerSpeedHandoff = -0.37;
 
-  private static final double  kLigament2dOffset   = 90.0;      // Offset from mechanism root for ligament
   private static final double  kRotaryGearRatio    = 27.0;
-  private static final double  kRotaryLengthMeters = 0.5;
-  private static final double  kRotaryWeightKg     = 4.0;
-  private static final double  kRotaryManualVolts  = 3.5;      // Motor voltage during manual operation (joystick)
+  private static final double  kRotaryLengthMeters = 0.5;       // Simulation
+  private static final double  kRotaryWeightKg     = 4.0;       // Simulation
+  private static final double  kRotaryManualVolts  = 3.5;       // Motor voltage during manual operation (joystick)
 
   /** Rotary manual move parameters */
   private enum RotaryMode
@@ -84,7 +82,7 @@ public class Feeder extends SubsystemBase
 
   // Rotary constants
   private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
-  private static final double       kMMSafetyTimeout      = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double       kMMMoveTimeout        = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: tune these angles!
   public static final double        kRotaryAngleAmp       = -33.0;
@@ -94,12 +92,13 @@ public class Feeder extends SubsystemBase
   public static final double        kRotaryAngleMin       = -61.89;
   public static final double        kRotaryAngleMax       = 90.0;
 
-  // Device and simulation objects
+  // Device objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
   private static final TalonFX      m_rotaryMotor         = new TalonFX(Ports.kCANID_FeederRotary);
   private static final CANcoder     m_CANcoder            = new CANcoder(Ports.kCANID_FeederCANcoder);
   private static final DigitalInput m_noteInFeeder        = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
+  // Simulation objects
   private final TalonFXSimState     m_rotarySim           = m_rotaryMotor.getSimState( );
   private final CANcoderSimState    m_CANcoderSim         = m_CANcoder.getSimState( );
   private final SingleJointedArmSim m_armSim              = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
@@ -109,7 +108,7 @@ public class Feeder extends SubsystemBase
   private final Mechanism2d         m_rotaryMech          = new Mechanism2d(1.0, 1.0);
   private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
   private final MechanismLigament2d m_mechLigament        =
-      m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kBlue)));
+      m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, 0.0, 6, new Color8Bit(Color.kBlue)));
 
   // Roller variables
   private boolean                   m_rollerValid;        // Health indicator for motor 
@@ -129,10 +128,10 @@ public class Feeder extends SubsystemBase
   private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_requestMMVolts      = new MotionMagicVoltage(0).withSlot(0);
-  private Debouncer                 m_withinTolerance     = new Debouncer(0.060, DebounceType.kRising);
-  private Timer                     m_safetyTimer         = new Timer( ); // Safety timer for movements
-  private boolean                   m_moveIsFinished;     // Movement has completed (within tolerance)
+  private MotionMagicVoltage        m_mmRequestVolts      = new MotionMagicVoltage(0).withSlot(0);
+  private Debouncer                 m_mmWithinTolerance   = new Debouncer(0.060, DebounceType.kRising);
+  private Timer                     m_mmMoveTimer         = new Timer( ); // Safety timer for movements
+  private boolean                   m_mmMoveIsFinished;   // Movement has completed (within tolerance)
 
   // Status signals
   private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
@@ -266,7 +265,7 @@ public class Feeder extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
+    m_mechLigament.setAngle(m_currentDegrees);
   }
 
   /****************************************************************************
@@ -380,7 +379,7 @@ public class Feeder extends SubsystemBase
   public void moveToPositionInit(FDRollerMode mode, double newAngle, boolean holdPosition)
   {
     setRollerMode(mode);
-    m_safetyTimer.restart( );
+    m_mmMoveTimer.restart( );
 
     if (holdPosition)
       newAngle = getFeederPosition( );
@@ -392,11 +391,11 @@ public class Feeder extends SubsystemBase
       if (isMoveValid(newAngle))
       {
         m_targetDegrees = newAngle;
-        m_moveIsFinished = false;
-        m_withinTolerance.calculate(false); // Reset the debounce filter
+        m_mmMoveIsFinished = false;
+        m_mmWithinTolerance.calculate(false); // Reset the debounce filter
 
         double targetRotations = Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio);
-        m_rotaryMotor.setControl(m_requestMMVolts.withPosition(targetRotations));
+        m_rotaryMotor.setControl(m_mmRequestVolts.withPosition(targetRotations));
         DataLogManager
             .log(String.format("%s: MM Position move: %.1f -> %.1f degrees (%.3f -> %.3f rot)", getSubsystem( ), m_currentDegrees,
                 m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio), targetRotations));
@@ -407,7 +406,7 @@ public class Feeder extends SubsystemBase
     }
     else
     {
-      m_moveIsFinished = true;
+      m_mmMoveIsFinished = true;
       DataLogManager.log(String.format("%s: MM Position already achieved -target %s degrees", getSubsystem( ), m_targetDegrees));
     }
   }
@@ -419,7 +418,7 @@ public class Feeder extends SubsystemBase
   public void moveToPositionExecute( )
   {
     m_rotaryMotor
-        .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
+        .setControl(m_mmRequestVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
   }
 
   /****************************************************************************
@@ -430,22 +429,22 @@ public class Feeder extends SubsystemBase
    */
   public boolean moveToPositionIsFinished(boolean hold)
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(kMMSafetyTimeout);
+    boolean timedOut = m_mmMoveTimer.hasElapsed(kMMMoveTimeout);
     double error = m_targetDegrees - m_currentDegrees;
 
     if (hold)
       return false;
 
-    if (m_withinTolerance.calculate(Math.abs(error) < kToleranceDegrees) || timedOut)
+    if (m_mmWithinTolerance.calculate(Math.abs(error) < kToleranceDegrees) || timedOut)
     {
-      if (!m_moveIsFinished)
+      if (!m_mmMoveIsFinished)
         DataLogManager.log(String.format("%s: MM Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f sec %s",
-            getSubsystem( ), m_currentDegrees, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
+            getSubsystem( ), m_currentDegrees, error, m_mmMoveTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
 
-      m_moveIsFinished = true;
+      m_mmMoveIsFinished = true;
     }
 
-    return m_moveIsFinished;
+    return m_mmMoveIsFinished;
   }
 
   /****************************************************************************
@@ -454,7 +453,7 @@ public class Feeder extends SubsystemBase
    */
   public void moveToPositionEnd( )
   {
-    m_safetyTimer.stop( );
+    m_mmMoveTimer.stop( );
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -527,9 +526,7 @@ public class Feeder extends SubsystemBase
    */
   private double getCANcoderRotations( )
   {
-    double ccRotations = (m_canCoderValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
-    ccRotations -= (Robot.isReal( )) ? 0.0 : 0.0; // 0.359130859;
-    return ccRotations;
+    return (m_canCoderValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
   }
 
   /****************************************************************************

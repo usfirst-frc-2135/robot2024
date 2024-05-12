@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
-import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
 import frc.robot.lib.phoenix.PhoenixUtil6;
@@ -43,10 +42,12 @@ public class Shooter extends SubsystemBase
 {
   // Constants
   private static final String kShooterTab        = "Shooter";
-  private static final double kFlywheelGearRatio = (18.0 / 18.0);
 
+  private static final double kMOI               = 0.001;     // Simulation - Moment of Inertia
   private static final double kFlywheelScoreRPM  = 3000.0;    // RPM to score
   private static final double kToleranceRPM      = 100.0;     // Tolerance band around target RPM
+
+  private static final double kFlywheelGearRatio = (18.0 / 18.0);
 
   /** Shooter (speed) modes */
   private enum ShooterMode
@@ -56,14 +57,15 @@ public class Shooter extends SubsystemBase
     SCORE,      // Shooter ramped to an initial speed before shooting
   }
 
-  // Devices and simulation objects
+  // Devices  objects
   private final TalonFX         m_lowerMotor            = new TalonFX(Ports.kCANID_ShooterLower);
   private final TalonFX         m_upperMotor            = new TalonFX(Ports.kCANID_ShooterUpper);
 
+  // Simulation objects
   private final TalonFXSimState m_lowerMotorSim         = new TalonFXSimState(m_lowerMotor);
   private final TalonFXSimState m_upperMotorSim         = new TalonFXSimState(m_upperMotor);
-  private final FlywheelSim     m_lowerFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
-  private final FlywheelSim     m_upperFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, 0.001);
+  private final FlywheelSim     m_lowerFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
+  private final FlywheelSim     m_upperFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
 
   // Declare module variables
   private boolean               m_shooterValid;
@@ -127,7 +129,7 @@ public class Shooter extends SubsystemBase
     m_upperValidEntry.setBoolean(upperValid);
     m_shooterValid = lowerValid && upperValid;
 
-    m_upperMotor.setControl(new Follower(m_lowerMotor.getDeviceID( ), (Robot.isComp( )) ? false : true));
+    m_upperMotor.setControl(new Follower(m_lowerMotor.getDeviceID( ), false));
 
     m_lowerVelocity.setUpdateFrequency(50);
     m_upperVelocity.setUpdateFrequency(50);

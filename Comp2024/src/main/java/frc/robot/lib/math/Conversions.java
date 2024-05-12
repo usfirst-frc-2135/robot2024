@@ -5,7 +5,7 @@ package frc.robot.lib.math;
 
 /****************************************************************************
  * 
- * Conversion class - rotations to degrees and through gearboxes
+ * Conversion class - gearbox calculations
  */
 public class Conversions
 {

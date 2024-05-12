@@ -11,7 +11,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LED;
 
 /**
- * Command to acquire a note from floor
+ * Auto command that just leaves the starting zone
  */
 public class AutoLeave extends SequentialCommandGroup
 {

@@ -13,7 +13,7 @@ import frc.robot.subsystems.Feeder;
 public class PrepareToClimb extends SequentialCommandGroup
 {
   /**
-   * Group command to prepare for a climb
+   * Group command to prepare robot for a climb
    * 
    * @param climber
    *          climber subsystem

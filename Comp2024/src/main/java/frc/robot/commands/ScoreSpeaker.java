@@ -15,7 +15,7 @@ import frc.robot.subsystems.Shooter;
 public class ScoreSpeaker extends SequentialCommandGroup
 {
   /**
-   * Group command to fire a note to speaker
+   * Group command to fire a note into speaker
    * 
    * @param shooter
    *          shooter subsystem

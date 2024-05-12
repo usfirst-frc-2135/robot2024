@@ -14,7 +14,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
 
 /**
- * Command to acquire a note from floor
+ * Auto command that shoots preloaded note and steals notes from centerline
  */
 public class AutoPreloadSteal extends SequentialCommandGroup
 {

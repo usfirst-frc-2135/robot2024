@@ -43,13 +43,13 @@ public class ScoreSpeaker extends SequentialCommandGroup
         new LogCommand(getName(), "Feed note from intake"),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.SHOOT, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.SHOOT, intake::getCurrentPosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakePosition)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)
 
         // shooter.getShooterStoppedCommand(), // Don't turn off
 

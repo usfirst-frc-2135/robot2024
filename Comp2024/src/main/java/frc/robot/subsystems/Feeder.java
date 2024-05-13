@@ -60,7 +60,7 @@ public class Feeder extends SubsystemBase
 {
 
   // Constants
-  private static final String  kFeederTab          = "Feeder";
+  private static final String  kSubsystemName      = "Feeder";
   private static final boolean kRollerMotorInvert  = true;      // Motor direction for positive input
 
   private static final double  kRollerSpeedScore   = -0.5;
@@ -74,10 +74,10 @@ public class Feeder extends SubsystemBase
   /** Rotary manual move parameters */
   private enum RotaryMode
   {
-    INIT,    // Initialize feeder
-    INBOARD, // Feeder Rotary moving into the feeder
-    STOPPED, // Feeder Rotary stop and hold position
-    OUTBOARD // Feeder Rotary moving out of the feeder
+    INIT,    // Initialize rotary
+    INBOARD, // Rotary moving into the robot
+    STOPPED, // Rotary stop and hold position
+    OUTBOARD // Rotary moving out of the robot
   }
 
   // Rotary constants
@@ -108,7 +108,7 @@ public class Feeder extends SubsystemBase
   private final Mechanism2d         m_rotaryMech          = new Mechanism2d(1.0, 1.0);
   private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
   private final MechanismLigament2d m_mechLigament        =
-      m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, 0.0, 6, new Color8Bit(Color.kBlue)));
+      m_mechRoot.append(new MechanismLigament2d(kSubsystemName, 0.5, 0.0, 6, new Color8Bit(Color.kPurple)));
 
   // Declare module variables
 
@@ -143,16 +143,16 @@ public class Feeder extends SubsystemBase
   private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
 
   // Shuffleboard objects
-  ShuffleboardTab                   m_feederTab           = Shuffleboard.getTab(kFeederTab);
+  ShuffleboardTab                   m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
   ShuffleboardLayout                m_rollerList          =
-      m_feederTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
+      m_subsystemTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   GenericEntry                      m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
   GenericEntry                      m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
   GenericEntry                      m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
   GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_rotaryList          =
-      m_feederTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
   GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
   GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
   GenericEntry                      m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
@@ -160,12 +160,12 @@ public class Feeder extends SubsystemBase
   GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_statusList          =
-      m_feederTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
   GenericEntry                      m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
   GenericEntry                      m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
   GenericEntry                      m_currentDegreesEntry = m_statusList.add("currentDegrees", 0.0).getEntry( );
   GenericEntry                      m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
-  GenericEntry                      m_noteInFeederEntry   = m_statusList.add("noteInFeeder", false).getEntry( );
+  GenericEntry                      m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -173,21 +173,22 @@ public class Feeder extends SubsystemBase
    */
   public Feeder( )
   {
-    setName("Feeder");
-    setSubsystem("Feeder");
+    setName(kSubsystemName);
+    setSubsystem(kSubsystemName);
 
     // Roller motor init
-    m_rollerValid =
-        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Feeder Roller", CTREConfigs5.feederRollerConfig( ));
+    m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, kSubsystemName + "Roller",
+        CTREConfigs5.feederRollerConfig( ));
     m_rollerMotor.setInverted(kRollerMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
     m_rollValidEntry.setBoolean(m_rollerValid);
 
     // Rotary motor and CANcoder init
-    m_rotaryValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Feeder Rotary",
-        CTREConfigs6.feederRotaryFXConfig(Units.degreesToRotations(kRotaryAngleMin), Units.degreesToRotations(kRotaryAngleMax)));
-    m_canCoderValid =
-        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Feeder Rotary", CTREConfigs6.feederRotaryCancoderConfig( ));
+    m_rotaryValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, kSubsystemName + "Rotary",
+        CTREConfigs6.feederRotaryFXConfig(Units.degreesToRotations(kRotaryAngleMin), Units.degreesToRotations(kRotaryAngleMax),
+            Ports.kCANID_FeederCANcoder, kRotaryGearRatio));
+    m_canCoderValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, kSubsystemName + "Rotary",
+        CTREConfigs6.feederRotaryCancoderConfig( ));
     m_rotValidEntry.setBoolean(m_rotaryValid);
     m_ccValidEntry.setBoolean(m_canCoderValid);
 
@@ -231,7 +232,7 @@ public class Feeder extends SubsystemBase
     m_currentDegreesEntry.setDouble(m_currentDegrees);
     m_ccDegreesEntry.setDouble(m_ccDegrees);
     m_rotDegreesEntry.setDouble(m_currentDegrees);
-    m_noteInFeederEntry.setBoolean(m_noteDetected);
+    m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
 
     BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
@@ -267,7 +268,7 @@ public class Feeder extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setAngle(m_currentDegrees);
+    m_mechLigament.setAngle(-m_currentDegrees);
   }
 
   /****************************************************************************
@@ -277,15 +278,15 @@ public class Feeder extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    m_feederTab.add("FDRotaryMech", m_rotaryMech).withPosition(0, 3);
+    m_subsystemTab.add("FDRotaryMech", m_rotaryMech).withPosition(0, 3);
 
     // Shuffleboard layout
-    ShuffleboardLayout cmdList = m_feederTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
         .withProperties(Map.of("Label position", "HIDDEN"));
-    cmdList.add("FdRollStop", getMoveToPositionCommand(FDRollerMode.STOP, this::getFeederPosition));
-    cmdList.add("FdRollScore", getMoveToPositionCommand(FDRollerMode.SCORE, this::getFeederPosition));
-    cmdList.add("FdRollHandoff", getMoveToPositionCommand(FDRollerMode.HANDOFF, this::getFeederPosition));
-    cmdList.add("FdRollHold", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederPosition));
+    cmdList.add("FdRollStop", getMoveToPositionCommand(FDRollerMode.STOP, this::getCurrentPosition));
+    cmdList.add("FdRollScore", getMoveToPositionCommand(FDRollerMode.SCORE, this::getCurrentPosition));
+    cmdList.add("FdRollHandoff", getMoveToPositionCommand(FDRollerMode.HANDOFF, this::getCurrentPosition));
+    cmdList.add("FdRollHold", getMoveToPositionCommand(FDRollerMode.HOLD, this::getCurrentPosition));
 
     cmdList.add("FdRotAmp", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederAmp));
     cmdList.add("FdRotClimb", getMoveToPositionCommand(FDRollerMode.HOLD, this::getFeederClimb));
@@ -313,9 +314,9 @@ public class Feeder extends SubsystemBase
    */
   public void printFaults( )
   {
-    PhoenixUtil5.getInstance( ).talonSRXPrintFaults(m_rollerMotor, "FeederRoller");
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rotaryMotor, "FeederRotary");
-    PhoenixUtil6.getInstance( ).cancoderPrintFaults(m_CANcoder, "FeederCANcoder");
+    PhoenixUtil5.getInstance( ).talonSRXPrintFaults(m_rollerMotor, kSubsystemName + "Roller");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rotaryMotor, kSubsystemName + "Rotary");
+    PhoenixUtil6.getInstance( ).cancoderPrintFaults(m_CANcoder, kSubsystemName + "CANcoder");
 
     m_rollerMotor.clearStickyFaults( );
     m_rotaryMotor.clearStickyFaults( );
@@ -354,8 +355,8 @@ public class Feeder extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: Manual move mode %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getFeederPosition( ),
-          ((rangeLimited) ? " - RANGE LIMITED" : "")));
+      DataLogManager.log(String.format("%s: Manual move mode %s %.1f deg %s", getSubsystem( ), m_rotaryMode,
+          getCurrentPosition( ), ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
     m_targetDegrees = m_currentDegrees;
@@ -384,7 +385,7 @@ public class Feeder extends SubsystemBase
     m_mmMoveTimer.restart( );
 
     if (holdPosition)
-      newAngle = getFeederPosition( );
+      newAngle = getCurrentPosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))
@@ -553,7 +554,7 @@ public class Feeder extends SubsystemBase
    * 
    * @return current rotary angle
    */
-  public double getFeederPosition( )
+  public double getCurrentPosition( )
   {
     return m_currentDegrees;
   }
@@ -593,9 +594,9 @@ public class Feeder extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Return feeder note sensor state
+   * Return note sensor state
    * 
-   * @return true if note detected in feeder
+   * @return true if note detected
    */
   public boolean isNoteDetected( )
   {
@@ -620,7 +621,7 @@ public class Feeder extends SubsystemBase
         ( ) -> moveRotaryWithJoystick(axis),  // Lambda method to call
         this                                  // Subsystem required
     )                                         //
-        .withName("FeederMoveWithJoystick");
+        .withName(kSubsystemName + "MoveWithJoystick");
   }
 
   /****************************************************************************
@@ -658,7 +659,7 @@ public class Feeder extends SubsystemBase
    */
   public Command getMoveToPositionCommand(FDRollerMode mode, DoubleSupplier position)
   {
-    return getMMPositionCommand(mode, position, false).withName("FeederMMMoveToPosition");
+    return getMMPositionCommand(mode, position, false).withName(kSubsystemName + "MMMoveToPosition");
   }
 
   /****************************************************************************
@@ -673,7 +674,7 @@ public class Feeder extends SubsystemBase
    */
   public Command getHoldPositionCommand(FDRollerMode mode, DoubleSupplier position)
   {
-    return getMMPositionCommand(mode, position, true).withName("FeederMMHoldPosition");
+    return getMMPositionCommand(mode, position, true).withName(kSubsystemName + "MMHoldPosition");
   }
 
 }

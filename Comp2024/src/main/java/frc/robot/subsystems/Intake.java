@@ -59,7 +59,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Intake extends SubsystemBase
 {
   // Constants
-  private static final String  kIntakeTab            = "Intake";
+  private static final String  kSubsystemName        = "Intake";
   private static final boolean kRollerMotorInvert    = false;     // Motor direction for positive input
 
   private static final double  kRollerSpeedAcquire   = 0.5;
@@ -75,10 +75,10 @@ public class Intake extends SubsystemBase
   /** Rotary manual move parameters */
   private enum RotaryMode
   {
-    INIT,    // Initialize intake
-    INBOARD, // Intake Rotary moving into the robot
-    STOPPED, // Intake Rotary stop and hold position
-    OUTBOARD // Intake Rotary moving out of the robot
+    INIT,    // Initialize rotary
+    INBOARD, // Rotary moving into the robot
+    STOPPED, // Rotary stop and hold position
+    OUTBOARD // Rotary moving out of the robot
   }
 
   // Rotary constants
@@ -109,7 +109,7 @@ public class Intake extends SubsystemBase
   private final Mechanism2d         m_rotaryMech          = new Mechanism2d(1.0, 1.0);
   private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
   private final MechanismLigament2d m_mechLigament        =
-      m_mechRoot.append(new MechanismLigament2d("intake", 0.5, 0.0, 6, new Color8Bit(Color.kPurple)));
+      m_mechRoot.append(new MechanismLigament2d(kSubsystemName, 0.5, 0.0, 6, new Color8Bit(Color.kPurple)));
 
   // Declare module variables
 
@@ -144,16 +144,16 @@ public class Intake extends SubsystemBase
   private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
 
   // Shuffleboard objects
-  ShuffleboardTab                   m_intakeTab           = Shuffleboard.getTab(kIntakeTab);
+  ShuffleboardTab                   m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
   ShuffleboardLayout                m_rollerList          =
-      m_intakeTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
+      m_subsystemTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   GenericEntry                      m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
   GenericEntry                      m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
   GenericEntry                      m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
   GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_rotaryList          =
-      m_intakeTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
   GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
   GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
   GenericEntry                      m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
@@ -161,12 +161,12 @@ public class Intake extends SubsystemBase
   GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_statusList          =
-      m_intakeTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
   GenericEntry                      m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
   GenericEntry                      m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
   GenericEntry                      m_currentDegreesEntry = m_statusList.add("currentDegrees", 0.0).getEntry( );
   GenericEntry                      m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
-  GenericEntry                      m_noteInIntakeEntry   = m_statusList.add("noteInIntake", false).getEntry( );
+  GenericEntry                      m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -174,21 +174,22 @@ public class Intake extends SubsystemBase
    */
   public Intake( )
   {
-    setName("Intake");
-    setSubsystem("Intake");
+    setName(kSubsystemName);
+    setSubsystem(kSubsystemName);
 
     // Roller motor init
-    m_rollerValid =
-        PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, "Intake Roller", CTREConfigs5.intakeRollerConfig( ));
+    m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, kSubsystemName + "Roller",
+        CTREConfigs5.intakeRollerConfig( ));
     m_rollerMotor.setInverted(kRollerMotorInvert);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(m_rollerMotor, "setInverted");
     m_rollValidEntry.setBoolean(m_rollerValid);
 
     // Rotary motor and CANcoder init
-    m_rotaryValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, "Intake Rotary",
-        CTREConfigs6.intakeRotaryFXConfig(Units.degreesToRotations(kRotaryAngleMin), Units.degreesToRotations(kRotaryAngleMax)));
-    m_canCoderValid =
-        PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, "Intake Rotary", CTREConfigs6.intakeRotaryCancoderConfig( ));
+    m_rotaryValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rotaryMotor, kSubsystemName + "Rotary",
+        CTREConfigs6.intakeRotaryFXConfig(Units.degreesToRotations(kRotaryAngleMin), Units.degreesToRotations(kRotaryAngleMax),
+            Ports.kCANID_IntakeCANcoder, kRotaryGearRatio));
+    m_canCoderValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANcoder, kSubsystemName + "Rotary",
+        CTREConfigs6.intakeRotaryCancoderConfig( ));
     m_rotValidEntry.setBoolean(m_rotaryValid);
     m_ccValidEntry.setBoolean(m_canCoderValid);
 
@@ -202,7 +203,7 @@ public class Intake extends SubsystemBase
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANcoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
-    m_rotaryPosition.setUpdateFrequency(50);
+    // Status signals
     if (m_debug)
       BaseStatusSignal.setUpdateFrequencyForAll(20, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
     m_ccPosition.setUpdateFrequency(50);
@@ -232,11 +233,11 @@ public class Intake extends SubsystemBase
     m_currentDegreesEntry.setDouble(m_currentDegrees);
     m_ccDegreesEntry.setDouble(m_ccDegrees);
     m_rotDegreesEntry.setDouble(m_currentDegrees);
-    m_noteInIntakeEntry.setBoolean(m_noteDetected);
+    m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
 
     BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
-    m_rotCurErrorEntry.setDouble(m_rotaryCLoopError.getValue( ));
+    m_rotCLoopErrorEntry.setDouble(m_rotaryCLoopError.refresh( ).getValue( ));
     m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
     m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
   }
@@ -268,7 +269,7 @@ public class Intake extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setAngle(m_currentDegrees);
+    m_mechLigament.setAngle(-m_currentDegrees);
   }
 
   /****************************************************************************
@@ -278,16 +279,16 @@ public class Intake extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    m_intakeTab.add("INRotaryMech", m_rotaryMech).withPosition(0, 3);
+    m_subsystemTab.add("INRotaryMech", m_rotaryMech).withPosition(0, 3);
 
     // Shuffleboard layout
-    ShuffleboardLayout cmdList = m_intakeTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
         .withProperties(Map.of("Label position", "HIDDEN"));
-    cmdList.add("InRollStop", getMoveToPositionCommand(INRollerMode.STOP, this::getIntakePosition));
-    cmdList.add("InRollAcquire", getMoveToPositionCommand(INRollerMode.ACQUIRE, this::getIntakePosition));
-    cmdList.add("InRollExpel", getMoveToPositionCommand(INRollerMode.EXPEL, this::getIntakePosition));
-    cmdList.add("InRollShoot", getMoveToPositionCommand(INRollerMode.SHOOT, this::getIntakePosition));
-    cmdList.add("InRollHold", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakePosition));
+    cmdList.add("InRollStop", getMoveToPositionCommand(INRollerMode.STOP, this::getCurrentPosition));
+    cmdList.add("InRollAcquire", getMoveToPositionCommand(INRollerMode.ACQUIRE, this::getCurrentPosition));
+    cmdList.add("InRollExpel", getMoveToPositionCommand(INRollerMode.EXPEL, this::getCurrentPosition));
+    cmdList.add("InRollShoot", getMoveToPositionCommand(INRollerMode.SHOOT, this::getCurrentPosition));
+    cmdList.add("InRollHold", getMoveToPositionCommand(INRollerMode.HOLD, this::getCurrentPosition));
 
     cmdList.add("InRotDeploy", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakeDeployed));
     cmdList.add("InRotRetract", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakeRetracted));
@@ -315,9 +316,9 @@ public class Intake extends SubsystemBase
    */
   public void printFaults( )
   {
-    PhoenixUtil5.getInstance( ).talonSRXPrintFaults(m_rollerMotor, "IntakeRoller");
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rotaryMotor, "IntakeRotary");
-    PhoenixUtil6.getInstance( ).cancoderPrintFaults(m_CANcoder, "IntakeCANcoder");
+    PhoenixUtil5.getInstance( ).talonSRXPrintFaults(m_rollerMotor, kSubsystemName + "Roller");
+    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rotaryMotor, kSubsystemName + "Rotary");
+    PhoenixUtil6.getInstance( ).cancoderPrintFaults(m_CANcoder, kSubsystemName + "CANcoder");
 
     m_rollerMotor.clearStickyFaults( );
     m_rotaryMotor.clearStickyFaults( );
@@ -356,8 +357,8 @@ public class Intake extends SubsystemBase
     if (newMode != m_rotaryMode)
     {
       m_rotaryMode = newMode;
-      DataLogManager.log(String.format("%s: Manual move mode %s %.1f deg %s", getSubsystem( ), m_rotaryMode, getIntakePosition( ),
-          ((rangeLimited) ? " - RANGE LIMITED" : "")));
+      DataLogManager.log(String.format("%s: Manual move mode %s %.1f deg %s", getSubsystem( ), m_rotaryMode,
+          getCurrentPosition( ), ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
     m_targetDegrees = m_currentDegrees;
@@ -386,7 +387,7 @@ public class Intake extends SubsystemBase
     m_mmMoveTimer.restart( );
 
     if (holdPosition)
-      newAngle = getIntakePosition( );
+      newAngle = getCurrentPosition( );
 
     // Decide if a new position request
     if (holdPosition || newAngle != m_targetDegrees || !MathUtil.isNear(newAngle, m_currentDegrees, kToleranceDegrees))
@@ -561,7 +562,7 @@ public class Intake extends SubsystemBase
    * 
    * @return current rotary angle
    */
-  public double getIntakePosition( )
+  public double getCurrentPosition( )
   {
     return m_currentDegrees;
   }
@@ -601,9 +602,9 @@ public class Intake extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Return intake note sensor state
+   * Return note sensor state
    * 
-   * @return true if note detected in intake
+   * @return true if note detected
    */
   public boolean isNoteDetected( )
   {
@@ -628,7 +629,7 @@ public class Intake extends SubsystemBase
         ( ) -> moveRotaryWithJoystick(axis),  // Lambda method to call
         this                                  // Subsystem required
     )                                         //
-        .withName("IntakeMoveWithJoystick");
+        .withName(kSubsystemName + "MoveWithJoystick");
   }
 
   /****************************************************************************
@@ -666,7 +667,7 @@ public class Intake extends SubsystemBase
    */
   public Command getMoveToPositionCommand(INRollerMode mode, DoubleSupplier position)
   {
-    return getMMPositionCommand(mode, position, false).withName("IntakeMMMoveToPosition");
+    return getMMPositionCommand(mode, position, false).withName(kSubsystemName + "MMMoveToPosition");
   }
 
   /****************************************************************************
@@ -681,7 +682,7 @@ public class Intake extends SubsystemBase
    */
   public Command getHoldPositionCommand(INRollerMode mode, DoubleSupplier position)
   {
-    return getMMPositionCommand(mode, position, true).withName("IntakeMMHoldPosition");
+    return getMMPositionCommand(mode, position, true).withName(kSubsystemName + "MMHoldPosition");
   }
 
 }

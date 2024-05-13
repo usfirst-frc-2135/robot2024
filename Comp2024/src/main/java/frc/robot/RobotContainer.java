@@ -374,8 +374,8 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
-    m_intake.setDefaultCommand(m_intake.getHoldPositionCommand(INRollerMode.HOLD, m_intake::getIntakePosition));
-    m_feeder.setDefaultCommand(m_feeder.getHoldPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederPosition));
+    m_intake.setDefaultCommand(m_intake.getHoldPositionCommand(INRollerMode.HOLD, m_intake::getCurrentPosition));
+    m_feeder.setDefaultCommand(m_feeder.getHoldPositionCommand(FDRollerMode.HOLD, m_feeder::getCurrentPosition));
     m_climber.setDefaultCommand(m_climber.getHoldPositionCommand(m_climber::getClimberPosition));
 
     //Default command - manual mode

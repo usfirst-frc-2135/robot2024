@@ -38,13 +38,13 @@ public class HandoffToFeeder extends SequentialCommandGroup
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeHandoff),
 
         new LogCommand(getName(), "Transfer Note"),
-        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HOLD, feeder::getFeederPosition),
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.HANDOFF, intake::getIntakePosition),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HOLD, feeder::getCurrentPosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.HANDOFF, intake::getCurrentPosition),
         
         new WaitCommand(0.1),
 
         new LogCommand(getName(), "Stop rollers"),
-        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederPosition),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getCurrentPosition),
 
         new WaitCommand(0.2),
 

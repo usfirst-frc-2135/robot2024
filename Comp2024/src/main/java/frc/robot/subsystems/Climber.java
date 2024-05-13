@@ -52,7 +52,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Climber extends SubsystemBase
 {
   // Constants
-  private static final String kClimberTab          = "Climber";
+  private static final String kSubsystemName       = "Climber";
   private static final double kGearRatio           = 16.0;    // Gear reduction
   private static final double kClimberLengthMeters = 0.5;     // Simulation
   private static final double kCarriageMassKg      = 2.0;     // Simulation
@@ -97,7 +97,7 @@ public class Climber extends SubsystemBase
   private final Mechanism2d         m_climberMech        = new Mechanism2d(1.0, 1.0);
   private final MechanismRoot2d     m_mechRoot           = m_climberMech.getRoot("Linear", 0.5, 0.5);
   private final MechanismLigament2d m_mechLigament       =
-      m_mechRoot.append(new MechanismLigament2d("climber", kClimberLengthMeters, 0.0, 6, new Color8Bit(Color.kRed)));
+      m_mechRoot.append(new MechanismLigament2d(kSubsystemName, kClimberLengthMeters, 0.0, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_debug              = true;
@@ -135,9 +135,9 @@ public class Climber extends SubsystemBase
   private StatusSignal<Double>      m_rightStatorCur     = m_rightMotor.getStatorCurrent( );
 
   // Shuffleboard objects
-  ShuffleboardTab                   m_climberTab         = Shuffleboard.getTab(kClimberTab);
+  ShuffleboardTab                   m_subsystemTab       = Shuffleboard.getTab(kSubsystemName);
   ShuffleboardLayout                m_leftList           =
-      m_climberTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 4);
   GenericEntry                      m_leftValidEntry     = m_leftList.add("leftValid", false).getEntry( );
   GenericEntry                      m_leftInchesEntry    = m_leftList.add("leftInches", 0.0).getEntry( );
   GenericEntry                      m_leftCurErrorEntry  = m_leftList.add("leftCurError", 0.0).getEntry( );
@@ -145,7 +145,7 @@ public class Climber extends SubsystemBase
   GenericEntry                      m_leftStatCurEntry   = m_leftList.add("leftStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_rightList          =
-      m_climberTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
   GenericEntry                      m_rightValidEntry    = m_rightList.add("righttValid", false).getEntry( );
   GenericEntry                      m_rightInchesEntry   = m_rightList.add("rightInches", 0.0).getEntry( );
   GenericEntry                      m_rightCurErrorEntry = m_rightList.add("rightCurError", 0.0).getEntry( );
@@ -153,24 +153,24 @@ public class Climber extends SubsystemBase
   GenericEntry                      m_rightStatCurEntry  = m_rightList.add("rightStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_statusList         =
-      m_climberTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
+      m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
   GenericEntry                      m_calibratedEntry    = m_statusList.add("calibrated", false).getEntry( );
   GenericEntry                      m_currentInchesEntry = m_statusList.add("currentInches", 0.0).getEntry( );
   GenericEntry                      m_targetInchesEntry  = m_statusList.add("targetInches", 0.0).getEntry( );
 
   /****************************************************************************
    * 
-   * Climber subsystem to control the climber linear mechanisms and provide command factories
+   * Constructor
    */
   public Climber( )
   {
-    setName("Climber");
-    setSubsystem("Climber");
+    setName(kSubsystemName);
+    setSubsystem(kSubsystemName);
 
     // Initialize climber motors
-    boolean leftValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_leftMotor, "Climber Left",
+    boolean leftValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_leftMotor, kSubsystemName + "Left",
         CTREConfigs6.climberFXConfig(Units.degreesToRotations(kLengthMin), Units.degreesToRotations(kLengthMax)));
-    boolean rightValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rightMotor, "Climber Right",
+    boolean rightValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_rightMotor, kSubsystemName + "Right",
         CTREConfigs6.climberFXConfig(Units.degreesToRotations(kLengthMin), Units.degreesToRotations(kLengthMax)));
     m_climberValid = leftValid && rightValid;
     m_leftValidEntry.setBoolean(leftValid);
@@ -264,9 +264,9 @@ public class Climber extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    m_climberTab.add("ClimberMech", m_climberMech).withPosition(0, 3);
+    m_subsystemTab.add(kSubsystemName + "Mech", m_climberMech).withPosition(0, 3);
 
-    ShuffleboardLayout cmdList = m_climberTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
         .withProperties(Map.of("Label position", "HIDDEN"));
     cmdList.add("ClRunExtended", getMoveToPositionCommand(this::getClimberFullyExtended));
     cmdList.add("ClRunChain", getMoveToPositionCommand(this::getClimberChainLevel));
@@ -304,7 +304,7 @@ public class Climber extends SubsystemBase
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
+  ///////////////////////// MANUAL MOVEMENT //////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
@@ -345,7 +345,7 @@ public class Climber extends SubsystemBase
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// MOTION MAGIC //////////////////////////////////////
+  ///////////////////////// MOTION MAGIC /////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
@@ -449,7 +449,7 @@ public class Climber extends SubsystemBase
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////// CALIBRATION ///////////////////////////////////
+  ///////////////////////// CALIBRATION //////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
   /****************************************************************************
@@ -642,7 +642,7 @@ public class Climber extends SubsystemBase
         ( ) -> calibrateIsFinished( ),  // IsFinished method
         this                            // Subsytem required
     )                                   //
-        .withName("ClimberCalibrate");
+        .withName(kSubsystemName + "Calibrate");
   }
 
   /****************************************************************************
@@ -659,7 +659,7 @@ public class Climber extends SubsystemBase
         ( ) -> moveWithJoystick(axis),  // Lambda method to call
         this                            // Subsystem required
     )                                   //
-        .withName("ClimberMoveWithJoystick");
+        .withName(kSubsystemName + "MoveWithJoystick");
   }
 
   /****************************************************************************
@@ -693,7 +693,7 @@ public class Climber extends SubsystemBase
    */
   public Command getMoveToPositionCommand(DoubleSupplier position)
   {
-    return getMMPositionCommand(position, false).withName("ClimberMMMoveToPosition");
+    return getMMPositionCommand(position, false).withName(kSubsystemName + "MMMoveToPosition");
   }
 
   /****************************************************************************
@@ -706,6 +706,6 @@ public class Climber extends SubsystemBase
    */
   public Command getHoldPositionCommand(DoubleSupplier position)
   {
-    return getMMPositionCommand(position, true).withName("ClimberMMHoldPosition");
+    return getMMPositionCommand(position, true).withName(kSubsystemName + "MMHoldPosition");
   }
 }

@@ -72,7 +72,7 @@ public class AutoPreloadScore extends SequentialCommandGroup
         new ScoreSpeaker(shooter, intake, led),
         
         new LogCommand(getName(), "Turn off intake rollers"), 
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition),
 
         drivetrain.getPathCommand(ppPaths.get(3))
         // @formatter:on

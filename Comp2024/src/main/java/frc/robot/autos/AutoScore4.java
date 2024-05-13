@@ -66,7 +66,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Deploy intake before moving"),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.ACQUIRE, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup( 
@@ -105,7 +105,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Turn off intake rollers"), 
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakePosition)
         // @formatter:on
     );
   }

@@ -35,11 +35,11 @@ public class HandoffToFeeder extends SequentialCommandGroup
 
         new LogCommand(getName(), "Align Feeder and Intake"),
         feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HANDOFF, feeder::getFeederHandoff),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeHandoff),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeHandoff),
 
         new LogCommand(getName(), "Transfer Note"),
         feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.HOLD, feeder::getFeederPosition),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.HANDOFF, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.HANDOFF, intake::getIntakePosition),
         
         new WaitCommand(0.1),
 
@@ -49,7 +49,7 @@ public class HandoffToFeeder extends SequentialCommandGroup
         new WaitCommand(0.2),
 
         new LogCommand(getName(), "Ensure Intake releases Note"),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted),
         led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
         
         // @formatter:on

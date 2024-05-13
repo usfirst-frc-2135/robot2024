@@ -44,7 +44,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.Constants.Ports;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs5;
@@ -138,9 +138,9 @@ public class Intake extends SubsystemBase
 
   // Status signals
   private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
+  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
 
   // Shuffleboard objects
@@ -156,17 +156,17 @@ public class Intake extends SubsystemBase
       m_intakeTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
   GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
   GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  GenericEntry                      m_rotCurErrorEntry    = m_rotaryList.add("rotCurError", 0.0).getEntry( );
+  GenericEntry                      m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
   GenericEntry                      m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
   GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout                statusList            =
+  ShuffleboardLayout                m_statusList          =
       m_intakeTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
-  GenericEntry                      m_ccValidEntry        = statusList.add("ccValid", false).getEntry( );
-  GenericEntry                      m_ccDegreesEntry      = statusList.add("ccDegrees", 0.0).getEntry( );
-  GenericEntry                      m_currentDegreesEntry = statusList.add("currentDegrees", 0.0).getEntry( );
-  GenericEntry                      m_targetDegreesEntry  = statusList.add("targetDegrees", 0.0).getEntry( );
-  GenericEntry                      m_noteInIntakeEntry   = statusList.add("noteInIntake", false).getEntry( );
+  GenericEntry                      m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
+  GenericEntry                      m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
+  GenericEntry                      m_currentDegreesEntry = m_statusList.add("currentDegrees", 0.0).getEntry( );
+  GenericEntry                      m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
+  GenericEntry                      m_noteInIntakeEntry   = m_statusList.add("noteInIntake", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -283,15 +283,15 @@ public class Intake extends SubsystemBase
     // Shuffleboard layout
     ShuffleboardLayout cmdList = m_intakeTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
         .withProperties(Map.of("Label position", "HIDDEN"));
-    cmdList.add("InRollStop", getMoveToPositionCommand(RollerMode.STOP, this::getIntakePosition));
-    cmdList.add("InRollAcquire", getMoveToPositionCommand(RollerMode.ACQUIRE, this::getIntakePosition));
-    cmdList.add("InRollExpel", getMoveToPositionCommand(RollerMode.EXPEL, this::getIntakePosition));
-    cmdList.add("InRollShoot", getMoveToPositionCommand(RollerMode.SHOOT, this::getIntakePosition));
-    cmdList.add("InRollHold", getMoveToPositionCommand(RollerMode.HOLD, this::getIntakePosition));
+    cmdList.add("InRollStop", getMoveToPositionCommand(INRollerMode.STOP, this::getIntakePosition));
+    cmdList.add("InRollAcquire", getMoveToPositionCommand(INRollerMode.ACQUIRE, this::getIntakePosition));
+    cmdList.add("InRollExpel", getMoveToPositionCommand(INRollerMode.EXPEL, this::getIntakePosition));
+    cmdList.add("InRollShoot", getMoveToPositionCommand(INRollerMode.SHOOT, this::getIntakePosition));
+    cmdList.add("InRollHold", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakePosition));
 
-    cmdList.add("InRotDeploy", getMoveToPositionCommand(RollerMode.HOLD, this::getIntakeDeployed));
-    cmdList.add("InRotRetract", getMoveToPositionCommand(RollerMode.HOLD, this::getIntakeRetracted));
-    cmdList.add("InRotHandoff", getMoveToPositionCommand(RollerMode.HOLD, this::getIntakeHandoff));
+    cmdList.add("InRotDeploy", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakeDeployed));
+    cmdList.add("InRotRetract", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakeRetracted));
+    cmdList.add("InRotHandoff", getMoveToPositionCommand(INRollerMode.HOLD, this::getIntakeHandoff));
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -302,7 +302,7 @@ public class Intake extends SubsystemBase
    */
   public void initialize( )
   {
-    setRollerMode(RollerMode.STOP);
+    setRollerMode(INRollerMode.STOP);
     setRotaryStopped( );
 
     m_targetDegrees = m_currentDegrees;
@@ -380,7 +380,7 @@ public class Intake extends SubsystemBase
    * @param holdPosition
    *          hold previous position if true
    */
-  public void moveToPositionInit(RollerMode mode, double newAngle, boolean holdPosition)
+  public void moveToPositionInit(INRollerMode mode, double newAngle, boolean holdPosition)
   {
     setRollerMode(mode);
     m_mmMoveTimer.restart( );
@@ -471,11 +471,11 @@ public class Intake extends SubsystemBase
    * @param mode
    *          requested speed
    */
-  private void setRollerMode(RollerMode mode)
+  private void setRollerMode(INRollerMode mode)
   {
     double output = 0.0;
 
-    if (mode == RollerMode.HOLD)
+    if (mode == INRollerMode.HOLD)
     {
       DataLogManager.log(String.format("%s: Roller mode is unchanged - %s (%.3f)", getSubsystem( ), mode, m_rollerMotor.get( )));
     }
@@ -643,7 +643,7 @@ public class Intake extends SubsystemBase
    *          boolen to indicate whether the command ever finishes
    * @return continuous command that runs climber motors
    */
-  private Command getMMPositionCommand(RollerMode mode, DoubleSupplier position, boolean hold)
+  private Command getMMPositionCommand(INRollerMode mode, DoubleSupplier position, boolean hold)
   {
     return new FunctionalCommand(                                 // Command with all phases declared
         ( ) -> moveToPositionInit(mode, position.getAsDouble( ), hold), // Init method
@@ -664,7 +664,7 @@ public class Intake extends SubsystemBase
    *          double supplier that provides the target distance value
    * @return continuous command that runs climber motors
    */
-  public Command getMoveToPositionCommand(RollerMode mode, DoubleSupplier position)
+  public Command getMoveToPositionCommand(INRollerMode mode, DoubleSupplier position)
   {
     return getMMPositionCommand(mode, position, false).withName("IntakeMMMoveToPosition");
   }
@@ -679,7 +679,7 @@ public class Intake extends SubsystemBase
    *          double supplier that provides the target distance value
    * @return continuous command that runs climber motors
    */
-  public Command getHoldPositionCommand(RollerMode mode, DoubleSupplier position)
+  public Command getHoldPositionCommand(INRollerMode mode, DoubleSupplier position)
   {
     return getMMPositionCommand(mode, position, true).withName("IntakeMMHoldPosition");
   }

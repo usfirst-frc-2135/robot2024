@@ -95,7 +95,7 @@ public class Constants
   public static final class INConsts
   {
     /** Intake roller modes */
-    public enum RollerMode
+    public enum INRollerMode
     {
       STOP,    // Stop any spinning
       ACQUIRE, // Acquire a game piece

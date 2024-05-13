@@ -84,7 +84,7 @@ public class Feeder extends SubsystemBase
   private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
   private static final double       kMMMoveTimeout        = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
-  // Rotary angles - Motion Magic move parameters - TODO: tune these angles!
+  // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
   public static final double        kRotaryAngleAmp       = -33.0;
   public static final double        kRotaryAngleClimb     = 60.0;
   public static final double        kRotaryAngleHandoff   = 88.75;
@@ -109,6 +109,8 @@ public class Feeder extends SubsystemBase
   private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
   private final MechanismLigament2d m_mechLigament        =
       m_mechRoot.append(new MechanismLigament2d("feeder", 0.5, 0.0, 6, new Color8Bit(Color.kBlue)));
+
+  // Declare module variables
 
   // Roller variables
   private boolean                   m_rollerValid;        // Health indicator for motor 
@@ -135,9 +137,9 @@ public class Feeder extends SubsystemBase
 
   // Status signals
   private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
+  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
 
   // Shuffleboard objects
@@ -153,7 +155,7 @@ public class Feeder extends SubsystemBase
       m_feederTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
   GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
   GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  GenericEntry                      m_rotCurErrorEntry    = m_rotaryList.add("rotCurError", 0.0).getEntry( );
+  GenericEntry                      m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
   GenericEntry                      m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
   GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
@@ -498,8 +500,7 @@ public class Feeder extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Set feeder rotary motor to stopped
-   * 
+   * Set rotary motor to stopped
    */
   private void setRotaryStopped( )
   {
@@ -509,9 +510,9 @@ public class Feeder extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Get feeder rotary rotations
+   * Get rotary rotations
    * 
-   * @return feeder rotary rotations
+   * @return rotary rotations
    */
   private double getRotaryRotations( )
   {
@@ -520,9 +521,9 @@ public class Feeder extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Get feeder CANcoder rotations
+   * Get CANcoder rotations
    * 
-   * @return feeder rotary CANcoder rotations
+   * @return rotary CANcoder rotations
    */
   private double getCANcoderRotations( )
   {
@@ -531,7 +532,7 @@ public class Feeder extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Validate requested feeder move
+   * Validate requested move
    * 
    * @param degrees
    *          angle requested
@@ -548,9 +549,9 @@ public class Feeder extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Return current feeder position
+   * Return current position
    * 
-   * @return current feeder rotary angle
+   * @return current rotary angle
    */
   public double getFeederPosition( )
   {

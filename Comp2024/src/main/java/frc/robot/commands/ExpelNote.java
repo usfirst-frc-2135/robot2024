@@ -32,16 +32,16 @@ public class ExpelNote extends SequentialCommandGroup
         // @formatter:off
 
         new LogCommand(getName(), "Stop rollers & Deploy intake rotary"),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeDeployed),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),        
-        intake.getMoveToPositionCommand(INConsts.RollerMode.EXPEL, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.EXPEL, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakePosition),
         led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
         
         // @formatter:on

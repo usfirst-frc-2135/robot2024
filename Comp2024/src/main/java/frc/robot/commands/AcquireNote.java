@@ -35,14 +35,14 @@ public class AcquireNote extends SequentialCommandGroup
 
         new LogCommand(getName(), "Start rollers & Deploy intake rotary"),
         led.getLEDCommand(COLOR.YELLOW, ANIMATION.CLEARALL),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.ACQUIRE, intake::getIntakeDeployed),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.ACQUIRE, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Wait for note"),
         new WaitUntilCommand(intake::isNoteDetected),
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
         hid.getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted)
         
         // @formatter:on
     );

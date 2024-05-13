@@ -35,7 +35,7 @@ public class ScoreSpeaker extends SequentialCommandGroup
         
         new LogCommand(getName(), "Start shooter, stop rollers and retract intake"),
         // shooter.getShooterScoreCommand(), // Already running
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakeRetracted),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted),
 
         new LogCommand(getName(), "Wait for desired speed"),
         new WaitUntilCommand(shooter::isAtTargetRPM),
@@ -43,13 +43,13 @@ public class ScoreSpeaker extends SequentialCommandGroup
         new LogCommand(getName(), "Feed note from intake"),
 
         new LogCommand(getName(), "Expel rollers & Hold intake rotary in same position"),            
-        intake.getMoveToPositionCommand(INConsts.RollerMode.SHOOT, intake::getIntakePosition),
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.SHOOT, intake::getIntakePosition),
 
         new LogCommand(getName(), "Wait for note to release"),
         new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
-        intake.getMoveToPositionCommand(INConsts.RollerMode.STOP, intake::getIntakePosition)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakePosition)
 
         // shooter.getShooterStoppedCommand(), // Don't turn off
 

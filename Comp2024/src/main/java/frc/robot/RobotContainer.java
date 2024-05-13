@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.FDConsts.FDRollerMode;
-import frc.robot.Constants.INConsts.RollerMode;
+import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.Constants.VIConsts;
 import frc.robot.autos.AutoLeave;
 import frc.robot.autos.AutoPreloadLeave;
@@ -374,7 +374,7 @@ public class RobotContainer
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // Default command - Motion Magic hold
-    m_intake.setDefaultCommand(m_intake.getHoldPositionCommand(RollerMode.HOLD, m_intake::getIntakePosition));
+    m_intake.setDefaultCommand(m_intake.getHoldPositionCommand(INRollerMode.HOLD, m_intake::getIntakePosition));
     m_feeder.setDefaultCommand(m_feeder.getHoldPositionCommand(FDRollerMode.HOLD, m_feeder::getFeederPosition));
     m_climber.setDefaultCommand(m_climber.getHoldPositionCommand(m_climber::getClimberPosition));
 

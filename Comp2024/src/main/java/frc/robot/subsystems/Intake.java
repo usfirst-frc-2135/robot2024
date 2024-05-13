@@ -83,7 +83,7 @@ public class Intake extends SubsystemBase
 
   // Rotary constants
   private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
-  private static final double       kMMMoveTimeout        = 2.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double       kMMMoveTimeout        = 1.2;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
   public static final double        kRotaryAngleRetracted = -97.5;
@@ -137,7 +137,7 @@ public class Intake extends SubsystemBase
   private boolean                   m_mmMoveIsFinished;   // Movement has completed (within tolerance)
 
   // Status signals
-  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getRotorPosition( );    // Not used in MM - uses CANcoder remote sensor
+  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getPosition( );
   private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
@@ -197,16 +197,17 @@ public class Intake extends SubsystemBase
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANcoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_rotaryValid)
-      m_rotaryMotor.setPosition(Conversions.rotationsToInputRotations(ccRotations, kRotaryGearRatio)); // Not really used - CANcoder is remote sensor with absolute position
+      m_rotaryMotor.setPosition(ccRotations);
 
     // Simulation object initialization
     m_rotarySim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANcoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     // Status signals
+    m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
       BaseStatusSignal.setUpdateFrequencyForAll(20, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
-    m_ccPosition.setUpdateFrequency(50);
+    m_ccPosition.setUpdateFrequency(200);
 
     initDashboard( );
     initialize( );
@@ -221,7 +222,7 @@ public class Intake extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    m_currentDegrees = Conversions.rotationsToOutputDegrees(getRotaryRotations( ), kRotaryGearRatio);
+    m_currentDegrees = Units.rotationsToDegrees(getRotaryRotations( ));
     m_ccDegrees = Units.rotationsToDegrees(getCANcoderRotations( ));
     m_noteDetected = m_noteDebouncer.calculate(m_noteInIntake.get( ));
 
@@ -399,11 +400,10 @@ public class Intake extends SubsystemBase
         m_mmMoveIsFinished = false;
         m_mmWithinTolerance.calculate(false); // Reset the debounce filter
 
-        double targetRotations = Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio);
+        double targetRotations = Units.degreesToRotations(m_targetDegrees);
         m_rotaryMotor.setControl(m_mmRequestVolts.withPosition(targetRotations));
-        DataLogManager
-            .log(String.format("%s: MM Position move: %.1f -> %.1f degrees (%.3f -> %.3f rot)", getSubsystem( ), m_currentDegrees,
-                m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, kRotaryGearRatio), targetRotations));
+        DataLogManager.log(String.format("%s: MM Position move: %.1f -> %.1f degrees (%.3f -> %.3f rot)", getSubsystem( ),
+            m_currentDegrees, m_targetDegrees, Units.degreesToRotations(m_currentDegrees), targetRotations));
       }
       else
         DataLogManager.log(String.format("%s: MM Position move target %.1f degrees is OUT OF RANGE! [%.1f, %.1f deg]",
@@ -422,8 +422,7 @@ public class Intake extends SubsystemBase
    */
   public void moveToPositionExecute( )
   {
-    m_rotaryMotor
-        .setControl(m_mmRequestVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, kRotaryGearRatio)));
+    m_rotaryMotor.setControl(m_mmRequestVolts.withPosition(Units.degreesToRotations(m_targetDegrees)));
   }
 
   /****************************************************************************
@@ -500,7 +499,6 @@ public class Intake extends SubsystemBase
           break;
         case HANDOFF :
           output = kRollerSpeedToFeeder;
-
       }
       DataLogManager.log(String.format("%s: Roller mode is now - %s", getSubsystem( ), mode));
       m_rollerMotor.set(output);

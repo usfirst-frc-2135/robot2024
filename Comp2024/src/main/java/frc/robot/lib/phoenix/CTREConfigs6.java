@@ -6,6 +6,7 @@ package frc.robot.lib.phoenix;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -25,7 +26,7 @@ public final class CTREConfigs6
    * 
    * Intake rotary motor - Falcon 500
    */
-  public static TalonFXConfiguration intakeRotaryFXConfig(double min, double max)
+  public static TalonFXConfiguration intakeRotaryFXConfig(double min, double max, int ccPort, double gearRatio)
   {
     TalonFXConfiguration inRotaryConfig = new TalonFXConfiguration( );
 
@@ -43,10 +44,10 @@ public final class CTREConfigs6
     inRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
-    // inRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANcoder;
-    // inRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    // inRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
-    // inRotaryConfig.Feedback.RotorToSensorRatio = 27.41;
+    inRotaryConfig.Feedback.FeedbackRemoteSensorID = ccPort;
+    inRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    inRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
+    inRotaryConfig.Feedback.RotorToSensorRatio = gearRatio;
 
     // Hardware limit switches - NONE
     // inRotaryConfig.HardwareLimitSwitch.*
@@ -66,8 +67,8 @@ public final class CTREConfigs6
 
     // Slot settings
     inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
-    inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    inRotaryConfig.Slot0.kP = 2.4;                                // Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kV = 0.1129 * gearRatio;                 // Voltage or duty cycle per requested RPS (velocity modes)
+    inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                                // Voltage or duty cycle per velocity error (velocity modes)
     inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
@@ -146,7 +147,7 @@ public final class CTREConfigs6
    * 
    * Feeder rotary motor - Falcon 500
    */
-  public static TalonFXConfiguration feederRotaryFXConfig(double min, double max)
+  public static TalonFXConfiguration feederRotaryFXConfig(double min, double max, int ccPort, double gearRatio)
   {
     TalonFXConfiguration fdRotaryConfig = new TalonFXConfiguration( );
 
@@ -164,10 +165,10 @@ public final class CTREConfigs6
     fdRotaryConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     // Feedback settings
-    // fdRotaryConfig.Feedback.FeedbackRemoteSensorID = Ports.kCANID_IntakeCANcoder;
-    // fdRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    // fdRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
-    // fdRotaryConfig.Feedback.RotorToSensorRatio = 27.41;
+    fdRotaryConfig.Feedback.FeedbackRemoteSensorID = ccPort;
+    fdRotaryConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    fdRotaryConfig.Feedback.SensorToMechanismRatio = 1.0;
+    fdRotaryConfig.Feedback.RotorToSensorRatio = gearRatio;
 
     // Hardware limit switches - NONE
     // fdRotaryConfig.HardwareLimitSwitch.*
@@ -187,8 +188,8 @@ public final class CTREConfigs6
 
     // Slot settings
     fdRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
-    fdRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    fdRotaryConfig.Slot0.kP = 2.4;                                // Voltage or duty cycle per velocity error (velocity modes)
+    fdRotaryConfig.Slot0.kV = 0.1129 * gearRatio;                 // Voltage or duty cycle per requested RPS (velocity modes)
+    fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                                // Voltage or duty cycle per velocity error (velocity modes)
     fdRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     fdRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

@@ -52,10 +52,10 @@ public final class CTREConfigs6
     // Hardware limit switches - NONE
     // inRotaryConfig.HardwareLimitSwitch.*
 
-    // Motion Magic settings
-    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0;  // Rotations / second
-    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0;    // Rotations / second ^ 2
-    inRotaryConfig.MotionMagic.MotionMagicJerk = 360.0;           // Rotations / second ^ 3
+    // Motion Magic settings - fused CANcoder affects all feedback constants by the gearRatio
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0 / gearRatio;  // Rotations / second
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0 / gearRatio;    // Rotations / second ^ 2
+    inRotaryConfig.MotionMagic.MotionMagicJerk = 360.0 / gearRatio;           // Rotations / second ^ 3
 
     // Motor output settings
     inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;  // Percentage
@@ -65,10 +65,10 @@ public final class CTREConfigs6
     // Open Loop settings
     // inRotaryConfig.OpenLoopRamps.*                             // Seconds to ramp
 
-    // Slot settings
+    // Slot settings - fused CANcoder affects all feedback constants by the gearRatio
     inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
-    inRotaryConfig.Slot0.kV = 0.1129 * gearRatio;                 // Voltage or duty cycle per requested RPS (velocity modes)
-    inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                                // Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
+    inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Voltage or duty cycle per velocity error (velocity modes)
     inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 
@@ -173,10 +173,10 @@ public final class CTREConfigs6
     // Hardware limit switches - NONE
     // fdRotaryConfig.HardwareLimitSwitch.*
 
-    // Motion Magic settings
-    fdRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0;  // Rotations / second
-    fdRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0;    // Rotations / second ^ 2
-    fdRotaryConfig.MotionMagic.MotionMagicJerk = 360.0;           // Rotations / second ^ 3
+    // Motion Magic settings - fused CANcoder affects all feedback constants by the gearRatio
+    fdRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0 / gearRatio;  // Rotations / second
+    fdRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0 / gearRatio;    // Rotations / second ^ 2
+    fdRotaryConfig.MotionMagic.MotionMagicJerk = 360.0 / gearRatio;           // Rotations / second ^ 3
 
     // Motor output settings
     fdRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;  // Percentage
@@ -186,10 +186,10 @@ public final class CTREConfigs6
     // Open Loop settings
     // fdRotaryConfig.OpenLoopRamps.*                             // Seconds to ramp
 
-    // Slot settings
+    // Slot settings - fused CANcoder affects all feedback constants by the gearRatio
     fdRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
-    fdRotaryConfig.Slot0.kV = 0.1129 * gearRatio;                 // Voltage or duty cycle per requested RPS (velocity modes)
-    fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                                // Voltage or duty cycle per velocity error (velocity modes)
+    fdRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
+    fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Voltage or duty cycle per velocity error (velocity modes)
     fdRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
     fdRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
 

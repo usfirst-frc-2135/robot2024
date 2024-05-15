@@ -19,8 +19,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -181,9 +183,7 @@ public class RobotContainer
 
   // Shuffleboard objects
   ShuffleboardTab                       autoTab        = Shuffleboard.getTab(kAutoTab);
-  ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(4, 3).withSize(2, 1);
-  ComplexWidget                         modeEntry2     =
-      autoTab.add("AutoMode2", m_autoChooser).withPosition(6, 0).withSize(2, 1);
+  ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(6, 0).withSize(2, 1);
   ComplexWidget                         startEntry     =
       autoTab.add("StartPosition", m_startChooser).withPosition(6, 1).withSize(2, 1);
   SimpleWidget                          autoDelay      = autoTab.add("AutoDelay", 0.0).withPosition(6, 2).withSize(2, 1);
@@ -225,28 +225,31 @@ public class RobotContainer
     m_startChooser.addOption("POSE2", StartPose.POSE2);
     m_startChooser.addOption("POSE3", StartPose.POSE3);
 
-    autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 3);
+    autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 2);
 
     // Command tab
     ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
     cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led, m_hid)).withPosition(0, 0);
     cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led)).withPosition(0, 1);
     cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led)).withPosition(0, 2);
-    cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid)).withPosition(0, 3);
 
-    cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(2, 0);
-    cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 2);
-    cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 3);
+    cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid)).withPosition(2, 0);
+    cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
+    cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
+
     cmdTab.add("HIDRumble", m_hid
         .getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity).withTimeout(1.0))
-        .withPosition(2, 1);
+        .withPosition(4, 0);
+    cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
 
-    cmdTab.add(m_intake).withPosition(4, 0);
-    cmdTab.add(m_shooter).withPosition(4, 1);
-    cmdTab.add(m_feeder).withPosition(4, 2);
-    cmdTab.add(m_climber).withPosition(4, 3);
+    ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
+        .withProperties(Map.of("Label position", "HIDDEN"));
+    subList.add(m_intake);
+    subList.add(m_shooter);
+    subList.add(m_feeder);
+    subList.add(m_climber);
 
-    cmdTab.add(CommandScheduler.getInstance( )).withPosition(6, 0);
+    cmdTab.add(CommandScheduler.getInstance( )).withPosition(8, 0);
   }
 
   /****************************************************************************

@@ -124,9 +124,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   GenericEntry                                       poseRotEntry                    =
       poseList.add("rotation", 0.0).withPosition(0, 2).getEntry( );
   ComplexWidget                                      setPose                         =
-      poseList.add("SetPose", new InstantCommand(( ) -> setOdometryFromDashboard( )).ignoringDisable(true)).withPosition(0, 3);
+      poseList.add("SetPose", new InstantCommand(( ) -> setOdometryFromDashboard( )).ignoringDisable(true)).withPosition(0, 2);
   GenericEntry                                       shooterDistanceEntry            =
-      swerveTab.add("shooterDistance", 0.0).withPosition(6, 3).withSize(2, 1).getEntry( );
+      swerveTab.add("shooterDistance", 0.0).withPosition(8, 2).withSize(2, 1).getEntry( );
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
       SwerveModuleConstants... modules)

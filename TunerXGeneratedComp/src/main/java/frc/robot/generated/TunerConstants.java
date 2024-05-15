@@ -58,7 +58,7 @@ public class TunerConstants {
 
     // Theoretical free speed (m/s) at 12v applied output;
     // This needs to be tuned to your individual robot
-    public static final double kSpeedAt12VoltsMps = 9.46;
+    public static final double kSpeedAt12VoltsMps = 4.73;
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot
@@ -66,11 +66,11 @@ public class TunerConstants {
 
     private static final double kDriveGearRatio = 6.746031746031747;
     private static final double kSteerGearRatio = 21.428571428571427;
-    private static final double kWheelRadiusInches = 4;
+    private static final double kWheelRadiusInches = 2;
 
     private static final boolean kSteerMotorReversed = true;
-    private static final boolean kInvertLeftSide = true;
-    private static final boolean kInvertRightSide = false;
+    private static final boolean kInvertLeftSide = false;
+    private static final boolean kInvertRightSide = true;
 
     private static final String kCANbusName = "canivore1";
     private static final int kPigeonId = 13;

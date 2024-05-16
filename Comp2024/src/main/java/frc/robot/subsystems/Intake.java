@@ -193,7 +193,7 @@ public class Intake extends SubsystemBase
     m_rotValidEntry.setBoolean(m_rotaryValid);
     m_ccValidEntry.setBoolean(m_canCoderValid);
 
-    Double ccRotations = getCANcoderRotations( );
+    Double ccRotations = (m_canCoderValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);
     DataLogManager.log(String.format("%s: CANcoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
     if (m_rotaryValid)
@@ -222,8 +222,9 @@ public class Intake extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    m_currentDegrees = Units.rotationsToDegrees(getRotaryRotations( ));
-    m_ccDegrees = Units.rotationsToDegrees(getCANcoderRotations( ));
+    BaseStatusSignal.refreshAll(m_rotaryPosition, m_ccPosition, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
+    m_currentDegrees = Units.rotationsToDegrees((m_rotaryValid) ? m_rotaryPosition.getValue( ) : 0.0);
+    m_ccDegrees = Units.rotationsToDegrees((m_canCoderValid) ? m_ccPosition.getValue( ) : 0.0);
     m_noteDetected = m_noteDebouncer.calculate(m_noteInIntake.get( ));
 
     // Update dashboard
@@ -237,7 +238,6 @@ public class Intake extends SubsystemBase
     m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
 
-    BaseStatusSignal.refreshAll(m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
     m_rotCLoopErrorEntry.setDouble(m_rotaryCLoopError.refresh( ).getValue( ));
     m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
     m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
@@ -513,28 +513,6 @@ public class Intake extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: Rotary motor now STOPPED", getSubsystem( )));
     m_rotaryMotor.setControl(m_requestVolts.withOutput(0.0));
-  }
-
-  /****************************************************************************
-   * 
-   * Get rotary rotations
-   * 
-   * @return rotary rotations
-   */
-  private double getRotaryRotations( )
-  {
-    return (m_rotaryValid) ? m_rotaryPosition.refresh( ).getValue( ) : 0.0;
-  }
-
-  /****************************************************************************
-   * 
-   * Get CANcoder rotations
-   * 
-   * @return rotary CANcoder rotations
-   */
-  private double getCANcoderRotations( )
-  {
-    return (m_canCoderValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
   }
 
   /****************************************************************************

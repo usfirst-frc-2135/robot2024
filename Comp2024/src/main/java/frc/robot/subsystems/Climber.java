@@ -220,10 +220,10 @@ public class Climber extends SubsystemBase
     {
       BaseStatusSignal.refreshAll(m_leftCLoopError, m_leftSupplyCur, m_leftStatorCur, m_rightCLoopError, m_rightSupplyCur,
           m_rightStatorCur);
-      m_leftCurErrorEntry.setDouble(m_leftCLoopError.getValue( ));
+      m_leftCurErrorEntry.setDouble(m_leftCLoopError.refresh( ).getValue( ));
       m_leftSupCurEntry.setDouble(m_leftSupplyCur.getValue( ));
       m_leftStatCurEntry.setDouble(m_leftStatorCur.getValue( ));
-      m_rightCurErrorEntry.setDouble(m_rightCLoopError.getValue( ));
+      m_rightCurErrorEntry.setDouble(m_rightCLoopError.refresh( ).getValue( ));
       m_rightSupCurEntry.setDouble(m_rightSupplyCur.getValue( ));
       m_rightStatCurEntry.setDouble(m_rightStatorCur.getValue( ));
     }

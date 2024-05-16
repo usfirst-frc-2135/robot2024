@@ -65,12 +65,14 @@ public final class CTREConfigs6
     // Open Loop settings
     // inRotaryConfig.OpenLoopRamps.*                             // Seconds to ramp
 
-    // Slot settings - fused CANcoder affects all feedback constants by the gearRatio
-    inRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
-    inRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Voltage or duty cycle per velocity error (velocity modes)
-    inRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
-    inRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
+    // Slot settings - remote/fused CANcoder affects all feedback constants by the gearRatio
+    inRotaryConfig.Slot0.kS = 0.0;                                // Feedforward: Voltage or duty cylce to overcome static friction
+    inRotaryConfig.Slot0.kG = 0.0;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) TODO: measure
+    inRotaryConfig.Slot0.kV = 0.1129;                             // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
+
+    inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Feedback: Voltage or duty cycle per velocity error (velocity modes)
+    inRotaryConfig.Slot0.kI = 0.0 * gearRatio;                    // Feedback: Voltage or duty cycle per accumulated error
+    inRotaryConfig.Slot0.kD = 0.0 * gearRatio;                    // Feedback: Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
     inRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = min;  // Rotations
@@ -132,8 +134,10 @@ public final class CTREConfigs6
     // shooterConfig.OpenLoopRamps.*                                // Seconds to ramp
 
     // Slot settings
-    shooterConfig.Slot0.kS = 0.0;                                   // Voltage or duty cylce to overcome static friction
-    shooterConfig.Slot0.kV = 0.1140;                                // Voltage or duty cycle per requested RPS (velocity modes)
+    shooterConfig.Slot0.kS = 0.0;                                   // Feedforward: Voltage or duty cylce to overcome static friction
+    shooterConfig.Slot0.kG = 0.0;                                   // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward)
+    shooterConfig.Slot0.kV = 0.1140;                                // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
+
     shooterConfig.Slot0.kP = 0.25;                                  // Voltage or duty cycle per velocity error (velocity modes)
     shooterConfig.Slot0.kI = 0.0;                                   // Voltage or duty cycle per accumulated error
     shooterConfig.Slot0.kD = 0.0;                                   // Voltage or duty cycle per unit of acceleration error (velocity modes)
@@ -186,12 +190,14 @@ public final class CTREConfigs6
     // Open Loop settings
     // fdRotaryConfig.OpenLoopRamps.*                             // Seconds to ramp
 
-    // Slot settings - fused CANcoder affects all feedback constants by the gearRatio
-    fdRotaryConfig.Slot0.kS = 0.0;                                // Voltage or duty cylce to overcome static friction
-    fdRotaryConfig.Slot0.kV = 0.1129;                             // Voltage or duty cycle per requested RPS (velocity modes)
-    fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Voltage or duty cycle per velocity error (velocity modes)
-    fdRotaryConfig.Slot0.kI = 0.0;                                // Voltage or duty cycle per accumulated error
-    fdRotaryConfig.Slot0.kD = 0.0;                                // Voltage or duty cycle per unit of acceleration error (velocity modes)
+    // Slot settings - remote/fused CANcoder affects all feedback constants by the gearRatio
+    fdRotaryConfig.Slot0.kS = 0.0;                                // Feedforward: Voltage or duty cylce to overcome static friction
+    fdRotaryConfig.Slot0.kG = 0.0;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) TODO: measure
+    fdRotaryConfig.Slot0.kV = 0.1129;                             // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
+
+    fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Feedback: Voltage or duty cycle per velocity error (velocity modes)
+    fdRotaryConfig.Slot0.kI = 0.0 * gearRatio;                    // Feedback: Voltage or duty cycle per accumulated error
+    fdRotaryConfig.Slot0.kD = 0.0 * gearRatio;                    // Feedback: Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
     fdRotaryConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = min;  // Rotations
@@ -261,11 +267,13 @@ public final class CTREConfigs6
     // climberConfig.OpenLoopRamps.*                              // Seconds to ramp
 
     // Slot settings
-    climberConfig.Slot0.kS = 0.0;                                 // Voltage or duty cylce to overcome static friction
-    climberConfig.Slot0.kV = 0.1129;                              // Voltage or duty cycle per requested RPS (velocity modes)
-    climberConfig.Slot0.kP = 9.60;                                 // Voltage or duty cycle per velocity error (velocity modes)
-    climberConfig.Slot0.kI = 0.0;                                 // Voltage or duty cycle per accumulated error
-    climberConfig.Slot0.kD = 0.0;                                 // Voltage or duty cycle per unit of acceleration error (velocity modes)
+    climberConfig.Slot0.kS = 0.0;                                 // Feedforward: Voltage or duty cylce to overcome static friction
+    climberConfig.Slot0.kG = 0.0;                                 // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward)
+    climberConfig.Slot0.kV = 0.1129;                              // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
+
+    climberConfig.Slot0.kP = 9.60;                                // Feedback: Voltage or duty cycle per velocity error (velocity modes)
+    climberConfig.Slot0.kI = 0.0;                                 // Feedback: Voltage or duty cycle per accumulated error
+    climberConfig.Slot0.kD = 0.0;                                 // Feedback: Voltage or duty cycle per unit of acceleration error (velocity modes)
 
     // Software limit switches
     // climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = min;   // Rotations

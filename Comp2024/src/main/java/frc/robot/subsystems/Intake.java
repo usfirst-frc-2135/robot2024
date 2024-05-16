@@ -153,7 +153,7 @@ public class Intake extends SubsystemBase
   GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_rotaryList          =
-      m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
   GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
   GenericEntry                      m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
@@ -161,7 +161,7 @@ public class Intake extends SubsystemBase
   GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_statusList          =
-      m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
   GenericEntry                      m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
   GenericEntry                      m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
   GenericEntry                      m_currentDegreesEntry = m_statusList.add("currentDegrees", 0.0).getEntry( );
@@ -280,10 +280,10 @@ public class Intake extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    m_subsystemTab.add("INRotaryMech", m_rotaryMech).withPosition(0, 3);
+    m_subsystemTab.add("INRotaryMech", m_rotaryMech).withPosition(0, 2);
 
     // Shuffleboard layout
-    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
         .withProperties(Map.of("Label position", "HIDDEN"));
     cmdList.add("InRollStop", getMoveToPositionCommand(INRollerMode.STOP, this::getCurrentPosition));
     cmdList.add("InRollAcquire", getMoveToPositionCommand(INRollerMode.ACQUIRE, this::getCurrentPosition));

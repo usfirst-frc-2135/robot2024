@@ -137,7 +137,7 @@ public class Climber extends SubsystemBase
   // Shuffleboard objects
   ShuffleboardTab                   m_subsystemTab       = Shuffleboard.getTab(kSubsystemName);
   ShuffleboardLayout                m_leftList           =
-      m_subsystemTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   GenericEntry                      m_leftValidEntry     = m_leftList.add("leftValid", false).getEntry( );
   GenericEntry                      m_leftInchesEntry    = m_leftList.add("leftInches", 0.0).getEntry( );
   GenericEntry                      m_leftCurErrorEntry  = m_leftList.add("leftCurError", 0.0).getEntry( );
@@ -145,7 +145,7 @@ public class Climber extends SubsystemBase
   GenericEntry                      m_leftStatCurEntry   = m_leftList.add("leftStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                m_rightList          =
-      m_subsystemTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
+      m_subsystemTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   GenericEntry                      m_rightValidEntry    = m_rightList.add("righttValid", false).getEntry( );
   GenericEntry                      m_rightInchesEntry   = m_rightList.add("rightInches", 0.0).getEntry( );
   GenericEntry                      m_rightCurErrorEntry = m_rightList.add("rightCurError", 0.0).getEntry( );
@@ -264,9 +264,9 @@ public class Climber extends SubsystemBase
   private void initDashboard( )
   {
     // Initialize dashboard widgets
-    m_subsystemTab.add(kSubsystemName + "Mech", m_climberMech).withPosition(0, 3);
+    m_subsystemTab.add(kSubsystemName + "Mech", m_climberMech).withPosition(0, 2);
 
-    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 4)
+    ShuffleboardLayout cmdList = m_subsystemTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
         .withProperties(Map.of("Label position", "HIDDEN"));
     cmdList.add("ClRunExtended", getMoveToPositionCommand(this::getClimberFullyExtended));
     cmdList.add("ClRunChain", getMoveToPositionCommand(this::getClimberChainLevel));

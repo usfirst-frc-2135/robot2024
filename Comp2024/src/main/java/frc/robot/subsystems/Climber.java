@@ -60,7 +60,7 @@ public class Climber extends SubsystemBase
   private static final double kDrumRadiusMeters    = Units.inchesToMeters(kDrumDiameterInches) / 2;
   private static final double kRolloutRatio        = kDrumDiameterInches * Math.PI / kGearRatio; // inches per shaft rotation
   private static final double kCalibrateSpeedVolts = -1.0;    // Motor voltage during calibration
-  private static final double kCalibrateStallAmps  = 4.0;     // Motor amps during calibration stall
+  private static final double kCalibrateStallAmps  = 25.0;    // Motor amps during calibration stall
   private static final double kManualSpeedVolts    = 3.0;     // Motor voltage during manual operation (joystick)
 
   private static final double kToleranceInches     = 0.5;     // Climber PID tolerance in inches
@@ -126,37 +126,35 @@ public class Climber extends SubsystemBase
   private boolean                   m_mmMoveIsFinished;     // Movement has completed (within tolerance)
 
   private StatusSignal<Double>      m_leftPosition       = m_leftMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_leftCLoopError     = m_leftMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_leftSupplyCur      = m_leftMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_leftStatorCur      = m_leftMotor.getStatorCurrent( );
   private StatusSignal<Double>      m_rightPosition      = m_rightMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_rightCLoopError    = m_rightMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rightSupplyCur     = m_rightMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rightStatorCur     = m_rightMotor.getStatorCurrent( );
 
   // Shuffleboard objects
-  ShuffleboardTab                   m_subsystemTab       = Shuffleboard.getTab(kSubsystemName);
-  ShuffleboardLayout                m_leftList           =
+  private ShuffleboardTab       m_subsystemTab         = Shuffleboard.getTab(kSubsystemName);
+  private ShuffleboardLayout    m_leftList             =
       m_subsystemTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  GenericEntry                      m_leftValidEntry     = m_leftList.add("leftValid", false).getEntry( );
-  GenericEntry                      m_leftInchesEntry    = m_leftList.add("leftInches", 0.0).getEntry( );
-  GenericEntry                      m_leftCurErrorEntry  = m_leftList.add("leftCurError", 0.0).getEntry( );
-  GenericEntry                      m_leftSupCurEntry    = m_leftList.add("leftSupCur", 0.0).getEntry( );
-  GenericEntry                      m_leftStatCurEntry   = m_leftList.add("leftStatCur", 0.0).getEntry( );
+  private GenericEntry          m_leftValidEntry       = m_leftList.add("leftValid", false).getEntry( );
+  private GenericEntry          m_leftInchesEntry      = m_leftList.add("leftInches", 0.0).getEntry( );
+  private GenericEntry          m_leftCurErrorEntry    = m_leftList.add("leftCurError", 0.0).getEntry( );
+  private GenericEntry          m_leftSupCurEntry      = m_leftList.add("leftSupCur", 0.0).getEntry( );
+  private GenericEntry          m_leftStatCurEntry     = m_leftList.add("leftStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout                m_rightList          =
+  private ShuffleboardLayout    m_rightList            =
       m_subsystemTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
-  GenericEntry                      m_rightValidEntry    = m_rightList.add("righttValid", false).getEntry( );
-  GenericEntry                      m_rightInchesEntry   = m_rightList.add("rightInches", 0.0).getEntry( );
-  GenericEntry                      m_rightCurErrorEntry = m_rightList.add("rightCurError", 0.0).getEntry( );
-  GenericEntry                      m_rightSupCurEntry   = m_rightList.add("rightSupCur", 0.0).getEntry( );
-  GenericEntry                      m_rightStatCurEntry  = m_rightList.add("rightStatCur", 0.0).getEntry( );
+  private GenericEntry          m_rightValidEntry      = m_rightList.add("righttValid", false).getEntry( );
+  private GenericEntry          m_rightInchesEntry     = m_rightList.add("rightInches", 0.0).getEntry( );
+  private GenericEntry          m_rightCurErrorEntry   = m_rightList.add("rightCurError", 0.0).getEntry( );
+  private GenericEntry          m_rightSupCurEntry     = m_rightList.add("rightSupCur", 0.0).getEntry( );
+  private GenericEntry          m_rightStatCurEntry    = m_rightList.add("rightStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout                m_statusList         =
+  private ShuffleboardLayout    m_statusList           =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
-  GenericEntry                      m_calibratedEntry    = m_statusList.add("calibrated", false).getEntry( );
-  GenericEntry                      m_currentInchesEntry = m_statusList.add("currentInches", 0.0).getEntry( );
-  GenericEntry                      m_targetInchesEntry  = m_statusList.add("targetInches", 0.0).getEntry( );
+  private GenericEntry          m_leftCalibratedEntry  = m_statusList.add("leftCalibrated", false).getEntry( );
+  private GenericEntry          m_rightCalibratedEntry = m_statusList.add("rightCalibrated", false).getEntry( );
+  private GenericEntry          m_targetInchesEntry    = m_statusList.add("targetInches", 0.0).getEntry( );
 
   /****************************************************************************
    * 
@@ -188,8 +186,8 @@ public class Climber extends SubsystemBase
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_leftPosition, m_rightPosition);
     if (m_debug)
     {
-      BaseStatusSignal.setUpdateFrequencyForAll(20, m_leftCLoopError, m_leftSupplyCur, m_leftStatorCur);
-      BaseStatusSignal.setUpdateFrequencyForAll(20, m_rightCLoopError, m_rightSupplyCur, m_rightStatorCur);
+      BaseStatusSignal.setUpdateFrequencyForAll(10, m_leftSupplyCur, m_leftStatorCur);
+      BaseStatusSignal.setUpdateFrequencyForAll(10, m_rightSupplyCur, m_rightStatorCur);
     }
 
     initDashboard( );
@@ -212,18 +210,18 @@ public class Climber extends SubsystemBase
       setClimberPosition(0.0);
 
     // Update dashboard
-    m_calibratedEntry.setBoolean((m_leftCalibrated && m_rightCalibrated));
+    m_leftCalibratedEntry.setBoolean((m_leftCalibrated));
+    m_rightCalibratedEntry.setBoolean((m_rightCalibrated));
     m_leftInchesEntry.setDouble(m_leftCurInches);
     m_rightInchesEntry.setDouble(m_rightCurInches);
     m_targetInchesEntry.setDouble(m_targetInches);
     if (m_debug)
     {
-      BaseStatusSignal.refreshAll(m_leftCLoopError, m_leftSupplyCur, m_leftStatorCur, m_rightCLoopError, m_rightSupplyCur,
-          m_rightStatorCur);
-      m_leftCurErrorEntry.setDouble(m_leftCLoopError.refresh( ).getValue( ));
+      BaseStatusSignal.refreshAll(m_leftSupplyCur, m_leftStatorCur, m_rightSupplyCur, m_rightStatorCur);
+      m_leftCurErrorEntry.setDouble(m_targetInches - m_leftCurInches);
       m_leftSupCurEntry.setDouble(m_leftSupplyCur.getValue( ));
       m_leftStatCurEntry.setDouble(m_leftStatorCur.getValue( ));
-      m_rightCurErrorEntry.setDouble(m_rightCLoopError.refresh( ).getValue( ));
+      m_rightCurErrorEntry.setDouble(m_targetInches - m_rightCurInches);
       m_rightSupCurEntry.setDouble(m_rightSupplyCur.getValue( ));
       m_rightStatCurEntry.setDouble(m_rightStatorCur.getValue( ));
     }
@@ -474,8 +472,8 @@ public class Climber extends SubsystemBase
    */
   private void calibrateExecute( )
   {
-    m_leftCalibrated = m_leftStalled.calculate(m_leftSupplyCur.getValue( ) > kCalibrateStallAmps);
-    m_rightCalibrated = m_rightStalled.calculate(m_rightSupplyCur.getValue( ) > kCalibrateStallAmps);
+    m_leftCalibrated = m_leftStalled.calculate(m_leftStatorCur.getValue( ) > kCalibrateStallAmps);
+    m_rightCalibrated = m_rightStalled.calculate(m_rightStatorCur.getValue( ) > kCalibrateStallAmps);
 
     setVoltage((m_leftCalibrated) ? 0.0 : kCalibrateSpeedVolts, (m_rightCalibrated) ? 0.0 : kCalibrateSpeedVolts);
   }

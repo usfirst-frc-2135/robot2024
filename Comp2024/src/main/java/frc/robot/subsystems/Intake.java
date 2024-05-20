@@ -138,35 +138,33 @@ public class Intake extends SubsystemBase
 
   // Status signals
   private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getPosition( );
-  private StatusSignal<Double>      m_rotaryCLoopError    = m_rotaryMotor.getClosedLoopError( );
   private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
   private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
 
   // Shuffleboard objects
-  ShuffleboardTab                   m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
-  ShuffleboardLayout                m_rollerList          =
+  private ShuffleboardTab             m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
+  private ShuffleboardLayout          m_rollerList          =
       m_subsystemTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  GenericEntry                      m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
-  GenericEntry                      m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
-  GenericEntry                      m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
-  GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
+  private GenericEntry                m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
+  private GenericEntry                m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
+  private GenericEntry                m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
+  // private GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout                m_rotaryList          =
+  private ShuffleboardLayout          m_rotaryList          =
       m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
-  GenericEntry                      m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
-  GenericEntry                      m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  GenericEntry                      m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
-  GenericEntry                      m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
-  GenericEntry                      m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
+  private GenericEntry                m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
+  private GenericEntry                m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
+  private GenericEntry                m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
+  private GenericEntry                m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
+  private GenericEntry                m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout                m_statusList          =
+  private ShuffleboardLayout          m_statusList          =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
-  GenericEntry                      m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
-  GenericEntry                      m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
-  GenericEntry                      m_currentDegreesEntry = m_statusList.add("currentDegrees", 0.0).getEntry( );
-  GenericEntry                      m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
-  GenericEntry                      m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
+  private GenericEntry                m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
+  private GenericEntry                m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
+  private GenericEntry                m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
+  private GenericEntry                m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -206,8 +204,8 @@ public class Intake extends SubsystemBase
     // Status signals
     m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
-      BaseStatusSignal.setUpdateFrequencyForAll(20, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
-    m_ccPosition.setUpdateFrequency(100);
+      BaseStatusSignal.setUpdateFrequencyForAll(10, m_rotarySupplyCur, m_rotaryStatorCur);
+    m_ccPosition.setUpdateFrequency(50);
 
     initDashboard( );
     initialize( );
@@ -222,7 +220,7 @@ public class Intake extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    BaseStatusSignal.refreshAll(m_rotaryPosition, m_ccPosition, m_rotaryCLoopError, m_rotarySupplyCur, m_rotaryStatorCur);
+    BaseStatusSignal.refreshAll(m_rotaryPosition, m_ccPosition);
     m_currentDegrees = Units.rotationsToDegrees((m_rotaryValid) ? m_rotaryPosition.getValue( ) : 0.0);
     m_ccDegrees = Units.rotationsToDegrees((m_canCoderValid) ? m_ccPosition.getValue( ) : 0.0);
     m_noteDetected = m_noteDebouncer.calculate(m_noteInIntake.get( ));
@@ -230,17 +228,19 @@ public class Intake extends SubsystemBase
     // Update dashboard
     m_rollSpeedEntry.setDouble(m_rollerMotor.get( ));
     m_rollSupCurEntry.setDouble(m_rollerMotor.getSupplyCurrent( ));
-    m_rollStatCurEntry.setDouble(m_rollerMotor.getStatorCurrent( ));
 
-    m_currentDegreesEntry.setDouble(m_currentDegrees);
     m_ccDegreesEntry.setDouble(m_ccDegrees);
     m_rotDegreesEntry.setDouble(m_currentDegrees);
     m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
 
-    m_rotCLoopErrorEntry.setDouble(m_rotaryCLoopError.refresh( ).getValue( ));
+    if (m_debug)
+    {
+      BaseStatusSignal.refreshAll(m_rotarySupplyCur, m_rotaryStatorCur);
+    m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
     m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
     m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
+  }
   }
 
   /****************************************************************************

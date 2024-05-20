@@ -45,7 +45,7 @@ public class Shooter extends SubsystemBase
 
   private static final double kMOI               = 0.001;     // Simulation - Moment of Inertia
   private static final double kFlywheelScoreRPM  = 3000.0;    // RPM to score
-  private static final double kToleranceRPM      = 100.0;     // Tolerance band around target RPM
+  private static final double kToleranceRPM      = 150.0;     // Tolerance band around target RPM
 
   private static final double kFlywheelGearRatio = (18.0 / 18.0);
 
@@ -133,7 +133,7 @@ public class Shooter extends SubsystemBase
 
     m_lowerVelocity.setUpdateFrequency(50);
     m_upperVelocity.setUpdateFrequency(50);
-    BaseStatusSignal.setUpdateFrequencyForAll(20, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
+    BaseStatusSignal.setUpdateFrequencyForAll(10, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
 
     initDashboard( );
     initialize( );
@@ -151,12 +151,14 @@ public class Shooter extends SubsystemBase
     // Calculate flywheel RPM and display on dashboard
     if (m_shooterValid)
     {
-      m_lowerRPM = m_lowerFlywheelFilter.calculate((m_lowerVelocity.refresh( ).getValue( ) * 60.0));
-      m_upperRPM = m_upperFlywheelFilter.calculate((m_upperVelocity.refresh( ).getValue( ) * 60.0));
+      BaseStatusSignal.refreshAll(m_lowerVelocity, m_upperVelocity);
+      m_lowerRPM = m_lowerFlywheelFilter.calculate((m_lowerVelocity.getValue( ) * 60.0));
+      m_upperRPM = m_upperFlywheelFilter.calculate((m_upperVelocity.getValue( ) * 60.0));
       m_lowerSpeedEntry.setDouble(m_lowerRPM);
       m_upperSpeedEntry.setDouble(m_upperRPM);
 
-      m_isAttargetRPM = (m_lowerRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_lowerRPM, kToleranceRPM);
+      m_isAttargetRPM = ((m_lowerRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_lowerRPM, kToleranceRPM))
+          && ((m_upperRPM > kToleranceRPM) && MathUtil.isNear(m_targetRPM, m_upperRPM, kToleranceRPM));
       m_atDesiredRPMEntry.setBoolean(m_isAttargetRPM);
 
       if (m_isAttargetRPM != m_isAttargetRPMPrevious)
@@ -167,6 +169,7 @@ public class Shooter extends SubsystemBase
 
       if (m_debug)
       {
+        BaseStatusSignal.refreshAll(m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
         m_lowerSupCurEntry.setDouble(m_lowerSupplyCur.getValue( ));
         m_lowerStatCurEntry.setDouble(m_lowerStatorCur.getValue( ));
         m_upperSupCurEntry.setDouble(m_upperSupplyCur.getValue( ));

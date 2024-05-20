@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -116,7 +115,7 @@ public class RobotContainer
   /**
    * Chooser options for autonomous commands - all starting from poses 1-3
    */
-  enum AutoChooser
+  private enum AutoChooser
   {
     AUTOSTOP,         // AutoStop - sit still, do nothing
     AUTOLEAVE,        // Leave starting zone avoiding spikes
@@ -131,7 +130,7 @@ public class RobotContainer
   /**
    * Chooser options for autonomous starting pose to select pose 1-3
    */
-  enum StartPose
+  private enum StartPose
   {
     POSE1, // Starting pose 1 - blue left, red right (driver perspective)
     POSE2, // Starting pose 2 - blue/red middle (driver perspective)
@@ -152,41 +151,38 @@ public class RobotContainer
    *          the auto filename associated with the key
    */
   private final HashMap<String, String> autoMap        = new HashMap<>(Map.ofEntries( //
-      Map.entry(AutoChooser.AUTOSTOP + StartPose.POSE1.toString( ), "Pos1_Stop"),
-      Map.entry(AutoChooser.AUTOSTOP + StartPose.POSE2.toString( ), "Pos2_Stop"),
-      Map.entry(AutoChooser.AUTOSTOP + StartPose.POSE3.toString( ), "Pos3_Stop"),
+      Map.entry(AutoChooser.AUTOSTOP.toString( ) + StartPose.POSE1.toString( ), "Pos1_Stop"),
+      Map.entry(AutoChooser.AUTOSTOP.toString( ) + StartPose.POSE2.toString( ), "Pos2_Stop"),
+      Map.entry(AutoChooser.AUTOSTOP.toString( ) + StartPose.POSE3.toString( ), "Pos3_Stop"),
 
-      Map.entry(AutoChooser.AUTOLEAVE + StartPose.POSE1.toString( ), "Pos1_L1"),
-      Map.entry(AutoChooser.AUTOLEAVE + StartPose.POSE2.toString( ), "Pos2_L2"),
-      Map.entry(AutoChooser.AUTOLEAVE + StartPose.POSE3.toString( ), "Pos3_L3"),
+      Map.entry(AutoChooser.AUTOLEAVE.toString( ) + StartPose.POSE1.toString( ), "Pos1_L1"),
+      Map.entry(AutoChooser.AUTOLEAVE.toString( ) + StartPose.POSE2.toString( ), "Pos2_L2"),
+      Map.entry(AutoChooser.AUTOLEAVE.toString( ) + StartPose.POSE3.toString( ), "Pos3_L3"),
 
-      Map.entry(AutoChooser.AUTOPRELOADLEAVE + StartPose.POSE1.toString( ), "Pos1_P0_L0"),
-      Map.entry(AutoChooser.AUTOPRELOADLEAVE + StartPose.POSE2.toString( ), "Pos2_P2_L2"),
-      Map.entry(AutoChooser.AUTOPRELOADLEAVE + StartPose.POSE3.toString( ), "Pos3_P4_L4"),
+      Map.entry(AutoChooser.AUTOPRELOADLEAVE.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_L0"),
+      Map.entry(AutoChooser.AUTOPRELOADLEAVE.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_L2"),
+      Map.entry(AutoChooser.AUTOPRELOADLEAVE.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_L4"),
 
-      Map.entry(AutoChooser.AUTOPRELOADSCORE + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1"),
-      Map.entry(AutoChooser.AUTOPRELOADSCORE + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
-      Map.entry(AutoChooser.AUTOPRELOADSCORE + StartPose.POSE3.toString( ), "Pos3_P3_S3_P2"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P2"),
 
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL + StartPose.POSE2.toString( ), "Pos2_P2_C1_C2_C3_C4"),
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C1_C2_C3_C4"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
 
-      Map.entry(AutoChooser.AUTOSCORE4 + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
-      Map.entry(AutoChooser.AUTOSCORE4 + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2_S1_P1_S3_P3"),
-      Map.entry(AutoChooser.AUTOSCORE4 + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
+      Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
+      Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2_S1_P1_S3_P3"),
+      Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
 
-      Map.entry(AutoChooser.AUTOTEST + StartPose.POSE1.toString( ), "Pos1_test1"),
-      Map.entry(AutoChooser.AUTOTEST + StartPose.POSE2.toString( ), "Pos2_test2"),
-      Map.entry(AutoChooser.AUTOTEST + StartPose.POSE3.toString( ), "Pos3_test3") //
+      Map.entry(AutoChooser.AUTOTEST.toString( ) + StartPose.POSE1.toString( ), "Pos1_test1"),
+      Map.entry(AutoChooser.AUTOTEST.toString( ) + StartPose.POSE2.toString( ), "Pos2_test2"),
+      Map.entry(AutoChooser.AUTOTEST.toString( ) + StartPose.POSE3.toString( ), "Pos3_test3") //
   ));
 
   // Shuffleboard objects
-  ShuffleboardTab                       autoTab        = Shuffleboard.getTab(kAutoTab);
-  ComplexWidget                         modeEntry      = autoTab.add("AutoMode", m_autoChooser).withPosition(6, 0).withSize(2, 1);
-  ComplexWidget                         startEntry     =
-      autoTab.add("StartPosition", m_startChooser).withPosition(6, 1).withSize(2, 1);
-  SimpleWidget                          autoDelay      = autoTab.add("AutoDelay", 0.0).withPosition(6, 2).withSize(2, 1);
+  private ShuffleboardTab               autoTab        = Shuffleboard.getTab(kAutoTab);
+  private SimpleWidget                  autoDelay      = autoTab.add("AutoDelay", 0.0).withPosition(6, 2).withSize(2, 1);
 
   /****************************************************************************
    * 
@@ -210,6 +206,8 @@ public class RobotContainer
   private void addDashboardWidgets( )
   {
     // Set up Shuffleboard layout from code
+    autoTab.add("AutoMode", m_autoChooser).withPosition(6, 0).withSize(2, 1);
+    autoTab.add("StartPosition", m_startChooser).withPosition(6, 1).withSize(2, 1);
 
     // Configure autonomous sendable chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);

@@ -85,12 +85,12 @@ public class Feeder extends SubsystemBase
   private static final double       kMMMoveTimeout        = 1.0;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
-  public static final double        kRotaryAngleAmp       = -33.0;
-  public static final double        kRotaryAngleClimb     = 60.0;
-  public static final double        kRotaryAngleHandoff   = 88.75;
+  private static final double         kRotaryAngleAmp      = -33.0;
+  private static final double         kRotaryAngleClimb    = 60.0;
+  private static final double         kRotaryAngleHandoff  = 88.75;
 
-  public static final double        kRotaryAngleMin       = -61.89;
-  public static final double        kRotaryAngleMax       = 90.0;
+  private static final double         kRotaryAngleMin      = -61.89;
+  private static final double         kRotaryAngleMax      = 90.0;
 
   // Device objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_FeederRoller);

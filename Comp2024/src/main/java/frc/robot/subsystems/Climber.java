@@ -68,12 +68,12 @@ public class Climber extends SubsystemBase
   private static final double kCalibrationTimeout  = 2.0;     // Max calibration time
 
   // Climber lengths - Motion Magic config parameters
-  public static final double  kLengthClimbed       = 0.0;     // By definition - Climber fully climbed
-  public static final double  kLengthFull          = 18.0;    // From Mech Design height needed to reach max chain
-  public static final double  kLengthChain         = 8.0;     // From Mech Design height needed to reach hanging chain
+  private static final double kLengthClimbed       = 0.0;     // By definition - Climber fully climbed
+  private static final double kLengthFull          = 18.0;    // From Mech Design height needed to reach max chain
+  private static final double kLengthChain         = 8.0;     // From Mech Design height needed to reach hanging chain
 
-  public static final double  kLengthMin           = 0.0;     // Climber minimum allowable length
-  public static final double  kLengthMax           = 21.0;    // Climber maximum allowable length (2" beyond high length)
+  private static final double kLengthMin           = 0.0;     // Climber minimum allowable length
+  private static final double kLengthMax           = 21.0;    // Climber maximum allowable length (2" beyond high length)
 
   /** Climber manual move parameters */
   private enum ClimberMode

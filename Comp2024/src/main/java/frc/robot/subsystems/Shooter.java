@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -83,12 +82,12 @@ public class Shooter extends SubsystemBase
   private LinearFilter          m_upperFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
 
   // Status signals
-  private StatusSignal<Double>  m_lowerVelocity         = m_lowerMotor.getRotorVelocity( );
-  private StatusSignal<Double>  m_lowerSupplyCur        = m_lowerMotor.getSupplyCurrent( );
-  private StatusSignal<Double>  m_lowerStatorCur        = m_lowerMotor.getStatorCurrent( );
-  private StatusSignal<Double>  m_upperVelocity         = m_upperMotor.getRotorVelocity( );
-  private StatusSignal<Double>  m_upperSupplyCur        = m_upperMotor.getSupplyCurrent( );
-  private StatusSignal<Double>  m_upperStatorCur        = m_upperMotor.getStatorCurrent( );
+  private StatusSignal<Double>  m_lowerVelocity         = m_lowerMotor.getRotorVelocity( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>  m_lowerSupplyCur        = m_lowerMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>  m_lowerStatorCur        = m_lowerMotor.getStatorCurrent( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>  m_upperVelocity         = m_upperMotor.getRotorVelocity( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>  m_upperSupplyCur        = m_upperMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>  m_upperStatorCur        = m_upperMotor.getStatorCurrent( );   // Default 4Hz (250ms)
 
   // Shuffleboard objects
   ShuffleboardTab               m_shooterTab            = Shuffleboard.getTab(kShooterTab);
@@ -129,10 +128,7 @@ public class Shooter extends SubsystemBase
     m_upperValidEntry.setBoolean(upperValid);
     m_shooterValid = lowerValid && upperValid;
 
-    m_upperMotor.setControl(new Follower(m_lowerMotor.getDeviceID( ), false));
-
-    m_lowerVelocity.setUpdateFrequency(50);
-    m_upperVelocity.setUpdateFrequency(50);
+    BaseStatusSignal.setUpdateFrequencyForAll(50, m_lowerVelocity, m_upperVelocity);
     BaseStatusSignal.setUpdateFrequencyForAll(10, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
 
     initDashboard( );
@@ -278,12 +274,34 @@ public class Shooter extends SubsystemBase
     if (m_shooterValid)
     {
       if (m_targetRPM > 100.0)
-        m_lowerMotor
-            .setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rotPerSecond, kFlywheelGearRatio)));
+        setShooterVelocity(rotPerSecond);
       else
-        m_lowerMotor.setControl(m_requestVolts);
+        setShooterStopped( );
     }
     DataLogManager.log(String.format("%s: Target rpm is %.1f rps %.1f", getSubsystem( ), m_targetRPM, rotPerSecond));
+  }
+
+  /****************************************************************************
+   * 
+   * Set shooter motors to requested velocity
+   * 
+   * @param rps
+   *          rotations per second
+   */
+  private void setShooterVelocity(double rps)
+  {
+    m_lowerMotor.setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rps, kFlywheelGearRatio)));
+    m_upperMotor.setControl(m_requestVelocity.withVelocity(Conversions.rotationsToInputRotations(rps, kFlywheelGearRatio)));
+  }
+
+  /****************************************************************************
+   * 
+   * Set shooter motors to stopped
+   */
+  private void setShooterStopped( )
+  {
+    m_lowerMotor.setControl(m_requestVolts);
+    m_upperMotor.setControl(m_requestVolts);
   }
 
   ////////////////////////////////////////////////////////////////////////////

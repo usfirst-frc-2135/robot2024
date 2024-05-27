@@ -125,12 +125,12 @@ public class Climber extends SubsystemBase
   private double                    m_totalArbFeedForward;  // Arbitrary feedforward added to counteract gravity
   private boolean                   m_mmMoveIsFinished;     // Movement has completed (within tolerance)
 
-  private StatusSignal<Double>      m_leftPosition       = m_leftMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_leftSupplyCur      = m_leftMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_leftStatorCur      = m_leftMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_rightPosition      = m_rightMotor.getRotorPosition( );
-  private StatusSignal<Double>      m_rightSupplyCur     = m_rightMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rightStatorCur     = m_rightMotor.getStatorCurrent( );
+  private StatusSignal<Double>      m_leftPosition         = m_leftMotor.getRotorPosition( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_leftSupplyCur        = m_leftMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_leftStatorCur        = m_leftMotor.getStatorCurrent( );   // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_rightPosition        = m_rightMotor.getRotorPosition( );  // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_rightSupplyCur       = m_rightMotor.getSupplyCurrent( );  // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_rightStatorCur       = m_rightMotor.getStatorCurrent( );  // Default 4Hz (250ms)
 
   // Shuffleboard objects
   private ShuffleboardTab       m_subsystemTab         = Shuffleboard.getTab(kSubsystemName);
@@ -185,10 +185,7 @@ public class Climber extends SubsystemBase
     // Status signals
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_leftPosition, m_rightPosition);
     if (m_debug)
-    {
-      BaseStatusSignal.setUpdateFrequencyForAll(10, m_leftSupplyCur, m_leftStatorCur);
-      BaseStatusSignal.setUpdateFrequencyForAll(10, m_rightSupplyCur, m_rightStatorCur);
-    }
+      BaseStatusSignal.setUpdateFrequencyForAll(10, m_leftSupplyCur, m_leftStatorCur, m_rightSupplyCur, m_rightStatorCur);
 
     initDashboard( );
     initialize( );

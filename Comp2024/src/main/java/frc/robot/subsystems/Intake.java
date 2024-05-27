@@ -86,12 +86,12 @@ public class Intake extends SubsystemBase
   private static final double       kMMMoveTimeout        = 1.5;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
-  private static final double         kRotaryAngleRetracted = -97.5;
-  private static final double         kRotaryAngleHandoff   = -49.9;
-  private static final double         kRotaryAngleDeployed  = 99.4;
+  private static final double       kRotaryAngleRetracted = -97.5;
+  private static final double       kRotaryAngleHandoff   = -49.9;
+  private static final double       kRotaryAngleDeployed  = 99.4;
 
-  private static final double         kRotaryAngleMin       = -99.0;
-  private static final double         kRotaryAngleMax       = 101.4;
+  private static final double       kRotaryAngleMin       = -99.0;
+  private static final double       kRotaryAngleMax       = 101.4;
 
   // Device objects
   private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -137,34 +137,34 @@ public class Intake extends SubsystemBase
   private boolean                   m_mmMoveIsFinished;   // Movement has completed (within tolerance)
 
   // Status signals
-  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getPosition( );
-  private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );
-  private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );
-  private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );
+  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getPosition( );       // Default 50Hz (20ms)
+  private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );  // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );  // Default 4Hz (250ms)
+  private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );  // Default 100Hz (10ms)
 
   // Shuffleboard objects
-  private ShuffleboardTab             m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
-  private ShuffleboardLayout          m_rollerList          =
+  private ShuffleboardTab           m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
+  private ShuffleboardLayout        m_rollerList          =
       m_subsystemTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  private GenericEntry                m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
-  private GenericEntry                m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
-  private GenericEntry                m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
+  private GenericEntry              m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
+  private GenericEntry              m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
+  private GenericEntry              m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
   // private GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
-  private ShuffleboardLayout          m_rotaryList          =
+  private ShuffleboardLayout        m_rotaryList          =
       m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
-  private GenericEntry                m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
-  private GenericEntry                m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  private GenericEntry                m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
-  private GenericEntry                m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
-  private GenericEntry                m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
+  private GenericEntry              m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
+  private GenericEntry              m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
+  private GenericEntry              m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
+  private GenericEntry              m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
+  private GenericEntry              m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
-  private ShuffleboardLayout          m_statusList          =
+  private ShuffleboardLayout        m_statusList          =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
-  private GenericEntry                m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
-  private GenericEntry                m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
-  private GenericEntry                m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
-  private GenericEntry                m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
+  private GenericEntry              m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
+  private GenericEntry              m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
+  private GenericEntry              m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
+  private GenericEntry              m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -202,10 +202,8 @@ public class Intake extends SubsystemBase
     m_CANcoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     // Status signals
-    m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
       BaseStatusSignal.setUpdateFrequencyForAll(10, m_rotarySupplyCur, m_rotaryStatorCur);
-    m_ccPosition.setUpdateFrequency(50);
 
     initDashboard( );
     initialize( );
@@ -237,10 +235,10 @@ public class Intake extends SubsystemBase
     if (m_debug)
     {
       BaseStatusSignal.refreshAll(m_rotarySupplyCur, m_rotaryStatorCur);
-    m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
-    m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
-    m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
-  }
+      m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
+      m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
+      m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
+    }
   }
 
   /****************************************************************************

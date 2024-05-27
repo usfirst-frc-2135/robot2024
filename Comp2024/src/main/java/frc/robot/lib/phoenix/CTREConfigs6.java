@@ -118,8 +118,8 @@ public final class CTREConfigs6
     shooterConfig.CurrentLimits.SupplyTimeThreshold = 0.001;      // Seconds
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
-    shooterConfig.CurrentLimits.StatorCurrentLimitEnable = false;
+    // shooterConfig.CurrentLimits.StatorCurrentLimit = 100.0;        // Amps
+    // shooterConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 
     // shooterConfig.Feedback.*
     // shooterConfig.HardwareLimitSwitch.*

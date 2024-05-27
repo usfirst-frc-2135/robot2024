@@ -406,9 +406,9 @@ public class RobotContainer
 
     // Get auto value using created key
     String autoName = autoMap.get(autoKey);
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
     DataLogManager.log(String.format("getAuto: autoKey: %s  autoName: %s", autoKey, autoName));
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
 
     // If auto not defined in hashmap, no path assigned so sit idle
     if (autoName == null)

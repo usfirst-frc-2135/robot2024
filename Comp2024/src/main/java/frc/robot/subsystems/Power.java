@@ -60,8 +60,8 @@ public class Power extends SubsystemBase
    */
   public void initialize( )
   {
-    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
-    DataLogManager.log(String.format("%s: Init Voltage is %.1f", getSubsystem( ), m_powerDistribution.getVoltage( )));
+    DataLogManager
+        .log(String.format("%s: Subsystem initialized!  %.1f volts", getSubsystem( ), m_powerDistribution.getVoltage( )));
   }
 
   /****************************************************************************
@@ -84,11 +84,11 @@ public class Power extends SubsystemBase
     DataLogManager.log(String.format("%s: ------------------ DUMP FAULTS ------------------", getSubsystem( )));
     PowerDistributionFaults faults = m_powerDistribution.getFaults( );
     PowerDistributionStickyFaults stickyFaults = m_powerDistribution.getStickyFaults( );
-    DataLogManager.log(String.format("  Brownout ............... %5s %5s", faults.Brownout, stickyFaults.Brownout));
-    DataLogManager.log(String.format("  CanBusOff .............. %5s %5s", "", stickyFaults.CanBusOff));
-    DataLogManager.log(String.format("  CanWarning ............. %5s %5s", faults.CanWarning, stickyFaults.CanWarning));
-    DataLogManager.log(String.format("  HardwareFault .......... %5s %5s", faults.HardwareFault, ""));
-    DataLogManager.log(String.format("  HasReset ............... %5s %5s", "", stickyFaults.HasReset));
+    DataLogManager.log(String.format("  Brownout ......... %5s %5s", faults.Brownout, stickyFaults.Brownout));
+    DataLogManager.log(String.format("  CanBusOff ........ %5s %5s", "", stickyFaults.CanBusOff));
+    DataLogManager.log(String.format("  CanWarning ....... %5s %5s", faults.CanWarning, stickyFaults.CanWarning));
+    DataLogManager.log(String.format("  HardwareFault .... %5s %5s", faults.HardwareFault, ""));
+    DataLogManager.log(String.format("  HasReset ......... %5s %5s", "", stickyFaults.HasReset));
     DataLogManager
         .log(String.format("  Channel0BreakerFault ... %5s %5s", faults.Channel0BreakerFault, stickyFaults.Channel0BreakerFault));
     DataLogManager

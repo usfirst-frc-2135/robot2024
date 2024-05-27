@@ -78,10 +78,10 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit( )
   {
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
     DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
 
     m_robotContainer.initialize( );
   }
@@ -112,10 +112,10 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit( )
   {
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
     DataLogManager.log(String.format("autonomousInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
 
     if (m_autonomousCommand != null)
     {
@@ -149,10 +149,10 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit( )
   {
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
     DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", DriverStation.getMatchType( ).toString( ),
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
-    DataLogManager.log(String.format("=========================================================================="));
+    DataLogManager.log(String.format("=========================================================="));
 
     // Make sure that the autonomous command stops running when Teleop starts running
     if (m_autonomousCommand != null)

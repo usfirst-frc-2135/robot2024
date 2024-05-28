@@ -258,7 +258,7 @@ public class LED extends SubsystemBase
 
     if (m_color == m_previousColor && m_animation == m_previousAnimation)
     {
-      DataLogManager.log(String.format("%s: Color and animation already active - %s, %s", getName( ), color, animation));
+      DataLogManager.log(String.format("%s: Color and animation already active - %s, %s", getSubsystem( ), color, animation));
       return;
     }
 

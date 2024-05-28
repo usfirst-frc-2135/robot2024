@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -82,89 +81,88 @@ public class Intake extends SubsystemBase
   }
 
   // Rotary constants
-  private static final double       kToleranceDegrees     = 4.0;      // PID tolerance in degrees
-  private static final double       kMMMoveTimeout        = 1.5;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double        kToleranceDegrees     = 4.0;      // PID tolerance in degrees
+  private static final double        kMMMoveTimeout        = 1.5;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
-  private static final double       kRotaryAngleRetracted = -97.5;
-  private static final double       kRotaryAngleHandoff   = -49.9;
-  private static final double       kRotaryAngleDeployed  = 99.4;
+  private static final double        kRotaryAngleRetracted = -97.5;
+  private static final double        kRotaryAngleHandoff   = -49.9;
+  private static final double        kRotaryAngleDeployed  = 99.4;
 
-  private static final double       kRotaryAngleMin       = -99.0;
-  private static final double       kRotaryAngleMax       = 101.4;
+  private static final double        kRotaryAngleMin       = -99.0;
+  private static final double        kRotaryAngleMax       = 101.4;
 
   // Device objects
-  private static final WPI_TalonSRX m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private static final TalonFX      m_rotaryMotor         = new TalonFX(Ports.kCANID_IntakeRotary);
-  private static final CANcoder     m_CANcoder            = new CANcoder(Ports.kCANID_IntakeCANcoder);
-  private static final DigitalInput m_noteInIntake        = new DigitalInput(Ports.kDIO0_NoteInIntake);
+  private static final WPI_TalonSRX  m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
+  private static final TalonFX       m_rotaryMotor         = new TalonFX(Ports.kCANID_IntakeRotary);
+  private static final CANcoder      m_CANcoder            = new CANcoder(Ports.kCANID_IntakeCANcoder);
+  private static final DigitalInput  m_noteInIntake        = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
   // Simulation objects
-  private final TalonFXSimState     m_rotarySim           = m_rotaryMotor.getSimState( );
-  private final CANcoderSimState    m_CANcoderSim         = m_CANcoder.getSimState( );
-  private final SingleJointedArmSim m_armSim              = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
+  private final TalonFXSimState      m_rotarySim           = m_rotaryMotor.getSimState( );
+  private final CANcoderSimState     m_CANcoderSim         = m_CANcoder.getSimState( );
+  private final SingleJointedArmSim  m_armSim              = new SingleJointedArmSim(DCMotor.getFalcon500(1), kRotaryGearRatio,
       SingleJointedArmSim.estimateMOI(kRotaryLengthMeters, kRotaryWeightKg), kRotaryLengthMeters, -Math.PI, Math.PI, false, 0.0);
 
   // Mechanism2d
-  private final Mechanism2d         m_rotaryMech          = new Mechanism2d(1.0, 1.0);
-  private final MechanismRoot2d     m_mechRoot            = m_rotaryMech.getRoot("Rotary", 0.5, 0.5);
-  private final MechanismLigament2d m_mechLigament        =
-      m_mechRoot.append(new MechanismLigament2d(kSubsystemName, 0.5, 0.0, 6, new Color8Bit(Color.kPurple)));
+  private final Mechanism2d          m_rotaryMech          = new Mechanism2d(1.0, 1.0);
+  private final MechanismLigament2d  m_mechLigament        = m_rotaryMech.getRoot("Rotary", 0.5, 0.5)
+      .append(new MechanismLigament2d(kSubsystemName, 0.5, 0.0, 6, new Color8Bit(Color.kPurple)));
+
+  // Status signals
+  private final StatusSignal<Double> m_rotaryPosition      = m_rotaryMotor.getPosition( );       // Default 50Hz (20ms)
+  private final StatusSignal<Double> m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_ccPosition          = m_CANcoder.getAbsolutePosition( );  // Default 100Hz (10ms)
 
   // Declare module variables
 
   // Roller variables
-  private boolean                   m_rollerValid;        // Health indicator for motor 
-  private Debouncer                 m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
-  private boolean                   m_noteDetected;       // Detection state of note in rollers
+  private boolean                    m_rollerValid;        // Health indicator for motor 
+  private Debouncer                  m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
+  private boolean                    m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
-  private boolean                   m_rotaryValid;        // Health indicator for motor 
-  private boolean                   m_canCoderValid;      // Health indicator for CANcoder 
-  private boolean                   m_debug               = true;
-  private double                    m_currentDegrees      = 0.0; // Current angle in degrees
-  private double                    m_targetDegrees       = 0.0; // Target angle in degrees
-  private double                    m_ccDegrees           = 0.0; // CANcoder angle in degrees
+  private boolean                    m_rotaryValid;        // Health indicator for motor 
+  private boolean                    m_canCoderValid;      // Health indicator for CANcoder 
+  private boolean                    m_debug               = true;
+  private double                     m_currentDegrees      = 0.0; // Current angle in degrees
+  private double                     m_targetDegrees       = 0.0; // Target angle in degrees
+  private double                     m_ccDegrees           = 0.0; // CANcoder angle in degrees
 
   // Manual mode config parameters
-  private VoltageOut                m_requestVolts        = new VoltageOut(0);
-  private RotaryMode                m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
+  private VoltageOut                 m_requestVolts        = new VoltageOut(0);
+  private RotaryMode                 m_rotaryMode          = RotaryMode.INIT;     // Manual movement mode with joysticks
 
   // Motion Magic config parameters
-  private MotionMagicVoltage        m_mmRequestVolts      = new MotionMagicVoltage(0).withSlot(0);
-  private Debouncer                 m_mmWithinTolerance   = new Debouncer(0.060, DebounceType.kRising);
-  private Timer                     m_mmMoveTimer         = new Timer( ); // Safety timer for movements
-  private boolean                   m_mmMoveIsFinished;   // Movement has completed (within tolerance)
-
-  // Status signals
-  private StatusSignal<Double>      m_rotaryPosition      = m_rotaryMotor.getPosition( );       // Default 50Hz (20ms)
-  private StatusSignal<Double>      m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );  // Default 4Hz (250ms)
-  private StatusSignal<Double>      m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );  // Default 4Hz (250ms)
-  private StatusSignal<Double>      m_ccPosition          = m_CANcoder.getAbsolutePosition( );  // Default 100Hz (10ms)
+  private MotionMagicVoltage         m_mmRequestVolts      = new MotionMagicVoltage(0).withSlot(0);
+  private Debouncer                  m_mmWithinTolerance   = new Debouncer(0.060, DebounceType.kRising);
+  private Timer                      m_mmMoveTimer         = new Timer( ); // Safety timer for movements
+  private boolean                    m_mmMoveIsFinished;   // Movement has completed (within tolerance)
 
   // Shuffleboard objects
-  private ShuffleboardTab           m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
-  private ShuffleboardLayout        m_rollerList          =
+  private ShuffleboardTab            m_subsystemTab        = Shuffleboard.getTab(kSubsystemName);
+  private ShuffleboardLayout         m_rollerList          =
       m_subsystemTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  private GenericEntry              m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
-  private GenericEntry              m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
-  private GenericEntry              m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
+  private GenericEntry               m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
+  private GenericEntry               m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
+  private GenericEntry               m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
   // private GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
-  private ShuffleboardLayout        m_rotaryList          =
+  private ShuffleboardLayout         m_rotaryList          =
       m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
-  private GenericEntry              m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
-  private GenericEntry              m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  private GenericEntry              m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
-  private GenericEntry              m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
-  private GenericEntry              m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
+  private GenericEntry               m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
+  private GenericEntry               m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
+  private GenericEntry               m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
+  private GenericEntry               m_rotSupCurEntry      = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
+  private GenericEntry               m_rotStatCurEntry     = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
-  private ShuffleboardLayout        m_statusList          =
+  private ShuffleboardLayout         m_statusList          =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
-  private GenericEntry              m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
-  private GenericEntry              m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
-  private GenericEntry              m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
-  private GenericEntry              m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
+  private GenericEntry               m_ccValidEntry        = m_statusList.add("ccValid", false).getEntry( );
+  private GenericEntry               m_ccDegreesEntry      = m_statusList.add("ccDegrees", 0.0).getEntry( );
+  private GenericEntry               m_targetDegreesEntry  = m_statusList.add("targetDegrees", 0.0).getEntry( );
+  private GenericEntry               m_noteDetectedEntry   = m_statusList.add("noteInDetected", false).getEntry( );
 
   /****************************************************************************
    * 
@@ -202,8 +200,14 @@ public class Intake extends SubsystemBase
     m_CANcoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     // Status signals
+    m_rotaryPosition.setUpdateFrequency(50);
     if (m_debug)
       BaseStatusSignal.setUpdateFrequencyForAll(10, m_rotarySupplyCur, m_rotaryStatorCur);
+
+    DataLogManager.log(
+        String.format("%s: Update (Hz) rotaryPosition: %.1f rotarySupplyCur: %.1f rotaryStatorCur: %.1f canCoderPosition: %.1f",
+            getSubsystem( ), m_rotaryPosition.getAppliedUpdateFrequency( ), m_rotarySupplyCur.getAppliedUpdateFrequency( ),
+            m_rotaryStatorCur.getAppliedUpdateFrequency( ), m_ccPosition.getAppliedUpdateFrequency( )));
 
     initDashboard( );
     initialize( );

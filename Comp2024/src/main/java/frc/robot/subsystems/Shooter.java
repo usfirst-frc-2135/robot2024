@@ -57,59 +57,59 @@ public class Shooter extends SubsystemBase
   }
 
   // Devices  objects
-  private final TalonFX         m_lowerMotor            = new TalonFX(Ports.kCANID_ShooterLower);
-  private final TalonFX         m_upperMotor            = new TalonFX(Ports.kCANID_ShooterUpper);
+  private final TalonFX              m_lowerMotor            = new TalonFX(Ports.kCANID_ShooterLower);
+  private final TalonFX              m_upperMotor            = new TalonFX(Ports.kCANID_ShooterUpper);
 
   // Simulation objects
-  private final TalonFXSimState m_lowerMotorSim         = new TalonFXSimState(m_lowerMotor);
-  private final TalonFXSimState m_upperMotorSim         = new TalonFXSimState(m_upperMotor);
-  private final FlywheelSim     m_lowerFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
-  private final FlywheelSim     m_upperFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
-
-  // Declare module variables
-  private boolean               m_shooterValid;
-  private boolean               m_debug                 = true;
-  private boolean               m_isAttargetRPM         = false; // Indicates flywheel RPM is close to target
-  private boolean               m_isAttargetRPMPrevious = false;
-
-  private double                m_targetRPM;            // Requested target flywheel RPM
-  private double                m_lowerRPM;             // Current lower RPM
-  private double                m_upperRPM;             // Current upper RPM
-
-  private VelocityVoltage       m_requestVelocity       = new VelocityVoltage(0.0);
-  private VoltageOut            m_requestVolts          = new VoltageOut(0.0);
-  private LinearFilter          m_lowerFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
-  private LinearFilter          m_upperFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
+  private final TalonFXSimState      m_lowerMotorSim         = new TalonFXSimState(m_lowerMotor);
+  private final TalonFXSimState      m_upperMotorSim         = new TalonFXSimState(m_upperMotor);
+  private final FlywheelSim          m_lowerFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
+  private final FlywheelSim          m_upperFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
 
   // Status signals
-  private StatusSignal<Double>  m_lowerVelocity         = m_lowerMotor.getRotorVelocity( );   // Default 4Hz (250ms)
-  private StatusSignal<Double>  m_lowerSupplyCur        = m_lowerMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
-  private StatusSignal<Double>  m_lowerStatorCur        = m_lowerMotor.getStatorCurrent( );   // Default 4Hz (250ms)
-  private StatusSignal<Double>  m_upperVelocity         = m_upperMotor.getRotorVelocity( );   // Default 4Hz (250ms)
-  private StatusSignal<Double>  m_upperSupplyCur        = m_upperMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
-  private StatusSignal<Double>  m_upperStatorCur        = m_upperMotor.getStatorCurrent( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_lowerVelocity         = m_lowerMotor.getRotorVelocity( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_lowerSupplyCur        = m_lowerMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_lowerStatorCur        = m_lowerMotor.getStatorCurrent( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_upperVelocity         = m_upperMotor.getRotorVelocity( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_upperSupplyCur        = m_upperMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_upperStatorCur        = m_upperMotor.getStatorCurrent( );   // Default 4Hz (250ms)
+
+  // Declare module variables
+  private boolean                    m_shooterValid;
+  private boolean                    m_debug                 = true;
+  private boolean                    m_isAttargetRPM         = false; // Indicates flywheel RPM is close to target
+  private boolean                    m_isAttargetRPMPrevious = false;
+
+  private double                     m_targetRPM;            // Requested target flywheel RPM
+  private double                     m_lowerRPM;             // Current lower RPM
+  private double                     m_upperRPM;             // Current upper RPM
+
+  private VelocityVoltage            m_requestVelocity       = new VelocityVoltage(0.0);
+  private VoltageOut            m_requestVolts          = new VoltageOut(0.0);
+  private LinearFilter               m_lowerFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
+  private LinearFilter               m_upperFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
 
   // Shuffleboard objects
-  ShuffleboardTab               m_shooterTab            = Shuffleboard.getTab(kShooterTab);
-  ShuffleboardLayout            m_lowerList             =
+  ShuffleboardTab                    m_shooterTab            = Shuffleboard.getTab(kShooterTab);
+  ShuffleboardLayout                 m_lowerList             =
       m_shooterTab.getLayout("Lower", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  GenericEntry                  m_lowerValidEntry       = m_lowerList.add("lowerValid", false).getEntry( );
-  GenericEntry                  m_lowerSpeedEntry       = m_lowerList.add("lowerSpeed", 0.0).getEntry( );
-  GenericEntry                  m_lowerSupCurEntry      = m_lowerList.add("lowerSupCur", 0.0).getEntry( );
-  GenericEntry                  m_lowerStatCurEntry     = m_lowerList.add("lowerStatCur", 0.0).getEntry( );
+  GenericEntry                       m_lowerValidEntry       = m_lowerList.add("lowerValid", false).getEntry( );
+  GenericEntry                       m_lowerSpeedEntry       = m_lowerList.add("lowerSpeed", 0.0).getEntry( );
+  GenericEntry                       m_lowerSupCurEntry      = m_lowerList.add("lowerSupCur", 0.0).getEntry( );
+  GenericEntry                       m_lowerStatCurEntry     = m_lowerList.add("lowerStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout            m_upperList             =
+  ShuffleboardLayout                 m_upperList             =
       m_shooterTab.getLayout("Upper", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
-  GenericEntry                  m_upperValidEntry       = m_upperList.add("upperValid", false).getEntry( );
-  GenericEntry                  m_upperSpeedEntry       = m_upperList.add("upperSpeed", 0.0).getEntry( );
-  GenericEntry                  m_upperSupCurEntry      = m_upperList.add("upperSupCur", 0.0).getEntry( );
-  GenericEntry                  m_upperStatCurEntry     = m_upperList.add("upperStatCur", 0.0).getEntry( );
+  GenericEntry                       m_upperValidEntry       = m_upperList.add("upperValid", false).getEntry( );
+  GenericEntry                       m_upperSpeedEntry       = m_upperList.add("upperSpeed", 0.0).getEntry( );
+  GenericEntry                       m_upperSupCurEntry      = m_upperList.add("upperSupCur", 0.0).getEntry( );
+  GenericEntry                       m_upperStatCurEntry     = m_upperList.add("upperStatCur", 0.0).getEntry( );
 
-  ShuffleboardLayout            m_statusList            =
+  ShuffleboardLayout                 m_statusList            =
       m_shooterTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
-  GenericEntry                  m_atDesiredRPMEntry     = m_statusList.add("atDesiredRPM", false).getEntry( );
-  GenericEntry                  m_targetRPMEntry        = m_statusList.add("targetRPM", 0.0).getEntry( );
-  GenericEntry                  m_flywheelRPMEntry      = m_statusList.add("flywheelRPM", 0.0).getEntry( );
+  GenericEntry                       m_atDesiredRPMEntry     = m_statusList.add("atDesiredRPM", false).getEntry( );
+  GenericEntry                       m_targetRPMEntry        = m_statusList.add("targetRPM", 0.0).getEntry( );
+  GenericEntry                       m_flywheelRPMEntry      = m_statusList.add("flywheelRPM", 0.0).getEntry( );
 
   /****************************************************************************
    * 
@@ -130,6 +130,12 @@ public class Shooter extends SubsystemBase
 
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_lowerVelocity, m_upperVelocity);
     BaseStatusSignal.setUpdateFrequencyForAll(10, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
+
+    DataLogManager.log(String.format(
+        "%s: Update (Hz) lowerVelocity: %.1f upperVelocity: %.1f lowerSupplyCur: %.1f lowerStatorCur: %.1f upperSupplyCur: %.1f upperStatorCur: %.1f",
+        getSubsystem( ), m_lowerVelocity.getAppliedUpdateFrequency( ), m_upperVelocity.getAppliedUpdateFrequency( ),
+        m_lowerSupplyCur.getAppliedUpdateFrequency( ), m_lowerStatorCur.getAppliedUpdateFrequency( ),
+        m_upperSupplyCur.getAppliedUpdateFrequency( ), m_upperStatorCur.getAppliedUpdateFrequency( )));
 
     initDashboard( );
     initialize( );

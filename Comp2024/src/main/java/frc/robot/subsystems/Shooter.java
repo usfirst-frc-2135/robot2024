@@ -40,7 +40,7 @@ import frc.robot.lib.phoenix.PhoenixUtil6;
 public class Shooter extends SubsystemBase
 {
   // Constants
-  private static final String kShooterTab        = "Shooter";
+  private static final String kSubsystemName     = "Shooter";
 
   private static final double kMOI               = 0.001;     // Simulation - Moment of Inertia
   private static final double kFlywheelScoreRPM  = 3000.0;    // RPM to score
@@ -85,12 +85,12 @@ public class Shooter extends SubsystemBase
   private double                     m_upperRPM;             // Current upper RPM
 
   private VelocityVoltage            m_requestVelocity       = new VelocityVoltage(0.0);
-  private VoltageOut            m_requestVolts          = new VoltageOut(0.0);
+  private VoltageOut                 m_requestVolts          = new VoltageOut(0.0);
   private LinearFilter               m_lowerFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
   private LinearFilter               m_upperFlywheelFilter   = LinearFilter.singlePoleIIR(0.060, 0.020);
 
   // Shuffleboard objects
-  ShuffleboardTab                    m_shooterTab            = Shuffleboard.getTab(kShooterTab);
+  ShuffleboardTab                    m_shooterTab            = Shuffleboard.getTab(kSubsystemName);
   ShuffleboardLayout                 m_lowerList             =
       m_shooterTab.getLayout("Lower", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   GenericEntry                       m_lowerValidEntry       = m_lowerList.add("lowerValid", false).getEntry( );
@@ -121,9 +121,9 @@ public class Shooter extends SubsystemBase
     setSubsystem("Shooter");
 
     boolean lowerValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, "Shooter Lower", CTREConfigs6.shooterFXConfig( ));
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, kSubsystemName + "Lower", CTREConfigs6.shooterFXConfig( ));
     boolean upperValid =
-        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_upperMotor, "Shooter Upper", CTREConfigs6.shooterFXConfig( ));
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_upperMotor, kSubsystemName + "Upper", CTREConfigs6.shooterFXConfig( ));
     m_lowerValidEntry.setBoolean(lowerValid);
     m_upperValidEntry.setBoolean(upperValid);
     m_shooterValid = lowerValid && upperValid;

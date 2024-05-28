@@ -81,16 +81,17 @@ public class PhoenixUtil5
    */
   public boolean talonSRXInitialize(WPI_TalonSRX talonSRX, String name, TalonSRXConfiguration config)
   {
+    final String devType = "talonSRX";
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
     int fwVersion = 0;
-    String baseStr = name + " talonSRX:    ";
+    String verStr = "ver: unknown";
     boolean talonSRXValid = false;
     boolean initialized = false;
 
     // Display Talon firmware versions
     deviceID = talonSRX.getDeviceID( );
-    error = talonSRXCheckError(talonSRX, baseStr + "getDeviceID error");
+    error = talonSRXCheckError(talonSRX, String.format(" %15s %8s:  getDeviceID error", name, devType));
 
     Timer.delay(0.250);
 
@@ -100,14 +101,14 @@ public class PhoenixUtil5
       for (int i = 0; i < m_retries && fwVersion == 0; i++)
       {
         fwVersion = talonSRX.getFirmwareVersion( );
-        error = talonSRXCheckError(talonSRX, baseStr + "getFirmwareVersion error");
+        error = talonSRXCheckError(talonSRX, String.format(" %15s %8s:  getFirmwareVersion error", name, devType));
 
         if (error == ErrorCode.OK)
         {
           talonSRXValid = true;
           if (fwVersion < Constants.kPhoenix5MajorVersion)
-            DataLogManager.log(String.format("%s: ID %2d - %s - Incorrect FW version: %d - error %d", m_className, deviceID,
-                baseStr, (fwVersion / 256), error.value));
+            DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  Incorrect FW version: %d - error %d", m_className, deviceID,
+                name, devType, (fwVersion / 256), error.value));
           break;
         }
 
@@ -117,20 +118,20 @@ public class PhoenixUtil5
 
     if (talonSRXValid)
     {
-      baseStr += "ver: " + (fwVersion / 256.0);
+      verStr = "ver: " + (fwVersion / 256.0);
       error = talonSRX.configFactoryDefault( );
       if (error != ErrorCode.OK)
-        DataLogManager
-            .log(String.format("%s: ID %2d - Msg: configFactoryDefault error - %d", m_className, deviceID, error.value));
+        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  %s Msg: configFactoryDefault error - %d", m_className, deviceID,
+            name, devType, verStr, error.value));
       else
       {
         initialized = true;
         talonSRX.configAllSettings(config);
-        error = talonSRXCheckError(talonSRX, baseStr + "configAllSettings error");
+        error = talonSRXCheckError(talonSRX, String.format(" %15s %8s:  %s configAllSettings error", name, devType, verStr));
       }
     }
 
-    DataLogManager.log(String.format("%s: ID %2d - %s is %s", m_className, deviceID, baseStr,
+    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  %s is %s", m_className, deviceID, name, devType, verStr,
         (talonSRXValid && initialized) ? "VALID!" : "UNRESPONSIVE!"));
 
     return talonSRXValid && initialized;

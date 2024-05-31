@@ -75,8 +75,6 @@ public class PhoenixUtil6
     // Display Talon firmware versions
     deviceID = talonFX.getDeviceID( );
 
-    Timer.delay(0.250);
-
     // This can take multiple attempts before ready
     for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {

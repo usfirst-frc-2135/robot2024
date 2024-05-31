@@ -67,12 +67,12 @@ public class Shooter extends SubsystemBase
   private final FlywheelSim          m_upperFlywheelSim      = new FlywheelSim(DCMotor.getFalcon500(1), kFlywheelGearRatio, kMOI);
 
   // Status signals
-  private final StatusSignal<Double> m_lowerVelocity         = m_lowerMotor.getRotorVelocity( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_lowerSupplyCur        = m_lowerMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_lowerStatorCur        = m_lowerMotor.getStatorCurrent( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_upperVelocity         = m_upperMotor.getRotorVelocity( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_upperSupplyCur        = m_upperMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_upperStatorCur        = m_upperMotor.getStatorCurrent( );   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_lowerVelocity;   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_lowerSupplyCur;  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_lowerStatorCur;  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_upperVelocity;   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_upperSupplyCur;  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_upperStatorCur;  // Default 4Hz (250ms)
 
   // Declare module variables
   private boolean                    m_shooterValid;
@@ -127,6 +127,13 @@ public class Shooter extends SubsystemBase
     m_lowerValidEntry.setBoolean(lowerValid);
     m_upperValidEntry.setBoolean(upperValid);
     m_shooterValid = lowerValid && upperValid;
+
+    m_lowerVelocity = m_lowerMotor.getRotorVelocity( );
+    m_lowerSupplyCur = m_lowerMotor.getSupplyCurrent( );
+    m_lowerStatorCur = m_lowerMotor.getStatorCurrent( );
+    m_upperVelocity = m_upperMotor.getRotorVelocity( );
+    m_upperSupplyCur = m_upperMotor.getSupplyCurrent( );
+    m_upperStatorCur = m_upperMotor.getStatorCurrent( );
 
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_lowerVelocity, m_upperVelocity);
     BaseStatusSignal.setUpdateFrequencyForAll(10, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);

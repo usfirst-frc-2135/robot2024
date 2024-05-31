@@ -97,14 +97,14 @@ public class Climber extends SubsystemBase
   private final MechanismLigament2d  m_mechLigament         = m_climberMech.getRoot("Linear", 0.5, 0.5)
       .append(new MechanismLigament2d(kSubsystemName, kClimberLengthMeters, 0.0, 6, new Color8Bit(Color.kRed)));
 
-  private final StatusSignal<Double> m_leftPosition         = m_leftMotor.getRotorPosition( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_leftSupplyCur        = m_leftMotor.getSupplyCurrent( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_leftStatorCur        = m_leftMotor.getStatorCurrent( );   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_rightPosition        = m_rightMotor.getRotorPosition( );  // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_rightSupplyCur       = m_rightMotor.getSupplyCurrent( );  // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_rightStatorCur       = m_rightMotor.getStatorCurrent( );  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_leftPosition;    // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_leftSupplyCur;   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_leftStatorCur;   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_rightPosition;   // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_rightSupplyCur;  // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_rightStatorCur;  // Default 4Hz (250ms)
 
-  // Declare module variables
+  // Declare module variables 
   private boolean                    m_debug                = true;
   private boolean                    m_climberValid;                  // Health indicator for Falcon 
   private double                     m_leftCurInches        = 0.0;    // Current length in inches on left (default) side
@@ -173,6 +173,13 @@ public class Climber extends SubsystemBase
     m_rightValidEntry.setBoolean(rightValid);
 
     m_rightMotor.setInverted(false);
+
+    m_leftPosition = m_leftMotor.getRotorPosition( );
+    m_leftSupplyCur = m_leftMotor.getSupplyCurrent( );
+    m_leftStatorCur = m_leftMotor.getStatorCurrent( );
+    m_rightPosition = m_rightMotor.getRotorPosition( );
+    m_rightSupplyCur = m_rightMotor.getSupplyCurrent( );
+    m_rightStatorCur = m_rightMotor.getStatorCurrent( );
 
     setClimberPosition(m_leftCurInches);
     DataLogManager.log(String.format("%s: Initial position %.1f inches", getSubsystem( ), m_leftCurInches));

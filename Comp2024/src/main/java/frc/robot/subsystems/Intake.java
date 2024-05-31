@@ -110,10 +110,10 @@ public class Intake extends SubsystemBase
       .append(new MechanismLigament2d(kSubsystemName, 0.5, 0.0, 6, new Color8Bit(Color.kPurple)));
 
   // Status signals
-  private final StatusSignal<Double> m_rotaryPosition      = m_rotaryMotor.getPosition( );       // Default 50Hz (20ms)
-  private final StatusSignal<Double> m_rotarySupplyCur     = m_rotaryMotor.getSupplyCurrent( );  // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_rotaryStatorCur     = m_rotaryMotor.getStatorCurrent( );  // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_ccPosition          = m_CANcoder.getAbsolutePosition( );  // Default 100Hz (10ms)
+  private final StatusSignal<Double> m_rotaryPosition;  // Default 50Hz (20ms)
+  private final StatusSignal<Double> m_rotarySupplyCur; // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_rotaryStatorCur; // Default 4Hz (250ms)
+  private final StatusSignal<Double> m_ccPosition;      // Default 100Hz (10ms)
 
   // Declare module variables
 
@@ -188,6 +188,11 @@ public class Intake extends SubsystemBase
         CTREConfigs6.intakeRotaryCancoderConfig( ));
     m_rotValidEntry.setBoolean(m_rotaryValid);
     m_ccValidEntry.setBoolean(m_canCoderValid);
+
+    m_rotaryPosition = m_rotaryMotor.getPosition( );
+    m_rotarySupplyCur = m_rotaryMotor.getSupplyCurrent( );
+    m_rotaryStatorCur = m_rotaryMotor.getStatorCurrent( );
+    m_ccPosition = m_CANcoder.getAbsolutePosition( ).waitForUpdate(10.0, false);
 
     Double ccRotations = (m_canCoderValid) ? m_ccPosition.refresh( ).getValue( ) : 0.0;
     m_currentDegrees = Units.rotationsToDegrees(ccRotations);

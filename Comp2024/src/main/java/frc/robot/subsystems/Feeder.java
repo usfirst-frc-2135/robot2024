@@ -124,7 +124,6 @@ public class Feeder extends SubsystemBase
   // Rotary variables
   private boolean                    m_rotaryValid;        // Health indicator for motor 
   private boolean                    m_canCoderValid;      // Health indicator for CANcoder 
-  private boolean                    m_debug              = true;
   private double                     m_currentDegrees     = 0.0; // Current angle in degrees
   private double                     m_targetDegrees      = 0.0; // Target angle in degrees
   private double                     m_ccDegrees          = 0.0; // CANcoder angle in degrees
@@ -153,8 +152,6 @@ public class Feeder extends SubsystemBase
   private GenericEntry               m_rotValidEntry      = m_rotaryList.add("rotValid", false).getEntry( );
   private GenericEntry               m_rotDegreesEntry    = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
   private GenericEntry               m_rotCLoopErrorEntry = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
-  private GenericEntry               m_rotSupCurEntry     = m_rotaryList.add("rotSupCur", 0.0).getEntry( );
-  private GenericEntry               m_rotStatCurEntry    = m_rotaryList.add("rotStatCur", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_statusList         =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
@@ -205,7 +202,7 @@ public class Feeder extends SubsystemBase
 
     // Status signals
     m_rotaryPosition.setUpdateFrequency(50);
-    if (m_debug)
+
       BaseStatusSignal.setUpdateFrequencyForAll(10, m_rotarySupplyCur, m_rotaryStatorCur);
 
     DataLogManager.log(
@@ -239,14 +236,7 @@ public class Feeder extends SubsystemBase
     m_rotDegreesEntry.setDouble(m_currentDegrees);
     m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
-
-    if (m_debug)
-    {
-      BaseStatusSignal.refreshAll(m_rotarySupplyCur, m_rotaryStatorCur);
       m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
-      m_rotSupCurEntry.setDouble(m_rotarySupplyCur.getValue( ));
-      m_rotStatCurEntry.setDouble(m_rotaryStatorCur.getValue( ));
-    }
   }
 
   /****************************************************************************

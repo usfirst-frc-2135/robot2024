@@ -76,7 +76,6 @@ public class Shooter extends SubsystemBase
 
   // Declare module variables
   private boolean                    m_shooterValid;
-  private boolean                    m_debug                 = true;
   private boolean                    m_isAttargetRPM         = false; // Indicates flywheel RPM is close to target
   private boolean                    m_isAttargetRPMPrevious = false;
 
@@ -95,15 +94,11 @@ public class Shooter extends SubsystemBase
       m_shooterTab.getLayout("Lower", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   GenericEntry                       m_lowerValidEntry       = m_lowerList.add("lowerValid", false).getEntry( );
   GenericEntry                       m_lowerSpeedEntry       = m_lowerList.add("lowerSpeed", 0.0).getEntry( );
-  GenericEntry                       m_lowerSupCurEntry      = m_lowerList.add("lowerSupCur", 0.0).getEntry( );
-  GenericEntry                       m_lowerStatCurEntry     = m_lowerList.add("lowerStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                 m_upperList             =
       m_shooterTab.getLayout("Upper", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   GenericEntry                       m_upperValidEntry       = m_upperList.add("upperValid", false).getEntry( );
   GenericEntry                       m_upperSpeedEntry       = m_upperList.add("upperSpeed", 0.0).getEntry( );
-  GenericEntry                       m_upperSupCurEntry      = m_upperList.add("upperSupCur", 0.0).getEntry( );
-  GenericEntry                       m_upperStatCurEntry     = m_upperList.add("upperStatCur", 0.0).getEntry( );
 
   ShuffleboardLayout                 m_statusList            =
       m_shooterTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
@@ -136,7 +131,6 @@ public class Shooter extends SubsystemBase
     m_upperStatorCur = m_upperMotor.getStatorCurrent( );
 
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_lowerVelocity, m_upperVelocity);
-    BaseStatusSignal.setUpdateFrequencyForAll(10, m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
 
     DataLogManager.log(String.format(
         "%s: Update (Hz) lowerVelocity: %.1f upperVelocity: %.1f lowerSupplyCur: %.1f lowerStatorCur: %.1f upperSupplyCur: %.1f upperStatorCur: %.1f",
@@ -174,15 +168,6 @@ public class Shooter extends SubsystemBase
       {
         DataLogManager.log(String.format("%s: At desired speed now: %.1f", getSubsystem( ), m_targetRPM));
         m_isAttargetRPMPrevious = m_isAttargetRPM;
-      }
-
-      if (m_debug)
-      {
-        BaseStatusSignal.refreshAll(m_lowerSupplyCur, m_lowerStatorCur, m_upperSupplyCur, m_upperStatorCur);
-        m_lowerSupCurEntry.setDouble(m_lowerSupplyCur.getValue( ));
-        m_lowerStatCurEntry.setDouble(m_lowerStatorCur.getValue( ));
-        m_upperSupCurEntry.setDouble(m_upperSupplyCur.getValue( ));
-        m_upperStatCurEntry.setDouble(m_upperStatorCur.getValue( ));
       }
     }
 

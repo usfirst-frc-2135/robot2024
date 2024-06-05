@@ -105,7 +105,6 @@ public class Climber extends SubsystemBase
   private final StatusSignal<Double> m_rightStatorCur;  // Default 4Hz (250ms)
 
   // Declare module variables 
-  private boolean                    m_debug                = true;
   private boolean                    m_climberValid;                  // Health indicator for Falcon 
   private double                     m_leftCurInches        = 0.0;    // Current length in inches on left (default) side
   private double                     m_rightCurInches       = 0.0;    // Current length in inches on right side
@@ -137,16 +136,12 @@ public class Climber extends SubsystemBase
   private GenericEntry               m_leftValidEntry       = m_leftList.add("leftValid", false).getEntry( );
   private GenericEntry               m_leftInchesEntry      = m_leftList.add("leftInches", 0.0).getEntry( );
   private GenericEntry               m_leftCLoopErrorEntry  = m_leftList.add("leftCLoopError", 0.0).getEntry( );
-  private GenericEntry               m_leftSupCurEntry      = m_leftList.add("leftSupCur", 0.0).getEntry( );
-  private GenericEntry               m_leftStatCurEntry     = m_leftList.add("leftStatCur", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_rightList            =
       m_subsystemTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   private GenericEntry               m_rightValidEntry      = m_rightList.add("righttValid", false).getEntry( );
   private GenericEntry               m_rightInchesEntry     = m_rightList.add("rightInches", 0.0).getEntry( );
   private GenericEntry               m_rightCLoopErrorEntry = m_rightList.add("rightCLoopError", 0.0).getEntry( );
-  private GenericEntry               m_rightSupCurEntry     = m_rightList.add("rightSupCur", 0.0).getEntry( );
-  private GenericEntry               m_rightStatCurEntry    = m_rightList.add("rightStatCur", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_statusList           =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
@@ -189,8 +184,6 @@ public class Climber extends SubsystemBase
 
     // Status signals
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_leftPosition, m_rightPosition);
-    if (m_debug)
-      BaseStatusSignal.setUpdateFrequencyForAll(10, m_leftSupplyCur, m_leftStatorCur, m_rightSupplyCur, m_rightStatorCur);
 
     DataLogManager.log(String.format(
         "%s: Update (Hz) leftPosition: %.1f rightPosition: %.1f leftSupplyCur: %.1f leftStatorCur: %.1f rightSupplyCur: %.1f rightStatorCur: %.1f",
@@ -223,16 +216,8 @@ public class Climber extends SubsystemBase
     m_leftInchesEntry.setDouble(m_leftCurInches);
     m_rightInchesEntry.setDouble(m_rightCurInches);
     m_targetInchesEntry.setDouble(m_targetInches);
-    if (m_debug)
-    {
-      BaseStatusSignal.refreshAll(m_leftSupplyCur, m_leftStatorCur, m_rightSupplyCur, m_rightStatorCur);
       m_leftCLoopErrorEntry.setDouble(m_targetInches - m_leftCurInches);
-      m_leftSupCurEntry.setDouble(m_leftSupplyCur.getValue( ));
-      m_leftStatCurEntry.setDouble(m_leftStatorCur.getValue( ));
       m_rightCLoopErrorEntry.setDouble(m_targetInches - m_rightCurInches);
-      m_rightSupCurEntry.setDouble(m_rightSupplyCur.getValue( ));
-      m_rightStatCurEntry.setDouble(m_rightStatorCur.getValue( ));
-    }
   }
 
   /****************************************************************************

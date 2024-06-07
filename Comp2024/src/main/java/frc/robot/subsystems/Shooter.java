@@ -68,11 +68,7 @@ public class Shooter extends SubsystemBase
 
   // Status signals
   private final StatusSignal<Double> m_lowerVelocity;   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_lowerSupplyCur;  // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_lowerStatorCur;  // Default 4Hz (250ms)
   private final StatusSignal<Double> m_upperVelocity;   // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_upperSupplyCur;  // Default 4Hz (250ms)
-  private final StatusSignal<Double> m_upperStatorCur;  // Default 4Hz (250ms)
 
   // Declare module variables
   private boolean                    m_shooterValid;
@@ -124,13 +120,14 @@ public class Shooter extends SubsystemBase
     m_shooterValid = lowerValid && upperValid;
 
     m_lowerVelocity = m_lowerMotor.getRotorVelocity( );
-    m_lowerSupplyCur = m_lowerMotor.getSupplyCurrent( );
-    m_lowerStatorCur = m_lowerMotor.getStatorCurrent( );
     m_upperVelocity = m_upperMotor.getRotorVelocity( );
-    m_upperSupplyCur = m_upperMotor.getSupplyCurrent( );
-    m_upperStatorCur = m_upperMotor.getStatorCurrent( );
 
     BaseStatusSignal.setUpdateFrequencyForAll(50, m_lowerVelocity, m_upperVelocity);
+
+    StatusSignal<Double> m_lowerSupplyCur = m_lowerMotor.getSupplyCurrent( ); // Default 4Hz (250ms)
+    StatusSignal<Double> m_lowerStatorCur = m_lowerMotor.getStatorCurrent( ); // Default 4Hz (250ms)
+    StatusSignal<Double> m_upperSupplyCur = m_upperMotor.getSupplyCurrent( ); // Default 4Hz (250ms)
+    StatusSignal<Double> m_upperStatorCur = m_upperMotor.getStatorCurrent( ); // Default 4Hz (250ms)
 
     DataLogManager.log(String.format(
         "%s: Update (Hz) lowerVelocity: %.1f upperVelocity: %.1f lowerSupplyCur: %.1f lowerStatorCur: %.1f upperSupplyCur: %.1f upperStatorCur: %.1f",

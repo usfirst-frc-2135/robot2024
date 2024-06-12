@@ -362,8 +362,7 @@ public class Climber extends SubsystemBase
     if (holdPosition)
       newLength = m_leftCurInches;
 
-    if (newLength < 0.25)
-      newLength = 0.25;
+    newLength = MathUtil.clamp(newLength, 0.25, kLengthMax);
 
     // Decide if a new position request
     if (holdPosition || newLength != m_targetInches || !MathUtil.isNear(newLength, m_leftCurInches, kToleranceInches))
@@ -453,6 +452,7 @@ public class Climber extends SubsystemBase
     m_leftCalibrated = false;
     m_rightCalibrated = false;
     m_calibrateTimer.restart( );
+    // Reset the debouce filters
     m_leftStalled.calculate(false);
     m_rightStalled.calculate(false);
     setVoltage(kCalibrateSpeedVolts, kCalibrateSpeedVolts);

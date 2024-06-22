@@ -190,13 +190,23 @@ public class RobotContainer
    */
   public RobotContainer( )
   {
+    Robot.timeMarker("robotContainer: before DAQ thread");
+
     m_drivetrain.getDaqThread( ).setThreadPriority(99);   // Start swerve telemetry thread
+
+    Robot.timeMarker("robotContainer: after DAQ thread");
 
     addDashboardWidgets( );      // Add dashboard widgets for commands
 
+    Robot.timeMarker("robotContainer: after dashboard widgets");
+
     configureButtonBindings( );       // Configure game controller buttons
 
+    Robot.timeMarker("robotContainer: after button bindings");
+
     initDefaultCommands( );           // Initialize subsystem default commands
+
+    Robot.timeMarker("robotContainer: after default commands");
   }
 
   /****************************************************************************

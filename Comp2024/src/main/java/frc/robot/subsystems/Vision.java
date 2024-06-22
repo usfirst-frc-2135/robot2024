@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.lib.LimelightHelpers;
 
 /****************************************************************************
@@ -77,9 +78,13 @@ public class Vision extends SubsystemBase
     setName("Vision");
     setSubsystem("Vision");
 
+    Robot.timeMarker(getName( ) + ": constructor start");
+
     // Get the Network table reference once for all methods
 
     initialize( );
+
+    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

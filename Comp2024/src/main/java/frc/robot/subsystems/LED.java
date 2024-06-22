@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConsts.ANIMATION;
 import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.Constants.Ports;
+import frc.robot.Robot;
 import frc.robot.lib.phoenix.PhoenixUtil5;
 
 /****************************************************************************
@@ -87,11 +88,15 @@ public class LED extends SubsystemBase
     setName("LED");
     setSubsystem("LED");
 
+    Robot.timeMarker(getName( ) + ": constructor start");
+
     m_candle.configBrightnessScalar(kBrightness);
     m_candle.clearAnimation(kSlot);
 
     initDashboard( );
     initialize( );
+
+    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

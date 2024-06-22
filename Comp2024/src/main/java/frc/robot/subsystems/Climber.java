@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
+import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
 import frc.robot.lib.phoenix.PhoenixUtil6;
@@ -158,6 +159,8 @@ public class Climber extends SubsystemBase
     setName(kSubsystemName);
     setSubsystem(kSubsystemName);
 
+    Robot.timeMarker(getName( ) + ": constructor start");
+
     // Initialize climber motors
     boolean leftValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_leftMotor, kSubsystemName + "Left",
         CTREConfigs6.climberFXConfig(Units.degreesToRotations(kLengthMin), Units.degreesToRotations(kLengthMax)));
@@ -193,6 +196,7 @@ public class Climber extends SubsystemBase
 
     initDashboard( );
     initialize( );
+    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************
@@ -216,8 +220,8 @@ public class Climber extends SubsystemBase
     m_leftInchesEntry.setDouble(m_leftCurInches);
     m_rightInchesEntry.setDouble(m_rightCurInches);
     m_targetInchesEntry.setDouble(m_targetInches);
-      m_leftCLoopErrorEntry.setDouble(m_targetInches - m_leftCurInches);
-      m_rightCLoopErrorEntry.setDouble(m_targetInches - m_rightCurInches);
+    m_leftCLoopErrorEntry.setDouble(m_targetInches - m_leftCurInches);
+    m_rightCLoopErrorEntry.setDouble(m_targetInches - m_rightCurInches);
   }
 
   /****************************************************************************

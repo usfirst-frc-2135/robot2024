@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -23,6 +24,7 @@ public class Robot extends TimedRobot
   private final RobotContainer m_robotContainer = new RobotContainer( );  // Create that robot
   private Command              m_autonomousCommand;
   private boolean              m_faultsCleared  = false;
+  private static double        m_timeMark       = Timer.getFPGATimestamp( );
 
   /****************************************************************************
    * 
@@ -33,6 +35,8 @@ public class Robot extends TimedRobot
   {
     // Starts recording to data log
     DataLogManager.start( );
+    DriverStation.startDataLog(DataLogManager.getLog( ));
+    Robot.timeMarker("robotInit: start");
 
     // Log when commands initialize, interrupt, and end states
     CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(String.format("%s: Init", cmd.getName( ))));
@@ -46,10 +50,12 @@ public class Robot extends TimedRobot
     PortForwarder.add(5803, "limelight.local", 5803);
     PortForwarder.add(5804, "limelight.local", 5804);
     PortForwarder.add(5805, "limelight.local", 5805);
+    Robot.timeMarker("robotInit: before warmup");
 
     // Put command scheduler on dashbaord for debugging
 
     FollowPathCommand.warmupCommand( ).withName("PathPlannerWarmupCommand").schedule( ); // Recommended by PathPlanner docs
+    Robot.timeMarker("robotInit: after warmup");
   }
 
   /****************************************************************************
@@ -83,7 +89,11 @@ public class Robot extends TimedRobot
         DriverStation.getMatchNumber( ), DriverStation.getAlliance( ).toString( )));
     DataLogManager.log(String.format("=========================================================="));
 
+    Robot.timeMarker("disabledInit: before init");
+
     m_robotContainer.initialize( );
+
+    Robot.timeMarker("disabledInit: after init");
   }
 
   /**
@@ -237,6 +247,20 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("robotContainer: Detected the %s robot (RoboRIO)!", robotName));
 
     return isComp;
+  }
+
+  /****************************************************************************
+   * 
+   * Our robot detection process between competition and beta (practice) robots
+   */
+  public static void timeMarker(String msg)
+  {
+    double current = Timer.getFPGATimestamp( );
+
+    DataLogManager
+        .log(String.format("***** TimeMarker ***** absolute: %.3f relative: %.3f - %s", current, current - m_timeMark, msg));
+
+    m_timeMark = current;
   }
 
 }

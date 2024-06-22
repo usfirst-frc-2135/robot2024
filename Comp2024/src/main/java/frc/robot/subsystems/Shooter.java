@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
+import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
 import frc.robot.lib.phoenix.PhoenixUtil6;
@@ -111,6 +112,8 @@ public class Shooter extends SubsystemBase
     setName("Shooter");
     setSubsystem("Shooter");
 
+    Robot.timeMarker(getName( ) + ": constructor start");
+
     boolean lowerValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, kSubsystemName + "Lower", CTREConfigs6.shooterFXConfig( ));
     boolean upperValid =
@@ -137,6 +140,8 @@ public class Shooter extends SubsystemBase
 
     initDashboard( );
     initialize( );
+
+    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

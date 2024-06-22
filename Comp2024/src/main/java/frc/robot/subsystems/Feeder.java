@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.Ports;
+import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs5;
 import frc.robot.lib.phoenix.CTREConfigs6;
@@ -167,6 +168,8 @@ public class Feeder extends SubsystemBase
     setName(kSubsystemName);
     setSubsystem(kSubsystemName);
 
+    Robot.timeMarker(getName( ) + ": constructor start");
+
     // Roller motor init
     m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, kSubsystemName + "Roller",
         CTREConfigs5.feederRollerConfig( ));
@@ -201,7 +204,7 @@ public class Feeder extends SubsystemBase
 
     StatusSignal<Double> m_rotarySupplyCur = m_rotaryMotor.getSupplyCurrent( ); // Default 4Hz (250ms)
     StatusSignal<Double> m_rotaryStatorCur = m_rotaryMotor.getStatorCurrent( ); // Default 4Hz (250ms)
-      BaseStatusSignal.setUpdateFrequencyForAll(10, m_rotarySupplyCur, m_rotaryStatorCur);
+    BaseStatusSignal.setUpdateFrequencyForAll(10, m_rotarySupplyCur, m_rotaryStatorCur);
 
     DataLogManager.log(
         String.format("%s: Update (Hz) rotaryPosition: %.1f rotarySupplyCur: %.1f rotaryStatorCur: %.1f canCoderPosition: %.1f",
@@ -210,6 +213,8 @@ public class Feeder extends SubsystemBase
 
     initDashboard( );
     initialize( );
+
+    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************
@@ -234,7 +239,7 @@ public class Feeder extends SubsystemBase
     m_rotDegreesEntry.setDouble(m_currentDegrees);
     m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
-      m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
+    m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
   }
 
   /****************************************************************************

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 /****************************************************************************
  * 
@@ -31,11 +32,15 @@ public class HID extends SubsystemBase
     setName("HID");
     setSubsystem("HID");
 
+    Robot.timeMarker(getName( ) + ": constructor start");
+
     m_driver = driver;
     m_operator = operator;
 
     initDashboard( );
     initialize( );
+
+    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

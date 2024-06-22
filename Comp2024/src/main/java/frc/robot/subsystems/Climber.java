@@ -396,9 +396,7 @@ public class Climber extends SubsystemBase
    * Continuously update Motion Magic setpoint
    */
   private void moveToPositionExecute( )
-  {
-    setMMPosition(m_targetInches);
-  }
+  {}
 
   /****************************************************************************
    * 
@@ -411,6 +409,8 @@ public class Climber extends SubsystemBase
     boolean timedOut = m_mmMoveTimer.hasElapsed(kMMMoveTimeout);
     double error = m_targetInches - m_leftCurInches;
     boolean hittingHardStop = (m_targetInches <= 0.0) && (m_leftCurInches <= 1.0) && (m_hardStopCounter++ >= 10);
+
+    setMMPosition(m_targetInches);
 
     if (hold)
       return false;
@@ -464,12 +464,7 @@ public class Climber extends SubsystemBase
    * 
    */
   private void calibrateExecute( )
-  {
-    m_leftCalibrated = m_leftStalled.calculate(m_leftStatorCur.getValue( ) > kCalibrateStallAmps);
-    m_rightCalibrated = m_rightStalled.calculate(m_rightStatorCur.getValue( ) > kCalibrateStallAmps);
-
-    setVoltage((m_leftCalibrated) ? 0.0 : kCalibrateSpeedVolts, (m_rightCalibrated) ? 0.0 : kCalibrateSpeedVolts);
-  }
+  {}
 
   /****************************************************************************
    * 
@@ -479,6 +474,19 @@ public class Climber extends SubsystemBase
    */
   private boolean calibrateIsFinished( )
   {
+    boolean leftCalibrated = m_leftStalled.calculate(m_leftStatorCur.getValue( ) > kCalibrateStallAmps);
+    boolean rightCalibrated = m_rightStalled.calculate(m_rightStatorCur.getValue( ) > kCalibrateStallAmps);
+
+    if (leftCalibrated && !m_leftCalibrated)
+      DataLogManager.log(String.format("%s: Left stalled %s (right %s)", getSubsystem( ), leftCalibrated, rightCalibrated));
+    if (rightCalibrated && !m_rightCalibrated)
+      DataLogManager.log(String.format("%s: Right stalled %s (left %s)", getSubsystem( ), rightCalibrated, leftCalibrated));
+
+    m_leftCalibrated = leftCalibrated;
+    m_rightCalibrated = rightCalibrated;
+
+    setVoltage((m_leftCalibrated) ? 0.0 : kCalibrateSpeedVolts, (m_rightCalibrated) ? 0.0 : kCalibrateSpeedVolts);
+
     return (m_leftCalibrated && m_rightCalibrated) || m_calibrateTimer.hasElapsed(kCalibrationTimeout);
   }
 

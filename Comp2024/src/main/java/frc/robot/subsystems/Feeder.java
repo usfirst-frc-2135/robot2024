@@ -414,9 +414,7 @@ public class Feeder extends SubsystemBase
    * Continuously update Motion Magic setpoint
    */
   public void moveToPositionExecute( )
-  {
-    m_rotaryMotor.setControl(m_mmRequestVolts.withPosition(Units.degreesToRotations(m_targetDegrees)));
-  }
+  {}
 
   /****************************************************************************
    * 
@@ -428,6 +426,8 @@ public class Feeder extends SubsystemBase
   {
     boolean timedOut = m_mmMoveTimer.hasElapsed(kMMMoveTimeout);
     double error = m_targetDegrees - m_currentDegrees;
+
+    m_rotaryMotor.setControl(m_mmRequestVolts.withPosition(Units.degreesToRotations(m_targetDegrees)));
 
     if (hold)
       return false;

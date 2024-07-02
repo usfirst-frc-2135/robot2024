@@ -21,9 +21,10 @@ import frc.robot.Constants;
  */
 public class PhoenixUtil5
 {
-  private static PhoenixUtil5 instance    = null;
-  private static final int    m_retries   = 5;    // Number of version check attempts
-  private static final String m_className = "PhoenixUtil5";
+  private static final int    kRetries   = 5;    // Number of version check attempts
+  private static final String kClassName = "PhoenixUtil5";
+
+  private static PhoenixUtil5 instance   = null;
 
   /****************************************************************************
    * 
@@ -62,7 +63,7 @@ public class PhoenixUtil5
     int deviceID = talonSRX.getDeviceID( );
 
     if (errorCode != ErrorCode.OK)
-      DataLogManager.log(String.format("%s: ID %2d - Msg: %s - error %d", m_className, deviceID, message, errorCode.value));
+      DataLogManager.log(String.format("%s: ID %2d - Msg: %s - error %d", kClassName, deviceID, message, errorCode.value));
 
     return errorCode;
   }
@@ -98,7 +99,7 @@ public class PhoenixUtil5
     if (error == ErrorCode.OK)
     {
       // This can take multiple attempts before ready
-      for (int i = 0; i < m_retries && fwVersion == 0; i++)
+      for (int i = 0; i < kRetries && fwVersion == 0; i++)
       {
         fwVersion = talonSRX.getFirmwareVersion( );
         error = talonSRXCheckError(talonSRX, String.format(" %15s %8s:  getFirmwareVersion error", name, devType));
@@ -107,7 +108,7 @@ public class PhoenixUtil5
         {
           talonSRXValid = true;
           if (fwVersion < Constants.kPhoenix5MajorVersion)
-            DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  Incorrect FW version: %d - error %d", m_className, deviceID,
+            DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  Incorrect FW version: %d - error %d", kClassName, deviceID,
                 name, devType, (fwVersion / 256), error.value));
           break;
         }
@@ -121,7 +122,7 @@ public class PhoenixUtil5
       verStr = "ver: " + (fwVersion / 256.0);
       error = talonSRX.configFactoryDefault( );
       if (error != ErrorCode.OK)
-        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  %s Msg: configFactoryDefault error - %d", m_className, deviceID,
+        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  %s Msg: configFactoryDefault error - %d", kClassName, deviceID,
             name, devType, verStr, error.value));
       else
       {
@@ -131,7 +132,7 @@ public class PhoenixUtil5
       }
     }
 
-    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  %s is %s", m_className, deviceID, name, devType, verStr,
+    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  %s is %s", kClassName, deviceID, name, devType, verStr,
         (talonSRXValid && initialized) ? "VALID!" : "UNRESPONSIVE!"));
 
     return talonSRXValid && initialized;

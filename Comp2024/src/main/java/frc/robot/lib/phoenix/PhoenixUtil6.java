@@ -23,10 +23,11 @@ import frc.robot.Constants;
  */
 public class PhoenixUtil6
 {
+  private static final int    kRetries    = 5;    // Number of version check attempts
+  private static final String kClassName  = "PhoenixUtil6";
+  private static final double kCANTimeout = 0.100;
+
   private static PhoenixUtil6 m_instance  = null;
-  private static final int    m_retries   = 5;    // Number of version check attempts
-  private static final String m_className = "PhoenixUtil6";
-  private static double       m_timeout   = 0.100;
 
   /****************************************************************************
    * 
@@ -76,7 +77,7 @@ public class PhoenixUtil6
     deviceID = talonFX.getDeviceID( );
 
     // This can take multiple attempts before ready
-    for (int i = 0; i < m_retries && fwvMajor == 0; i++)
+    for (int i = 0; i < kRetries && fwvMajor == 0; i++)
     {
       StatusSignal<Integer> statusSignal = talonFX.getVersion( ).waitForUpdate(0.250);
       status = statusSignal.getStatus( );
@@ -94,22 +95,22 @@ public class PhoenixUtil6
     talonValid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
-      if ((status = talonFX.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  getConfigurator.apply - %s!", m_className, deviceID, name,
+      if ((status = talonFX.getConfigurator( ).apply(config, kCANTimeout)) != StatusCode.OK)
+        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  getConfigurator.apply - %s!", kClassName, deviceID, name,
             devType, status.getDescription( )));
 
     if ((status = talonFX.setControl(new VoltageOut(0))) != StatusCode.OK)
-      DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  setControl - %s!", m_className, deviceID, name, devType,
+      DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  setControl - %s!", kClassName, deviceID, name, devType,
           status.getDescription( )));
 
     // Configure sensor settings
     if ((status = talonFX.setPosition(0.0)) != StatusCode.OK)
-      DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  setRotorPosition - %s!", m_className, deviceID, name, devType,
+      DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  setRotorPosition - %s!", kClassName, deviceID, name, devType,
           status.getDescription( )));
 
     talonFX.setSafetyEnabled(false);
 
-    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, devType,
+    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  ver: %d.%d.%d.%d is %s!", kClassName, deviceID, name, devType,
         fwvMajor, fwvMinor, fwvBugfix, fwvBuild, (talonValid) ? "VALID" : "URESPONSIVE"));
 
     return talonValid;
@@ -142,7 +143,7 @@ public class PhoenixUtil6
     deviceID = canCoder.getDeviceID( );
 
     // This can take multiple attempts before ready
-    for (int i = 0; i < m_retries && fwvMajor == 0; i++)
+    for (int i = 0; i < kRetries && fwvMajor == 0; i++)
     {
       StatusSignal<Integer> statusSignal = canCoder.getVersion( );
       status = statusSignal.getStatus( );
@@ -160,11 +161,11 @@ public class PhoenixUtil6
     canCoderValid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
-      if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  getConfigurator.apply - %s!", m_className, deviceID, name,
+      if ((status = canCoder.getConfigurator( ).apply(config, kCANTimeout)) != StatusCode.OK)
+        DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  getConfigurator.apply - %s!", kClassName, deviceID, name,
             devType, status.getDescription( )));
 
-    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, devType,
+    DataLogManager.log(String.format("%s: ID %2d - %15s %8s:  ver: %d.%d.%d.%d is %s!", kClassName, deviceID, name, devType,
         fwvMajor, fwvMinor, fwvBugfix, fwvBuild, (canCoderValid) ? "VALID" : "URESPONSIVE"));
 
     return canCoderValid;
@@ -196,7 +197,7 @@ public class PhoenixUtil6
     Timer.delay(0.25);
 
     // This can take multiple attempts before ready
-    for (int i = 0; i < m_retries && fwvMajor == 0; i++)
+    for (int i = 0; i < kRetries && fwvMajor == 0; i++)
     {
       StatusSignal<Integer> statusSignal = pigeon2.getVersion( );
       status = statusSignal.getStatus( );
@@ -214,16 +215,16 @@ public class PhoenixUtil6
     pigeon2Valid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
-      if ((status = pigeon2.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %2d - pigeon2:      getConfigurator.apply - %s!", m_className, deviceID,
+      if ((status = pigeon2.getConfigurator( ).apply(config, kCANTimeout)) != StatusCode.OK)
+        DataLogManager.log(String.format("%s: ID %2d - pigeon2:      getConfigurator.apply - %s!", kClassName, deviceID,
             status.getDescription( )));
 
     // Configure sensor settings
     if ((status = pigeon2.setYaw(0.0)) != StatusCode.OK)
       DataLogManager
-          .log(String.format("%s: ID %2d - pigeon2:      setYaw - %s!", m_className, deviceID, status.getDescription( )));
+          .log(String.format("%s: ID %2d - pigeon2:      setYaw - %s!", kClassName, deviceID, status.getDescription( )));
 
-    DataLogManager.log(String.format("%s: ID %2d - pigeon2:      ver: %d.%d.%d.%d is %s!", m_className, deviceID, fwvMajor,
+    DataLogManager.log(String.format("%s: ID %2d - pigeon2:      ver: %d.%d.%d.%d is %s!", kClassName, deviceID, fwvMajor,
         fwvMinor, fwvBugfix, fwvBuild, (pigeon2Valid) ? "VALID" : "URESPONSIVE"));
 
     return pigeon2Valid;

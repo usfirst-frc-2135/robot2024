@@ -94,10 +94,10 @@ public class Intake extends SubsystemBase
   private static final double        kRotaryAngleMax       = 101.4;
 
   // Device objects
-  private static final WPI_TalonSRX  m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
-  private static final TalonFX       m_rotaryMotor         = new TalonFX(Ports.kCANID_IntakeRotary);
-  private static final CANcoder      m_CANcoder            = new CANcoder(Ports.kCANID_IntakeCANcoder);
-  private static final DigitalInput  m_noteInIntake        = new DigitalInput(Ports.kDIO0_NoteInIntake);
+  private final WPI_TalonSRX         m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
+  private final TalonFX              m_rotaryMotor         = new TalonFX(Ports.kCANID_IntakeRotary);
+  private final CANcoder             m_CANcoder            = new CANcoder(Ports.kCANID_IntakeCANcoder);
+  private final DigitalInput         m_noteInIntake        = new DigitalInput(Ports.kDIO0_NoteInIntake);
 
   // Simulation objects
   private final TalonFXSimState      m_rotarySim           = m_rotaryMotor.getSimState( );

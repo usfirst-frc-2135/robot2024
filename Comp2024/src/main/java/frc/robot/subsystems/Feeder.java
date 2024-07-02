@@ -93,10 +93,10 @@ public class Feeder extends SubsystemBase
   private static final double        kRotaryAngleMax      = 90.0;
 
   // Device objects
-  private static final WPI_TalonSRX  m_rollerMotor        = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
-  private static final TalonFX       m_rotaryMotor        = new TalonFX(Ports.kCANID_FeederRotary);
-  private static final CANcoder      m_CANcoder           = new CANcoder(Ports.kCANID_FeederCANcoder);
-  private static final DigitalInput  m_noteInFeeder       = new DigitalInput(Ports.kDIO1_NoteInFeeder);
+  private final WPI_TalonSRX         m_rollerMotor        = new WPI_TalonSRX(Ports.kCANID_FeederRoller);
+  private final TalonFX              m_rotaryMotor        = new TalonFX(Ports.kCANID_FeederRotary);
+  private final CANcoder             m_CANcoder           = new CANcoder(Ports.kCANID_FeederCANcoder);
+  private final DigitalInput         m_noteInFeeder       = new DigitalInput(Ports.kDIO1_NoteInFeeder);
 
   // Simulation objects
   private final TalonFXSimState      m_rotarySim          = m_rotaryMotor.getSimState( );

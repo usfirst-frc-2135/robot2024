@@ -50,7 +50,6 @@ import frc.robot.Constants.VIConsts;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.LimelightHelpers;
-import frc.robot.lib.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -106,10 +105,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
 
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
-      1.0,       // kMaxVelocityMps                               (slowed from 3.0 for testing)    
-      1.0, // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  
-      1.0 * Math.PI,            // kMaxAngularSpeedRadiansPerSecond              (slowed from 2.0 * Math.PI for testing)  
-      1.0 * Math.PI             // kMaxAngularSpeedRadiansPerSecondSquared       (slowed from 1.5 * Math.PIfor testing)  
+      1.0,            // kMaxVelocityMps                               (slowed from 3.0 for testing)    
+      1.0,            // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  
+      1.0 * Math.PI,  // kMaxAngularSpeedRadiansPerSecond              (slowed from 2.0 * Math.PI for testing)  
+      1.0 * Math.PI   // kMaxAngularSpeedRadiansPerSecondSquared       (slowed from 1.5 * Math.PIfor testing)  
   );
 
   // Shuffleboard objects
@@ -270,19 +269,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
       }
 
-    // MegaTag1 logic (used with LL Helper library v1.4)
-    // PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-    // if (poseEstimate.tagCount >= 2)
-    // {
-    //   setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-    //   addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+      // MegaTag1 logic (used with LL Helper library v1.4)
+      // LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      // if (poseEstimate.tagCount >= 2)
+      // {
+      //   setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      //   addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
 
-    //   fieldTypePub.set("Field2d");
-    //   fieldPub.set(new double[ ]
-    //   {
-    //       poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
-    //   });
-    // }
+      //   fieldTypePub.set("Field2d");
+      //   fieldPub.set(new double[ ]
+      //   {
+      //       poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
+      //   });
+      // }
     }
   }
 

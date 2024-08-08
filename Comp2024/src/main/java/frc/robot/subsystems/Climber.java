@@ -170,8 +170,6 @@ public class Climber extends SubsystemBase
     m_leftValidEntry.setBoolean(leftValid);
     m_rightValidEntry.setBoolean(rightValid);
 
-    m_rightMotor.setInverted(false);
-
     m_leftPosition = m_leftMotor.getRotorPosition( );
     m_leftSupplyCur = m_leftMotor.getSupplyCurrent( );
     m_leftStatorCur = m_leftMotor.getStatorCurrent( );
@@ -179,20 +177,26 @@ public class Climber extends SubsystemBase
     m_rightSupplyCur = m_rightMotor.getSupplyCurrent( );
     m_rightStatorCur = m_rightMotor.getStatorCurrent( );
 
-    setClimberPosition(m_leftCurInches);
+    if (m_climberValid)
+    {
+      m_rightMotor.setInverted(false);
+
+      setClimberPosition(m_leftCurInches);
+
+      // Status signals
+      BaseStatusSignal.setUpdateFrequencyForAll(50, m_leftPosition, m_rightPosition);
+
+      DataLogManager.log(String.format(
+          "%s: Update (Hz) leftPosition: %.1f rightPosition: %.1f leftSupplyCur: %.1f leftStatorCur: %.1f rightSupplyCur: %.1f rightStatorCur: %.1f",
+          getSubsystem( ), m_leftPosition.getAppliedUpdateFrequency( ), m_rightPosition.getAppliedUpdateFrequency( ),
+          m_leftSupplyCur.getAppliedUpdateFrequency( ), m_leftStatorCur.getAppliedUpdateFrequency( ),
+          m_rightSupplyCur.getAppliedUpdateFrequency( ), m_rightStatorCur.getAppliedUpdateFrequency( )));
+    }
+
     DataLogManager.log(String.format("%s: Initial position %.1f inches", getSubsystem( ), m_leftCurInches));
 
     // Simulation object initialization
     m_climberSim.Orientation = ChassisReference.CounterClockwise_Positive;
-
-    // Status signals
-    BaseStatusSignal.setUpdateFrequencyForAll(50, m_leftPosition, m_rightPosition);
-
-    DataLogManager.log(String.format(
-        "%s: Update (Hz) leftPosition: %.1f rightPosition: %.1f leftSupplyCur: %.1f leftStatorCur: %.1f rightSupplyCur: %.1f rightStatorCur: %.1f",
-        getSubsystem( ), m_leftPosition.getAppliedUpdateFrequency( ), m_rightPosition.getAppliedUpdateFrequency( ),
-        m_leftSupplyCur.getAppliedUpdateFrequency( ), m_leftStatorCur.getAppliedUpdateFrequency( ),
-        m_rightSupplyCur.getAppliedUpdateFrequency( ), m_rightStatorCur.getAppliedUpdateFrequency( )));
 
     initDashboard( );
     initialize( );
@@ -208,11 +212,14 @@ public class Climber extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    BaseStatusSignal.refreshAll(m_leftPosition, m_rightPosition);
-    m_leftCurInches = Conversions.rotationsToWinchInches(m_leftPosition.getValue( ), kRolloutRatio);
-    m_rightCurInches = Conversions.rotationsToWinchInches(m_rightPosition.getValue( ), kRolloutRatio);
-    if (m_leftCurInches < 0)
-      setClimberPosition(0.0);
+    if (m_climberValid)
+    {
+      BaseStatusSignal.refreshAll(m_leftPosition, m_rightPosition);
+      m_leftCurInches = Conversions.rotationsToWinchInches(m_leftPosition.getValue( ), kRolloutRatio);
+      m_rightCurInches = Conversions.rotationsToWinchInches(m_rightPosition.getValue( ), kRolloutRatio);
+      if (m_leftCurInches < 0)
+        setClimberPosition(0.0);
+    }
 
     // Update dashboard
     m_leftCalibratedEntry.setBoolean((m_leftCalibrated));
@@ -292,10 +299,17 @@ public class Climber extends SubsystemBase
    */
   public void printFaults( )
   {
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_leftMotor, "ClimeberLeft");
-    PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rightMotor, "ClimeberRight");
-    m_leftMotor.clearStickyFaults( );
-    m_rightMotor.clearStickyFaults( );
+    if (m_climberValid)
+    {
+      PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_leftMotor, "ClimeberLeft");
+      PhoenixUtil6.getInstance( ).talonFXPrintFaults(m_rightMotor, "ClimeberRight");
+      m_leftMotor.clearStickyFaults( );
+      m_rightMotor.clearStickyFaults( );
+    }
+    else
+    {
+      DataLogManager.log(String.format("%s: m_climberValid is FALSE!", getSubsystem( )));
+    }
   }
 
   ////////////////////////////////////////////////////////////////////////////

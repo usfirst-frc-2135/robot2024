@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -88,8 +88,9 @@ public class RobotContainer
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage);             // We want field-centric driving in open loop
   private final SwerveRequest.SwerveDriveBrake        brake           = new SwerveRequest.SwerveDriveBrake( );
   private final SwerveRequest.FieldCentricFacingAngle facing          = new SwerveRequest.FieldCentricFacingAngle( )  //
-      .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)                 //
-      .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed);                // Field centric drive facing a direction
+      .withDeadband(kMaxSpeed * Constants.kStickDeadband)                  //
+      .withRotationalDeadband(kMaxAngularRate * Constants.kStickDeadband)  //
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);             // We want field-centric driving in open loop
   @SuppressWarnings("unused")
   private final SwerveRequest.PointWheelsAt           point           = new SwerveRequest.PointWheelsAt( );
   private final SwerveRequest.RobotCentric            aim             = new SwerveRequest.RobotCentric( );
@@ -193,6 +194,7 @@ public class RobotContainer
     Robot.timeMarker("robotContainer: before DAQ thread");
 
     m_drivetrain.getDaqThread( ).setThreadPriority(99);   // Start swerve telemetry thread
+    facing.HeadingController = new PhoenixPIDController(10.0, 0.0, 0.0); // Swerve steer PID for facing request
 
     Robot.timeMarker("robotContainer: after DAQ thread");
 
@@ -293,14 +295,23 @@ public class RobotContainer
     //
     // Driver - POV buttons
     //
-    m_driverPad.pov(0)
-        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(0.0)))));
-    m_driverPad.pov(90)
-        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(270.0)))));
-    m_driverPad.pov(180)
-        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(180.0)))));
-    m_driverPad.pov(270)
-        .whileTrue(m_drivetrain.applyRequest(( ) -> facing.withTargetDirection(new Rotation2d(Units.degreesToRadians(90.0)))));
+    m_driverPad.pov(0).whileTrue(m_drivetrain.applyRequest(( ) -> facing //
+        .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)  //
+        .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed)  //
+        .withTargetDirection(Rotation2d.fromDegrees(0.0))));
+    m_driverPad.pov(90).whileTrue(m_drivetrain.applyRequest(( ) -> facing //
+        .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)  //
+        .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed)  //
+        .withTargetDirection(Rotation2d.fromDegrees(270.0))));
+    m_driverPad.pov(180).whileTrue(m_drivetrain.applyRequest(( ) -> facing  //
+        .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)  //
+        .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed)  //
+        .withTargetDirection(Rotation2d.fromDegrees(180.0))));
+    m_driverPad.pov(270).whileTrue(m_drivetrain.applyRequest(( ) -> facing  //
+        .withVelocityX(-m_driverPad.getLeftY( ) * kMaxSpeed)  //
+        .withVelocityY(-m_driverPad.getLeftX( ) * kMaxSpeed)  //
+        .withTargetDirection(Rotation2d.fromDegrees(90.0))));
+
     //
     // Driver Left/Right Trigger
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}

@@ -35,7 +35,7 @@ public class Robot extends TimedRobot
   {
     // Starts recording to data log
     DataLogManager.start( );
-    DriverStation.startDataLog(DataLogManager.getLog( ));
+    DriverStation.startDataLog(DataLogManager.getLog( )); // Logs joystick data
     Robot.timeMarker("robotInit: start");
 
     // Log when commands initialize, interrupt, and end states

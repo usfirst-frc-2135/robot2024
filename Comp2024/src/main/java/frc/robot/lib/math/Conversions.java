@@ -1,15 +1,21 @@
-
+//
 // Conversions - useful unit conversion utilities
-
+//
 package frc.robot.lib.math;
 
+/****************************************************************************
+ * 
+ * Conversion class - gearbox calculations
+ */
 public class Conversions
 {
   //
-  // Gearbox degrees
+  // Gearbox degrees to/from rotations
   //
 
   /**
+   * Convert input motor rotations thru gearbox to output shaft degrees
+   * 
    * @param rotations
    *          Input Shaft Rotations
    * @param gearRatio
@@ -22,6 +28,8 @@ public class Conversions
   }
 
   /**
+   * Convert output shaft degrees backward thru gearbox to input motor rotations
+   * 
    * @param degrees
    *          Output Shaft Degrees of Mechanism
    * @param gearRatio
@@ -33,7 +41,13 @@ public class Conversions
     return degrees / (360.0 / gearRatio);
   }
 
+  //
+  // Gearbox rotations to/from rotations
+  //
+
   /**
+   * Convert input motor rotations thru gearbox to output shaft rotationss
+   * 
    * @param rotations
    *          Input Shaft Rotations
    * @param gearRatio
@@ -46,6 +60,8 @@ public class Conversions
   }
 
   /**
+   * Convert output shaft rotations backward thru gearbox to input motor rotations
+   * 
    * @param rotations
    *          Output Shaft Rotations of Mechanism
    * @param gearRatio
@@ -58,10 +74,12 @@ public class Conversions
   }
 
   //
-  // Gearbox radians
+  // Gearbox degrees to/from radians
   //
 
   /**
+   * Convert input motor rotations thru gearbox to output shaft radians
+   * 
    * @param rotations
    *          Input Shaft Rotations
    * @param gearRatio
@@ -74,6 +92,8 @@ public class Conversions
   }
 
   /**
+   * Convert output shaft radians backward thru gearbox to input motor rotations
+   * 
    * @param radians
    *          Output Shaft Radians of Mechanism
    * @param gearRatio
@@ -86,10 +106,12 @@ public class Conversions
   }
 
   //
-  // Gearbox velocity
+  // Velocity calculations
   //
 
   /**
+   * Calculate velocity (m/s) through a gearbox given input motor rotations per second
+   * 
    * @param rotationsPerSecond
    *          Motor rotations per second
    * @param circumference
@@ -105,6 +127,8 @@ public class Conversions
   }
 
   /**
+   * Calculate input motor rotations per second through a gearbox given a velocity (m/s)
+   * 
    * @param velocity
    *          Velocity meters per second
    * @param circumference
@@ -120,10 +144,12 @@ public class Conversions
   }
 
   //
-  // Gearbox distance
+  // Distance calculations
   //
 
   /**
+   * Calculate distance (meters) through a gearbox given input motor rotations
+   * 
    * @param rotations
    *          Motor rotations
    * @param circumference
@@ -138,6 +164,8 @@ public class Conversions
   }
 
   /**
+   * Calculate input motor rotations through a gearbox given a distance (meters)
+   * 
    * @param distance
    *          Distance in meters
    * @param circumference
@@ -152,24 +180,14 @@ public class Conversions
   }
 
   //
-  // Winch distance
+  // WINCH calculatons
   //
 
   /**
-   * @param meters
-   *          Linear winch distance
-   * @param rolloutRatio
-   *          Winch rollout ratio
-   * @return Winch shaft rotations
-   */
-  public static double inchesToWinchRotations(double inches, double rolloutRatio)
-  {
-    return inches / rolloutRatio;
-  }
-
-  /**
+   * Calculate distance (inches) through a winch gearbox given input motor rotations
+   * 
    * @param rotations
-   *          Winch shaft rotations
+   *          Input motor rotations
    * @param rolloutRatio
    *          Winch rollout ratio
    * @return Linear winch distance
@@ -178,4 +196,19 @@ public class Conversions
   {
     return rotations * rolloutRatio;
   }
+
+  /**
+   * Calculate input motor rotations through a winch gearbox given a rope distance (inches)
+   * 
+   * @param inches
+   *          Linear winch distance
+   * @param rolloutRatio
+   *          Winch rollout ratio
+   * @return Input motor rotations
+   */
+  public static double inchesToWinchRotations(double inches, double rolloutRatio)
+  {
+    return inches / rolloutRatio;
+  }
+
 }

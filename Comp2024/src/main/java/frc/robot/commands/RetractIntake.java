@@ -38,8 +38,8 @@ public class RetractIntake extends SequentialCommandGroup
           led.getLEDCommand(COLOR.BLUE, ANIMATION.CLEARALL),
           led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL),
           intake::isNoteDetected),
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted),
-        hid.getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted)
+        //hid.getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity)
 
         //@formatter:on
     );

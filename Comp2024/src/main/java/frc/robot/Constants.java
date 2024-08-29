@@ -31,9 +31,9 @@ public class Constants
   public static final double  kStickDeadband        = 0.15;
   public static final double  kTriggerThreshold     = 0.25;
 
-  public static final boolean kDriverRumbleOn       = true;
-  public static final boolean kOperatorRumbleOn     = true;
-  public static final double  kRumbleIntensity      = 1.0;
+  public static final boolean kRumbleOn             = true;
+  public static final boolean kRumbleOff            = false;
+  public static final double  kRumbleIntensity      = 0.5;  // 0.0 is low, 1.0 is high
 
   // Phoenix firmware versions expected
   public static final int     kPhoenix5MajorVersion = ((22 * 256) + 0);

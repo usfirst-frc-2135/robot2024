@@ -166,14 +166,14 @@ public class RobotContainer
 
       Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1"),
       Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
-      Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P2"),
+      Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3"),
 
       Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C1_C2_C3_C4"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C5_C4_C3_C2"),
       Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
 
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
-      Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2_S1_P1_S3_P3"),
+      Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE2.toString( ), "Pos2_P1_S1_P1_S2_P2_S3_P3"),
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
 
       Map.entry(AutoChooser.AUTOTEST.toString( ) + StartPose.POSE1.toString( ), "Pos1_test1"),
@@ -247,9 +247,8 @@ public class RobotContainer
     cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
     cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
 
-    cmdTab.add("HIDRumble", m_hid
-        .getHIDRumbleCommand(Constants.kDriverRumbleOn, Constants.kOperatorRumbleOn, Constants.kRumbleIntensity).withTimeout(1.0))
-        .withPosition(4, 0);
+    cmdTab.add("HIDRumble", m_hid.getHIDRumbleCommand(Constants.kRumbleOn, Constants.kRumbleOn, Constants.kRumbleIntensity)
+        .asProxy( ).withTimeout(0.5)).withPosition(4, 0);
     cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
 
     ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
@@ -446,6 +445,8 @@ public class RobotContainer
       return m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
     }
 
+    DataLogManager.log(String.format("getAuto: %s contains %s paths in list", autoName, ppPathList.size( )));
+
     // If on red alliance, flip each path
     PathPlannerPath initialPath = ppPathList.get(0);
     if (DriverStation.getAlliance( ).orElse(Alliance.Blue) == Alliance.Red)
@@ -480,7 +481,7 @@ public class RobotContainer
         m_autoCommand = new AutoPreloadScore(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);
         break;
       case AUTOPRELOADSTEAL :
-        m_autoCommand = new AutoPreloadSteal(ppPathList, m_drivetrain, m_intake, m_shooter, m_led);
+        m_autoCommand = new AutoPreloadSteal(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);
         break;
       case AUTOSCORE4 :
         m_autoCommand = new AutoScore4(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);

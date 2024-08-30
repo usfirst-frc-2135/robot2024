@@ -250,38 +250,38 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight && Robot.isReal( ))
     {
-      // // MegaTag2 logic
-      // LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition( ).getRotation( ).getDegrees( ), 0, 0, 0,
-      //     0, 0);
-      // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      // boolean doRejectUpdate = false;
-      // if (Math.abs(m_pigeon2.getRate( )) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      // {
-      //   doRejectUpdate = true;
-      // }
-      // if (mt2.tagCount == 0)
-      // {
-      //   doRejectUpdate = true;
-      // }
-      // if (!doRejectUpdate)
-      // {
-      //   setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-      //   addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-      // }
-
-      //MegaTag1 logic (used with LL Helper library v1.4)
-      LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      if (poseEstimate.tagCount >= 2)
+      // MegaTag2 logic
+      LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition( ).getRotation( ).getDegrees( ), 0, 0, 0,
+          0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      boolean doRejectUpdate = false;
+      if (Math.abs(m_pigeon2.getRate( )) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if (mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if (!doRejectUpdate)
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
-
-        fieldTypePub.set("Field2d");
-        fieldPub.set(new double[ ]
-        {
-            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
-        });
+        addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
       }
+
+      // MegaTag1 logic (used with LL Helper library v1.4)
+      // LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      // if (poseEstimate.tagCount >= 2)
+      // {
+      //   setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      //   addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+
+      //   fieldTypePub.set("Field2d");
+      //   fieldPub.set(new double[ ]
+      //   {
+      //       poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
+      //   });
+      // }
     }
   }
 

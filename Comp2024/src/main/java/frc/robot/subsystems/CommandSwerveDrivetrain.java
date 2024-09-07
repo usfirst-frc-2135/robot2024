@@ -22,10 +22,12 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.GenericEntry;
@@ -218,6 +220,60 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
+  /*
+   * Limelight MegaTag example code for vision processing
+   */
+  private void visionUpdate( )
+  {
+    boolean useMegaTag2 = true; //set to false to use MegaTag1
+    boolean doRejectUpdate = false;
+    if (useMegaTag2 == false)
+    {
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
+      if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
+      {
+        if (mt1.rawFiducials[0].ambiguity > .7)
+        {
+          doRejectUpdate = true;
+        }
+        if (mt1.rawFiducials[0].distToCamera > 3)
+        {
+          doRejectUpdate = true;
+        }
+      }
+      if (mt1.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+
+      if (!doRejectUpdate)
+      {
+        setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+        addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
+      }
+    }
+    else if (useMegaTag2 == true)
+    {
+      LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition( ).getRotation( ).getDegrees( ), 0, 0, 0,
+          0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      if (Math.abs(m_pigeon2.getRate( )) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if (mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if (!doRejectUpdate)
+      {
+        setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+      }
+    }
+  }
+
   @Override
   public void periodic( )
   {
@@ -250,38 +306,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     if (m_useLimelight && Robot.isReal( ))
     {
-      // MegaTag2 logic
-      LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition( ).getRotation( ).getDegrees( ), 0, 0, 0,
-          0, 0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      boolean doRejectUpdate = false;
-      if (Math.abs(m_pigeon2.getRate( )) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      {
-        doRejectUpdate = true;
-      }
-      if (mt2.tagCount == 0)
-      {
-        doRejectUpdate = true;
-      }
-      if (!doRejectUpdate)
-      {
-        setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-      }
-
-      // MegaTag1 logic (used with LL Helper library v1.4)
-      // LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      // if (poseEstimate.tagCount >= 2)
-      // {
-      //   setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-      //   addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
-
-      //   fieldTypePub.set("Field2d");
-      //   fieldPub.set(new double[ ]
-      //   {
-      //       poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
-      //   });
-      // }
+      visionUpdate( );
     }
   }
 

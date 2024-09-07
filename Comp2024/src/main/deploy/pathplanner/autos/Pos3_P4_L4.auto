@@ -16,6 +16,12 @@
           "data": {
             "pathName": "Pos3_P4"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P4-L4"
+          }
         }
       ]
     }

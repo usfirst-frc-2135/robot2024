@@ -16,6 +16,12 @@
           "data": {
             "pathName": "Pos2_P2"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P2-L2"
+          }
         }
       ]
     }

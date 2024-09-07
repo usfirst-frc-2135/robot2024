@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 /****************************************************************************
@@ -105,10 +106,12 @@ public class HID extends SubsystemBase
    * @param intensity
    *          requested rumble strength
    */
-  private void setHIDs(boolean driverPad, boolean operatorPad, double intensity)
+  private void setHIDRumble(boolean driverRumble, boolean operatorRumble, double intensity)
   {
-    m_driver.setRumble(RumbleType.kBothRumble, (driverPad) ? intensity : 0.0);
-    m_operator.setRumble(RumbleType.kBothRumble, (operatorPad) ? intensity : 0.0);
+    DataLogManager.log(
+        String.format("%s: Rumble driver: %s operator: %s intensity: %.1f", getName( ), driverRumble, operatorRumble, intensity));
+    m_driver.setRumble(RumbleType.kBothRumble, (driverRumble) ? intensity : 0.0);
+    m_operator.setRumble(RumbleType.kBothRumble, (operatorRumble) ? intensity : 0.0);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -130,8 +133,8 @@ public class HID extends SubsystemBase
   public Command getHIDRumbleCommand(boolean driverRumble, boolean operatorRumble, double intensity)
   {
     return new StartEndCommand(            // Command that has start and end conditions
-        ( ) -> setHIDs(driverRumble, operatorRumble, intensity),     // Method to call at start
-        ( ) -> setHIDs(driverRumble, operatorRumble, 0.0), // Method to call when done
+        ( ) -> setHIDRumble(driverRumble, operatorRumble, intensity),         // Method to call at start
+        ( ) -> setHIDRumble(Constants.kRumbleOff, Constants.kRumbleOff, 0.0), // Method to call at start
         this                              // Subsystem requirement
     )                                     //
         .withName("HIDRumble")       //

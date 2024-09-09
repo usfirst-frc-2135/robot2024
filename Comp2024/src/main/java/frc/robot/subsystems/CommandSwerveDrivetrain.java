@@ -50,6 +50,7 @@ import frc.robot.Constants.VIConsts;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.LimelightHelpers;
+import frc.robot.lib.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -223,6 +224,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
    */
   private void visionUpdate( )
   {
+    PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
     boolean useMegaTag2 = true; //set to false to use MegaTag1
     boolean doRejectUpdate = false;
     if (useMegaTag2 == false)
@@ -249,6 +252,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
         addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
+
+        fieldTypePub.set("Field2d");
+        fieldPub.set(new double[ ]
+        {
+            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
+        });
+
       }
     }
     else if (useMegaTag2 == true)
@@ -268,6 +278,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+
+        fieldTypePub.set("Field2d");
+        fieldPub.set(new double[ ]
+        {
+            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
+        });
       }
     }
   }

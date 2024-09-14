@@ -86,12 +86,12 @@ public class Intake extends SubsystemBase
   private static final double        kMMMoveTimeout        = 1.5;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
-  private static final double        kRotaryAngleRetracted = -97.5;
-  private static final double        kRotaryAngleHandoff   = -49.9;
-  private static final double        kRotaryAngleDeployed  = 99.4;
+  private static final double        kRotaryAngleRetracted = -183.4277;
+  private static final double        kRotaryAngleHandoff   = -133.154;
+  private static final double        kRotaryAngleDeployed  = 19.85;
 
-  private static final double        kRotaryAngleMin       = -99.0;
-  private static final double        kRotaryAngleMax       = 101.4;
+  private static final double        kRotaryAngleMin       = -185.43;
+  private static final double        kRotaryAngleMax       = 21.9;
 
   // Device objects
   private final WPI_TalonSRX         m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);

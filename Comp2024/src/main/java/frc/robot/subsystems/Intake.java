@@ -86,11 +86,11 @@ public class Intake extends SubsystemBase
   private static final double        kMMMoveTimeout        = 1.5;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
 
   // Rotary angles - Motion Magic move parameters - TODO: Tune these angles!
-  private static final double        kRotaryAngleRetracted = -183.4277;
-  private static final double        kRotaryAngleHandoff   = -133.154;
-  private static final double        kRotaryAngleDeployed  = 19.85;
+  private static final double        kRotaryAngleRetracted = -177.27;
+  private static final double        kRotaryAngleHandoff   = -130.3;
+  private static final double        kRotaryAngleDeployed  = 19.51;
 
-  private static final double        kRotaryAngleMin       = -185.43;
+  private static final double        kRotaryAngleMin       = -179.27;
   private static final double        kRotaryAngleMax       = 21.9;
 
   // Device objects

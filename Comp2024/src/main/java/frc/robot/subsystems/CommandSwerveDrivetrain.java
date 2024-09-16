@@ -22,6 +22,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -304,6 +305,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
      * This ensures driving behavior doesn't change until an explicit disable event occurs during
      * testing
      */
+
     if (!hasAppliedOperatorPerspective || DriverStation.isDisabled( ))
     {
       DriverStation.getAlliance( ).ifPresent((allianceColor) ->
@@ -339,5 +341,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             new Rotation2d(poseRotEntry.getDouble(0.0)))        //
     );
   }
+
+  // Pose2d pathErrorX = Telemetry.fieldPub[0] - "pathplannerpose"
+  // Pose2d pathErrorY = Telemetry.fieldPub[1] - "pathplannerpose"
+  // Pose2d pathErrorRotation = Telemetry.fieldPub[2] - "pathplannerpose"
 
 }

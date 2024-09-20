@@ -2,8 +2,20 @@
   "robotWidth": 0.8763,
   "robotLength": 0.8763,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
+  "pathFolders": [
+    "FromPreload",
+    "PoseToPreload",
+    "FromSpike",
+    "FromCenterline"
+  ],
+  "autoFolders": [
+    "AutoLeave",
+    "AutoPrelaodLeave",
+    "AutoPreloadScore",
+    "AutoPreloadSteal",
+    "AutoScore4",
+    "TestAuto"
+  ],
   "defaultMaxVel": 3.5,
   "defaultMaxAccel": 4.75,
   "defaultMaxAngVel": 540.0,

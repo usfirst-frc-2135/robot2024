@@ -3,10 +3,10 @@
   "robotLength": 0.8763,
   "holonomicMode": true,
   "pathFolders": [
+    "FromCenterline",
     "FromPreload",
-    "PoseToPreload",
     "FromSpike",
-    "FromCenterline"
+    "FromPose"
   ],
   "autoFolders": [
     "AutoLeave",

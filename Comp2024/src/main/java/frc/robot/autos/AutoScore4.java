@@ -71,7 +71,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(1)),
-            new AcquireNote(intake, led, hid)
+            new AcquireNote(intake, led, hid).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
@@ -83,7 +83,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(3)),
-            new AcquireNote(intake, led, hid)
+            new AcquireNote(intake, led, hid).withTimeout(1.5)
         ),
 
         new LogCommand(getName(), "Drive to scoring pose"),
@@ -95,7 +95,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(5)),
-            new AcquireNote(intake, led, hid)
+            new AcquireNote(intake, led, hid).withTimeout(1.5)
         ), 
         
         new LogCommand(getName(), "Drive to scoring pose"),

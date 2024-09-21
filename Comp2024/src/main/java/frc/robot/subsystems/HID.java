@@ -7,10 +7,12 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.HID;
 
 /****************************************************************************
  * 
@@ -106,11 +108,17 @@ public class HID extends SubsystemBase
    * @param intensity
    *          requested rumble strength
    */
-  private void setHIDRumble(boolean driverRumble, boolean operatorRumble, double intensity)
+  private void setHIDRumbleDriver(boolean driverRumble, double intensity)
   {
-    DataLogManager.log(
-        String.format("%s: Rumble driver: %s operator: %s intensity: %.1f", getName( ), driverRumble, operatorRumble, intensity));
+    DataLogManager.log(String.format("%s: Rumble driver: %s intensity: %.1f", getName( ), driverRumble, intensity));
+
     m_driver.setRumble(RumbleType.kBothRumble, (driverRumble) ? intensity : 0.0);
+  }
+
+  private void setHIDRumbleOperator(boolean operatorRumble, double intensity)
+  {
+    DataLogManager.log(String.format("%s operator: %s intensity: %.1f", getName( ), operatorRumble, intensity));
+
     m_operator.setRumble(RumbleType.kBothRumble, (operatorRumble) ? intensity : 0.0);
   }
 
@@ -130,15 +138,21 @@ public class HID extends SubsystemBase
    *          stength of the rumble [0.0 .. 1.0]
    * @return instant command that rumbles the gamppads
    */
-  public Command getHIDRumbleCommand(boolean driverRumble, boolean operatorRumble, double intensity)
+  public Command getHIDRumbleCommandDriver(boolean driverRumble, double intensity)
   {
-    return new StartEndCommand(            // Command that has start and end conditions
-        ( ) -> setHIDRumble(driverRumble, operatorRumble, intensity),         // Method to call at start
-        ( ) -> setHIDRumble(Constants.kRumbleOff, Constants.kRumbleOff, 0.0), // Method to call at start
-        this                              // Subsystem requirement
-    )                                     //
-        .withName("HIDRumble")       //
-        .ignoringDisable(true);
+    {
+      return new InstantCommand(            // Command that runs exactly once
+          ( ) -> setHIDRumbleDriver(driverRumble, intensity), // Method to call
+          this                              // Subsystem requirement
+      ).withName("HIDRumbleOperator").ignoringDisable(true).withTimeout(0.5);
+    }
   }
 
+  public Command getHIDRumbleCommandOperator(boolean operatorRumble, double intensity)
+  {
+    return new InstantCommand(            // Command that runs exactly once
+        ( ) -> setHIDRumbleOperator(operatorRumble, intensity), // Method to call
+        this                              // Subsystem requirement
+    ).withName("HIDRumbleOperator").ignoringDisable(true).withTimeout(0.5);
+  }
 }

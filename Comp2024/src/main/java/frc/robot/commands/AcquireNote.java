@@ -1,6 +1,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
@@ -41,8 +42,14 @@ public class AcquireNote extends SequentialCommandGroup
         new WaitUntilCommand(intake::isNoteDetected),
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
-        hid.getHIDRumbleCommand(Constants.kRumbleOn, Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy().withTimeout(0.5),
+       
+        hid.getHIDRumbleCommandDriver(Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy(),
+        hid.getHIDRumbleCommandOperator(Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy(),
+        
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted)
+        
+
+      
 
         // @formatter:on
     );

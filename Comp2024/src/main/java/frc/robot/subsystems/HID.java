@@ -5,14 +5,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.HID;
 
 /****************************************************************************
  * 
@@ -25,12 +23,16 @@ public class HID extends SubsystemBase
   // Member objects
   private GenericHID m_driver;
   private GenericHID m_operator;
+  private Timer      m_timerDriver   = new Timer( );
+  private Timer      m_timerOperator = new Timer( );
+  private Boolean    m_driverRumbleOn;
+  private Boolean    m_operatorRumbleOn;
 
   /****************************************************************************
    * 
    * Constructor
    */
-  public HID(GenericHID driver, GenericHID operator)
+  public HID(GenericHID driver, GenericHID operator, Boolean driverRumbleOn, Boolean operatorRumbleOn)
   {
     setName("HID");
     setSubsystem("HID");
@@ -39,6 +41,8 @@ public class HID extends SubsystemBase
 
     m_driver = driver;
     m_operator = operator;
+    m_driverRumbleOn = driverRumbleOn;
+    m_operatorRumbleOn = operatorRumbleOn;
 
     initDashboard( );
     initialize( );
@@ -53,7 +57,15 @@ public class HID extends SubsystemBase
   @Override
   public void periodic( )
   {
-    // This method will be called once per scheduler run
+    if (m_timerDriver.hasElapsed(1.5) && m_driverRumbleOn)
+    {
+      m_driverRumbleOn = false;
+    }
+
+    if (m_timerOperator.hasElapsed(1.5) && m_operatorRumbleOn)
+    {
+      m_operatorRumbleOn = false;
+    }
   }
 
   /****************************************************************************
@@ -72,7 +84,7 @@ public class HID extends SubsystemBase
    */
   private void initDashboard( )
   {
-    // Initialize dashboard widgets
+
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -112,6 +124,8 @@ public class HID extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: Rumble driver: %s intensity: %.1f", getName( ), driverRumble, intensity));
 
+    m_driverRumbleOn = true;
+    m_timerDriver.reset( );
     m_driver.setRumble(RumbleType.kBothRumble, (driverRumble) ? intensity : 0.0);
   }
 
@@ -119,6 +133,8 @@ public class HID extends SubsystemBase
   {
     DataLogManager.log(String.format("%s operator: %s intensity: %.1f", getName( ), operatorRumble, intensity));
 
+    m_operatorRumbleOn = true;
+    m_timerOperator.reset( );
     m_operator.setRumble(RumbleType.kBothRumble, (operatorRumble) ? intensity : 0.0);
   }
 
@@ -140,19 +156,21 @@ public class HID extends SubsystemBase
    */
   public Command getHIDRumbleCommandDriver(boolean driverRumble, double intensity)
   {
-    {
-      return new InstantCommand(            // Command that runs exactly once
-          ( ) -> setHIDRumbleDriver(driverRumble, intensity), // Method to call
-          this                              // Subsystem requirement
-      ).withName("HIDRumbleOperator").ignoringDisable(true).withTimeout(0.5);
-    }
+
+    return new InstantCommand(            // Command that runs exactly once
+        ( ) -> setHIDRumbleDriver(driverRumble, intensity), // Method to call
+        this                              // Subsystem requirement
+    ).withName("HIDRumbleOperator").ignoringDisable(true);
+
   }
 
   public Command getHIDRumbleCommandOperator(boolean operatorRumble, double intensity)
   {
+
     return new InstantCommand(            // Command that runs exactly once
         ( ) -> setHIDRumbleOperator(operatorRumble, intensity), // Method to call
         this                              // Subsystem requirement
-    ).withName("HIDRumbleOperator").ignoringDisable(true).withTimeout(0.5);
+    ).withName("HIDRumbleOperator").ignoringDisable(true);
+
   }
 }

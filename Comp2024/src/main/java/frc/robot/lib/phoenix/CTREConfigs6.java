@@ -67,7 +67,7 @@ public final class CTREConfigs6
 
     // Slot settings - remote/fused CANcoder affects all feedback constants by the gearRatio
     inRotaryConfig.Slot0.kS = 0.0;                                // Feedforward: Voltage or duty cylce to overcome static friction
-    inRotaryConfig.Slot0.kG = -0.51;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) TODO: measure
+    inRotaryConfig.Slot0.kG = 0.5;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) TODO: measure
     inRotaryConfig.Slot0.kV = 0.1129;                             // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
 
     inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Feedback: Voltage or duty cycle per velocity error (velocity modes)

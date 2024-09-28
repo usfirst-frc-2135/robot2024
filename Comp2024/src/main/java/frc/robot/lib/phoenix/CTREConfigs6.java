@@ -67,7 +67,7 @@ public final class CTREConfigs6
 
     // Slot settings - remote/fused CANcoder affects all feedback constants by the gearRatio
     inRotaryConfig.Slot0.kS = 0.0;                                // Feedforward: Voltage or duty cylce to overcome static friction
-    inRotaryConfig.Slot0.kG = 0.5;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) TODO: measure
+    inRotaryConfig.Slot0.kG = 0.50;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward)
     inRotaryConfig.Slot0.kV = 0.1129;                             // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
 
     inRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Feedback: Voltage or duty cycle per velocity error (velocity modes)
@@ -90,11 +90,14 @@ public final class CTREConfigs6
   public static CANcoderConfiguration intakeRotaryCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
+    double kQuarterRotation = 0.25;
+    double CompRobotOffset = -0.015;
 
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? (-0.311768 - 0.25 - 0.015) : (0.104492 - 0.25);
+      config.MagnetSensor.MagnetOffset =
+          (Robot.isComp( )) ? (-0.311768 - kQuarterRotation + CompRobotOffset) : (0.104492 - kQuarterRotation);
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 
@@ -192,7 +195,7 @@ public final class CTREConfigs6
 
     // Slot settings - remote/fused CANcoder affects all feedback constants by the gearRatio
     fdRotaryConfig.Slot0.kS = 0.0;                                // Feedforward: Voltage or duty cylce to overcome static friction
-    fdRotaryConfig.Slot0.kG = -0.5;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) TODO: measure
+    fdRotaryConfig.Slot0.kG = -0.50;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) 
     fdRotaryConfig.Slot0.kV = 0.1129;                             // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
 
     fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Feedback: Voltage or duty cycle per velocity error (velocity modes)
@@ -215,11 +218,12 @@ public final class CTREConfigs6
   public static CANcoderConfiguration feederRotaryCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
+    double kQuarterRotation = 0.25;
 
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
-      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? (0.059814 - 0.25) : (-0.2581 - 0.25);
+      config.MagnetSensor.MagnetOffset = (Robot.isComp( )) ? (0.059814 - kQuarterRotation) : (-0.2581 - kQuarterRotation);
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 

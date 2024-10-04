@@ -60,7 +60,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to centerline acquire note 1"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(1)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+            new AcquireNote(intake, led, hid)
         ),
 
         new LogCommand(getName(), "Pass centerline note 1"),
@@ -69,7 +69,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to centerline acquire note 2"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(2)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+            new AcquireNote(intake, led, hid)
         ),
 
         new LogCommand(getName(), "Pass centerline note 2"),
@@ -78,7 +78,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to centerline acquire note 3"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(3)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+            new AcquireNote(intake, led, hid)
         ),
 
         new LogCommand(getName(), "Pass centerline note 3"),
@@ -87,7 +87,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to centerline acquire note 4"),
         new ParallelCommandGroup( 
             drivetrain.getPathCommand(ppPaths.get(4)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+            new AcquireNote(intake, led, hid)
         ),
 
         new LogCommand(getName(), "Pass centerline note 4"),

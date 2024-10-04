@@ -62,7 +62,7 @@ public class AutoPreloadScore extends SequentialCommandGroup
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(1)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+            new AcquireNote(intake, led, hid)
         ),
         
         new LogCommand(getName(), "Drive to scoring pose"),

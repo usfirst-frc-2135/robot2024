@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.5905008158090483,
-        "y": 4.27445533921025
+        "x": 2.53,
+        "y": 4.29
       },
       "prevControl": {
-        "x": 2.1975199394692426,
-        "y": 4.4678259031451715
+        "x": 2.137019123660194,
+        "y": 4.483370563934922
       },
       "nextControl": null,
       "isLocked": false,
@@ -40,7 +40,7 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": -26.19999999999999,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "FromPreload",

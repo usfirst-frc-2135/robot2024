@@ -57,14 +57,14 @@ public class HID extends SubsystemBase
   @Override
   public void periodic( )
   {
-    if (m_timerDriver.hasElapsed(1.5) && m_driverRumbleOn)
+    if (m_timerDriver.hasElapsed(1.0) && m_driverRumbleOn)
     {
-      m_driverRumbleOn = false;
+      setHIDRumbleDriver(false, 0);
     }
 
-    if (m_timerOperator.hasElapsed(1.5) && m_operatorRumbleOn)
+    if (m_timerOperator.hasElapsed(1.0) && m_operatorRumbleOn)
     {
-      m_operatorRumbleOn = false;
+      setHIDRumbleOperator(false, 0);
     }
   }
 
@@ -124,8 +124,13 @@ public class HID extends SubsystemBase
   {
     DataLogManager.log(String.format("%s: Rumble driver: %s intensity: %.1f", getName( ), driverRumble, intensity));
 
-    m_driverRumbleOn = true;
-    m_timerDriver.reset( );
+    m_driverRumbleOn = driverRumble;
+
+    if (m_driverRumbleOn)
+    {
+      m_timerDriver.restart( );
+    }
+
     m_driver.setRumble(RumbleType.kBothRumble, (driverRumble) ? intensity : 0.0);
   }
 
@@ -133,8 +138,13 @@ public class HID extends SubsystemBase
   {
     DataLogManager.log(String.format("%s operator: %s intensity: %.1f", getName( ), operatorRumble, intensity));
 
-    m_operatorRumbleOn = true;
-    m_timerOperator.reset( );
+    m_operatorRumbleOn = operatorRumble;
+
+    if (m_operatorRumbleOn)
+    {
+      m_timerOperator.restart( );
+    }
+
     m_operator.setRumble(RumbleType.kBothRumble, (operatorRumble) ? intensity : 0.0);
   }
 

@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.861068120824799,
+        "x": 2.77,
         "y": 5.55
       },
       "isLocked": false,
@@ -20,12 +20,12 @@
         "y": 5.55
       },
       "prevControl": {
-        "x": 2.8620203838472484,
+        "x": 2.9499999999999997,
         "y": 5.55
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "S2"
+      "linkedName": "S2B"
     }
   ],
   "rotationTargets": [],
@@ -40,7 +40,7 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": 0.0,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "FromPreload",

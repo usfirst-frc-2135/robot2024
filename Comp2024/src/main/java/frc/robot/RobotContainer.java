@@ -99,8 +99,7 @@ public class RobotContainer
   private final Telemetry                             logger          = new Telemetry(kMaxSpeed);
 
   // The robot's shared subsystems
-  private final HID                                   m_hid           =
-      new HID(m_driverPad.getHID( ), m_operatorPad.getHID( ), false, false);
+  private final HID                                   m_hid           = new HID(m_driverPad.getHID( ), m_operatorPad.getHID( ));
   private final LED                                   m_led           = new LED( );
   private final Power                                 m_power         = new Power( );
   private final Vision                                m_vision        = new Vision( );
@@ -248,9 +247,9 @@ public class RobotContainer
     cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
     cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
 
-    cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleCommandDriver(Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy( ))
+    cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleCommandDriver(Constants.kRumbleOn, Constants.kRumbleIntensity))
         .withPosition(4, 0);
-    cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleCommandOperator(Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy( ))
+    cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleCommandOperator(Constants.kRumbleOn, Constants.kRumbleIntensity))
         .withPosition(6, 0);
     cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
 

@@ -32,7 +32,7 @@ public class HID extends SubsystemBase
    * 
    * Constructor
    */
-  public HID(GenericHID driver, GenericHID operator, Boolean driverRumbleOn, Boolean operatorRumbleOn)
+  public HID(GenericHID driver, GenericHID operator)
   {
     setName("HID");
     setSubsystem("HID");
@@ -41,8 +41,6 @@ public class HID extends SubsystemBase
 
     m_driver = driver;
     m_operator = operator;
-    m_driverRumbleOn = driverRumbleOn;
-    m_operatorRumbleOn = operatorRumbleOn;
 
     initDashboard( );
     initialize( );
@@ -57,6 +55,8 @@ public class HID extends SubsystemBase
   @Override
   public void periodic( )
   {
+    //this method will be called once per scheduler run
+
     if (m_timerDriver.hasElapsed(1.0) && m_driverRumbleOn)
     {
       setHIDRumbleDriver(false, 0);
@@ -84,7 +84,7 @@ public class HID extends SubsystemBase
    */
   private void initDashboard( )
   {
-
+    //initialize dashboard widgets
   }
 
   // Put methods for controlling this subsystem here. Call these from Commands.
@@ -136,7 +136,7 @@ public class HID extends SubsystemBase
 
   private void setHIDRumbleOperator(boolean operatorRumble, double intensity)
   {
-    DataLogManager.log(String.format("%s operator: %s intensity: %.1f", getName( ), operatorRumble, intensity));
+    DataLogManager.log(String.format("%s Rumble operator: %s intensity: %.1f", getName( ), operatorRumble, intensity));
 
     m_operatorRumbleOn = operatorRumble;
 
@@ -169,9 +169,9 @@ public class HID extends SubsystemBase
 
     return new InstantCommand(            // Command that runs exactly once
         ( ) -> setHIDRumbleDriver(driverRumble, intensity), // Method to call
-        this                              // Subsystem requirement
-    ).withName("HIDRumbleOperator").ignoringDisable(true);
-
+        this                              // Command that runs exactly once
+    ).withName("HIDRumbleOperator").ignoringDisable(true); // Method to call
+    // Subsystem requirement
   }
 
   public Command getHIDRumbleCommandOperator(boolean operatorRumble, double intensity)
@@ -179,8 +179,8 @@ public class HID extends SubsystemBase
 
     return new InstantCommand(            // Command that runs exactly once
         ( ) -> setHIDRumbleOperator(operatorRumble, intensity), // Method to call
-        this                              // Subsystem requirement
-    ).withName("HIDRumbleOperator").ignoringDisable(true);
-
+        this                              // Command that runs exactly once
+    ).withName("HIDRumbleOperator").ignoringDisable(true); // Method to call
+    // Subsystem requirement
   }
 }

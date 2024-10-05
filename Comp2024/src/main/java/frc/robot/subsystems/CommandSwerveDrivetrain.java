@@ -102,8 +102,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   /* Robot pose for field positioning */
   private final NetworkTable                         table                           = inst.getTable("Pose");
-  private final DoubleArrayPublisher                 fieldPub                        =
-      table.getDoubleArrayTopic("llPose").publish( );
   private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
 
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
@@ -254,12 +252,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
         addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
 
-        fieldTypePub.set("Field2d");
-        fieldPub.set(new double[ ]
-        {
-            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
-        });
-
       }
     }
     else if (useMegaTag2 == true)
@@ -280,11 +272,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
 
-        fieldTypePub.set("Field2d");
-        fieldPub.set(new double[ ]
-        {
-            poseEstimate.pose.getX( ), poseEstimate.pose.getY( ), poseEstimate.pose.getRotation( ).getDegrees( )
-        });
       }
     }
   }

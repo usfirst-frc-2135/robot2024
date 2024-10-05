@@ -43,8 +43,8 @@ public class AcquireNote extends SequentialCommandGroup
 
         new LogCommand(getName(), "Stop rollers & Retract intake rotary"),
        
-        hid.getHIDRumbleCommandDriver(Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy(),
-        hid.getHIDRumbleCommandOperator(Constants.kRumbleOn, Constants.kRumbleIntensity).asProxy(),
+        hid.getHIDRumbleCommandDriver(Constants.kRumbleOn, Constants.kRumbleIntensity),
+        hid.getHIDRumbleCommandOperator(Constants.kRumbleOn, Constants.kRumbleIntensity),
         
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted)
         

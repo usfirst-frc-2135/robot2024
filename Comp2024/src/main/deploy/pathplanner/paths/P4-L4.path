@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.52,
-        "y": 3.68
+        "x": 1.55,
+        "y": 3.7
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8040510590825103,
-        "y": 1.321528885398458
+        "x": 1.8340510590825103,
+        "y": 1.341528885398458
       },
       "isLocked": false,
       "linkedName": "P4"
@@ -33,7 +33,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 5.25,
+    "maxAcceleration": 4.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -43,9 +43,9 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "FromPreload",
   "previewStartingState": {
-    "rotation": -50.89999999999998,
+    "rotation": -50.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

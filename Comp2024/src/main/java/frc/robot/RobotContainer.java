@@ -247,8 +247,10 @@ public class RobotContainer
     cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
     cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
 
-    cmdTab.add("HIDRumble", m_hid.getHIDRumbleCommand(Constants.kRumbleOn, Constants.kRumbleOn, Constants.kRumbleIntensity)
-        .asProxy( ).withTimeout(0.5)).withPosition(4, 0);
+    cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleDriverCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
+        .withPosition(4, 0);
+    cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleOperatorCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
+        .withPosition(6, 0);
     cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
 
     ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)

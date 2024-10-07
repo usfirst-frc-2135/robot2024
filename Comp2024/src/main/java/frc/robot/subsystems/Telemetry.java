@@ -31,7 +31,6 @@ public class Telemetry
   {
     MaxSpeed = maxSpeed;
     SignalLogger.start( );
-    lastTime = Utils.getCurrentTimeSeconds( );
   }
 
   /* What to publish over networktables for telemetry */
@@ -51,7 +50,7 @@ public class Telemetry
 
   /* Keep a reference of the last pose to calculate the speeds */
   private Pose2d                       m_lastPose         = new Pose2d( );
-  private double                       lastTime           = 0.0;
+  private double                       lastTime           = Utils.getCurrentTimeSeconds( );
 
   /* Mechanisms to represent the swerve module states */
   private final Mechanism2d[ ]         m_moduleMechanisms = new Mechanism2d[ ]

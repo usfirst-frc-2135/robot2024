@@ -5,11 +5,11 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
 
 /****************************************************************************
@@ -23,6 +23,10 @@ public class HID extends SubsystemBase
   // Member objects
   private GenericHID m_driver;
   private GenericHID m_operator;
+  private Timer      m_timerDriver   = new Timer( );
+  private Timer      m_timerOperator = new Timer( );
+  private Boolean    m_driverRumbleOn;
+  private Boolean    m_operatorRumbleOn;
 
   /****************************************************************************
    * 
@@ -52,6 +56,16 @@ public class HID extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
+
+    if (m_timerDriver.hasElapsed(1.0) && m_driverRumbleOn)
+    {
+      setHIDRumbleDriver(false, 0);
+    }
+
+    if (m_timerOperator.hasElapsed(1.0) && m_operatorRumbleOn)
+    {
+      setHIDRumbleOperator(false, 0);
+    }
   }
 
   /****************************************************************************
@@ -97,21 +111,48 @@ public class HID extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Set HIDs based on the requested intensity and options
+   * Set HID driver rumble based on the requested on/off and intensity
    * 
-   * @param color
-   *          requested color
-   * @param animation
-   *          requested animation
+   * @param rumbleOn
+   *          request rumble on or off
    * @param intensity
    *          requested rumble strength
    */
-  private void setHIDRumble(boolean driverRumble, boolean operatorRumble, double intensity)
+  private void setHIDRumbleDriver(boolean rumbleOn, double intensity)
   {
-    DataLogManager.log(
-        String.format("%s: Rumble driver: %s operator: %s intensity: %.1f", getName( ), driverRumble, operatorRumble, intensity));
-    m_driver.setRumble(RumbleType.kBothRumble, (driverRumble) ? intensity : 0.0);
-    m_operator.setRumble(RumbleType.kBothRumble, (operatorRumble) ? intensity : 0.0);
+    DataLogManager.log(String.format("%s: Rumble driver: %s intensity: %.1f", getName( ), rumbleOn, intensity));
+
+    m_driverRumbleOn = rumbleOn;
+
+    if (m_driverRumbleOn)
+    {
+      m_timerDriver.restart( );
+    }
+
+    m_driver.setRumble(RumbleType.kBothRumble, (rumbleOn) ? intensity : 0.0);
+  }
+
+  /****************************************************************************
+   * 
+   * Set HID operator rumble based on the requested on/off and intensity
+   * 
+   * @param rumbleOn
+   *          request rumble on or off
+   * @param intensity
+   *          requested rumble strength
+   */
+  private void setHIDRumbleOperator(boolean rumbleOn, double intensity)
+  {
+    DataLogManager.log(String.format("%s Rumble operator: %s intensity: %.1f", getName( ), rumbleOn, intensity));
+
+    m_operatorRumbleOn = rumbleOn;
+
+    if (m_operatorRumbleOn)
+    {
+      m_timerOperator.restart( );
+    }
+
+    m_operator.setRumble(RumbleType.kBothRumble, (rumbleOn) ? intensity : 0.0);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -120,25 +161,39 @@ public class HID extends SubsystemBase
 
   /****************************************************************************
    * 
-   * Create HID set command
+   * Create HID set rumble for driver controller command
    * 
    * @param driverRumble
    *          rumble the driver gamepad
+   * @param intensity
+   *          stength of the rumble [0.0 .. 1.0]
+   * @return instant command that rumbles the gamepad
+   */
+  public Command getHIDRumbleDriverCommand(boolean driverRumble, double intensity)
+  {
+
+    return new InstantCommand(                              // Command that runs exactly once
+        ( ) -> setHIDRumbleDriver(driverRumble, intensity), // Method to call
+        this                                                // Command that runs exactly once
+    ).withName("HIDRumbleDriver").ignoringDisable(true);
+  }
+
+  /****************************************************************************
+   * 
+   * Create HID set rumble for operator controller command
+   * 
    * @param operatorRumble
    *          rumble the operator gamepad
    * @param intensity
    *          stength of the rumble [0.0 .. 1.0]
-   * @return instant command that rumbles the gamppads
+   * @return instant command that rumbles the gamepad
    */
-  public Command getHIDRumbleCommand(boolean driverRumble, boolean operatorRumble, double intensity)
+  public Command getHIDRumbleOperatorCommand(boolean operatorRumble, double intensity)
   {
-    return new StartEndCommand(            // Command that has start and end conditions
-        ( ) -> setHIDRumble(driverRumble, operatorRumble, intensity),         // Method to call at start
-        ( ) -> setHIDRumble(Constants.kRumbleOff, Constants.kRumbleOff, 0.0), // Method to call at start
-        this                              // Subsystem requirement
-    )                                     //
-        .withName("HIDRumble")       //
-        .ignoringDisable(true);
-  }
 
+    return new InstantCommand(                                  // Command that runs exactly once
+        ( ) -> setHIDRumbleOperator(operatorRumble, intensity), // Method to call
+        this                                                    // Command that runs exactly once
+    ).withName("HIDRumbleOperator").ignoringDisable(true);
+  }
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.5905008158090483,
-        "y": 4.27445533921025
+        "x": 2.53,
+        "y": 4.29
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9862528788156273,
-        "y": 4.079721182386244
+        "x": 2.217046017106221,
+        "y": 4.44671568074357
       },
       "isLocked": false,
       "linkedName": "S3"
     },
     {
       "anchor": {
-        "x": 2.17,
-        "y": 4.49
+        "x": 2.16,
+        "y": 4.47
       },
       "prevControl": {
-        "x": 1.7770191236601942,
-        "y": 4.683370563934922
+        "x": 2.472953982893779,
+        "y": 4.3132843192564305
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,19 +33,19 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 5.25,
+    "maxAcceleration": 4.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -26.19999999999999,
-    "rotateFast": false
+    "rotation": -26.600000000000023,
+    "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "FromSpike",
   "previewStartingState": {
-    "rotation": -26.19999999999999,
+    "rotation": -26.600000000000023,
     "velocity": 0
   },
   "useDefaultConstraints": true

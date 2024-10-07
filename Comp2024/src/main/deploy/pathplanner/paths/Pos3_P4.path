@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.72,
+        "x": 0.76,
         "y": 4.44
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.175166501927118,
-        "y": 4.0230421754528365
+        "x": 1.181058005498364,
+        "y": 4.0401556009913495
       },
       "isLocked": false,
       "linkedName": "Pos3"
     },
     {
       "anchor": {
-        "x": 1.52,
-        "y": 3.68
+        "x": 1.55,
+        "y": 3.7
       },
       "prevControl": {
-        "x": 1.1734234604275464,
-        "y": 4.045345183731446
+        "x": 1.2315752358220402,
+        "y": 3.9997338986712294
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 5.25,
+    "maxAcceleration": 4.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "FromPose",
   "previewStartingState": {
     "rotation": -60.0,
     "velocity": 0

@@ -27,7 +27,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -100,8 +99,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   /* Robot pose for field positioning */
   private final NetworkTable                         table                           = inst.getTable("Pose");
-  private final DoubleArrayPublisher                 fieldPub                        =
-      table.getDoubleArrayTopic("llPose").publish( );
   private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
 
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!

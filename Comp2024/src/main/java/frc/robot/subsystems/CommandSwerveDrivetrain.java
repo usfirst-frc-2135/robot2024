@@ -22,13 +22,11 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -51,7 +49,6 @@ import frc.robot.Constants.VIConsts;
 import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.LimelightHelpers;
-import frc.robot.lib.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
@@ -223,8 +220,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
    */
   private void visionUpdate( )
   {
-    PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-
     boolean useMegaTag2 = true; //set to false to use MegaTag1
     boolean doRejectUpdate = false;
     if (useMegaTag2 == false)
@@ -251,7 +246,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
         addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
-
       }
     }
     else if (useMegaTag2 == true)
@@ -271,7 +265,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       {
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-
       }
     }
   }
@@ -292,7 +285,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
      * This ensures driving behavior doesn't change until an explicit disable event occurs during
      * testing
      */
-
     if (!hasAppliedOperatorPerspective || DriverStation.isDisabled( ))
     {
       DriverStation.getAlliance( ).ifPresent((allianceColor) ->
@@ -328,9 +320,5 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             new Rotation2d(poseRotEntry.getDouble(0.0)))        //
     );
   }
-
-  // Pose2d pathErrorX = Telemetry.fieldPub[0] - "pathplannerpose"
-  // Pose2d pathErrorY = Telemetry.fieldPub[1] - "pathplannerpose"
-  // Pose2d pathErrorRotation = Telemetry.fieldPub[2] - "pathplannerpose"
 
 }

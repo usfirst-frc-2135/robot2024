@@ -31,7 +31,6 @@ public class Telemetry
   {
     MaxSpeed = maxSpeed;
     SignalLogger.start( );
-    lastTime = Utils.getCurrentTimeSeconds( );
   }
 
   /* What to publish over networktables for telemetry */
@@ -39,6 +38,7 @@ public class Telemetry
 
   /* Robot pose for field positioning */
   private final NetworkTable           table              = inst.getTable("Pose");
+  private final DoubleArrayPublisher   fieldPub           = table.getDoubleArrayTopic("robotPose").publish( );
   private final StringPublisher        fieldTypePub       = table.getStringTopic(".type").publish( );
 
   /* Robot speeds for general checking */
@@ -50,7 +50,7 @@ public class Telemetry
 
   /* Keep a reference of the last pose to calculate the speeds */
   private Pose2d                       m_lastPose         = new Pose2d( );
-  private double                       lastTime           = 0.0;
+  private double                       lastTime           = Utils.getCurrentTimeSeconds( );
 
   /* Mechanisms to represent the swerve module states */
   private final Mechanism2d[ ]         m_moduleMechanisms = new Mechanism2d[ ]
@@ -83,6 +83,11 @@ public class Telemetry
   {
     /* Telemeterize the pose */
     Pose2d pose = state.Pose;
+    fieldTypePub.set("Field2d");
+    fieldPub.set(new double[ ]
+    {
+        pose.getX( ), pose.getY( ), pose.getRotation( ).getDegrees( )
+    });
 
     /* Telemeterize the robot's general speeds */
     double currentTime = Utils.getCurrentTimeSeconds( );

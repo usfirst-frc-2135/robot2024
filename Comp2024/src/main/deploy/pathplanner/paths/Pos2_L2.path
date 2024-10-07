@@ -20,8 +20,8 @@
         "y": 2.0868094983738996
       },
       "prevControl": {
-        "x": 1.8740863102130616,
-        "y": 2.308238079251894
+        "x": 2.0406823174246838,
+        "y": 2.0758825739465205
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 5.25,
+    "maxAcceleration": 4.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "FromPose",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

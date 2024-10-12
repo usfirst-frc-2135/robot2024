@@ -89,8 +89,8 @@ public class Intake extends SubsystemBase
   private static final double        kRotaryAngleHandoff   = -130.3;
   private static final double        kRotaryAngleDeployed  = 19.51;
 
-  private static final double        kRotaryAngleMin       = -179.27;
-  private static final double        kRotaryAngleMax       = 21.9;
+  private static final double        kRotaryAngleMin       = kRotaryAngleRetracted - 2;
+  private static final double        kRotaryAngleMax       = kRotaryAngleDeployed + 2.39;
 
   // Device objects
   private final WPI_TalonSRX         m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);

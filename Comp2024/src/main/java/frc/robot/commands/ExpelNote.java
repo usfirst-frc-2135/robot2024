@@ -38,7 +38,7 @@ public class ExpelNote extends SequentialCommandGroup
         intake.getMoveToPositionCommand(INConsts.INRollerMode.EXPEL, intake::getCurrentPosition),
 
         new LogCommand(getName(), "Wait for note to release"),
-        new WaitCommand(1.0),
+        new WaitCommand(0.5),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition),

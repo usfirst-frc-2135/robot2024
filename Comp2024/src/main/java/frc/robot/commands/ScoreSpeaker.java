@@ -46,7 +46,7 @@ public class ScoreSpeaker extends SequentialCommandGroup
         intake.getMoveToPositionCommand(INConsts.INRollerMode.SHOOT, intake::getCurrentPosition),
 
         new LogCommand(getName(), "Wait for note to release"),
-        new WaitCommand(0.5),
+        new WaitCommand(0.25),
 
         new LogCommand(getName(), "Stop rollers & Hold intake rotary in same position"),
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)

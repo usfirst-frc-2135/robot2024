@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.16,
-        "y": 6.63
+        "x": 2.1,
+        "y": 6.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6051493622595088,
-        "y": 5.857904905913979
+        "x": 1.3967648957601837,
+        "y": 5.570132424223183
       },
       "isLocked": false,
       "linkedName": "P1"
@@ -20,8 +20,8 @@
         "y": 5.55
       },
       "prevControl": {
-        "x": 1.7489809435807597,
-        "y": 5.656231887678237
+        "x": 1.5484164539101135,
+        "y": 5.571508633060159
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 4.75,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

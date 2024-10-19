@@ -82,15 +82,19 @@ public class Intake extends SubsystemBase
   }
 
   private static final double        kToleranceDegrees     = 4.0;      // PID tolerance in degrees
-  private static final double        kMMMoveTimeout        = 1.5;      // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double        kMMMoveTimeout        = 1.0;      // Seconds allowed for a Motion Magic movement
 
   // Rotary angles - Motion Magic move parameters
-  private static final double        kRotaryAngleRetracted = -177.27;
-  private static final double        kRotaryAngleHandoff   = -130.3;
-  private static final double        kRotaryAngleDeployed  = 19.51;
+  //    Measured hardstops and pre-defined positions:
+  //                retracted handoff   deployed
+  //      Comp      -177.3    130.3     25.9
+  //      Practice  -177.71   -131.30   27.4
+  private static final double        kRotaryAngleRetracted = Robot.isComp( ) ? -176.3 : -176.83; // One degree from hardstops
+  private static final double        kRotaryAngleHandoff   = Robot.isComp( ) ? -130.3 : -131.66;  // TODO: Needs to be tested on both robots
+  private static final double        kRotaryAngleDeployed  = Robot.isComp( ) ? 24.9 : 27.33;     // One degree from hardstops
 
-  private static final double        kRotaryAngleMin       = -179.27;
-  private static final double        kRotaryAngleMax       = 21.9;
+  private static final double        kRotaryAngleMin       = kRotaryAngleRetracted - 3.0;
+  private static final double        kRotaryAngleMax       = kRotaryAngleDeployed + 3.0;
 
   // Device objects
   private final WPI_TalonSRX         m_rollerMotor         = new WPI_TalonSRX(Ports.kCANID_IntakeRoller);
@@ -583,7 +587,7 @@ public class Intake extends SubsystemBase
    */
   public boolean isNoteDetected( )
   {
-    return m_noteDetected;
+    return m_noteInIntake.get( );
   }
 
   ////////////////////////////////////////////////////////////////////////////

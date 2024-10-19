@@ -583,7 +583,7 @@ public class Intake extends SubsystemBase
    */
   public boolean isNoteDetected( )
   {
-    return m_noteDetected;
+    return m_noteInIntake.get( );
   }
 
   ////////////////////////////////////////////////////////////////////////////

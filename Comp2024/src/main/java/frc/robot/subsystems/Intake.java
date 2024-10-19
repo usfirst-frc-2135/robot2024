@@ -87,8 +87,8 @@ public class Intake extends SubsystemBase
   // Rotary angles - Motion Magic move parameters
   //    Measured hardstops and pre-defined positions:
   //                retracted handoff   deployed
-  //      Comp      -183.1    130.3     21.5
-  //      Practice  -177.3    130.3     25.9
+  //      Comp      -177.3    130.3     25.9
+  //      Practice  -177.71   -131.30   
   private static final double        kRotaryAngleRetracted = Robot.isComp( ) ? -176.3 : -182.1; // One degree from hardstops
   private static final double        kRotaryAngleHandoff   = Robot.isComp( ) ? -130.3 : 130.3;  // TODO: Needs to be tested on both robots
   private static final double        kRotaryAngleDeployed  = Robot.isComp( ) ? 24.9 : 20.5;     // One degree from hardstops

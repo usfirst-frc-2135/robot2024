@@ -53,9 +53,9 @@ public final class CTREConfigs6
     // inRotaryConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings - fused CANcoder affects all feedback constants by the gearRatio
-    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 30.0 / gearRatio;  // Rotations / second
-    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 90.0 / gearRatio;    // Rotations / second ^ 2
-    inRotaryConfig.MotionMagic.MotionMagicJerk = 360.0 / gearRatio;           // Rotations / second ^ 3
+    inRotaryConfig.MotionMagic.MotionMagicCruiseVelocity = 50.0 / gearRatio;  // Rotations / second
+    inRotaryConfig.MotionMagic.MotionMagicAcceleration = 220.0 / gearRatio;    // Rotations / second ^ 2
+    inRotaryConfig.MotionMagic.MotionMagicJerk = 1600.0 / gearRatio;           // Rotations / second ^ 3
 
     // Motor output settings
     inRotaryConfig.MotorOutput.DutyCycleNeutralDeadband = 0.001;  // Percentage
@@ -97,7 +97,7 @@ public final class CTREConfigs6
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     if (Robot.isReal( ))
       config.MagnetSensor.MagnetOffset =
-          (Robot.isComp( )) ? (-0.311768 - kQuarterRotation + CompRobotOffset) : (0.104492 - kQuarterRotation);
+          (Robot.isComp( )) ? (-0.311768 - kQuarterRotation + CompRobotOffset) : (0.1184 - kQuarterRotation);
     else
       config.MagnetSensor.MagnetOffset = -0.25; // Simulated CANcoder default in rotations
 

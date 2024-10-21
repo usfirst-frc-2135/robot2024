@@ -5,7 +5,8 @@ import java.util.List;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
 import frc.robot.commands.AcquireNote;
@@ -69,43 +70,50 @@ public class AutoScore4 extends SequentialCommandGroup
         intake.getMoveToPositionCommand(INConsts.INRollerMode.ACQUIRE, intake::getIntakeDeployed),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
-        new ParallelCommandGroup( 
+        new ParallelDeadlineGroup(
+          new SequentialCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(1)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+            drivetrain.getPathCommand(ppPaths.get(2))
+          ),
+          new AcquireNote(intake, led, hid)
         ),
-
-        new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getPathCommand(ppPaths.get(2)),
-
-        new LogCommand(getName(), "Score note 2"),
-        new ScoreSpeaker(shooter, intake, led),
+         new ConditionalCommand(
+          new ScoreSpeaker(shooter, intake, led),
+          new LogCommand(getName(), "Missed note"),
+          intake::isNoteDetected
+          ),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
-        new ParallelCommandGroup(
-            drivetrain.getPathCommand(ppPaths.get(3)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
+        new ParallelDeadlineGroup( 
+            new SequentialCommandGroup(
+              drivetrain.getPathCommand(ppPaths.get(3)),
+              drivetrain.getPathCommand(ppPaths.get(4))
+            ),
+            new AcquireNote(intake, led, hid)
         ),
-
-        new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getPathCommand(ppPaths.get(4)),
-
-        new LogCommand(getName(), "Score note 3"),
-        new ScoreSpeaker(shooter, intake, led),
+        new ConditionalCommand(
+          new ScoreSpeaker(shooter, intake, led),
+          new LogCommand(getName(), "Missed note"),
+          intake::isNoteDetected
+          ),
 
         new LogCommand(getName(), "Drive to spike while intaking"),
-        new ParallelCommandGroup(
-            drivetrain.getPathCommand(ppPaths.get(5)),
-            new AcquireNote(intake, led, hid).withTimeout(1.5)
-        ), 
-        
-        new LogCommand(getName(), "Drive to scoring pose"),
-        drivetrain.getPathCommand(ppPaths.get(6)),
-
-        new LogCommand(getName(), "Score note 4"),
-        new ScoreSpeaker(shooter, intake, led),
-
+        new ParallelDeadlineGroup( 
+            new SequentialCommandGroup(
+              drivetrain.getPathCommand(ppPaths.get(5)),
+              drivetrain.getPathCommand(ppPaths.get(6))
+            ),
+            new AcquireNote(intake, led, hid)
+        ),
+        new ConditionalCommand(
+          new ScoreSpeaker(shooter, intake, led),
+          new LogCommand(getName(), "Missed note "),
+          intake::isNoteDetected
+          ),
+          
         new LogCommand(getName(), "Turn off intake rollers"), 
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)
+
         // @formatter:on
     );
   }

@@ -489,7 +489,7 @@ public class Intake extends SubsystemBase
         default :
           DataLogManager.log(String.format("%s: Roller mode is invalid: %s", getSubsystem( ), mode));
         case STOP :
-          output = 0.0;
+          output = (m_noteDetected) ? kRollerSpeedHold : 0.0;
           break;
         case ACQUIRE :
           output = kRollerSpeedAcquire;

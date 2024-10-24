@@ -81,7 +81,7 @@ public class Feeder extends SubsystemBase
   }
 
   // Rotary constants
-  private static final double        kToleranceDegrees    = 4.0;      // PID tolerance in degrees
+  private static final double        kToleranceDegrees    = 3.0;      // PID tolerance in degrees
   private static final double        kMMMoveTimeout       = 1.0;      // Seconds allowed for a Motion Magic movement
 
   // Rotary angles - Motion Magic move parameters 

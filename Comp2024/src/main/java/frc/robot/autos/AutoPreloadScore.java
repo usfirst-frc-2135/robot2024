@@ -62,17 +62,18 @@ public class AutoPreloadScore extends SequentialCommandGroup
 
         new LogCommand(getName(), "Drive to spike while intaking"),
         new ParallelDeadlineGroup( 
-            new SequentialCommandGroup(
-              drivetrain.getPathCommand(ppPaths.get(1)),
-              drivetrain.getPathCommand(ppPaths.get(2))
-            ),
-            new AcquireNote(intake, led, hid)
+          new SequentialCommandGroup(
+            drivetrain.getPathCommand(ppPaths.get(1)),
+            drivetrain.getPathCommand(ppPaths.get(2))
+          ),
+          new AcquireNote(intake, led, hid)
         ),
         new ConditionalCommand(
           new ScoreSpeaker(shooter, intake, led),
-          new LogCommand(getName(), "Missed note"),
+          new LogCommand(getName(), "Missed spike note"),
           intake::isNoteDetected
-          ),
+        ),
+
         new LogCommand(getName(), "Turn off intake rollers"), 
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)
 

@@ -69,7 +69,7 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Deploy intake before moving"),
         intake.getMoveToPositionCommand(INConsts.INRollerMode.ACQUIRE, intake::getIntakeDeployed),
 
-        new LogCommand(getName(), "Drive to spike while intaking"),
+        new LogCommand(getName(), "Drive to first spike while intaking"),
         new ParallelDeadlineGroup(
           new SequentialCommandGroup(
             drivetrain.getPathCommand(ppPaths.get(1)),
@@ -77,39 +77,39 @@ public class AutoScore4 extends SequentialCommandGroup
           ),
           new AcquireNote(intake, led, hid)
         ),
-         new ConditionalCommand(
+        new ConditionalCommand(
           new ScoreSpeaker(shooter, intake, led),
-          new LogCommand(getName(), "Missed note"),
+          new LogCommand(getName(), "Missed first spike note"),
           intake::isNoteDetected
-          ),
+        ),
 
-        new LogCommand(getName(), "Drive to spike while intaking"),
+        new LogCommand(getName(), "Drive to second spike while intaking"),
         new ParallelDeadlineGroup( 
-            new SequentialCommandGroup(
-              drivetrain.getPathCommand(ppPaths.get(3)),
-              drivetrain.getPathCommand(ppPaths.get(4))
-            ),
-            new AcquireNote(intake, led, hid)
+          new SequentialCommandGroup(
+            drivetrain.getPathCommand(ppPaths.get(3)),
+            drivetrain.getPathCommand(ppPaths.get(4))
+          ),
+          new AcquireNote(intake, led, hid)
         ),
         new ConditionalCommand(
           new ScoreSpeaker(shooter, intake, led),
-          new LogCommand(getName(), "Missed note"),
+          new LogCommand(getName(), "Missed second spike note"),
           intake::isNoteDetected
-          ),
+        ),
 
-        new LogCommand(getName(), "Drive to spike while intaking"),
+        new LogCommand(getName(), "Drive to third spike while intaking"),
         new ParallelDeadlineGroup( 
-            new SequentialCommandGroup(
-              drivetrain.getPathCommand(ppPaths.get(5)),
-              drivetrain.getPathCommand(ppPaths.get(6))
-            ),
-            new AcquireNote(intake, led, hid)
+          new SequentialCommandGroup(
+            drivetrain.getPathCommand(ppPaths.get(5)),
+            drivetrain.getPathCommand(ppPaths.get(6))
+          ),
+          new AcquireNote(intake, led, hid)
         ),
         new ConditionalCommand(
           new ScoreSpeaker(shooter, intake, led),
-          new LogCommand(getName(), "Missed note "),
+          new LogCommand(getName(), "Missed third spike note "),
           intake::isNoteDetected
-          ),
+        ),
           
         new LogCommand(getName(), "Turn off intake rollers"), 
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)

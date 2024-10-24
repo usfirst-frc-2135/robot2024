@@ -66,6 +66,7 @@ public class Intake extends SubsystemBase
   private static final double  kRollerSpeedExpel     = -0.4;
   private static final double  kRollerSpeedToShooter = -1.0;
   private static final double  kRollerSpeedToFeeder  = -0.4;
+  private static final double  kRollerSpeedHold      = 0.1;
 
   private static final double  kRotaryGearRatio      = 30.83;
   private static final double  kRotaryLengthMeters   = 0.3;       // Simulation
@@ -81,7 +82,7 @@ public class Intake extends SubsystemBase
     OUTBOARD // Rotary moving out of the robot
   }
 
-  private static final double        kToleranceDegrees     = 4.0;      // PID tolerance in degrees
+  private static final double        kToleranceDegrees     = 3.0;      // PID tolerance in degrees
   private static final double        kMMMoveTimeout        = 1.0;      // Seconds allowed for a Motion Magic movement
 
   // Rotary angles - Motion Magic move parameters
@@ -121,7 +122,7 @@ public class Intake extends SubsystemBase
 
   // Roller variables
   private boolean                    m_rollerValid;        // Health indicator for motor 
-  private Debouncer                  m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
+  private Debouncer                  m_noteDebouncer       = new Debouncer(0.045, DebounceType.kBoth);
   private boolean                    m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
@@ -489,7 +490,7 @@ public class Intake extends SubsystemBase
         default :
           DataLogManager.log(String.format("%s: Roller mode is invalid: %s", getSubsystem( ), mode));
         case STOP :
-          output = 0.0;
+          output = (m_noteDetected) ? kRollerSpeedHold : 0.0;
           break;
         case ACQUIRE :
           output = kRollerSpeedAcquire;

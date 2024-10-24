@@ -56,7 +56,7 @@ import frc.robot.lib.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
   private static final String                        kSwerveTab                      = "Swerve";
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;
@@ -157,7 +157,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this::seedFieldRelative,                                      // Consumer for seeding pose against auto
         this::getCurrentRobotChassisSpeeds,                           // Supplier of chassis speeds
         (speeds) -> this.setControl(AutoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
-        new HolonomicPathFollowerConfig(new PIDConstants(23, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
+        new HolonomicPathFollowerConfig(new PIDConstants(25, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
             driveBaseRadius, new ReplanningConfig( )),                // Path following config
         ( ) -> DriverStation.getAlliance( ).orElse(Alliance.Blue) == Alliance.Red, // Assume the path needs to be flipped for Red vs Blue (normally case)
         this);                                                        // Subsystem for requirements

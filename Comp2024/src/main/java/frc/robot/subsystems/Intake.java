@@ -66,6 +66,7 @@ public class Intake extends SubsystemBase
   private static final double  kRollerSpeedExpel     = -0.4;
   private static final double  kRollerSpeedToShooter = -1.0;
   private static final double  kRollerSpeedToFeeder  = -0.4;
+  private static final double  kRollerSpeedHold      = 0.1;
 
   private static final double  kRotaryGearRatio      = 30.83;
   private static final double  kRotaryLengthMeters   = 0.3;       // Simulation

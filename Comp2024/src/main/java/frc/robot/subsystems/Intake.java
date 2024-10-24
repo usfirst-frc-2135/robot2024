@@ -121,7 +121,7 @@ public class Intake extends SubsystemBase
 
   // Roller variables
   private boolean                    m_rollerValid;        // Health indicator for motor 
-  private Debouncer                  m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
+  private Debouncer                  m_noteDebouncer       = new Debouncer(0.045, DebounceType.kBoth);
   private boolean                    m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
@@ -587,7 +587,7 @@ public class Intake extends SubsystemBase
    */
   public boolean isNoteDetected( )
   {
-    return m_noteInIntake.get( );
+    return m_noteDetected;
   }
 
   ////////////////////////////////////////////////////////////////////////////

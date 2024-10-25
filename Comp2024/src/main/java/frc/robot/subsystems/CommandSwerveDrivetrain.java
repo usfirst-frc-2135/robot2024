@@ -56,7 +56,7 @@ import frc.robot.lib.LimelightHelpers;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem
 {
-  private final boolean                              m_useLimelight                  = false; // set to false when no limelight to prevent sim errors
+  private final boolean                              m_useLimelight                  = true; // set to false when no limelight to prevent sim errors
   private static final String                        kSwerveTab                      = "Swerve";
   private static final double                        kSimLoopPeriod                  = 0.005; // 5 ms
   private Notifier                                   m_simNotifier                   = null;

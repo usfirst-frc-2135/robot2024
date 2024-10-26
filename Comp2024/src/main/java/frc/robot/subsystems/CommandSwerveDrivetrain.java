@@ -94,13 +94,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /* Change this to the sysid routine you want to test */
   private final SysIdRoutine                         RoutineToApply                  = SysIdRoutineTranslation;
 
-  /* What to publish over networktables for telemetry */
-  private final NetworkTableInstance                 inst                            = NetworkTableInstance.getDefault( );
-
-  /* Robot pose for field positioning */
-  private final NetworkTable                         table                           = inst.getTable("Pose");
-  private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
-
+  /* Robot pathToPose constraints */
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
       1.0,            // kMaxVelocityMps                               (slowed from 3.0 for testing)    
       1.0,            // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  
@@ -157,7 +151,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this::seedFieldRelative,                                      // Consumer for seeding pose against auto
         this::getCurrentRobotChassisSpeeds,                           // Supplier of chassis speeds
         (speeds) -> this.setControl(AutoRequest.withSpeeds(speeds)),  // Consumer of ChassisSpeeds to drive the robot
-        new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
+        new HolonomicPathFollowerConfig(new PIDConstants(25, 0, 0), new PIDConstants(10, 0, 0), TunerConstants.kSpeedAt12VoltsMps,
             driveBaseRadius, new ReplanningConfig( )),                // Path following config
         ( ) -> DriverStation.getAlliance( ).orElse(Alliance.Blue) == Alliance.Red, // Assume the path needs to be flipped for Red vs Blue (normally case)
         this);                                                        // Subsystem for requirements

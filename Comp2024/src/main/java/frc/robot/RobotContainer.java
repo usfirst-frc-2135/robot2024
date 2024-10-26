@@ -44,6 +44,7 @@ import frc.robot.commands.AcquireNote;
 import frc.robot.commands.ExpelNote;
 import frc.robot.commands.HandoffToFeeder;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.PassNote;
 import frc.robot.commands.PrepareToClimb;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ScoreAmp;
@@ -333,7 +334,8 @@ public class RobotContainer
     //
     m_operatorPad.a( ).onTrue(m_shooter.getShooterScoreCommand( ));
     m_operatorPad.b( ).onTrue(m_shooter.getShooterStopCommand( ));
-    m_operatorPad.x( ).onTrue(new LogCommand("operPad", "X"));
+    m_operatorPad.x( ).onTrue(new PassNote(m_shooter, m_intake, m_led));
+    m_operatorPad.x( ).onFalse(m_shooter.getShooterScoreCommand( ));
     m_operatorPad.y( ).onTrue(new ExpelNote(m_intake, m_led));
 
     //

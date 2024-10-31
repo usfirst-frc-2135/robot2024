@@ -136,13 +136,13 @@ public class Climber extends SubsystemBase
       m_subsystemTab.getLayout("Left", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   private GenericEntry               m_leftValidEntry       = m_leftList.add("leftValid", false).getEntry( );
   private GenericEntry               m_leftInchesEntry      = m_leftList.add("leftInches", 0.0).getEntry( );
-  private GenericEntry               m_leftCLoopErrorEntry  = m_leftList.add("leftCLoopError", 0.0).getEntry( );
+  // private GenericEntry               m_leftCLoopErrorEntry  = m_leftList.add("leftCLoopError", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_rightList            =
       m_subsystemTab.getLayout("Right", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   private GenericEntry               m_rightValidEntry      = m_rightList.add("righttValid", false).getEntry( );
   private GenericEntry               m_rightInchesEntry     = m_rightList.add("rightInches", 0.0).getEntry( );
-  private GenericEntry               m_rightCLoopErrorEntry = m_rightList.add("rightCLoopError", 0.0).getEntry( );
+  // private GenericEntry               m_rightCLoopErrorEntry = m_rightList.add("rightCLoopError", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_statusList           =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
@@ -227,8 +227,8 @@ public class Climber extends SubsystemBase
     m_leftInchesEntry.setDouble(m_leftCurInches);
     m_rightInchesEntry.setDouble(m_rightCurInches);
     m_targetInchesEntry.setDouble(m_targetInches);
-    m_leftCLoopErrorEntry.setDouble(m_targetInches - m_leftCurInches);
-    m_rightCLoopErrorEntry.setDouble(m_targetInches - m_rightCurInches);
+    // m_leftCLoopErrorEntry.setDouble(m_targetInches - m_leftCurInches);
+    // m_rightCLoopErrorEntry.setDouble(m_targetInches - m_rightCurInches);
   }
 
   /****************************************************************************

@@ -6,9 +6,11 @@ import java.util.List;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
+import frc.robot.Robot;
 import frc.robot.commands.AcquireNote;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.ScoreSpeaker;
@@ -26,19 +28,16 @@ public class AutoScore4 extends SequentialCommandGroup
   /**
    * Autonomous command to:
    * 1 - Drive to a scoring position
-   * 2 - Shoot the preloaded note
-   * 3a - Start and deploy intake
-   * 3b - Drive to a spike while acquiring a note
-   * 3c - Drive to a scoring position
-   * 3d - Shoot a the first spike note
-   * 4a - Start and deploy intake
-   * 4b - Drive to a spike while acquiring a note
-   * 4c - Drive to a scoring position
-   * 4d - Shoot a the second spike note
-   * 5a - Start and deploy intake
-   * 5b - Drive to a spike while acquiring a note
-   * 5c - Drive to a scoring position
-   * 5d - Shoot a the third spike note
+   * 1a - Shoot the preloaded note
+   * 2a - Deploy intake and run rollers
+   * 2b - Drive to a spike and back while acquiring a note
+   * 2c - Shoot a the first spike note
+   * 3a - Deploy intake and run rollers
+   * 3b - Drive to a spike and back while acquiring a note
+   * 3c - Shoot a the second spike note
+   * 4a - Deploy intake and run rollers
+   * 4b - Drive to a spike and back while acquiring a note
+   * 4c - Shoot a the third spike note
    * 
    * @param ppPaths
    *          swerve drivetrain subsystem
@@ -60,6 +59,8 @@ public class AutoScore4 extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+        new InstantCommand(()->Robot.timeMarker(getName())),
+
         new LogCommand(getName(), "Drive to scoring pose"),
         drivetrain.getPathCommand(ppPaths.get(0)),
 
@@ -112,8 +113,9 @@ public class AutoScore4 extends SequentialCommandGroup
         ),
           
         new LogCommand(getName(), "Turn off intake rollers"), 
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition),
 
+        new InstantCommand(()->Robot.timeMarker(getName()))
         // @formatter:on
     );
   }

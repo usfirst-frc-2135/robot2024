@@ -72,7 +72,7 @@ public class RobotContainer
 {
   private final boolean                               m_macOSXSim     = false;        // Enables Mac OS X controller compatibility in simulation
   private static final String                         kAutoTab        = "Autonomous"; // Shuffleboard tab name for autonomous mode
-  private static final String                         kCommandTab     = "Command";    // Shuffleboard tab name for commands
+  //private static final String                         kCommandTab     = "Command";    // Shuffleboard tab name for commands
 
   // Gamepad controllers
   private static final CommandXboxController          m_driverPad     = new CommandXboxController(Constants.kDriverPadPort);
@@ -239,29 +239,29 @@ public class RobotContainer
     autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 2);
 
     // Command tab
-    ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
-    cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led, m_hid)).withPosition(0, 0);
-    cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led)).withPosition(0, 1);
-    cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led)).withPosition(0, 2);
+    //ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
+    // cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led, m_hid)).withPosition(0, 0);
+    // cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led)).withPosition(0, 1);
+    // cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led)).withPosition(0, 2);
 
-    cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid)).withPosition(2, 0);
-    cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
-    cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
+    // cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid)).withPosition(2, 0);
+    // cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
+    // cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
 
-    cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleDriverCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
-        .withPosition(4, 0);
-    cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleOperatorCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
-        .withPosition(6, 0);
-    cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
+    // cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleDriverCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
+    //     .withPosition(4, 0);
+    // cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleOperatorCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
+    //     .withPosition(6, 0);
+    // cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
 
-    ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
-        .withProperties(Map.of("Label position", "HIDDEN"));
-    subList.add(m_intake);
-    subList.add(m_shooter);
-    subList.add(m_feeder);
-    subList.add(m_climber);
+    //ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
+    //    .withProperties(Map.of("Label position", "HIDDEN"));
+    // subList.add(m_intake);
+    // subList.add(m_shooter);
+    // subList.add(m_feeder);
+    // subList.add(m_climber);
 
-    cmdTab.add(CommandScheduler.getInstance( )).withPosition(8, 0);
+    // cmdTab.add(CommandScheduler.getInstance( )).withPosition(8, 0);
   }
 
   /****************************************************************************

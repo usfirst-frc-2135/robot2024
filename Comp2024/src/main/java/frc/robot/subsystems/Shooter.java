@@ -45,6 +45,7 @@ public class Shooter extends SubsystemBase
 
   private static final double kMOI               = 0.001;     // Simulation - Moment of Inertia
   private static final double kFlywheelScoreRPM  = 3300.0;    // RPM to score
+  private static final double kFlywheelPassRPM   = 2600.0;    // RPM to pass
   private static final double kToleranceRPM      = 150.0;     // Tolerance band around target RPM
 
   private static final double kFlywheelGearRatio = (18.0 / 18.0);
@@ -55,6 +56,7 @@ public class Shooter extends SubsystemBase
     REVERSE,    // Shooter runs in reverse direction to handle jams
     STOP,       // Shooter is stopped
     SCORE,      // Shooter ramped to an initial speed before shooting
+    PASS        // Shooter slowed to passing speed
   }
 
   // Devices  objects
@@ -101,7 +103,7 @@ public class Shooter extends SubsystemBase
       m_shooterTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
   GenericEntry                       m_atDesiredRPMEntry     = m_statusList.add("atDesiredRPM", false).getEntry( );
   GenericEntry                       m_targetRPMEntry        = m_statusList.add("targetRPM", 0.0).getEntry( );
-  GenericEntry                       m_flywheelRPMEntry      = m_statusList.add("flywheelRPM", 0.0).getEntry( );
+  GenericEntry                       m_flywheelScoreEntry    = m_statusList.add("flywheelRPM", 0.0).getEntry( );
 
   /****************************************************************************
    * 
@@ -210,7 +212,7 @@ public class Shooter extends SubsystemBase
    */
   private void initDashboard( )
   {
-    m_flywheelRPMEntry.setDouble(kFlywheelScoreRPM);
+    m_flywheelScoreEntry.setDouble(kFlywheelScoreRPM);
 
     ShuffleboardLayout cmdList = m_shooterTab.getLayout("Commands", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
         .withProperties(Map.of("Label position", "HIDDEN"));
@@ -266,7 +268,10 @@ public class Shooter extends SubsystemBase
         m_targetRPM = 0.0;
         break;
       case SCORE :
-        m_targetRPM = m_flywheelRPMEntry.getDouble(0.0);
+        m_targetRPM = m_flywheelScoreEntry.getDouble(0.0);
+        break;
+      case PASS :
+        m_targetRPM = kFlywheelPassRPM;
         break;
     }
 
@@ -337,6 +342,17 @@ public class Shooter extends SubsystemBase
         ( ) -> setShooterMode(mode),  // Method to call
         this                          // Subsystem requirement
     );
+  }
+
+  /****************************************************************************
+   * 
+   * Create shooter mode command for passing
+   * 
+   * @return instant command that runs shooter motors for scoring
+   */
+  public Command getShooterPassCommand( )
+  {
+    return getShooterCommand(ShooterMode.PASS).withName("ShooterPassNote");
   }
 
   /****************************************************************************

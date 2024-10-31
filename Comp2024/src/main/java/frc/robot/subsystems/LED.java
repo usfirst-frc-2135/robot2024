@@ -71,13 +71,13 @@ public class LED extends SubsystemBase
   private Animation                        m_previousAnimation = null;
 
   // Shuffleboard objects
-  ShuffleboardTab                          m_ledTab            = Shuffleboard.getTab(kLEDTab);
-  ShuffleboardLayout                       m_ledList           =
-      m_ledTab.getLayout("LED", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  ComplexWidget                            m_colorWidget       = m_ledList.add("color", m_colorChooser);
-  ComplexWidget                            m_animationWidget   = m_ledList.add("animation", m_animationChooser);
-  ComplexWidget                            m_commandEntry      =
-      m_ledList.add("LEDSet", this.getLEDCommand(COLOR.DASHBOARD, ANIMATION.DASHBOARD));
+  // ShuffleboardTab                          m_ledTab            = Shuffleboard.getTab(kLEDTab);
+  // ShuffleboardLayout                       m_ledList           =
+  //     m_ledTab.getLayout("LED", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
+  // ComplexWidget                            m_colorWidget       = m_ledList.add("color", m_colorChooser);
+  // ComplexWidget                            m_animationWidget   = m_ledList.add("animation", m_animationChooser);
+  // ComplexWidget                            m_commandEntry      =
+  //     m_ledList.add("LEDSet", this.getLEDCommand(COLOR.DASHBOARD, ANIMATION.DASHBOARD));
 
   /****************************************************************************
    * 

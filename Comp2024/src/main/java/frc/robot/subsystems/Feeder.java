@@ -172,7 +172,7 @@ public class Feeder extends SubsystemBase
     setName(kSubsystemName);
     setSubsystem(kSubsystemName);
 
-    Robot.timeMarker(getName( ) + ": constructor start");
+    //Robot.timeMarker(getName( ) + ": constructor start");
 
     // Roller motor init
     m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, kSubsystemName + "Roller",
@@ -218,7 +218,7 @@ public class Feeder extends SubsystemBase
     initDashboard( );
     initialize( );
 
-    Robot.timeMarker(getName( ) + ": constructor end");
+    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

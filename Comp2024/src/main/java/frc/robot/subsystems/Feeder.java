@@ -81,7 +81,7 @@ public class Feeder extends SubsystemBase
   }
 
   // Rotary constants
-  private static final double        kToleranceDegrees    = 4.0;      // PID tolerance in degrees
+  private static final double        kToleranceDegrees    = 3.0;      // PID tolerance in degrees
   private static final double        kMMMoveTimeout       = 1.0;      // Seconds allowed for a Motion Magic movement
 
   // Rotary angles - Motion Magic move parameters 
@@ -154,7 +154,7 @@ public class Feeder extends SubsystemBase
       m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   private GenericEntry               m_rotValidEntry      = m_rotaryList.add("rotValid", false).getEntry( );
   private GenericEntry               m_rotDegreesEntry    = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  private GenericEntry               m_rotCLoopErrorEntry = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
+  // private GenericEntry               m_rotCLoopErrorEntry = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_statusList         =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
@@ -243,7 +243,7 @@ public class Feeder extends SubsystemBase
     m_rotDegreesEntry.setDouble(m_currentDegrees);
     m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
-    m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
+    // m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
   }
 
   /****************************************************************************

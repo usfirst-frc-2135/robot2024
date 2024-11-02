@@ -66,6 +66,7 @@ public class Intake extends SubsystemBase
   private static final double  kRollerSpeedExpel     = -0.4;
   private static final double  kRollerSpeedToShooter = -1.0;
   private static final double  kRollerSpeedToFeeder  = -0.4;
+  private static final double  kRollerSpeedHold      = 0.1;
 
   private static final double  kRotaryGearRatio      = 30.83;
   private static final double  kRotaryLengthMeters   = 0.3;       // Simulation
@@ -81,7 +82,7 @@ public class Intake extends SubsystemBase
     OUTBOARD // Rotary moving out of the robot
   }
 
-  private static final double        kToleranceDegrees     = 4.0;      // PID tolerance in degrees
+  private static final double        kToleranceDegrees     = 3.0;      // PID tolerance in degrees
   private static final double        kMMMoveTimeout        = 1.0;      // Seconds allowed for a Motion Magic movement
 
   // Rotary angles - Motion Magic move parameters
@@ -121,7 +122,7 @@ public class Intake extends SubsystemBase
 
   // Roller variables
   private boolean                    m_rollerValid;        // Health indicator for motor 
-  private Debouncer                  m_noteDebouncer       = new Debouncer(0.030, DebounceType.kBoth);
+  private Debouncer                  m_noteDebouncer       = new Debouncer(0.045, DebounceType.kBoth);
   private boolean                    m_noteDetected;       // Detection state of note in rollers
 
   // Rotary variables
@@ -146,15 +147,15 @@ public class Intake extends SubsystemBase
   private ShuffleboardLayout         m_rollerList          =
       m_subsystemTab.getLayout("Roller", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
   private GenericEntry               m_rollValidEntry      = m_rollerList.add("rollValid", false).getEntry( );
-  private GenericEntry               m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
-  private GenericEntry               m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
+  // private GenericEntry               m_rollSpeedEntry      = m_rollerList.add("rollSpeed", 0.0).getEntry( );
+  // private GenericEntry               m_rollSupCurEntry     = m_rollerList.add("rollSupCur", 0.0).getEntry( );
   // private GenericEntry                      m_rollStatCurEntry    = m_rollerList.add("rollStatCur", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_rotaryList          =
       m_subsystemTab.getLayout("Rotary", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
   private GenericEntry               m_rotValidEntry       = m_rotaryList.add("rotValid", false).getEntry( );
   private GenericEntry               m_rotDegreesEntry     = m_rotaryList.add("rotDegrees", 0.0).getEntry( );
-  private GenericEntry               m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
+  // private GenericEntry               m_rotCLoopErrorEntry  = m_rotaryList.add("rotCLoopError", 0.0).getEntry( );
 
   private ShuffleboardLayout         m_statusList          =
       m_subsystemTab.getLayout("Status", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 3);
@@ -236,14 +237,14 @@ public class Intake extends SubsystemBase
     m_noteDetected = m_noteDebouncer.calculate(m_noteInIntake.get( ));
 
     // Update dashboard
-    m_rollSpeedEntry.setDouble(m_rollerMotor.get( ));
-    m_rollSupCurEntry.setDouble(m_rollerMotor.getSupplyCurrent( ));
+    // m_rollSpeedEntry.setDouble(m_rollerMotor.get( ));
+    // m_rollSupCurEntry.setDouble(m_rollerMotor.getSupplyCurrent( ));
 
     m_ccDegreesEntry.setDouble(m_ccDegrees);
     m_rotDegreesEntry.setDouble(m_currentDegrees);
     m_noteDetectedEntry.setBoolean(m_noteDetected);
     m_targetDegreesEntry.setDouble(m_targetDegrees);
-    m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
+    // m_rotCLoopErrorEntry.setDouble(m_targetDegrees - m_currentDegrees);
   }
 
   /****************************************************************************
@@ -489,7 +490,7 @@ public class Intake extends SubsystemBase
         default :
           DataLogManager.log(String.format("%s: Roller mode is invalid: %s", getSubsystem( ), mode));
         case STOP :
-          output = 0.0;
+          output = (m_noteDetected) ? kRollerSpeedHold : 0.0;
           break;
         case ACQUIRE :
           output = kRollerSpeedAcquire;
@@ -587,7 +588,7 @@ public class Intake extends SubsystemBase
    */
   public boolean isNoteDetected( )
   {
-    return m_noteInIntake.get( );
+    return m_noteDetected;
   }
 
   ////////////////////////////////////////////////////////////////////////////

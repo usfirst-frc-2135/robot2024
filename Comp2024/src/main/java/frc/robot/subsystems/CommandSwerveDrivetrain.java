@@ -94,13 +94,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /* Change this to the sysid routine you want to test */
   private final SysIdRoutine                         RoutineToApply                  = SysIdRoutineTranslation;
 
-  /* What to publish over networktables for telemetry */
-  private final NetworkTableInstance                 inst                            = NetworkTableInstance.getDefault( );
-
-  /* Robot pose for field positioning */
-  private final NetworkTable                         table                           = inst.getTable("Pose");
-  private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
-
+  /* Robot pathToPose constraints */
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
       1.0,            // kMaxVelocityMps                               (slowed from 3.0 for testing)    
       1.0,            // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  

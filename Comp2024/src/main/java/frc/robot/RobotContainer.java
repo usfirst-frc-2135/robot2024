@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.FDConsts;
 import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.Constants.VIConsts;
@@ -342,6 +343,7 @@ public class RobotContainer
     // Operator - Bumpers, start, back
     //
     m_operatorPad.leftBumper( ).onTrue(new HandoffToFeeder(m_intake, m_feeder, m_led));
+    //m_operatorPad.leftBumper( ).onFalse(m_feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, m_feeder::getFeederHandoff));
     m_operatorPad.rightBumper( ).onTrue(new AcquireNote(m_intake, m_led, m_hid));
     m_operatorPad.rightBumper( ).onFalse(new RetractIntake(m_intake, m_led, m_hid));
     m_operatorPad.back( ).toggleOnTrue(m_climber.getJoystickCommand(( ) -> getClimberAxis( )));  // aka View

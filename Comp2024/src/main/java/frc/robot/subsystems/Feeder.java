@@ -90,7 +90,7 @@ public class Feeder extends SubsystemBase
   //      Comp      -135.0   -113.0   -4.5
   //      Practice  -135.0   -113.0   -4.5
   private static final double        kRotaryAngleClimb    = Robot.isComp( ) ? -135.0 : -135.0;  // TODO: At least one degree from hardstops
-  private static final double        kRotaryAngleAmp      = Robot.isComp( ) ? -130.23 : -113.0;  // TODO: Needs to be tested on both robots
+  private static final double        kRotaryAngleAmp      = Robot.isComp( ) ? -130.23 : -130.23;  // TODO: Needs to be tested on both robots
   private static final double        kRotaryAngleHandoff  = Robot.isComp( ) ? -4.5 : -4.5;      // TODO: At least one degree from hardstops
 
   private static final double        kRotaryAngleMin      = kRotaryAngleClimb - 3.0;

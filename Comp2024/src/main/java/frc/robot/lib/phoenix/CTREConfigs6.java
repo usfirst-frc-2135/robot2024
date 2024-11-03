@@ -199,7 +199,7 @@ public final class CTREConfigs6
     // Slot settings - remote/fused CANcoder affects all feedback constants by the gearRatio
     fdRotaryConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine; // Feedforward: Mechanism is an arm and needs cosine
     fdRotaryConfig.Slot0.kS = 0.0;                                // Feedforward: Voltage or duty cylce to overcome static friction
-    fdRotaryConfig.Slot0.kG = -0.50;                               // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) 
+    fdRotaryConfig.Slot0.kG = -0.50;                                // Feedforward: Voltage or duty cylce to overcome gravity (arbitrary feedforward) 
     fdRotaryConfig.Slot0.kV = 0.1129;                             // Feedforward: Voltage or duty cycle per requested RPS (velocity modes)
 
     fdRotaryConfig.Slot0.kP = 2.4 * gearRatio;                    // Feedback: Voltage or duty cycle per velocity error (velocity modes)

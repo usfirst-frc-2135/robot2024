@@ -159,7 +159,7 @@ public class Climber extends SubsystemBase
     setName(kSubsystemName);
     setSubsystem(kSubsystemName);
 
-    Robot.timeMarker(getName( ) + ": constructor start");
+    //Robot.timeMarker(getName( ) + ": constructor start");
 
     // Initialize climber motors
     boolean leftValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_leftMotor, kSubsystemName + "Left",
@@ -200,7 +200,7 @@ public class Climber extends SubsystemBase
 
     initDashboard( );
     initialize( );
-    Robot.timeMarker(getName( ) + ": constructor end");
+    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

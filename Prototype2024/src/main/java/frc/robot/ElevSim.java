@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
@@ -26,28 +25,22 @@ public class ElevSim
   private final ElevatorSim     m_elevatorSim       = new ElevatorSim(DCMotor.getVex775Pro(1), kGearRatio, kCarriageMassKg,
       kDrumDiameterMeters / 2, -kLengthMeters, kLengthMeters, false, 0.0);
 
-  private double                m_cpr;
-  private WPI_TalonSRX          m_motor;
-  private int                   m_port;
   private TalonSRXSimCollection m_motorSim;
+  private double                m_cpr;
 
   /**
    * Creates a new Elevator Simulation class.
    *
+   * @param motorSim
+   *          The motor simulation.
    * @param encoderCPR
    *          Encoder counts per revolution.
-   * @param motor
-   *          The motor object being simulated.
    */
-  public ElevSim(WPI_TalonSRX motor, double encoderCPR)
+  public ElevSim(TalonSRXSimCollection motorSim, double encoderCPR)
   {
     // Connect simulation object to the Talon SRX
-    m_motor = motor;
+    m_motorSim = motorSim;
     m_cpr = encoderCPR;
-
-    m_port = motor.getDeviceID( );
-
-    m_motorSim = m_motor.getSimCollection( );
   }
 
   public void periodic( )
@@ -66,9 +59,9 @@ public class ElevSim
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps( )));
 
-    SmartDashboard.putNumber("SIM" + m_port + "-motorVolts", m_motorSim.getMotorOutputLeadVoltage( ));    // Voltage applied to motor
-    SmartDashboard.putNumber("SIM" + m_port + "-elevPos", m_elevatorSim.getPositionMeters( ));            // Get elevator position from simulation (meters)
-    SmartDashboard.putNumber("SIM" + m_port + "-elevVel", m_elevatorSim.getVelocityMetersPerSecond( ));   // Get elevator velocity from simulation (mps)
+    SmartDashboard.putNumber("SIM-motorVolts", m_motorSim.getMotorOutputLeadVoltage( ));    // Voltage applied to motor
+    SmartDashboard.putNumber("SIM-elevPos", m_elevatorSim.getPositionMeters( ));            // Get elevator position from simulation (meters)
+    SmartDashboard.putNumber("SIM-elevVel", m_elevatorSim.getVelocityMetersPerSecond( ));   // Get elevator velocity from simulation (mps)
   }
 
   public void reset( )

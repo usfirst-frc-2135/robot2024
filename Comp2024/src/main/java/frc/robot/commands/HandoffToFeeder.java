@@ -52,7 +52,10 @@ public class HandoffToFeeder extends SequentialCommandGroup
 
         new LogCommand(getName(), "Ensure Intake releases Note"),
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted),
-        led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL)
+        led.getLEDCommand(COLOR.OFF, ANIMATION.CLEARALL),
+
+        new LogCommand(getName(), "Align Feeder to Amp"),
+        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederAmp)
         
         // @formatter:on
     );

@@ -52,6 +52,12 @@
           "data": {
             "pathName": "S3-P3"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P3-C3"
+          }
         }
       ]
     }

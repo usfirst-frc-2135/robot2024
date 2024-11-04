@@ -88,7 +88,7 @@ public class LED extends SubsystemBase
     setName("LED");
     setSubsystem("LED");
 
-    Robot.timeMarker(getName( ) + ": constructor start");
+    //Robot.timeMarker(getName( ) + ": constructor start");
 
     m_candle.configBrightnessScalar(kBrightness);
     m_candle.clearAnimation(kSlot);
@@ -96,7 +96,7 @@ public class LED extends SubsystemBase
     initDashboard( );
     initialize( );
 
-    Robot.timeMarker(getName( ) + ": constructor end");
+    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

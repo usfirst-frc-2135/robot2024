@@ -63,7 +63,7 @@ public class Feeder extends SubsystemBase
   private static final String  kSubsystemName      = "Feeder";
   private static final boolean kRollerMotorInvert  = true;      // Motor direction for positive input
 
-  private static final double  kRollerSpeedScore   = -0.4;
+  private static final double  kRollerSpeedScore   = -0.5;
   private static final double  kRollerSpeedHandoff = -0.37;
 
   private static final double  kRotaryGearRatio    = 27.0;

@@ -26,9 +26,6 @@ public class ScoreAmp extends SequentialCommandGroup
 
         // @formatter:off
 
-        new LogCommand(getName(), "Align Feeder to Amp"),
-        feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.STOP, feeder::getFeederAmp),
-
         new LogCommand(getName(), "Score Note to Amp"),
         feeder.getMoveToPositionCommand(FDConsts.FDRollerMode.SCORE, feeder::getCurrentPosition),
         new WaitCommand(0.5),

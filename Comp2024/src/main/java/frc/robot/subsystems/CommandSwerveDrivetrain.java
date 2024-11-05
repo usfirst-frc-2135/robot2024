@@ -27,6 +27,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -93,6 +94,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   /* Change this to the sysid routine you want to test */
   private final SysIdRoutine                         RoutineToApply                  = SysIdRoutineTranslation;
+
+  /* What to publish over networktables for telemetry */
+  private final NetworkTableInstance                 inst                            = NetworkTableInstance.getDefault( );
+
+  /* Robot pose for field positioning */
+  private final NetworkTable                         table                           = inst.getTable("Pose");
+  private final DoubleArrayPublisher                 fieldPub                        =
+      table.getDoubleArrayTopic("llPose").publish( );
+  private final StringPublisher                      fieldTypePub                    = table.getStringTopic(".type").publish( );
 
   /* Robot pathToPose constraints */
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
@@ -247,6 +257,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition( ).getRotation( ).getDegrees( ), 0, 0, 0,
           0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+
       if (Math.abs(m_pigeon2.getRate( )) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
       {
         doRejectUpdate = true;
@@ -257,6 +268,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       }
       if (!doRejectUpdate)
       {
+        fieldTypePub.set("Field2d");
+        fieldPub.set(new double[ ]
+        {
+            mt2.pose.getX( ), mt2.pose.getY( ), mt2.pose.getRotation( ).getDegrees( )
+        });
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
       }

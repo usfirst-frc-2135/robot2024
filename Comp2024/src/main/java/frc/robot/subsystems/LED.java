@@ -20,11 +20,6 @@ import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConsts.ANIMATION;
 import frc.robot.Constants.LEDConsts.COLOR;
 import frc.robot.Constants.Ports;
-import frc.robot.Robot;
 import frc.robot.lib.phoenix.PhoenixUtil5;
 
 /****************************************************************************
@@ -43,7 +37,6 @@ import frc.robot.lib.phoenix.PhoenixUtil5;
 public class LED extends SubsystemBase
 {
   // Constants
-  private static final String              kLEDTab             = "LED";
   private static final int                 kLEDCount           = 8;
 
   private final Color8Bit                  kWhite              = new Color8Bit(255, 255, 255);
@@ -71,6 +64,7 @@ public class LED extends SubsystemBase
   private Animation                        m_previousAnimation = null;
 
   // Shuffleboard objects
+  // private static final String              kLEDTab             = "LED";
   // ShuffleboardTab                          m_ledTab            = Shuffleboard.getTab(kLEDTab);
   // ShuffleboardLayout                       m_ledList           =
   //     m_ledTab.getLayout("LED", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);

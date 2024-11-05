@@ -5,15 +5,8 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.lib.LimelightHelpers;
@@ -24,8 +17,7 @@ import frc.robot.lib.LimelightHelpers;
  */
 public class Vision extends SubsystemBase
 {
-  private static final String kVisionTab = "Vision";
-  private static final String kLLName    = "limelight";
+  private static final String kLLName = "limelight";
 
   /** Camera stream mode parameter */
   private enum streamMode
@@ -49,24 +41,7 @@ public class Vision extends SubsystemBase
 
   // Objects
 
-  // Shuffleboard objects
-  // ShuffleboardTab             m_visionTab  = Shuffleboard.getTab(kVisionTab);
-  // ShuffleboardLayout          m_targetList =
-  //     m_visionTab.getLayout("Target", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 3);
-  // GenericEntry                m_txEntry    = m_targetList.add("tx-horizontal", 0.0).getEntry( );
-  // GenericEntry                m_tyEntry    = m_targetList.add("ty-vertical", 0.0).getEntry( );
-  // GenericEntry                m_taEntry    = m_targetList.add("ta-area", 0.0).getEntry( );
-  // GenericEntry                m_tsEntry    = m_targetList.add("ts-skew", 0.0).getEntry( );
-
-  // ShuffleboardLayout          m_statusList =
-  //     m_visionTab.getLayout("Status", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 3);
-  // GenericEntry                m_tvEntry    = m_statusList.add("tv-valid", false).getEntry( );
-  // GenericEntry                m_tlEntry    = m_statusList.add("tl-latency", 0.0).getEntry( );
-  // GenericEntry                m_tidEntry   = m_statusList.add("tid-targetid", 0.0).getEntry( );
-
   // Declare module variables
-  private NetworkTable        m_table    = NetworkTableInstance.getDefault( ).getTable(kLLName); // Network table reference for LL values
-
   private streamMode          m_stream   = streamMode.STANDARD;
 
   /****************************************************************************
@@ -95,13 +70,6 @@ public class Vision extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    // m_tvEntry.setBoolean(m_table.getEntry("tv").getDouble(0.0) > 0.5);
-    // m_txEntry.setDouble(m_table.getEntry("tx").getDouble(0.0));
-    // m_tyEntry.setDouble(m_table.getEntry("ty").getDouble(0.0));
-    // m_taEntry.setDouble(m_table.getEntry("ta").getDouble(0.0));
-    // m_tsEntry.setDouble(m_table.getEntry("ts").getDouble(0.0));
-    // m_tlEntry.setDouble(m_table.getEntry("tl").getDouble(0.0));
-    // m_tidEntry.setDouble(m_table.getEntry("tid").getDouble(0.0));
   }
 
   /****************************************************************************

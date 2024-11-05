@@ -40,7 +40,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
-import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
 import frc.robot.lib.phoenix.PhoenixUtil6;
@@ -64,7 +63,7 @@ public class Climber extends SubsystemBase
   private static final double kManualSpeedVolts    = 3.0;     // Motor voltage during manual operation (joystick)
 
   private static final double kToleranceInches     = 0.5;     // Climber PID tolerance in inches
-  private static final double kMMMoveTimeout       = 2.0;     // Seconds allowed for a Motion Magic movement (TODO: TUNE ME)
+  private static final double kMMMoveTimeout       = 2.0;     // Seconds allowed for a Motion Magic movement
   private static final double kCalibrationTimeout  = 2.0;     // Max calibration time
 
   // Climber lengths - Motion Magic config parameters

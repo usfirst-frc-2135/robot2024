@@ -92,9 +92,8 @@ public class Feeder extends SubsystemBase
   private static final double        kRotaryAngleClimb    = Robot.isComp( ) ? -135.0 : -135.0;  // TODO: At least one degree from hardstops
   private static final double        kRotaryAngleAmp      = Robot.isComp( ) ? -130.23 : -130.23;  // TODO: Needs to be tested on both robots
   private static final double        kRotaryAngleHandoff  = Robot.isComp( ) ? -4.5 : -4.5;      // TODO: At least one degree from hardstops
-
   private static final double        kRotaryAngleMin      = kRotaryAngleClimb - 3.0;
-  private static final double        kRotaryAngleMax      = kRotaryAngleHandoff + 3.0;
+  private static final double        kRotaryAngleMax      = kRotaryAngleHandoff + 0.5;
 
   // Device objects
   private final WPI_TalonSRX         m_rollerMotor        = new WPI_TalonSRX(Ports.kCANID_FeederRoller);

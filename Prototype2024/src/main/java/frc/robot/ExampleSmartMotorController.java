@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -18,43 +19,44 @@ public class ExampleSmartMotorController implements MotorController
     kPosition, kVelocity, kMovementWitchcraft
   }
 
-  private static final double kEncoderCPR = 4096;
-
   // private final static double ks          = 0.0;   // Volts to overcome static friction
   // private final static double kf          = 0.0;   // Volts per velocity unit
-  private final static double kp          = 0.8;      // (native units) 10% * 102.3 / 1023
-  private final static double ki          = 0.0;
-  private final static double kd          = 0.0;
+  private final static double   m_kp = 0.8;           // (native units) 10% * 102.3 / 1023
+  private final static double   m_ki = 0.0;
+  private final static double   m_kd = 0.0;
 
-  private int                 m_port;
-  private WPI_TalonSRX        m_motor;
-  private ElevSim             m_elevSim;
-  private double              m_rotations;
-  private double              m_rotPerSec;
+  private int                   m_port;
+  private WPI_TalonSRX          m_motor;
+  private TalonSRXSimCollection m_motorSim;
+  private double                m_encoderCPR;
+  private double                m_rotations;
+  private double                m_rotPerSec;
 
   /**
    * Creates a new ExampleSmartMotorController.
    *
    * @param port
    *          The port for the controller.
+   * @param encoderCPR
+   *          The counts per rotation for the attached encoder.
    */
   //  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public ExampleSmartMotorController(int port)
+  public ExampleSmartMotorController(int port, double encoderCPR)
   {
     m_port = port;
+    m_encoderCPR = encoderCPR;
 
     // Create the Talon SRX object and the attached CTRE Mag encoder
     m_motor = new WPI_TalonSRX(port);
+    m_motorSim = m_motor.getSimCollection( );
+
     m_motor.configFactoryDefault( );
     m_motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
     m_motor.selectProfileSlot(0, 0);
 
-    m_motor.config_kP(0, kp);
-    m_motor.config_kI(0, ki);
-    m_motor.config_kD(0, kd);
-
-    // Connect simulation object to the Talon SRX
-    m_elevSim = new ElevSim(m_motor, kEncoderCPR);
+    m_motor.config_kP(0, m_kp);
+    m_motor.config_kI(0, m_ki);
+    m_motor.config_kD(0, m_kd);
   }
 
   /**
@@ -68,13 +70,21 @@ public class ExampleSmartMotorController implements MotorController
     m_rotations = countsToRotations(m_motor.getSelectedSensorPosition(0));
     m_rotPerSec = countsToRotations(m_motor.getSelectedSensorVelocity(0) * 10);
 
-    m_elevSim.periodic( );
-
     SmartDashboard.putNumber("SRX" + m_port + "-Rotations", m_rotations);                                 // Output shaft distance (rotations)
     SmartDashboard.putNumber("SRX" + m_port + "-Velocity", m_rotPerSec);                                  // Output shaft velocity (rps)
-    SmartDashboard.putNumber("SRX" + m_port + "-normError", m_motor.getClosedLoopError( ) / kEncoderCPR); // Normalized error in shaft rotations 
+    SmartDashboard.putNumber("SRX" + m_port + "-normError", m_motor.getClosedLoopError( ) / m_encoderCPR); // Normalized error in shaft rotations 
     if (m_motor.getControlMode( ) == ControlMode.Position || m_motor.getControlMode( ) == ControlMode.Velocity)
       SmartDashboard.putNumber("SRX" + m_port + "-target", m_motor.getClosedLoopTarget( ));              // Normalized error in shaft rotations 
+  }
+
+  /**
+   * Return the motor simulation object for this controller
+   *
+   * @return motor simulation object
+   */
+  public TalonSRXSimCollection getMotorSimulation( )
+  {
+    return m_motorSim;
   }
 
   /**
@@ -86,7 +96,7 @@ public class ExampleSmartMotorController implements MotorController
    */
   private double rotationsToCounts(double rotation)
   {
-    return rotation * kEncoderCPR;
+    return rotation * m_encoderCPR;
   }
 
   /**
@@ -98,7 +108,7 @@ public class ExampleSmartMotorController implements MotorController
    */
   private double countsToRotations(double encoderCounts)
   {
-    return encoderCounts / kEncoderCPR;
+    return encoderCounts / m_encoderCPR;
   }
 
   /**
@@ -172,7 +182,6 @@ public class ExampleSmartMotorController implements MotorController
   public void resetEncoder( )
   {
     m_motor.setSelectedSensorPosition(0, 0, 0);
-    m_elevSim.reset( );
   }
 
   /**

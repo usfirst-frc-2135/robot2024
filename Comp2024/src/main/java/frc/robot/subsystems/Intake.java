@@ -91,7 +91,7 @@ public class Intake extends SubsystemBase
   //      Comp      -177.3    130.3     25.9
   //      Practice  -177.71   -131.30   27.4
   private static final double        kRotaryAngleRetracted = Robot.isComp( ) ? -176.3 : -176.83; // One degree from hardstops
-  private static final double        kRotaryAngleHandoff   = Robot.isComp( ) ? -130.3 : -131.66;  // TODO: Needs to be tested on both robots
+  private static final double        kRotaryAngleHandoff   = Robot.isComp( ) ? -124.7 : -131.66;  // TODO: Needs to be tested on both robots
   private static final double        kRotaryAngleDeployed  = Robot.isComp( ) ? 24.9 : 27.33;     // One degree from hardstops
 
   private static final double        kRotaryAngleMin       = kRotaryAngleRetracted - 3.0;

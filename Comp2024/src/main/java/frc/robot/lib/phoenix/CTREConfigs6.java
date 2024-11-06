@@ -166,8 +166,8 @@ public final class CTREConfigs6
     // fdRotaryConfig.ClosedLoopRamps.*                           // Seconds to ramp
 
     // Current limit settings
-    fdRotaryConfig.CurrentLimits.SupplyCurrentLimit = 30.0;       // Amps
-    fdRotaryConfig.CurrentLimits.SupplyCurrentThreshold = 30.0;   // Amps
+    fdRotaryConfig.CurrentLimits.SupplyCurrentLimit = 32.0;       // Amps
+    fdRotaryConfig.CurrentLimits.SupplyCurrentThreshold = 32.0;   // Amps
     fdRotaryConfig.CurrentLimits.SupplyTimeThreshold = 0.001;     // Seconds
     fdRotaryConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 

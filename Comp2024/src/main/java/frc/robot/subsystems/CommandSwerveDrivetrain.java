@@ -106,8 +106,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   /* Robot pathToPose constraints */
   private final PathConstraints                      kPathFindConstraints            = new PathConstraints( // TODO: set back to faster speeds!
-      1.0,            // kMaxVelocityMps                               (slowed from 3.0 for testing)    
-      1.0,            // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  
+      2.5,            // kMaxVelocityMps                               (slowed from 3.0 for testing)    
+      2.5,            // kMaxAccelerationMpsSq                         (slowed from 3.0 for testing)  
       1.0 * Math.PI,  // kMaxAngularSpeedRadiansPerSecond              (slowed from 2.0 * Math.PI for testing)  
       1.0 * Math.PI   // kMaxAngularSpeedRadiansPerSecondSquared       (slowed from 1.5 * Math.PIfor testing)  
   );

@@ -6,10 +6,11 @@ import java.util.List;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
+import frc.robot.Robot;
 import frc.robot.commands.AcquireNote;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.ScoreSpeaker;
@@ -26,9 +27,14 @@ public class AutoPreloadSteal extends SequentialCommandGroup
 {
   /**
    * Autonomous command to:
-   * 1 - Drive to a scoring position
-   * 2 - Shoot the preloaded note
-   * 3 - Drive to steal centerline notes
+   * 1a - Drive to a scoring position
+   * 1b - Shoot the preloaded note
+   * 2a - Drive to get a centerline note
+   * 2b - Drive to shooting position
+   * 2c - Shoot the note
+   * 3a - Drive to get a centerline note
+   * 3b - Drive to shooting position
+   * 3c - Shoot the note
    * 
    * @param ppPaths
    *          swerve drivetrain subsystem
@@ -50,6 +56,8 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+        new InstantCommand(()->Robot.timeMarker(getName())),
+
         new LogCommand(getName(), "Drive to scoring pose"),
         drivetrain.getPathCommand(ppPaths.get(0)),
 
@@ -85,7 +93,9 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         ),
 
         new LogCommand(getName(), "Turn off intake rollers"), 
-        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition)
+        intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition),
+
+        new InstantCommand(()->Robot.timeMarker(getName()))
 
         // @formatter:on
     );

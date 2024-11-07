@@ -123,7 +123,6 @@ public class AutoScore4 extends SequentialCommandGroup
           new AcquireNote(intake,led,hid)
         ),
  
-
         new InstantCommand(()->Robot.timeMarker(getName()))
     
         // @formatter:on

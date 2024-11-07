@@ -86,12 +86,12 @@ public class Feeder extends SubsystemBase
 
   // Rotary angles - Motion Magic move parameters 
   //    Measured hardstops and pre-defined positions:
-  //                amp      climb    handoff
-  //      Comp      -135.0   -113.0   -4.5
-  //      Practice  -135.0   -113.0   -4.5
-  private static final double        kRotaryAngleClimb    = Robot.isComp( ) ? -135.0 : -135.0;  // TODO: At least one degree from hardstops
-  private static final double        kRotaryAngleAmp      = Robot.isComp( ) ? -130.23 : -130.23;  // TODO: Needs to be tested on both robots
-  private static final double        kRotaryAngleHandoff  = Robot.isComp( ) ? -4.5 : -4.5;      // TODO: At least one degree from hardstops
+  //               hstop  climb   amp    handoff hstop
+  //      Comp     -152.1 -135.0  -130.2 -1.5    -1.5
+  //      Practice -152.1 -135.0  -130.2 -1.5    -1.5
+  private static final double        kRotaryAngleClimb    = Robot.isComp( ) ? -135.0 : -135.0;  // TODO: Tune on practice robot
+  private static final double        kRotaryAngleAmp      = Robot.isComp( ) ? -130.2 : -130.2;  //
+  private static final double        kRotaryAngleHandoff  = Robot.isComp( ) ? -1.5 : -1.5;      //
   private static final double        kRotaryAngleMin      = kRotaryAngleClimb - 3.0;
   private static final double        kRotaryAngleMax      = kRotaryAngleHandoff + 0.5;
 

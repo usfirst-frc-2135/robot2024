@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.72,
+      "x": 0.76,
       "y": 4.44
     },
     "rotation": -60.0
@@ -26,24 +26,24 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C5-C4"
+            "pathName": "C5-P4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4-C3"
+            "pathName": "P4-C4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C3-C2"
+            "pathName": "C4-P4"
           }
         }
       ]
     }
   },
-  "folder": "AutoPreloadSteal",
+  "folder": "AutoCenterlineScore",
   "choreoAuto": false
 }

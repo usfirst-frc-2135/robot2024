@@ -41,7 +41,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "L1"
     }
   ],
   "rotationTargets": [
@@ -67,7 +67,7 @@
   "reversed": false,
   "folder": "FromPreload",
   "previewStartingState": {
-    "rotation": 50.0,
+    "rotation": 47.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -40,7 +40,7 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": -26.600000000000023,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "FromSpike",

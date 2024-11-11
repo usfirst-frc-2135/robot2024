@@ -169,7 +169,7 @@ public class RobotContainer
 
       Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
       Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C5_C4_C3_C2"),
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_C4_C3_C2"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_P4_C4_P4"),
 
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE2.toString( ), "Pos2_P1_S1_P1_S2_P2_S3_P3"),

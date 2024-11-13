@@ -195,15 +195,9 @@ public class RobotContainer
     m_drivetrain.getDaqThread( ).setThreadPriority(99);   // Start swerve telemetry thread
     facing.HeadingController = new PhoenixPIDController(10.0, 0.0, 0.0); // Swerve steer PID for facing request
 
-    Robot.timeMarker("robotContainer: after DAQ thread");
-
     addDashboardWidgets( );      // Add dashboard widgets for commands
 
-    Robot.timeMarker("robotContainer: after dashboard widgets");
-
     configureButtonBindings( );       // Configure game controller buttons
-
-    Robot.timeMarker("robotContainer: after button bindings");
 
     initDefaultCommands( );           // Initialize subsystem default commands
 
@@ -428,9 +422,9 @@ public class RobotContainer
 
     // Get auto value using created key
     String autoName = autoMap.get(autoKey);
-    DataLogManager.log(String.format("=========================================================="));
+    DataLogManager.log(String.format("===================================================================="));
     DataLogManager.log(String.format("getAuto: autoKey: %s  autoName: %s", autoKey, autoName));
-    DataLogManager.log(String.format("=========================================================="));
+    DataLogManager.log(String.format("===================================================================="));
 
     // If auto not defined in hashmap, no path assigned so sit idle
     if (autoName == null)

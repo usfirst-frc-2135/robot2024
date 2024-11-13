@@ -113,8 +113,6 @@ public class Shooter extends SubsystemBase
     setName("Shooter");
     setSubsystem("Shooter");
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     boolean lowerValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, kSubsystemName + "Lower", CTREConfigs6.shooterFXConfig( ));
     boolean upperValid =
@@ -141,8 +139,6 @@ public class Shooter extends SubsystemBase
 
     initDashboard( );
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

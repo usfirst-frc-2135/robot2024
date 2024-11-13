@@ -53,13 +53,9 @@ public class Vision extends SubsystemBase
     setName("Vision");
     setSubsystem("Vision");
 
-    Robot.timeMarker(getName( ) + ": constructor start");
-
     // Get the Network table reference once for all methods
 
     initialize( );
-
-    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

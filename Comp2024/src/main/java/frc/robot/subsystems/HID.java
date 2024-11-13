@@ -36,15 +36,11 @@ public class HID extends SubsystemBase
     setName("HID");
     setSubsystem("HID");
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     m_driver = driver;
     m_operator = operator;
 
     initDashboard( );
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

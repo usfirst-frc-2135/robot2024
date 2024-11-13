@@ -173,8 +173,6 @@ public class Intake extends SubsystemBase
     setName(kSubsystemName);
     setSubsystem(kSubsystemName);
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     // Roller motor init
     m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, kSubsystemName + "Roller",
         CTREConfigs5.intakeRollerConfig( ));
@@ -218,8 +216,6 @@ public class Intake extends SubsystemBase
 
     initDashboard( );
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

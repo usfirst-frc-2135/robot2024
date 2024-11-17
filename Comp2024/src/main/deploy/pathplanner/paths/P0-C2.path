@@ -43,7 +43,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "FromCenterline",
+  "folder": "FromPreload",
   "previewStartingState": {
     "rotation": 47.0,
     "velocity": 0

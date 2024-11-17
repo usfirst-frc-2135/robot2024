@@ -8,7 +8,6 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.lib.LimelightHelpers;
 
 /****************************************************************************

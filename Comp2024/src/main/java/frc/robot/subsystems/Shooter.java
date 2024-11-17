@@ -352,6 +352,17 @@ public class Shooter extends SubsystemBase
 
   /****************************************************************************
    * 
+   * Create shooter mode command for feeding notes
+   * 
+   * @return instant command that runs shooter motors for feeding
+   */
+  public Command getShooterFeedCommand( )
+  {
+    return getShooterCommand(ShooterMode.PASS).withName("ShooterScore");
+  }
+
+  /****************************************************************************
+   * 
    * Create shooter mode command for scoring
    * 
    * @return instant command that runs shooter motors for scoring

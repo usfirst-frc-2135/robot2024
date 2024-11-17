@@ -33,6 +33,7 @@ import frc.robot.Constants.FDConsts.FDRollerMode;
 import frc.robot.Constants.INConsts.INRollerMode;
 import frc.robot.Constants.VIConsts;
 import frc.robot.autos.AutoLeave;
+import frc.robot.autos.AutoPreloadCLine;
 import frc.robot.autos.AutoPreloadLeave;
 import frc.robot.autos.AutoPreloadScore;
 import frc.robot.autos.AutoPreloadSteal;
@@ -167,13 +168,17 @@ public class RobotContainer
       Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_S2_P2"),
       Map.entry(AutoChooser.AUTOPRELOADSCORE.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3"),
 
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_C1_C2_C3_C4"),
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C5_C4_C3_C2"),
-      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_P4_C4_P4"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_C1_F1_C2_F1"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C5_F5_C4_F5"),
+      Map.entry(AutoChooser.AUTOPRELOADSTEAL.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_F5_C4_F5"),
 
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE1.toString( ), "Pos1_P1_S1_P1_S2_P2_S3_P3"),
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE2.toString( ), "Pos2_P1_S1_P1_S2_P2_S3_P3"),
       Map.entry(AutoChooser.AUTOSCORE4.toString( ) + StartPose.POSE3.toString( ), "Pos3_P3_S3_P3_S2_P2_S1_P1"),
+
+      Map.entry(AutoChooser.AUTOPRELOADCLINE.toString( ) + StartPose.POSE1.toString( ), "Pos1_P0_C1_P0_C2_P0"),
+      Map.entry(AutoChooser.AUTOPRELOADCLINE.toString( ) + StartPose.POSE2.toString( ), "Pos2_P2_C5_P4_C4_P4"),
+      Map.entry(AutoChooser.AUTOPRELOADCLINE.toString( ) + StartPose.POSE3.toString( ), "Pos3_P4_C5_P4_C4_P4"),
 
       Map.entry(AutoChooser.AUTOTEST.toString( ) + StartPose.POSE1.toString( ), "Pos1_test1"),
       Map.entry(AutoChooser.AUTOTEST.toString( ) + StartPose.POSE2.toString( ), "Pos2_test2"),
@@ -192,10 +197,10 @@ public class RobotContainer
   {
     Robot.timeMarker("robotContainer: before DAQ thread");
 
-    m_drivetrain.getDaqThread( ).setThreadPriority(99);   // Start swerve telemetry thread
-    facing.HeadingController = new PhoenixPIDController(10.0, 0.0, 0.0); // Swerve steer PID for facing request
+    m_drivetrain.getDaqThread( ).setThreadPriority(99);                   // Start swerve telemetry thread
+    facing.HeadingController = new PhoenixPIDController(10.0, 0.0, 0.0);  // Swerve steer PID for facing request
 
-    addDashboardWidgets( );      // Add dashboard widgets for commands
+    addDashboardWidgets( );           // Add dashboard widgets for commands
 
     configureButtonBindings( );       // Configure game controller buttons
 
@@ -221,7 +226,8 @@ public class RobotContainer
     m_autoChooser.addOption("3 - AutoPreloadScore", AutoChooser.AUTOPRELOADSCORE);
     m_autoChooser.addOption("4 - AutoPreloadSteal", AutoChooser.AUTOPRELOADSTEAL);
     m_autoChooser.addOption("5 - AutoScore4", AutoChooser.AUTOSCORE4);
-    m_autoChooser.addOption("6 - AutoTestPath", AutoChooser.AUTOTEST);
+    m_autoChooser.addOption("6 - AutoPreloadCLine", AutoChooser.AUTOPRELOADCLINE);
+    m_autoChooser.addOption("7 - AutoTestPath", AutoChooser.AUTOTEST);
 
     // Configure starting pose sendable chooser
     m_startChooser.setDefaultOption("POSE1", StartPose.POSE1);
@@ -231,29 +237,26 @@ public class RobotContainer
     autoTab.add("AutoChooserRun", new InstantCommand(( ) -> getAutonomousCommand( ))).withPosition(6, 2);
 
     // Command tab
-    //ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
-    // cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led, m_hid)).withPosition(0, 0);
-    // cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led)).withPosition(0, 1);
-    // cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led)).withPosition(0, 2);
+    // ShuffleboardTab cmdTab = Shuffleboard.getTab(kCommandTab);
+    // cmdTab.add("AcquireNote", new AcquireNote(m_intake, m_led, m_hid));
+    // cmdTab.add("ExpelNote", new ExpelNote(m_intake, m_led));
+    // cmdTab.add("HandoffToFeeder", new HandoffToFeeder(m_intake, m_feeder, m_led));
 
-    // cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid)).withPosition(2, 0);
-    // cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder)).withPosition(2, 1);
-    // cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led)).withPosition(2, 2);
+    // cmdTab.add("RetractIntake", new RetractIntake(m_intake, m_led, m_hid));
+    // cmdTab.add("ScoreAmp", new ScoreAmp(m_feeder));
+    // cmdTab.add("ScoreSpeaker", new ScoreSpeaker(m_shooter, m_intake, m_led));
 
-    // cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleDriverCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
-    //     .withPosition(4, 0);
-    // cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleOperatorCommand(Constants.kRumbleOn, Constants.kRumbleIntensity))
-    //     .withPosition(6, 0);
-    // cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder)).withPosition(4, 1);
+    // cmdTab.add("HIDRumbleDriver", m_hid.getHIDRumbleDriverCommand(Constants.kRumbleOn, Constants.kRumbleIntensity));
+    // cmdTab.add("HIDRumbleOperator", m_hid.getHIDRumbleOperatorCommand(Constants.kRumbleOn, Constants.kRumbleIntensity));
+    // cmdTab.add("PrepareToClimb", new PrepareToClimb(m_climber, m_feeder));
 
-    //ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 3)
-    //    .withProperties(Map.of("Label position", "HIDDEN"));
+    // ShuffleboardLayout subList = cmdTab.getLayout("Subsystems", BuiltInLayouts.kList).withProperties(Map.of("Label position", "HIDDEN"));
     // subList.add(m_intake);
     // subList.add(m_shooter);
     // subList.add(m_feeder);
     // subList.add(m_climber);
 
-    // cmdTab.add(CommandScheduler.getInstance( )).withPosition(8, 0);
+    // cmdTab.add(CommandScheduler.getInstance( ));
   }
 
   /****************************************************************************
@@ -463,7 +466,6 @@ public class RobotContainer
     switch (autoOption)
     {
       default :
-      case AUTOPRELOADCLINE : // TODO: Until paths are implemented to score centerline, default to stop command
       case AUTOSTOP :
         m_autoCommand = m_drivetrain.applyRequest(( ) -> idle);
         break;
@@ -481,6 +483,9 @@ public class RobotContainer
         break;
       case AUTOSCORE4 :
         m_autoCommand = new AutoScore4(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);
+        break;
+      case AUTOPRELOADCLINE :
+        m_autoCommand = new AutoPreloadCLine(ppPathList, m_drivetrain, m_intake, m_shooter, m_led, m_hid);
         break;
       case AUTOTEST :
         m_autoCommand = new AutoTest(ppPathList, m_drivetrain, m_led);

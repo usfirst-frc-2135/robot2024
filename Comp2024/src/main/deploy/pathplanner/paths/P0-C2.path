@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.25,
+    "maxVelocity": 3.83,
     "maxAcceleration": 4.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -43,7 +43,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "FromCenterline",
+  "folder": "FromPreload",
   "previewStartingState": {
     "rotation": 47.0,
     "velocity": 0

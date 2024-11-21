@@ -113,8 +113,6 @@ public class Shooter extends SubsystemBase
     setName("Shooter");
     setSubsystem("Shooter");
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     boolean lowerValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, kSubsystemName + "Lower", CTREConfigs6.shooterFXConfig( ));
     boolean upperValid =
@@ -141,8 +139,6 @@ public class Shooter extends SubsystemBase
 
     initDashboard( );
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************
@@ -352,6 +348,17 @@ public class Shooter extends SubsystemBase
   public Command getShooterPassCommand( )
   {
     return getShooterCommand(ShooterMode.PASS).withName("ShooterPassNote");
+  }
+
+  /****************************************************************************
+   * 
+   * Create shooter mode command for feeding notes
+   * 
+   * @return instant command that runs shooter motors for feeding
+   */
+  public Command getShooterFeedCommand( )
+  {
+    return getShooterCommand(ShooterMode.PASS).withName("ShooterScore");
   }
 
   /****************************************************************************

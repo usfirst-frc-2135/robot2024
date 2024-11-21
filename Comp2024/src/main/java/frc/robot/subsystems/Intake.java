@@ -91,7 +91,7 @@ public class Intake extends SubsystemBase
   //      Comp     -177.3  -176.3     -124.7    24.9      25.8
   //      Practice -177.8  -176.8     -124.7    27.3      27.4
   private static final double        kRotaryAngleRetracted = Robot.isComp( ) ? -176.3 : -176.8; // One degree from hardstops
-  private static final double        kRotaryAngleHandoff   = Robot.isComp( ) ? -124.7 : -124.7;  // TODO: Needs to be tested on both robots
+  private static final double        kRotaryAngleHandoff   = Robot.isComp( ) ? -124.7 : -124.7;  // TODO: Tune on practice robot
   private static final double        kRotaryAngleDeployed  = Robot.isComp( ) ? 24.9 : 27.3;     // One degree from hardstops
 
   private static final double        kRotaryAngleMin       = kRotaryAngleRetracted - 3.0;
@@ -173,8 +173,6 @@ public class Intake extends SubsystemBase
     setName(kSubsystemName);
     setSubsystem(kSubsystemName);
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     // Roller motor init
     m_rollerValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_rollerMotor, kSubsystemName + "Roller",
         CTREConfigs5.intakeRollerConfig( ));
@@ -218,8 +216,6 @@ public class Intake extends SubsystemBase
 
     initDashboard( );
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

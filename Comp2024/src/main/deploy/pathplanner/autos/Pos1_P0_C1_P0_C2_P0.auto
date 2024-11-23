@@ -3,9 +3,9 @@
   "startingPose": {
     "position": {
       "x": 0.76,
-      "y": 4.44
+      "y": 6.66
     },
-    "rotation": -60.0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -14,24 +14,36 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos3_P3"
+            "pathName": "Pos1_P0"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "P3-S3"
+            "pathName": "P0-C1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S3-P3"
+            "pathName": "C1-P0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P0-C2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C2-P0"
           }
         }
       ]
     }
   },
-  "folder": "AutoPreloadScore",
+  "folder": "AutoPreloadCLine",
   "choreoAuto": false
 }

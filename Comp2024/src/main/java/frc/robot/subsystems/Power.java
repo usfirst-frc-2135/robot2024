@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 
 /****************************************************************************
  * 
@@ -29,13 +28,9 @@ public class Power extends SubsystemBase
     setName("Power");
     setSubsystem("Power");
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     addChild("PowerDistribution", m_powerDistribution);
 
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

@@ -39,7 +39,7 @@ public class RetractIntake extends SequentialCommandGroup
           intake::isNoteDetected),
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getIntakeRetracted)
 
-        //@formatter:on
+        // @formatter:on
     );
 
   }

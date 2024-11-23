@@ -14,24 +14,36 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos3_P3"
+            "pathName": "Pos3_P4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "P3-S3"
+            "pathName": "P4-C5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S3-P3"
+            "pathName": "C5-P4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "P4-C4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C4-P4"
           }
         }
       ]
     }
   },
-  "folder": "AutoPreloadScore",
+  "folder": "AutoPreloadSteal",
   "choreoAuto": false
 }

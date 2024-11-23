@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.36,
-      "y": 5.55
+      "x": 0.76,
+      "y": 6.66
     },
-    "rotation": 0.0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -14,36 +14,36 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos2_P2"
+            "pathName": "Pos1_P0"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "P2-C5"
+            "pathName": "P0-C1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C5-C4"
+            "pathName": "C1-P0"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4-C3"
+            "pathName": "P0-C2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C3-C2"
+            "pathName": "C2-P0"
           }
         }
       ]
     }
   },
-  "folder": "AutoCenterlineScore",
+  "folder": "AutoPreloadSteal",
   "choreoAuto": false
 }

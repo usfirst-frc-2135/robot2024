@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
-import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.phoenix.CTREConfigs6;
 import frc.robot.lib.phoenix.PhoenixUtil6;
@@ -45,7 +44,7 @@ public class Shooter extends SubsystemBase
 
   private static final double kMOI               = 0.001;     // Simulation - Moment of Inertia
   private static final double kFlywheelScoreRPM  = 3300.0;    // RPM to score
-  private static final double kFlywheelPassRPM   = 2800.0;    // RPM to pass
+  private static final double kFlywheelPassRPM   = 3000.0;    // RPM to pass
   private static final double kToleranceRPM      = 150.0;     // Tolerance band around target RPM
 
   private static final double kFlywheelGearRatio = (18.0 / 18.0);
@@ -114,8 +113,6 @@ public class Shooter extends SubsystemBase
     setName("Shooter");
     setSubsystem("Shooter");
 
-    //Robot.timeMarker(getName( ) + ": constructor start");
-
     boolean lowerValid =
         PhoenixUtil6.getInstance( ).talonFXInitialize6(m_lowerMotor, kSubsystemName + "Lower", CTREConfigs6.shooterFXConfig( ));
     boolean upperValid =
@@ -142,8 +139,6 @@ public class Shooter extends SubsystemBase
 
     initDashboard( );
     initialize( );
-
-    //Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************
@@ -353,6 +348,17 @@ public class Shooter extends SubsystemBase
   public Command getShooterPassCommand( )
   {
     return getShooterCommand(ShooterMode.PASS).withName("ShooterPassNote");
+  }
+
+  /****************************************************************************
+   * 
+   * Create shooter mode command for feeding notes
+   * 
+   * @return instant command that runs shooter motors for feeding
+   */
+  public Command getShooterFeedCommand( )
+  {
+    return getShooterCommand(ShooterMode.PASS).withName("ShooterScore");
   }
 
   /****************************************************************************

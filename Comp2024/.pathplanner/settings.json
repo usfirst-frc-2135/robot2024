@@ -11,9 +11,10 @@
   "autoFolders": [
     "AutoLeave",
     "AutoPrelaodLeave",
+    "AutoPreloadCLine",
     "AutoPreloadScore",
-    "AutoCenterlineScore",
     "AutoScore4",
+    "AutoPreloadSteal",
     "TestAuto"
   ],
   "defaultMaxVel": 3.5,

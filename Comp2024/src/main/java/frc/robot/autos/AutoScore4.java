@@ -7,6 +7,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INConsts;
@@ -115,7 +116,15 @@ public class AutoScore4 extends SequentialCommandGroup
         new LogCommand(getName(), "Turn off intake rollers"), 
         intake.getMoveToPositionCommand(INConsts.INRollerMode.STOP, intake::getCurrentPosition),
 
+        new LogCommand(getName(), "Drive to c3 while intaking"),
+
+        new ParallelCommandGroup(
+          drivetrain.getPathCommand(ppPaths.get(7)),
+          new AcquireNote(intake,led,hid)
+        ),
+ 
         new InstantCommand(()->Robot.timeMarker(getName()))
+    
         // @formatter:on
     );
   }

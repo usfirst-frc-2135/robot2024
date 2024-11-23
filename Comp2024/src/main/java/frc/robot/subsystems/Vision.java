@@ -8,7 +8,6 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.lib.LimelightHelpers;
 
 /****************************************************************************
@@ -53,13 +52,9 @@ public class Vision extends SubsystemBase
     setName("Vision");
     setSubsystem("Vision");
 
-    Robot.timeMarker(getName( ) + ": constructor start");
-
     // Get the Network table reference once for all methods
 
     initialize( );
-
-    Robot.timeMarker(getName( ) + ": constructor end");
   }
 
   /****************************************************************************

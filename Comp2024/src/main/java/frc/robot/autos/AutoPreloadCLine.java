@@ -13,7 +13,7 @@ import frc.robot.Constants.INConsts;
 import frc.robot.Robot;
 import frc.robot.commands.AcquireNote;
 import frc.robot.commands.LogCommand;
-import frc.robot.commands.PassNote;
+import frc.robot.commands.ScoreSpeaker;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.HID;
 import frc.robot.subsystems.Intake;
@@ -21,20 +21,20 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
 
 /**
- * Auto command that shoots preloaded note and feeds notes from centerline
+ * Auto command that shoots preloaded note and steals notes from centerline
  */
-public class AutoPreloadSteal extends SequentialCommandGroup
+public class AutoPreloadCLine extends SequentialCommandGroup
 {
   /**
-   * Autonomous command to: // TODO: This is not yet implemented below
+   * Autonomous command to:
    * 1a - Drive to a scoring position
    * 1b - Shoot the preloaded note
    * 2a - Drive to get a centerline note
-   * 2b - Drive to feeding position
-   * 2c - Feed the note
+   * 2b - Drive to shooting position
+   * 2c - Shoot the note
    * 3a - Drive to get a centerline note
-   * 3b - Drive to feeding position
-   * 3c - Feed the note
+   * 3b - Drive to shooting position
+   * 3c - Shoot the note
    * 
    * @param ppPaths
    *          swerve drivetrain subsystem
@@ -47,10 +47,10 @@ public class AutoPreloadSteal extends SequentialCommandGroup
    * @param led
    *          led subsystem
    */
-  public AutoPreloadSteal(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
+  public AutoPreloadCLine(List<PathPlannerPath> ppPaths, CommandSwerveDrivetrain drivetrain, Intake intake, Shooter shooter,
       LED led, HID hid)
   {
-    setName("AutoPreloadSteal");
+    setName("AutoPreloadCLine");
 
     addCommands(
         // Add Commands here:
@@ -62,7 +62,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
         drivetrain.getPathCommand(ppPaths.get(0)),
 
         new LogCommand(getName(), "Score preloaded note"),
-        new PassNote(shooter, intake, led),
+        new ScoreSpeaker(shooter, intake, led),
 
         new LogCommand(getName(), "Drive to centerline acquire note 1"),
         new ParallelDeadlineGroup( 
@@ -73,7 +73,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
           new AcquireNote(intake, led, hid)
         ),
         new ConditionalCommand(
-          new PassNote(shooter, intake, led),
+          new ScoreSpeaker(shooter, intake, led),
           new LogCommand(getName(), "Missed centerline 1 note"),
           intake::isNoteDetected
         ),
@@ -87,7 +87,7 @@ public class AutoPreloadSteal extends SequentialCommandGroup
           new AcquireNote(intake, led, hid)
         ),
         new ConditionalCommand(
-          new PassNote(shooter, intake, led),
+          new ScoreSpeaker(shooter, intake, led),
           new LogCommand(getName(), "Missed centerline 2 note"),
           intake::isNoteDetected
         ),

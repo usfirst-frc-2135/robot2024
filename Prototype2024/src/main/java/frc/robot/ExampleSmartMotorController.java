@@ -26,8 +26,8 @@ public class ExampleSmartMotorController implements MotorController
   private final static double   m_kd = 0.0;
 
   private int                   m_port;
-  private WPI_TalonSRX          m_motor;
-  private TalonSRXSimCollection m_motorSim;
+  private WPI_TalonSRX          m_srxMotor;
+  private TalonSRXSimCollection m_srxMotorSim;
   private double                m_encoderCPR;
   private double                m_rotations;
   private double                m_rotPerSec;
@@ -47,16 +47,16 @@ public class ExampleSmartMotorController implements MotorController
     m_encoderCPR = encoderCPR;
 
     // Create the Talon SRX object and the attached CTRE Mag encoder
-    m_motor = new WPI_TalonSRX(port);
-    m_motorSim = m_motor.getSimCollection( );
+    m_srxMotor = new WPI_TalonSRX(port);
+    m_srxMotorSim = m_srxMotor.getSimCollection( );
 
-    m_motor.configFactoryDefault( );
-    m_motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
-    m_motor.selectProfileSlot(0, 0);
+    m_srxMotor.configFactoryDefault( );
+    m_srxMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+    m_srxMotor.selectProfileSlot(0, 0);
 
-    m_motor.config_kP(0, m_kp);
-    m_motor.config_kI(0, m_ki);
-    m_motor.config_kD(0, m_kd);
+    m_srxMotor.config_kP(0, m_kp);
+    m_srxMotor.config_kI(0, m_ki);
+    m_srxMotor.config_kD(0, m_kd);
   }
 
   /**
@@ -67,14 +67,14 @@ public class ExampleSmartMotorController implements MotorController
   {
     // This method will be called once per scheduler run
 
-    m_rotations = countsToRotations(m_motor.getSelectedSensorPosition(0));
-    m_rotPerSec = countsToRotations(m_motor.getSelectedSensorVelocity(0) * 10);
+    m_rotations = countsToRotations(m_srxMotor.getSelectedSensorPosition(0));
+    m_rotPerSec = countsToRotations(m_srxMotor.getSelectedSensorVelocity(0) * 10);
 
     SmartDashboard.putNumber("SRX" + m_port + "-Rotations", m_rotations);                                 // Output shaft distance (rotations)
     SmartDashboard.putNumber("SRX" + m_port + "-Velocity", m_rotPerSec);                                  // Output shaft velocity (rps)
-    SmartDashboard.putNumber("SRX" + m_port + "-normError", m_motor.getClosedLoopError( ) / m_encoderCPR); // Normalized error in shaft rotations 
-    if (m_motor.getControlMode( ) == ControlMode.Position || m_motor.getControlMode( ) == ControlMode.Velocity)
-      SmartDashboard.putNumber("SRX" + m_port + "-target", m_motor.getClosedLoopTarget( ));              // Normalized error in shaft rotations 
+    SmartDashboard.putNumber("SRX" + m_port + "-normError", m_srxMotor.getClosedLoopError( ) / m_encoderCPR); // Normalized error in shaft rotations 
+    if (m_srxMotor.getControlMode( ) == ControlMode.Position || m_srxMotor.getControlMode( ) == ControlMode.Velocity)
+      SmartDashboard.putNumber("SRX" + m_port + "-target", m_srxMotor.getClosedLoopTarget( ));              // Normalized error in shaft rotations 
   }
 
   /**
@@ -84,7 +84,7 @@ public class ExampleSmartMotorController implements MotorController
    */
   public TalonSRXSimCollection getMotorSimulation( )
   {
-    return m_motorSim;
+    return m_srxMotorSim;
   }
 
   /**
@@ -143,7 +143,7 @@ public class ExampleSmartMotorController implements MotorController
     }
 
     // Talon SRX is before gearbox, but CTRE mag encoder is after it (multiply by gear ratio)
-    m_motor.set(controlMode, rotationsToCounts(setpoint));
+    m_srxMotor.set(controlMode, rotationsToCounts(setpoint));
   }
 
   /**
@@ -172,7 +172,7 @@ public class ExampleSmartMotorController implements MotorController
    */
   public double getEncoderVelocity( )
   {
-    return countsToRotations(m_motor.getSelectedSensorVelocity(0) * 10);
+    return countsToRotations(m_srxMotor.getSelectedSensorVelocity(0) * 10);
   }
 
   /**
@@ -181,7 +181,7 @@ public class ExampleSmartMotorController implements MotorController
    */
   public void resetEncoder( )
   {
-    m_motor.setSelectedSensorPosition(0, 0, 0);
+    m_srxMotor.setSelectedSensorPosition(0, 0, 0);
   }
 
   /**
@@ -193,7 +193,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public void set(double percentOutput)
   {
-    m_motor.set(ControlMode.PercentOutput, percentOutput);
+    m_srxMotor.set(ControlMode.PercentOutput, percentOutput);
   }
 
   /**
@@ -204,7 +204,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public double get( )
   {
-    return m_motor.getMotorOutputPercent( );
+    return m_srxMotor.getMotorOutputPercent( );
   }
 
   /**
@@ -216,7 +216,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public void setInverted(boolean isInverted)
   {
-    m_motor.setInverted(isInverted);
+    m_srxMotor.setInverted(isInverted);
   }
 
   /**
@@ -227,7 +227,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public boolean getInverted( )
   {
-    return m_motor.getInverted( );
+    return m_srxMotor.getInverted( );
   }
 
   /**
@@ -237,7 +237,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public void disable( )
   {
-    m_motor.set(ControlMode.Disabled, 0);
+    m_srxMotor.set(ControlMode.Disabled, 0);
   }
 
   /**
